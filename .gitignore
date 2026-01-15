@@ -14,3 +14,4 @@ dist-ssr
 !.vscode/extensions.json
 
 .env
+.plan
