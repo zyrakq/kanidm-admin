@@ -1,0 +1,31 @@
+{
+  "git.openRepositoryInParentFolders": "never",
+  "git.detectSubmodules": false,
+  "git.scanRepositories": [],
+  "git.autoRepositoryDetection": false,
+  "files.associations": {
+    "LICENSE-APACHE": "plaintext",
+    "LICENSE-MIT": "plaintext",
+    ".gitmessage": "plaintext"
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[dockerfile]": {
+    "editor.formatOnSave": false
+  },
+  "[html]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}

@@ -1,0 +1,56 @@
+{
+    "name": "Kanidm Admin Workspace (Archlinux)",
+    // Pre-built image from https://github.com/zyrakq/arch-devcontainer-images
+    // See full list of available images at: https://github.com/zyrakq/arch-devcontainer-images#available-images
+    // You can replace this with any image from the arch-base family (base, lang, dind, dood variants)
+    "image": "ghcr.io/zyrakq/arch-devcontainer-images/arch-base-dood:latest",
+    "workspaceFolder": "/workspace/kanidm-admin",
+    "workspaceMount": "source=kanidm-admin-workspace,target=/workspace/kanidm-admin,type=volume",
+    "mounts": [
+        "source=kanidm-admin-home,target=/home/vscode,type=volume"
+    ],
+    "remoteUser": "vscode",
+    "runArgs": [
+        "--name",
+        "kanidm-admin-workspace",
+        "--network=kanidm-admin-workspace-network"
+    ],
+    "initializeCommand": [
+        "bash",
+        "-c",
+        "docker network ls | grep -q kanidm-admin-workspace-network || docker network create kanidm-admin-workspace-network"
+    ],
+    "features": {
+        "ghcr.io/zyrakq/arch-devcontainer-features/bun:1": {
+            "globalPackages": "typescript,nodemon"
+        },
+        "ghcr.io/zyrakq/arch-devcontainer-features/clone-repo:1": {
+            "repoUrl": "git@github.com:zyrakq/kanidm-admin.git",
+            "targetDir": "/workspace/kanidm-admin"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                // VSCode
+                "vscode-icons-team.vscode-icons",
+                "aaron-bond.better-comments",
+                "IBM.output-colorizer",
+                // Markdown
+                "davidanson.vscode-markdownlint",
+                // Docker
+                "ms-azuretools.vscode-docker",
+                // Git
+                "eamodio.gitlens",
+                "codezombiech.gitignore",
+                // AI Assistant
+                "saoudrizwan.claude-dev",
+                // Lit
+                "runem.lit-plugin",
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "oven.bun-vscode"
+            ]
+        }
+    }
+}

@@ -1,0 +1,20 @@
+# Logs
+logs
+*.log
+
+node_modules
+build
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+
+.env
+
+bun.lock
+
+# Ignore minified files
+**/*.min.js
+**/*.min.css
