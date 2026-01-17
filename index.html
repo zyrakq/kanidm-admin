@@ -7,19 +7,12 @@
     <title>kanidm-admin</title>
     <link rel="stylesheet" href="./src/index.css" />
     <script type="module">
-      import { initRouter } from './src/router.ts';
-
-      // Initialize router when DOM is ready
-      window.addEventListener('DOMContentLoaded', () => {
-        const outlet = document.getElementById('outlet');
-        if (outlet) {
-          initRouter(outlet);
-        }
-      });
+      import 'urlpattern-polyfill';
+      import './src/app-component.ts';
     </script>
   </head>
   <body>
-    <div id="outlet"></div>
+    <app-component></app-component>
     <toast-container></toast-container>
   </body>
 </html>

@@ -11,8 +11,9 @@
     "build": "tsc && vite build"
   },
   "dependencies": {
-    "@vaadin/router": "^2.0.1",
-    "lit": "^3.3.1"
+    "@lit-labs/router": "^0.1.4",
+    "lit": "^3.3.1",
+    "urlpattern-polyfill": "^10.1.0"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",
