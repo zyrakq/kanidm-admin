@@ -3,9 +3,18 @@ import { customElement, state } from 'lit/decorators.js';
 import type { Notification } from '/workspace/kanidm-admin/src/types/notification.types.ts';
 import '/workspace/kanidm-admin/src/components/toast-notification.ts';
 
+interface NotificationTimer {
+  id: string;
+  startTime: number;
+  duration: number;
+  pausedAt: number | null;
+  animationFrame: number | null;
+}
+
 @customElement('toast-container')
 export class ToastContainer extends LitElement {
   @state() private notifications: Notification[] = [];
+  private timers: Map<string, NotificationTimer> = new Map();
 
   connectedCallback() {
     super.connectedCallback();
@@ -23,18 +32,26 @@ export class ToastContainer extends LitElement {
       'notification-remove',
       this.handleRemoveNotification
     );
+    this.timers.forEach((timer) => {
+      if (timer.animationFrame) {
+        cancelAnimationFrame(timer.animationFrame);
+      }
+    });
+    this.timers.clear();
   }
 
-  private handleAddNotification = (event: Event) => {
+  private handleAddNotification = async (event: Event) => {
     const customEvent = event as CustomEvent<Notification>;
     const notification = customEvent.detail;
 
     this.notifications = [...this.notifications, notification];
 
-    const duration = notification.duration || 3000;
-    setTimeout(() => {
-      this.removeNotification(notification.id);
-    }, duration);
+    await this.updateComplete;
+
+    requestAnimationFrame(() => {
+      const duration = notification.duration || 3000;
+      this.startTimer(notification.id, duration);
+    });
   };
 
   private handleRemoveNotification = (event: Event) => {
@@ -42,7 +59,78 @@ export class ToastContainer extends LitElement {
     this.removeNotification(customEvent.detail);
   };
 
+  private startTimer(id: string, duration: number) {
+    const timer: NotificationTimer = {
+      id,
+      startTime: Date.now(),
+      duration,
+      pausedAt: null,
+      animationFrame: null,
+    };
+
+    this.timers.set(id, timer);
+    this.animateTimer(id);
+  }
+
+  private animateTimer(id: string) {
+    const timer = this.timers.get(id);
+    if (!timer || timer.pausedAt !== null) return;
+
+    const element = this.shadowRoot?.querySelector(
+      `toast-notification[notificationId="${id}"]`
+    ) as HTMLElement;
+
+    if (!element) return;
+
+    const elapsed = Date.now() - timer.startTime;
+    const progress = Math.min(elapsed / timer.duration, 1);
+    const opacity = 1 - progress;
+
+    element.style.setProperty('--toast-opacity', opacity.toString());
+
+    if (progress >= 1) {
+      this.removeNotification(id);
+    } else {
+      timer.animationFrame = requestAnimationFrame(() => this.animateTimer(id));
+    }
+  }
+
+  private pauseTimer(id: string) {
+    const timer = this.timers.get(id);
+    if (!timer) return;
+
+    timer.pausedAt = Date.now();
+    if (timer.animationFrame) {
+      cancelAnimationFrame(timer.animationFrame);
+      timer.animationFrame = null;
+    }
+
+    const element = this.shadowRoot?.querySelector(
+      `toast-notification[notificationId="${id}"]`
+    ) as HTMLElement;
+
+    if (element) {
+      element.style.setProperty('--toast-opacity', '1');
+    }
+  }
+
+  private resumeTimer(id: string) {
+    const timer = this.timers.get(id);
+    if (!timer || timer.pausedAt === null) return;
+
+    timer.startTime = Date.now();
+    timer.pausedAt = null;
+
+    this.animateTimer(id);
+  }
+
   private removeNotification(id: string) {
+    const timer = this.timers.get(id);
+    if (timer?.animationFrame) {
+      cancelAnimationFrame(timer.animationFrame);
+    }
+    this.timers.delete(id);
+
     const element = this.shadowRoot?.querySelector(
       `toast-notification[notificationId="${id}"]`
     ) as HTMLElement;
@@ -62,6 +150,16 @@ export class ToastContainer extends LitElement {
     this.removeNotification(customEvent.detail);
   }
 
+  private handlePause(event: Event) {
+    const customEvent = event as CustomEvent<string>;
+    this.pauseTimer(customEvent.detail);
+  }
+
+  private handleResume(event: Event) {
+    const customEvent = event as CustomEvent<string>;
+    this.resumeTimer(customEvent.detail);
+  }
+
   render() {
     return html`
       <div class="toast-container">
@@ -72,6 +170,8 @@ export class ToastContainer extends LitElement {
               .type=${notification.type}
               .notificationId=${notification.id}
               @toast-close=${this.handleClose}
+              @toast-pause=${this.handlePause}
+              @toast-resume=${this.handleResume}
             ></toast-notification>
           `
         )}

@@ -6,12 +6,32 @@ import type { NotificationType } from '/workspace/kanidm-admin/src/types/notific
 export class ToastNotification extends LitElement {
   @property({ type: String }) message = '';
   @property({ type: String }) type: NotificationType = 'info';
-  @property({ type: String }) notificationId = '';
+  @property({ type: String, reflect: true }) notificationId = '';
 
   private handleClose(e: Event) {
     e.stopPropagation();
     this.dispatchEvent(
       new CustomEvent('toast-close', {
+        detail: this.notificationId,
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private handleMouseEnter() {
+    this.dispatchEvent(
+      new CustomEvent('toast-pause', {
+        detail: this.notificationId,
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private handleMouseLeave() {
+    this.dispatchEvent(
+      new CustomEvent('toast-resume', {
         detail: this.notificationId,
         bubbles: true,
         composed: true,
@@ -36,7 +56,11 @@ export class ToastNotification extends LitElement {
 
   render() {
     return html`
-      <div class="toast toast-${this.type}">
+      <div
+        class="toast toast-${this.type}"
+        @mouseenter=${this.handleMouseEnter}
+        @mouseleave=${this.handleMouseLeave}
+      >
         <div class="toast-icon">${this.getIcon()}</div>
         <div class="toast-message">${this.message}</div>
         <button
@@ -93,6 +117,8 @@ export class ToastNotification extends LitElement {
       min-width: 320px;
       max-width: 420px;
       border-left: 4px solid;
+      opacity: var(--toast-opacity, 1);
+      transition: opacity 0.05s linear;
     }
 
     .toast-success {
