@@ -1,7 +1,7 @@
 import type { AuthState, User } from '../types/auth.types';
+import { trailbaseService, type TrailBaseUser } from './trailbase.service';
 
-// Mock authentication service
-// This will be replaced with actual OIDC integration later
+// Authentication service using TrailBase
 class AuthService {
   private static instance: AuthService;
   private authState: AuthState = {
@@ -9,9 +9,10 @@ class AuthService {
     user: null,
     token: null,
   };
+  private initPromise: Promise<void> | null = null;
 
   private constructor() {
-    this.loadAuthState();
+    // Don't initialize immediately, let components call init()
   }
 
   static getInstance(): AuthService {
@@ -21,84 +22,127 @@ class AuthService {
     return AuthService.instance;
   }
 
-  // Load authentication state from localStorage
-  private loadAuthState(): void {
-    const token = localStorage.getItem('auth_token');
-    const userStr = localStorage.getItem('auth_user');
+  /**
+   * Initialize auth state by checking with TrailBase
+   * Should be called when app starts
+   */
+  async init(): Promise<void> {
+    if (this.initPromise) {
+      return this.initPromise;
+    }
 
-    if (token && userStr) {
-      try {
-        const user: User = JSON.parse(userStr);
+    this.initPromise = this.loadAuthState();
+    return this.initPromise;
+  }
+
+  /**
+   * Load authentication state from TrailBase
+   */
+  private async loadAuthState(): Promise<void> {
+    try {
+      console.log('[AuthService] Initializing auth state...');
+      const trailbaseUser = await trailbaseService.getCurrentUser();
+
+      if (trailbaseUser) {
         this.authState = {
           isAuthenticated: true,
-          user,
-          token,
+          user: this.mapTrailBaseUser(trailbaseUser),
+          token: null, // TrailBase uses cookies, no token needed
         };
-      } catch (error) {
-        console.error('Failed to parse user data:', error);
-        this.clearAuthState();
+        console.log(
+          '[AuthService] User is authenticated:',
+          this.authState.user
+        );
+      } else {
+        this.authState = {
+          isAuthenticated: false,
+          user: null,
+          token: null,
+        };
+        console.log('[AuthService] User is not authenticated');
       }
+    } catch (error) {
+      console.error('[AuthService] Failed to load auth state:', error);
+      this.authState = {
+        isAuthenticated: false,
+        user: null,
+        token: null,
+      };
     }
   }
 
-  // Save authentication state to localStorage
-  private saveAuthState(): void {
-    if (this.authState.token && this.authState.user) {
-      localStorage.setItem('auth_token', this.authState.token);
-      localStorage.setItem('auth_user', JSON.stringify(this.authState.user));
-    }
-  }
-
-  // Clear authentication state
-  private clearAuthState(): void {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_user');
-    this.authState = {
-      isAuthenticated: false,
-      user: null,
-      token: null,
+  /**
+   * Map TrailBase user to our User type
+   */
+  private mapTrailBaseUser(tbUser: TrailBaseUser): User {
+    return {
+      id: tbUser.id,
+      username: tbUser.email || tbUser.id,
+      email: tbUser.email,
+      displayName: tbUser.email,
     };
   }
 
-  // Get current authentication state
+  /**
+   * Get current authentication state
+   */
   getAuthState(): AuthState {
     return { ...this.authState };
   }
 
-  // Check if user is authenticated
+  /**
+   * Check if user is authenticated
+   */
   isAuthenticated(): boolean {
     return this.authState.isAuthenticated;
   }
 
-  // Get current user
+  /**
+   * Get current user
+   */
   getUser(): User | null {
     return this.authState.user ? { ...this.authState.user } : null;
   }
 
-  // Mock sign in (will be replaced with OIDC flow)
-  async signIn(): Promise<void> {
-    // TODO: Implement actual OIDC redirect
-    console.log('Sign in initiated - redirect to OIDC provider');
-
-    // For now, just throw to indicate this needs implementation
-    throw new Error('OIDC integration not implemented yet');
+  /**
+   * Initiate sign in via TrailBase OAuth
+   * @param provider - OAuth provider name
+   * @param redirectUri - Where to redirect after successful login
+   */
+  async signIn(
+    provider: string = 'oidc0',
+    redirectUri?: string
+  ): Promise<void> {
+    console.log('[AuthService] Sign in initiated');
+    await trailbaseService.login(provider, redirectUri);
   }
 
-  // Sign out
-  signOut(): void {
-    this.clearAuthState();
-    // TODO: Implement OIDC logout if needed
+  /**
+   * Sign out current user
+   */
+  async signOut(): Promise<void> {
+    try {
+      console.log('[AuthService] Signing out...');
+      await trailbaseService.logout();
+      this.authState = {
+        isAuthenticated: false,
+        user: null,
+        token: null,
+      };
+      console.log('[AuthService] Sign out successful');
+    } catch (error) {
+      console.error('[AuthService] Sign out error:', error);
+      throw error;
+    }
   }
 
-  // Mock method to simulate successful authentication (for testing)
-  // Remove this when implementing real OIDC
-  mockSignIn(user: User, token: string): void {
-    this.authState = {
-      isAuthenticated: true,
-      user,
-      token,
-    };
-    this.saveAuthState();
+  /**
+   * Refresh auth state from TrailBase
+   * Useful after OAuth callback
+   */
+  async refresh(): Promise<void> {
+    console.log('[AuthService] Refreshing auth state...');
+    await this.loadAuthState();
   }
 }
 

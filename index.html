@@ -6,9 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>kanidm-admin</title>
     <link rel="stylesheet" href="./src/index.css" />
-    <script type="module" src="/src/components/welcome-page.ts"></script>
+    <script type="module">
+      import { initRouter } from './src/router.ts';
+
+      // Initialize router when DOM is ready
+      window.addEventListener('DOMContentLoaded', () => {
+        const outlet = document.getElementById('outlet');
+        if (outlet) {
+          initRouter(outlet);
+        }
+      });
+    </script>
   </head>
   <body>
-    <welcome-page></welcome-page>
+    <div id="outlet"></div>
   </body>
 </html>

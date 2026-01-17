@@ -4,10 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bun run build --watch & trail run -a 0.0.0.0:4000 --public-dir dist",
+    "dev": "bun dev:frontend & bun dev:backend",
+    "dev:frontend": "tsc && bun run build --watch",
+    "dev:backend": "trail run -a 0.0.0.0:4000 --public-dir dist --spa",
+    "watch": "vite --host",
     "build": "tsc && vite build"
   },
   "dependencies": {
+    "@vaadin/router": "^2.0.1",
     "lit": "^3.3.1"
   },
   "devDependencies": {

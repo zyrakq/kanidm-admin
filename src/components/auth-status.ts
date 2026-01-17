@@ -15,32 +15,39 @@ export class AuthStatus extends LitElement {
   @property({ type: Boolean })
   loading = false;
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
-    this.checkAuthStatus();
+    await this.checkAuthStatus();
   }
 
-  private checkAuthStatus() {
+  private async checkAuthStatus() {
+    console.log('[AuthStatus] Checking auth status...');
+    await authService.init();
     const authState = authService.getAuthState();
     this.isAuthenticated = authState.isAuthenticated;
     this.user = authState.user;
+    console.log('[AuthStatus] Auth state loaded:', {
+      isAuthenticated: this.isAuthenticated,
+      user: this.user,
+    });
   }
 
   private async handleSignIn() {
     try {
       this.loading = true;
-      await authService.signIn();
+      console.log('[AuthStatus] Starting sign in...');
+      // Redirect to /auth/callback after successful OAuth
+      await authService.signIn('oidc0', '/auth/callback');
     } catch (error) {
-      console.error('Sign in error:', error);
-      alert('SSO integration not implemented yet. This is a placeholder.');
+      console.error('[AuthStatus] Sign in error:', error);
     } finally {
       this.loading = false;
     }
   }
 
   private handleDashboardClick() {
-    console.log('Navigate to dashboard');
-    alert('Dashboard navigation will be implemented in next phase');
+    console.log('[AuthStatus] Navigate to dashboard');
+    window.location.href = '/dashboard';
   }
 
   render() {

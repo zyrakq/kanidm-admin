@@ -1,0 +1,264 @@
+import { LitElement, css, html } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+import { authService } from '../services/auth.service';
+import type { User } from '../types/auth.types';
+import './app-header';
+import './footer-info';
+
+@customElement('dashboard-page')
+export class DashboardPage extends LitElement {
+  @state()
+  private user: User | null = null;
+
+  @state()
+  private loading = false;
+
+  async connectedCallback() {
+    super.connectedCallback();
+    await this.loadUserData();
+  }
+
+  private async loadUserData() {
+    console.log('[Dashboard] Loading user data...');
+    const authState = authService.getAuthState();
+    this.user = authState.user;
+    console.log('[Dashboard] User loaded:', this.user);
+  }
+
+  private async handleSignOut() {
+    try {
+      this.loading = true;
+      console.log('[Dashboard] Sign out initiated');
+      await authService.signOut();
+      console.log('[Dashboard] Sign out successful, redirecting to home...');
+      window.location.href = '/';
+    } catch (error) {
+      console.error('[Dashboard] Sign out error:', error);
+      alert('Failed to sign out. Please try again.');
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  render() {
+    return html`
+      <div class="page">
+        <app-header></app-header>
+        <main class="main-content">
+          <div class="dashboard-container">
+            <div class="dashboard-card">
+              <h1 class="title">Dashboard</h1>
+              <p class="subtitle">Welcome to your protected area</p>
+
+              ${this.user
+                ? html`
+                    <div class="user-section">
+                      <h2>User Information</h2>
+                      <div class="user-details">
+                        <div class="detail-row">
+                          <span class="label">ID:</span>
+                          <span class="value">${this.user.id}</span>
+                        </div>
+                        ${this.user.email
+                          ? html`
+                              <div class="detail-row">
+                                <span class="label">Email:</span>
+                                <span class="value">${this.user.email}</span>
+                              </div>
+                            `
+                          : ''}
+                        ${this.user.username
+                          ? html`
+                              <div class="detail-row">
+                                <span class="label">Username:</span>
+                                <span class="value">${this.user.username}</span>
+                              </div>
+                            `
+                          : ''}
+                        ${this.user.displayName
+                          ? html`
+                              <div class="detail-row">
+                                <span class="label">Display Name:</span>
+                                <span class="value"
+                                  >${this.user.displayName}</span
+                                >
+                              </div>
+                            `
+                          : ''}
+                      </div>
+                    </div>
+                  `
+                : html`
+                    <div class="loading-message">
+                      <p>Loading user information...</p>
+                    </div>
+                  `}
+
+              <div class="actions">
+                <button
+                  class="btn btn-danger"
+                  @click=${this.handleSignOut}
+                  ?disabled=${this.loading}
+                >
+                  ${this.loading ? 'Signing out...' : 'Sign Out'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+        <footer-info></footer-info>
+      </div>
+    `;
+  }
+
+  static styles = css`
+    :host {
+      display: block;
+      min-height: 100vh;
+    }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: #f9fafb;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .dashboard-container {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .dashboard-card {
+      background: white;
+      border-radius: 8px;
+      padding: 3rem 2.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    }
+
+    .title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: #6b7280;
+      margin: 0 0 2rem 0;
+    }
+
+    .user-section {
+      margin: 2rem 0;
+    }
+
+    .user-section h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0 0 1rem 0;
+    }
+
+    .user-details {
+      background: #f9fafb;
+      border-radius: 6px;
+      padding: 1.5rem;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    .value {
+      color: #1f2937;
+      word-break: break-all;
+    }
+
+    .loading-message {
+      text-align: center;
+      padding: 2rem;
+      color: #6b7280;
+    }
+
+    .actions {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 0.75rem 2rem;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: #dc2626;
+    }
+
+    .btn-danger:active:not(:disabled) {
+      background: #b91c1c;
+    }
+
+    @media (max-width: 640px) {
+      .main-content {
+        padding: 1.5rem 1rem;
+      }
+
+      .dashboard-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .title {
+        font-size: 1.75rem;
+      }
+
+      .detail-row {
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+    }
+  `;
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'dashboard-page': DashboardPage;
+  }
+}
