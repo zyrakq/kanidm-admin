@@ -20,23 +20,18 @@ export class DashboardPage extends LitElement {
   }
 
   private async loadUserData() {
-    console.log('[Dashboard] Loading user data...');
     const authState = authService.getAuthState();
     this.user = authState.user;
-    console.log('[Dashboard] User loaded:', this.user);
   }
 
   private async handleSignOut() {
     try {
       this.loading = true;
-      console.log('[Dashboard] Sign out initiated');
       await authService.signOut();
-      console.log('[Dashboard] Sign out successful, redirecting to home...');
       setTimeout(() => {
         window.location.href = '/';
       }, 1000);
     } catch (error) {
-      console.error('[Dashboard] Sign out error:', error);
       notificationService.error('Failed to sign out. Please try again.');
     } finally {
       this.loading = false;

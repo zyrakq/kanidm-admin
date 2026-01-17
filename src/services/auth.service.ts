@@ -3,6 +3,7 @@ import {
   trailbaseService,
   type TrailBaseUser,
 } from '@/services/trailbase.service';
+import { notificationService } from '@/services/notification.service';
 
 // Authentication service using TrailBase
 class AuthService {
@@ -43,7 +44,6 @@ class AuthService {
    */
   private async loadAuthState(): Promise<void> {
     try {
-      console.log('[AuthService] Initializing auth state...');
       const trailbaseUser = await trailbaseService.getCurrentUser();
 
       if (trailbaseUser) {
@@ -52,20 +52,17 @@ class AuthService {
           user: this.mapTrailBaseUser(trailbaseUser),
           token: null, // TrailBase uses cookies, no token needed
         };
-        console.log(
-          '[AuthService] User is authenticated:',
-          this.authState.user
-        );
       } else {
         this.authState = {
           isAuthenticated: false,
           user: null,
           token: null,
         };
-        console.log('[AuthService] User is not authenticated');
       }
     } catch (error) {
-      console.error('[AuthService] Failed to load auth state:', error);
+      notificationService.warning(
+        'Failed to load authentication state. Please refresh the page.'
+      );
       this.authState = {
         isAuthenticated: false,
         user: null,
@@ -116,7 +113,6 @@ class AuthService {
     provider: string = 'oidc0',
     redirectUri?: string
   ): Promise<void> {
-    console.log('[AuthService] Sign in initiated');
     await trailbaseService.login(provider, redirectUri);
   }
 
@@ -125,16 +121,14 @@ class AuthService {
    */
   async signOut(): Promise<void> {
     try {
-      console.log('[AuthService] Signing out...');
       await trailbaseService.logout();
       this.authState = {
         isAuthenticated: false,
         user: null,
         token: null,
       };
-      console.log('[AuthService] Sign out successful');
     } catch (error) {
-      console.error('[AuthService] Sign out error:', error);
+      notificationService.error('Failed to sign out. Please try again.');
       throw error;
     }
   }
@@ -144,7 +138,6 @@ class AuthService {
    * Useful after OAuth callback
    */
   async refresh(): Promise<void> {
-    console.log('[AuthService] Refreshing auth state...');
     await this.loadAuthState();
   }
 }

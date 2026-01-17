@@ -1,6 +1,7 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { authService } from '@/services/auth.service';
+import { notificationService } from '@/services/notification.service';
 import type { User } from '@/types/auth.types';
 import logoLight from '@/assets/logo-light.svg';
 
@@ -21,32 +22,25 @@ export class AuthStatus extends LitElement {
   }
 
   private async checkAuthStatus() {
-    console.log('[AuthStatus] Checking auth status...');
     await authService.init();
     const authState = authService.getAuthState();
     this.isAuthenticated = authState.isAuthenticated;
     this.user = authState.user;
-    console.log('[AuthStatus] Auth state loaded:', {
-      isAuthenticated: this.isAuthenticated,
-      user: this.user,
-    });
   }
 
   private async handleSignIn() {
     try {
       this.loading = true;
-      console.log('[AuthStatus] Starting sign in...');
       // Redirect to /auth/callback after successful OAuth
       await authService.signIn('oidc0', '/auth/callback');
     } catch (error) {
-      console.error('[AuthStatus] Sign in error:', error);
+      notificationService.error('Failed to sign in. Please try again.');
     } finally {
       this.loading = false;
     }
   }
 
   private handleDashboardClick() {
-    console.log('[AuthStatus] Navigate to dashboard');
     window.location.href = '/dashboard';
   }
 

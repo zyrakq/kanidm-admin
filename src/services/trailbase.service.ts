@@ -40,9 +40,6 @@ class TrailBaseService {
    * @param redirectUri - Optional redirect URI after successful login
    */
   async login(provider: string = 'oidc0', redirectUri?: string): Promise<void> {
-    console.log(
-      `[TrailBase] Initiating OAuth login with provider: ${provider}`
-    );
     try {
       let url = `/api/auth/v1/oauth/${provider}/login`;
 
@@ -50,10 +47,8 @@ class TrailBaseService {
         url += `?redirect_uri=${encodeURIComponent(redirectUri)}`;
       }
 
-      console.log(`[TrailBase] Redirecting to: ${url}`);
       window.location.href = url;
     } catch (error) {
-      console.error('[TrailBase] Login error:', error);
       throw error;
     }
   }
@@ -64,31 +59,22 @@ class TrailBaseService {
    */
   async getLoginStatus(): Promise<LoginStatusResponse | null> {
     try {
-      console.log('[TrailBase] Checking login status...');
       const response = await fetch('/api/auth/v1/status', {
         credentials: 'include', // Include cookies
       });
 
       if (response.status === 401) {
-        console.log('[TrailBase] User not authenticated (401)');
         return null;
       }
 
       if (!response.ok) {
-        console.error('[TrailBase] Failed to get status:', response.status);
         throw new Error(`Failed to get status: ${response.statusText}`);
       }
 
       const status: LoginStatusResponse = await response.json();
-      console.log('[TrailBase] Login status:', {
-        hasAuthToken: !!status.auth_token,
-        hasCsrfToken: !!status.csrf_token,
-        hasRefreshToken: !!status.refresh_token,
-      });
 
       return status;
     } catch (error) {
-      console.error('[TrailBase] Error getting login status:', error);
       throw error;
     }
   }
@@ -103,13 +89,11 @@ class TrailBaseService {
       // JWT has 3 parts: header.payload.signature
       const parts = authToken.split('.');
       if (parts.length !== 3) {
-        console.error('[TrailBase] Invalid JWT format');
         return null;
       }
 
       // Decode payload (base64url)
       const payload = JSON.parse(atob(parts[1]));
-      console.log('[TrailBase] Parsed JWT payload:', payload);
 
       return {
         id: payload.sub || payload.user_id || payload.id,
@@ -117,7 +101,6 @@ class TrailBaseService {
         verified: payload.verified,
       };
     } catch (error) {
-      console.error('[TrailBase] Failed to parse JWT:', error);
       return null;
     }
   }
@@ -131,15 +114,12 @@ class TrailBaseService {
       const status = await this.getLoginStatus();
 
       if (!status || !status.auth_token) {
-        console.log('[TrailBase] No auth token found');
         return null;
       }
 
       const user = this.parseUserFromToken(status.auth_token);
-      console.log('[TrailBase] Current user:', user);
       return user;
     } catch (error) {
-      console.error('[TrailBase] Error getting current user:', error);
       return null;
     }
   }
@@ -150,8 +130,6 @@ class TrailBaseService {
    */
   async logout(redirectUri?: string): Promise<void> {
     try {
-      console.log('[TrailBase] Logging out...');
-
       let url = '/api/auth/v1/logout';
       if (redirectUri) {
         url += `?redirect_uri=${encodeURIComponent(redirectUri)}`;
@@ -163,13 +141,9 @@ class TrailBaseService {
       });
 
       if (!response.ok) {
-        console.error('[TrailBase] Logout failed:', response.status);
         throw new Error(`Logout failed: ${response.statusText}`);
       }
-
-      console.log('[TrailBase] Logout successful');
     } catch (error) {
-      console.error('[TrailBase] Logout error:', error);
       throw error;
     }
   }
@@ -182,7 +156,6 @@ class TrailBaseService {
       const status = await this.getLoginStatus();
       return status !== null && status.auth_token !== null;
     } catch (error) {
-      console.error('[TrailBase] Auth check error:', error);
       return false;
     }
   }
