@@ -1,0 +1,20 @@
+# Auto-generated config.Config textproto
+email {}
+server {
+  application_name: "TrailBase"
+  logs_retention_sec: 604800
+}
+auth {
+  oauth_providers: [{
+    key: "oidc0"
+    value {
+      client_id: "kanidm-admin"
+      client_secret: "<REDACTED>"
+      provider_id: OIDC0
+      auth_url: "https://kanidm.ax/ui/oauth2"
+      token_url: "https://kanidm.ax/oauth2/token"
+      user_api_url: "https://kanidm.ax/oauth2/openid/kanidm-admin/userinfo"
+    }
+  }]
+}
+jobs {}

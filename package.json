@@ -4,9 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "dev": "bun run build --watch & trail run -a 0.0.0.0:4000 --public-dir dist",
+    "build": "tsc && vite build"
   },
   "dependencies": {
     "lit": "^3.3.1"
