@@ -1,8 +1,8 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { authService } from '@/services/auth.service';
-import { notificationService } from '@/services/notification.service';
-import type { User } from '@/types/auth.types';
+import { authService } from '../services/auth.service';
+import { notificationService } from '@/features/notifications';
+import type { User } from '@/features/auth';
 import logoLight from '@/assets/logo-light.svg';
 
 @customElement('auth-status')

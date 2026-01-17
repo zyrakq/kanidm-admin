@@ -1,10 +1,10 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { authService } from '@/services/auth.service';
-import { notificationService } from '@/services/notification.service';
-import type { User } from '@/types/auth.types';
-import '@/components/app-header';
-import '@/components/footer-info';
+import { authService } from '@/features/auth';
+import { notificationService } from '@/features/notifications';
+import type { User } from '@/features/auth';
+import '@/shared/components/app-header';
+import '@/shared/components/footer-info';
 
 @customElement('dashboard-page')
 export class DashboardPage extends LitElement {

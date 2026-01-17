@@ -2,7 +2,7 @@ import type {
   Notification,
   NotificationType,
   NotificationOptions,
-} from '@/types/notification.types.ts';
+} from '../types/notification.types.ts';
 
 class NotificationService {
   private generateId(): string {

@@ -1,8 +1,8 @@
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import './app-header';
-import './auth-status';
-import './footer-info';
+import '@/shared/components/app-header';
+import '@/features/auth/components/auth-status';
+import '@/shared/components/footer-info';
 
 @customElement('welcome-page')
 export class WelcomePage extends LitElement {

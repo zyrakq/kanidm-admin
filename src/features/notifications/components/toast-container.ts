@@ -1,9 +1,9 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state, query } from 'lit/decorators.js';
-import type { Notification } from '@/types/notification.types.ts';
-import '@/components/toast-notification.ts';
-import '@/components/notification-modal.ts';
-import type { NotificationModal } from '@/components/notification-modal.ts';
+import type { Notification } from '../types/notification.types.ts';
+import './toast-notification.ts';
+import './notification-modal.ts';
+import type { NotificationModal } from './notification-modal.ts';
 
 interface NotificationTimer {
   id: string;

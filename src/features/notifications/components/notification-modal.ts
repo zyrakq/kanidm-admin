@@ -1,6 +1,6 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { NotificationType } from '@/types/notification.types.ts';
+import type { NotificationType } from '../types/notification.types.ts';
 
 @customElement('notification-modal')
 export class NotificationModal extends LitElement {

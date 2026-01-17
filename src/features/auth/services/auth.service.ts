@@ -1,9 +1,6 @@
-import type { AuthState, User } from '@/types/auth.types';
-import {
-  trailbaseService,
-  type TrailBaseUser,
-} from '@/services/trailbase.service';
-import { notificationService } from '@/services/notification.service';
+import type { AuthState, User } from '../types/auth.types';
+import { trailbaseService, type TrailBaseUser } from './trailbase.service';
+// Notification service will be accessed via events to avoid circular imports
 
 // Authentication service using TrailBase
 class AuthService {
@@ -60,8 +57,18 @@ class AuthService {
         };
       }
     } catch (error) {
-      notificationService.warning(
-        'Failed to load authentication state. Please refresh the page.'
+      // Dispatch notification event instead of direct service call
+      window.dispatchEvent(
+        new CustomEvent('notification-add', {
+          detail: {
+            id: `auth-error-${Date.now()}`,
+            message:
+              'Failed to load authentication state. Please refresh the page.',
+            type: 'warning' as const,
+          },
+          bubbles: true,
+          composed: true,
+        })
       );
       this.authState = {
         isAuthenticated: false,
@@ -128,7 +135,18 @@ class AuthService {
         token: null,
       };
     } catch (error) {
-      notificationService.error('Failed to sign out. Please try again.');
+      // Dispatch notification event instead of direct service call
+      window.dispatchEvent(
+        new CustomEvent('notification-add', {
+          detail: {
+            id: `signout-error-${Date.now()}`,
+            message: 'Failed to sign out. Please try again.',
+            type: 'error' as const,
+          },
+          bubbles: true,
+          composed: true,
+        })
+      );
       throw error;
     }
   }

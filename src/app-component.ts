@@ -1,13 +1,13 @@
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { Router } from '@lit-labs/router';
-import { authService } from './services/auth.service';
+import { authService } from '@/features/auth';
 
 // Import components (they will be registered as custom elements)
-import './components/welcome-page';
-import './components/oauth-callback';
-import './components/dashboard-page';
-import './components/toast-container';
+import '@/pages/welcome-page';
+import '@/features/auth/components/oauth-callback';
+import '@/pages/dashboard-page';
+import '@/features/notifications/components/toast-container';
 
 @customElement('app-component')
 export class AppComponent extends LitElement {

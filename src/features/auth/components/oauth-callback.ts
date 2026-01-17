@@ -1,6 +1,6 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { authService } from '@/services/auth.service';
+import { authService } from '../services/auth.service';
 
 @customElement('oauth-callback')
 export class OAuthCallback extends LitElement {
