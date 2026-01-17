@@ -5,6 +5,7 @@ import { authService } from './services/auth.service';
 import './components/welcome-page';
 import './components/oauth-callback';
 import './components/dashboard-page';
+import './components/toast-container';
 
 /**
  * Guard function to protect routes that require authentication

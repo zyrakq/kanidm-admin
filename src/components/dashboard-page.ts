@@ -1,6 +1,7 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { authService } from '../services/auth.service';
+import { notificationService } from '../services/notification.service';
 import type { User } from '../types/auth.types';
 import './app-header';
 import './footer-info';
@@ -31,13 +32,32 @@ export class DashboardPage extends LitElement {
       console.log('[Dashboard] Sign out initiated');
       await authService.signOut();
       console.log('[Dashboard] Sign out successful, redirecting to home...');
-      window.location.href = '/';
+      notificationService.success('You have been signed out successfully');
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
     } catch (error) {
       console.error('[Dashboard] Sign out error:', error);
-      alert('Failed to sign out. Please try again.');
+      notificationService.error('Failed to sign out. Please try again.');
     } finally {
       this.loading = false;
     }
+  }
+
+  private handleTestSuccess() {
+    notificationService.success('Operation completed successfully!');
+  }
+
+  private handleTestError() {
+    notificationService.error('An error occurred during the operation');
+  }
+
+  private handleTestWarning() {
+    notificationService.warning('This action requires your attention');
+  }
+
+  private handleTestInfo() {
+    notificationService.info('New information is available');
   }
 
   render() {
@@ -93,6 +113,33 @@ export class DashboardPage extends LitElement {
                       <p>Loading user information...</p>
                     </div>
                   `}
+
+              <div class="test-section">
+                <h2>Test Notifications</h2>
+                <p class="test-description">
+                  Click buttons below to test different notification types
+                </p>
+                <div class="test-buttons">
+                  <button
+                    class="btn btn-success"
+                    @click=${this.handleTestSuccess}
+                  >
+                    Success
+                  </button>
+                  <button class="btn btn-error" @click=${this.handleTestError}>
+                    Error
+                  </button>
+                  <button
+                    class="btn btn-warning"
+                    @click=${this.handleTestWarning}
+                  >
+                    Warning
+                  </button>
+                  <button class="btn btn-info" @click=${this.handleTestInfo}>
+                    Info
+                  </button>
+                </div>
+              </div>
 
               <div class="actions">
                 <button
@@ -234,6 +281,84 @@ export class DashboardPage extends LitElement {
 
     .btn-danger:active:not(:disabled) {
       background: #b91c1c;
+    }
+
+    .test-section {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: #f9fafb;
+      border-radius: 6px;
+    }
+
+    .test-section h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .test-description {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin: 0 0 1rem 0;
+    }
+
+    .test-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
+    .btn-success:active {
+      background: #047857;
+    }
+
+    .btn-error {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-error:hover {
+      background: #dc2626;
+    }
+
+    .btn-error:active {
+      background: #b91c1c;
+    }
+
+    .btn-warning {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #d97706;
+    }
+
+    .btn-warning:active {
+      background: #b45309;
+    }
+
+    .btn-info {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .btn-info:hover {
+      background: #2563eb;
+    }
+
+    .btn-info:active {
+      background: #1d4ed8;
     }
 
     @media (max-width: 640px) {
