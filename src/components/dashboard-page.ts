@@ -32,7 +32,6 @@ export class DashboardPage extends LitElement {
       console.log('[Dashboard] Sign out initiated');
       await authService.signOut();
       console.log('[Dashboard] Sign out successful, redirecting to home...');
-      notificationService.success('You have been signed out successfully');
       setTimeout(() => {
         window.location.href = '/';
       }, 1000);
