@@ -1,7 +1,9 @@
 import { LitElement, css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import type { Notification } from '/workspace/kanidm-admin/src/types/notification.types.ts';
-import '/workspace/kanidm-admin/src/components/toast-notification.ts';
+import { customElement, state, query } from 'lit/decorators.js';
+import type { Notification } from '@/types/notification.types.ts';
+import '@/components/toast-notification.ts';
+import '@/components/notification-modal.ts';
+import type { NotificationModal } from '@/components/notification-modal.ts';
 
 interface NotificationTimer {
   id: string;
@@ -15,6 +17,8 @@ interface NotificationTimer {
 export class ToastContainer extends LitElement {
   @state() private notifications: Notification[] = [];
   private timers: Map<string, NotificationTimer> = new Map();
+  private isModalOpen = false;
+  @query('notification-modal') private modal?: NotificationModal;
 
   connectedCallback() {
     super.connectedCallback();
@@ -23,6 +27,9 @@ export class ToastContainer extends LitElement {
       'notification-remove',
       this.handleRemoveNotification
     );
+    window.addEventListener('modal-opened', this.handleModalOpened);
+    window.addEventListener('modal-closed', this.handleModalClosed);
+    window.addEventListener('open-notification-modal', this.handleOpenModal);
   }
 
   disconnectedCallback() {
@@ -32,6 +39,9 @@ export class ToastContainer extends LitElement {
       'notification-remove',
       this.handleRemoveNotification
     );
+    window.removeEventListener('modal-opened', this.handleModalOpened);
+    window.removeEventListener('modal-closed', this.handleModalClosed);
+    window.removeEventListener('open-notification-modal', this.handleOpenModal);
     this.timers.forEach((timer) => {
       if (timer.animationFrame) {
         cancelAnimationFrame(timer.animationFrame);
@@ -64,17 +74,31 @@ export class ToastContainer extends LitElement {
       id,
       startTime: Date.now(),
       duration,
-      pausedAt: null,
+      pausedAt: this.isModalOpen ? Date.now() : null,
       animationFrame: null,
     };
 
     this.timers.set(id, timer);
-    this.animateTimer(id);
+
+    // Only start animation if modal is not open
+    if (!this.isModalOpen) {
+      this.animateTimer(id);
+    } else {
+      // If modal is open, keep opacity at 1
+      const element = this.shadowRoot?.querySelector(
+        `toast-notification[notificationId="${id}"]`
+      ) as HTMLElement;
+      if (element) {
+        element.style.setProperty('--toast-opacity', '1');
+      }
+    }
   }
 
   private animateTimer(id: string) {
     const timer = this.timers.get(id);
-    if (!timer || timer.pausedAt !== null) return;
+    if (!timer || timer.pausedAt !== null) {
+      return;
+    }
 
     const element = this.shadowRoot?.querySelector(
       `toast-notification[notificationId="${id}"]`
@@ -97,7 +121,14 @@ export class ToastContainer extends LitElement {
 
   private pauseTimer(id: string) {
     const timer = this.timers.get(id);
-    if (!timer) return;
+    if (!timer) {
+      return;
+    }
+
+    // Only pause if not already paused
+    if (timer.pausedAt !== null) {
+      return;
+    }
 
     timer.pausedAt = Date.now();
     if (timer.animationFrame) {
@@ -116,7 +147,14 @@ export class ToastContainer extends LitElement {
 
   private resumeTimer(id: string) {
     const timer = this.timers.get(id);
-    if (!timer || timer.pausedAt === null) return;
+    if (!timer || timer.pausedAt === null) {
+      return;
+    }
+
+    // Don't resume if modal is open
+    if (this.isModalOpen) {
+      return;
+    }
 
     timer.startTime = Date.now();
     timer.pausedAt = null;
@@ -160,6 +198,38 @@ export class ToastContainer extends LitElement {
     this.resumeTimer(customEvent.detail);
   }
 
+  private handleOpenModal = (event: Event) => {
+    const customEvent = event as CustomEvent<{
+      message: string;
+      type: string;
+    }>;
+    if (this.modal) {
+      this.modal.message = customEvent.detail.message;
+      this.modal.type = customEvent.detail.type as any;
+      this.modal.open();
+    }
+  };
+
+  private handleModalOpened = () => {
+    this.isModalOpen = true;
+
+    // Pause all timers when modal opens (unconditionally, to override any resume events)
+    this.timers.forEach((timer) => {
+      this.pauseTimer(timer.id);
+    });
+  };
+
+  private handleModalClosed = () => {
+    this.isModalOpen = false;
+
+    // Resume all timers when modal closes (only if they were paused)
+    this.timers.forEach((timer) => {
+      if (timer.pausedAt !== null) {
+        this.resumeTimer(timer.id);
+      }
+    });
+  };
+
   render() {
     return html`
       <div class="toast-container">
@@ -176,6 +246,7 @@ export class ToastContainer extends LitElement {
           `
         )}
       </div>
+      <notification-modal></notification-modal>
     `;
   }
 

@@ -1,10 +1,10 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { authService } from '../services/auth.service';
-import { notificationService } from '../services/notification.service';
-import type { User } from '../types/auth.types';
-import './app-header';
-import './footer-info';
+import { authService } from '@/services/auth.service';
+import { notificationService } from '@/services/notification.service';
+import type { User } from '@/types/auth.types';
+import '@/components/app-header';
+import '@/components/footer-info';
 
 @customElement('dashboard-page')
 export class DashboardPage extends LitElement {
@@ -58,6 +58,30 @@ export class DashboardPage extends LitElement {
 
   private handleTestInfo() {
     notificationService.info('New information is available');
+  }
+
+  private handleTestLongSuccess() {
+    notificationService.success(
+      'The operation has been completed successfully! All user data has been synchronized with the remote server, and the local cache has been updated accordingly. Please verify the changes in your dashboard.'
+    );
+  }
+
+  private handleTestLongError() {
+    notificationService.error(
+      'Failed to connect to the authentication server. The connection was refused due to network timeout (error code: ETIMEDOUT). Please check your internet connection and try again. If the problem persists, contact your system administrator for assistance.'
+    );
+  }
+
+  private handleTestLongWarning() {
+    notificationService.warning(
+      'Your session is about to expire in 5 minutes. Any unsaved changes will be lost. Please save your work and refresh your session to continue working without interruption. This is an automated security measure to protect your account.'
+    );
+  }
+
+  private handleTestVeryLongInfo() {
+    notificationService.info(
+      'System maintenance is scheduled for tonight between 2:00 AM and 4:00 AM UTC. During this time, the following services will be temporarily unavailable: user authentication, data synchronization, file uploads, and API access. We apologize for any inconvenience this may cause. All services are expected to be fully operational by 4:30 AM UTC. For emergency support during the maintenance window, please contact our 24/7 helpdesk at support@example.com or call +1-800-123-4567. Thank you for your patience and understanding.'
+    );
   }
 
   render() {
@@ -137,6 +161,40 @@ export class DashboardPage extends LitElement {
                   </button>
                   <button class="btn btn-info" @click=${this.handleTestInfo}>
                     Info
+                  </button>
+                </div>
+              </div>
+
+              <div class="test-section">
+                <h2>Test Long Notifications</h2>
+                <p class="test-description">
+                  Click to test notifications with long messages (clickable to
+                  see full text)
+                </p>
+                <div class="test-buttons">
+                  <button
+                    class="btn btn-success"
+                    @click=${this.handleTestLongSuccess}
+                  >
+                    Long Success
+                  </button>
+                  <button
+                    class="btn btn-error"
+                    @click=${this.handleTestLongError}
+                  >
+                    Long Error
+                  </button>
+                  <button
+                    class="btn btn-warning"
+                    @click=${this.handleTestLongWarning}
+                  >
+                    Long Warning
+                  </button>
+                  <button
+                    class="btn btn-info"
+                    @click=${this.handleTestVeryLongInfo}
+                  >
+                    Very Long Info
                   </button>
                 </div>
               </div>

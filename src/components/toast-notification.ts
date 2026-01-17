@@ -1,12 +1,14 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { NotificationType } from '/workspace/kanidm-admin/src/types/notification.types.ts';
+import type { NotificationType } from '@/types/notification.types.ts';
 
 @customElement('toast-notification')
 export class ToastNotification extends LitElement {
   @property({ type: String }) message = '';
   @property({ type: String }) type: NotificationType = 'info';
   @property({ type: String, reflect: true }) notificationId = '';
+
+  private readonly MAX_LENGTH = 150;
 
   private handleClose(e: Event) {
     e.stopPropagation();
@@ -54,15 +56,41 @@ export class ToastNotification extends LitElement {
     }
   }
 
+  private isLongMessage(): boolean {
+    return this.message.length > this.MAX_LENGTH;
+  }
+
+  private handleToastClick(e: Event) {
+    if (this.isLongMessage()) {
+      e.stopPropagation();
+
+      // Dispatch event to toast-container to open modal
+      window.dispatchEvent(
+        new CustomEvent('open-notification-modal', {
+          detail: {
+            message: this.message,
+            type: this.type,
+          },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
+  }
+
   render() {
+    const isLong = this.isLongMessage();
     return html`
       <div
-        class="toast toast-${this.type}"
+        class="toast toast-${this.type} ${isLong ? 'toast-clickable' : ''}"
         @mouseenter=${this.handleMouseEnter}
         @mouseleave=${this.handleMouseLeave}
+        @click=${this.handleToastClick}
       >
         <div class="toast-icon">${this.getIcon()}</div>
-        <div class="toast-message">${this.message}</div>
+        <div class="toast-message ${isLong ? 'toast-message-truncated' : ''}">
+          ${this.message}
+        </div>
         <button
           class="toast-close"
           @click=${this.handleClose}
@@ -175,6 +203,47 @@ export class ToastNotification extends LitElement {
       font-size: 0.875rem;
       font-weight: 500;
       line-height: 1.4;
+    }
+
+    .toast-message-truncated {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      position: relative;
+      max-height: 4.2rem;
+    }
+
+    .toast-message-truncated::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 100%;
+      height: 1.4rem;
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 1)
+      );
+      pointer-events: none;
+    }
+
+    .toast-clickable {
+      cursor: pointer;
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .toast-clickable:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .toast-clickable:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .toast-close {

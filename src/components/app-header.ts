@@ -1,6 +1,6 @@
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import logoLight from '../assets/logo-light.svg';
+import logoLight from '@/assets/logo-light.svg';
 
 @customElement('app-header')
 export class AppHeader extends LitElement {

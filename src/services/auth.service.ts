@@ -1,5 +1,8 @@
-import type { AuthState, User } from '../types/auth.types';
-import { trailbaseService, type TrailBaseUser } from './trailbase.service';
+import type { AuthState, User } from '@/types/auth.types';
+import {
+  trailbaseService,
+  type TrailBaseUser,
+} from '@/services/trailbase.service';
 
 // Authentication service using TrailBase
 class AuthService {

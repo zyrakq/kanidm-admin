@@ -1,8 +1,8 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { authService } from '../services/auth.service';
-import type { User } from '../types/auth.types';
-import logoLight from '../assets/logo-light.svg';
+import { authService } from '@/services/auth.service';
+import type { User } from '@/types/auth.types';
+import logoLight from '@/assets/logo-light.svg';
 
 @customElement('auth-status')
 export class AuthStatus extends LitElement {
