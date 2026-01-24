@@ -29,6 +29,9 @@
       "@/features/*": [
         "./src/features/*"
       ],
+      "@/features/localization": [
+        "./src/features/localization"
+      ],
       "@/pages/*": [
         "./src/pages/*"
       ],

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+<file target-language="es" source-language="en" original="lit-localize-inputs" datatype="plaintext">
+<body>
+<trans-unit id="s8a4d6da58d9acb76">
+  <source>Welcome to Kanidm</source>
+  <target>Bienvenido a Kanidm</target>
+</trans-unit>
+<trans-unit id="sebe7fcdde2daf169">
+  <source>Sign in to continue</source>
+  <target>Inicie sesión para continuar</target>
+</trans-unit>
+<trans-unit id="sbbd340ef453ff7e4">
+  <source>Go to Dashboard</source>
+  <target>Ir al Panel de Control</target>
+</trans-unit>
+<trans-unit id="sa0edd3227b3addeb">
+  <source>Redirecting...</source>
+  <target>Redirigiendo...</target>
+</trans-unit>
+<trans-unit id="s5e94738a2eeb8943">
+  <source>Sign In</source>
+  <target>Iniciar Sesión</target>
+</trans-unit>
+<trans-unit id="s424c654650973289">
+  <source>Change language</source>
+  <target>Cambiar idioma</target>
+</trans-unit>
+<trans-unit id="sef058092ccff6354">
+  <source>Authentication failed. No user session found.</source>
+  <target>Error de autenticación. No se encontró sesión de usuario.</target>
+</trans-unit>
+<trans-unit id="s10e7b6cfbe5c865e">
+  <source>Unknown error occurred</source>
+  <target>Ocurrió un error desconocido</target>
+</trans-unit>
+<trans-unit id="sffef1a8596bc58bb">
+  <source>Authenticating...</source>
+  <target>Autenticando...</target>
+</trans-unit>
+<trans-unit id="scd5b45ca7378126e">
+  <source>Please wait while we complete the sign in process.</source>
+  <target>Por favor espere mientras completamos el proceso de inicio de sesión.</target>
+</trans-unit>
+<trans-unit id="sc09939f2fc8b8be3">
+  <source>Success!</source>
+  <target>¡Éxito!</target>
+</trans-unit>
+<trans-unit id="s503b0848078dd117">
+  <source>You have been authenticated. Redirecting...</source>
+  <target>Has sido autenticado. Redirigiendo...</target>
+</trans-unit>
+<trans-unit id="sf3ba1de979a9b38e">
+  <source>Authentication Failed</source>
+  <target>Error de Autenticación</target>
+</trans-unit>
+<trans-unit id="s6a6528b527495513">
+  <source>Return to Home</source>
+  <target>Volver al Inicio</target>
+</trans-unit>
+<trans-unit id="s92a0d19a28995530">
+  <source>Success</source>
+  <target>Éxito</target>
+</trans-unit>
+<trans-unit id="s5f343a43e7ea9f91">
+  <source>Error</source>
+  <target>Error</target>
+</trans-unit>
+<trans-unit id="s34be76c6b1eadbef">
+  <source>Warning</source>
+  <target>Advertencia</target>
+</trans-unit>
+<trans-unit id="s2063a9d17c280fe5">
+  <source>Info</source>
+  <target>Información</target>
+</trans-unit>
+<trans-unit id="scb832fc8958bf9e6">
+  <source>Notification</source>
+  <target>Notificación</target>
+</trans-unit>
+<trans-unit id="sa95b4224f685a36a">
+  <source>Close modal</source>
+  <target>Cerrar ventana</target>
+</trans-unit>
+<trans-unit id="s4a73273533c585d2">
+  <source>Close notification</source>
+  <target>Cerrar notificación</target>
+</trans-unit>
+<trans-unit id="sae506e1a821a6d4b">
+  <source>Failed to sign out. Please try again.</source>
+  <target>Error al cerrar sesión. Por favor intenta de nuevo.</target>
+</trans-unit>
+<trans-unit id="s5285ab86397ccb7f">
+  <source>Operation completed successfully!</source>
+  <target>¡Operación completada con éxito!</target>
+</trans-unit>
+<trans-unit id="s9c274ca3aae0227e">
+  <source>An error occurred during the operation</source>
+  <target>Ocurrió un error durante la operación</target>
+</trans-unit>
+<trans-unit id="sc95aa17001f8e45c">
+  <source>This action requires your attention</source>
+  <target>Esta acción requiere tu atención</target>
+</trans-unit>
+<trans-unit id="s5187bdebb3f4a25e">
+  <source>New information is available</source>
+  <target>Nueva información disponible</target>
+</trans-unit>
+<trans-unit id="sd53dfb57070970e2">
+  <source>The operation has been completed successfully! All user data has been synchronized with the remote server, and the local cache has been updated accordingly. Please verify the changes in your dashboard.</source>
+  <target>¡La operación se completó con éxito! Todos los datos de usuario se han sincronizado con el servidor remoto y la caché local se ha actualizado. Por favor verifica los cambios en tu panel de control.</target>
+</trans-unit>
+<trans-unit id="sf3fda5790cfa46f6">
+  <source>Failed to connect to the authentication server. The connection was refused due to network timeout (error code: ETIMEDOUT). Please check your internet connection and try again. If the problem persists, contact your system administrator for assistance.</source>
+  <target>Error al conectar con el servidor de autenticación. La conexión fue rechazada debido a tiempo de espera de red (código de error: ETIMEDOUT). Por favor verifica tu conexión a internet e intenta de nuevo. Si el problema persiste, contacta a tu administrador del sistema.</target>
+</trans-unit>
+<trans-unit id="s36c0017e9dc2414f">
+  <source>Your session is about to expire in 5 minutes. Any unsaved changes will be lost. Please save your work and refresh your session to continue working without interruption. This is an automated security measure to protect your account.</source>
+  <target>Tu sesión está a punto de expirar en 5 minutos. Los cambios no guardados se perderán. Por favor guarda tu trabajo y actualiza tu sesión para continuar trabajando sin interrupciones. Esta es una medida de seguridad automatizada para proteger tu cuenta.</target>
+</trans-unit>
+<trans-unit id="sb70a5cf1313da61a">
+  <source>System maintenance is scheduled for tonight between 2:00 AM and 4:00 AM UTC. During this time, the following services will be temporarily unavailable: user authentication, data synchronization, file uploads, and API access. We apologize for any inconvenience this may cause. All services are expected to be fully operational by 4:30 AM UTC. For emergency support during the maintenance window, please contact our 24/7 helpdesk at support@example.com or call +1-800-123-4567. Thank you for your patience and understanding.</source>
+  <target>Mantenimiento del sistema programado para esta noche entre las 2:00 AM y 4:00 AM UTC. Durante este tiempo, los siguientes servicios estarán temporalmente no disponibles: autenticación de usuarios, sincronización de datos, carga de archivos y acceso a la API. Disculpa las molestias. Se espera que todos los servicios estén completamente operativos para las 4:30 AM UTC. Para soporte de emergencia durante la ventana de mantenimiento, contacta nuestro servicio de ayuda 24/7 en support@example.com o llama al +1-800-123-4567. Gracias por tu paciencia y comprensión.</target>
+</trans-unit>
+<trans-unit id="s7fee95b66225e1fb">
+  <source>Dashboard</source>
+  <target>Panel de Control</target>
+</trans-unit>
+<trans-unit id="s5eddcab87c38b6b6">
+  <source>Welcome to your protected area</source>
+  <target>Bienvenido a tu área protegida</target>
+</trans-unit>
+<trans-unit id="s551172bd09a2a438">
+  <source>User Information</source>
+  <target>Información del Usuario</target>
+</trans-unit>
+<trans-unit id="s09240e07b5b8d640">
+  <source>ID</source>
+  <target>ID</target>
+</trans-unit>
+<trans-unit id="sd1f44f1a8bc20e67">
+  <source>Email</source>
+  <target>Correo Electrónico</target>
+</trans-unit>
+<trans-unit id="s03f42eea72154959">
+  <source>Username</source>
+  <target>Nombre de Usuario</target>
+</trans-unit>
+<trans-unit id="s11b2e9ecce28690c">
+  <source>Display Name</source>
+  <target>Nombre para Mostrar</target>
+</trans-unit>
+<trans-unit id="s54fa6ceb8030c6ae">
+  <source>Loading user information...</source>
+  <target>Cargando información del usuario...</target>
+</trans-unit>
+<trans-unit id="s74693aa15a1926a9">
+  <source>Test Notifications</source>
+  <target>Probar Notificaciones</target>
+</trans-unit>
+<trans-unit id="s46e024afcbd27a75">
+  <source>Click buttons below to test different notification types</source>
+  <target>Haz clic en los botones para probar diferentes tipos de notificaciones</target>
+</trans-unit>
+<trans-unit id="se5da7e083aba2325">
+  <source>Test Long Notifications</source>
+  <target>Probar Notificaciones Largas</target>
+</trans-unit>
+<trans-unit id="s05d67462a1797543">
+  <source>Click to test notifications with long messages (clickable to see full text)</source>
+  <target>Haz clic para probar notificaciones con mensajes largos (haz clic para ver el texto completo)</target>
+</trans-unit>
+<trans-unit id="s0e0f74677975e7fc">
+  <source>Long Success</source>
+  <target>Éxito Largo</target>
+</trans-unit>
+<trans-unit id="se6a30dcfa276174d">
+  <source>Long Error</source>
+  <target>Error Largo</target>
+</trans-unit>
+<trans-unit id="se2cfa296a74531fb">
+  <source>Long Warning</source>
+  <target>Advertencia Larga</target>
+</trans-unit>
+<trans-unit id="s33e0ec252844c273">
+  <source>Very Long Info</source>
+  <target>Información Muy Larga</target>
+</trans-unit>
+<trans-unit id="sea6ff86442041be6">
+  <source>Signing out...</source>
+  <target>Cerrando sesión...</target>
+</trans-unit>
+<trans-unit id="s8fa032cdafb3c9b0">
+  <source>Sign Out</source>
+  <target>Cerrar Sesión</target>
+</trans-unit>
+<trans-unit id="sbacae193cb065a4c">
+  <source>Kanidm Admin</source>
+  <target>Administrador Kanidm</target>
+</trans-unit>
+<trans-unit id="saea6a4171ae86e4b">
+  <source>Operational</source>
+  <target>Operacional</target>
+</trans-unit>
+<trans-unit id="sbb3cb2f217271ccb">
+  <source>v0.0.0</source>
+  <target>v0.0.0</target>
+</trans-unit>
+<trans-unit id="sa8c3b80277455232">
+  <source>GitHub</source>
+  <target>GitHub</target>
+</trans-unit>
+<trans-unit id="sdbf31fbe1f747f1a">
+  <source>Kanidm Docs</source>
+  <target>Documentación de Kanidm</target>
+</trans-unit>
+<trans-unit id="s631b1127429695aa">
+  <source>Kanidm GitHub</source>
+  <target>GitHub de Kanidm</target>
+</trans-unit>
+</body>
+</file>
+</xliff>

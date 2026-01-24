@@ -1,8 +1,11 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { msg } from '@lit/localize';
+import { localized } from '@/features/localization';
 import type { NotificationType } from '../types/notification.types.ts';
 
 @customElement('notification-modal')
+@localized()
 export class NotificationModal extends LitElement {
   @property({ type: String }) message = '';
   @property({ type: String }) type: NotificationType = 'info';
@@ -66,15 +69,15 @@ export class NotificationModal extends LitElement {
   private getTypeLabel() {
     switch (this.type) {
       case 'success':
-        return 'Success';
+        return msg('Success');
       case 'error':
-        return 'Error';
+        return msg('Error');
       case 'warning':
-        return 'Warning';
+        return msg('Warning');
       case 'info':
-        return 'Info';
+        return msg('Info');
       default:
-        return 'Notification';
+        return msg('Notification');
     }
   }
 
@@ -109,7 +112,7 @@ export class NotificationModal extends LitElement {
             <button
               class="modal-close"
               @click=${(e: Event) => this.handleClose(e)}
-              aria-label="Close modal"
+              aria-label=${msg('Close modal')}
             >
               ✕
             </button>

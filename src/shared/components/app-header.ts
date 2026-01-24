@@ -1,10 +1,14 @@
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { msg } from '@lit/localize';
+import { localized } from '@/features/localization';
 import { ThemeController } from '@/features/theme';
+import '@/features/localization/components/locale-switcher';
 import logoLight from '@/assets/logo-light.svg';
 import logoDark from '@/assets/logo-dark.svg';
 
 @customElement('app-header')
+@localized()
 export class AppHeader extends LitElement {
   private theme = new ThemeController(this);
 
@@ -16,10 +20,11 @@ export class AppHeader extends LitElement {
         <div class="header-content">
           <div class="logo-section">
             <img src=${logo} alt="Kanidm Logo" class="logo" />
-            <span class="app-name">Kanidm Admin</span>
+            <span class="app-name">${msg('Kanidm Admin')}</span>
           </div>
           <div class="actions">
             <theme-toggler></theme-toggler>
+            <locale-switcher></locale-switcher>
           </div>
         </div>
       </header>
@@ -84,6 +89,12 @@ export class AppHeader extends LitElement {
       .logo {
         width: 40px;
         height: 40px;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .app-name {
+        display: none;
       }
     }
   `;

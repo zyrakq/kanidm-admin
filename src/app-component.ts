@@ -2,6 +2,7 @@ import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { Router } from '@lit-labs/router';
 import { authService } from '@/features/auth';
+import { localizationService } from '@/features/localization';
 import '@/features/theme/services/favicon.service';
 
 // Import components (they will be registered as custom elements)
@@ -12,6 +13,11 @@ import '@/features/notifications/components/toast-container';
 
 @customElement('app-component')
 export class AppComponent extends LitElement {
+  constructor() {
+    super();
+    localizationService.init();
+  }
+
   // Router - основной роутер с глобальными listeners (Router наследует от Routes)
   private _router = new Router(this, [
     {

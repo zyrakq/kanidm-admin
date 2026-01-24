@@ -1,5 +1,7 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { msg } from '@lit/localize';
+import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import type { User } from '@/features/auth';
@@ -7,6 +9,7 @@ import '@/shared/components/app-header';
 import '@/shared/components/footer-info';
 
 @customElement('dashboard-page')
+@localized()
 export class DashboardPage extends LitElement {
   @state()
   private user: User | null = null;
@@ -32,49 +35,57 @@ export class DashboardPage extends LitElement {
         window.location.href = '/';
       }, 1000);
     } catch (error) {
-      notificationService.error('Failed to sign out. Please try again.');
+      notificationService.error(msg('Failed to sign out. Please try again.'));
     } finally {
       this.loading = false;
     }
   }
 
   private handleTestSuccess() {
-    notificationService.success('Operation completed successfully!');
+    notificationService.success(msg('Operation completed successfully!'));
   }
 
   private handleTestError() {
-    notificationService.error('An error occurred during the operation');
+    notificationService.error(msg('An error occurred during the operation'));
   }
 
   private handleTestWarning() {
-    notificationService.warning('This action requires your attention');
+    notificationService.warning(msg('This action requires your attention'));
   }
 
   private handleTestInfo() {
-    notificationService.info('New information is available');
+    notificationService.info(msg('New information is available'));
   }
 
   private handleTestLongSuccess() {
     notificationService.success(
-      'The operation has been completed successfully! All user data has been synchronized with the remote server, and the local cache has been updated accordingly. Please verify the changes in your dashboard.'
+      msg(
+        'The operation has been completed successfully! All user data has been synchronized with the remote server, and the local cache has been updated accordingly. Please verify the changes in your dashboard.'
+      )
     );
   }
 
   private handleTestLongError() {
     notificationService.error(
-      'Failed to connect to the authentication server. The connection was refused due to network timeout (error code: ETIMEDOUT). Please check your internet connection and try again. If the problem persists, contact your system administrator for assistance.'
+      msg(
+        'Failed to connect to the authentication server. The connection was refused due to network timeout (error code: ETIMEDOUT). Please check your internet connection and try again. If the problem persists, contact your system administrator for assistance.'
+      )
     );
   }
 
   private handleTestLongWarning() {
     notificationService.warning(
-      'Your session is about to expire in 5 minutes. Any unsaved changes will be lost. Please save your work and refresh your session to continue working without interruption. This is an automated security measure to protect your account.'
+      msg(
+        'Your session is about to expire in 5 minutes. Any unsaved changes will be lost. Please save your work and refresh your session to continue working without interruption. This is an automated security measure to protect your account.'
+      )
     );
   }
 
   private handleTestVeryLongInfo() {
     notificationService.info(
-      'System maintenance is scheduled for tonight between 2:00 AM and 4:00 AM UTC. During this time, the following services will be temporarily unavailable: user authentication, data synchronization, file uploads, and API access. We apologize for any inconvenience this may cause. All services are expected to be fully operational by 4:30 AM UTC. For emergency support during the maintenance window, please contact our 24/7 helpdesk at support@example.com or call +1-800-123-4567. Thank you for your patience and understanding.'
+      msg(
+        'System maintenance is scheduled for tonight between 2:00 AM and 4:00 AM UTC. During this time, the following services will be temporarily unavailable: user authentication, data synchronization, file uploads, and API access. We apologize for any inconvenience this may cause. All services are expected to be fully operational by 4:30 AM UTC. For emergency support during the maintenance window, please contact our 24/7 helpdesk at support@example.com or call +1-800-123-4567. Thank you for your patience and understanding.'
+      )
     );
   }
 
@@ -85,22 +96,22 @@ export class DashboardPage extends LitElement {
         <main class="main-content">
           <div class="dashboard-container">
             <div class="dashboard-card">
-              <h1 class="title">Dashboard</h1>
-              <p class="subtitle">Welcome to your protected area</p>
+              <h1 class="title">${msg('Dashboard')}</h1>
+              <p class="subtitle">${msg('Welcome to your protected area')}</p>
 
               ${this.user
                 ? html`
                     <div class="user-section">
-                      <h2>User Information</h2>
+                      <h2>${msg('User Information')}</h2>
                       <div class="user-details">
                         <div class="detail-row">
-                          <span class="label">ID:</span>
+                          <span class="label">${msg('ID')}:</span>
                           <span class="value">${this.user.id}</span>
                         </div>
                         ${this.user.email
                           ? html`
                               <div class="detail-row">
-                                <span class="label">Email:</span>
+                                <span class="label">${msg('Email')}:</span>
                                 <span class="value">${this.user.email}</span>
                               </div>
                             `
@@ -108,7 +119,7 @@ export class DashboardPage extends LitElement {
                         ${this.user.username
                           ? html`
                               <div class="detail-row">
-                                <span class="label">Username:</span>
+                                <span class="label">${msg('Username')}:</span>
                                 <span class="value">${this.user.username}</span>
                               </div>
                             `
@@ -116,7 +127,9 @@ export class DashboardPage extends LitElement {
                         ${this.user.displayName
                           ? html`
                               <div class="detail-row">
-                                <span class="label">Display Name:</span>
+                                <span class="label"
+                                  >${msg('Display Name')}:</span
+                                >
                                 <span class="value"
                                   >${this.user.displayName}</span
                                 >
@@ -128,67 +141,70 @@ export class DashboardPage extends LitElement {
                   `
                 : html`
                     <div class="loading-message">
-                      <p>Loading user information...</p>
+                      <p>${msg('Loading user information...')}</p>
                     </div>
                   `}
 
               <div class="test-section">
-                <h2>Test Notifications</h2>
+                <h2>${msg('Test Notifications')}</h2>
                 <p class="test-description">
-                  Click buttons below to test different notification types
+                  ${msg(
+                    'Click buttons below to test different notification types'
+                  )}
                 </p>
                 <div class="test-buttons">
                   <button
                     class="btn btn-success"
                     @click=${this.handleTestSuccess}
                   >
-                    Success
+                    ${msg('Success')}
                   </button>
                   <button class="btn btn-error" @click=${this.handleTestError}>
-                    Error
+                    ${msg('Error')}
                   </button>
                   <button
                     class="btn btn-warning"
                     @click=${this.handleTestWarning}
                   >
-                    Warning
+                    ${msg('Warning')}
                   </button>
                   <button class="btn btn-info" @click=${this.handleTestInfo}>
-                    Info
+                    ${msg('Info')}
                   </button>
                 </div>
               </div>
 
               <div class="test-section">
-                <h2>Test Long Notifications</h2>
+                <h2>${msg('Test Long Notifications')}</h2>
                 <p class="test-description">
-                  Click to test notifications with long messages (clickable to
-                  see full text)
+                  ${msg(
+                    'Click to test notifications with long messages (clickable to see full text)'
+                  )}
                 </p>
                 <div class="test-buttons">
                   <button
                     class="btn btn-success"
                     @click=${this.handleTestLongSuccess}
                   >
-                    Long Success
+                    ${msg('Long Success')}
                   </button>
                   <button
                     class="btn btn-error"
                     @click=${this.handleTestLongError}
                   >
-                    Long Error
+                    ${msg('Long Error')}
                   </button>
                   <button
                     class="btn btn-warning"
                     @click=${this.handleTestLongWarning}
                   >
-                    Long Warning
+                    ${msg('Long Warning')}
                   </button>
                   <button
                     class="btn btn-info"
                     @click=${this.handleTestVeryLongInfo}
                   >
-                    Very Long Info
+                    ${msg('Very Long Info')}
                   </button>
                 </div>
               </div>
@@ -199,7 +215,7 @@ export class DashboardPage extends LitElement {
                   @click=${this.handleSignOut}
                   ?disabled=${this.loading}
                 >
-                  ${this.loading ? 'Signing out...' : 'Sign Out'}
+                  ${this.loading ? msg('Signing out...') : msg('Sign Out')}
                 </button>
               </div>
             </div>

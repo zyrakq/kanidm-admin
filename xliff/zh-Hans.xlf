@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+<file target-language="zh-Hans" source-language="en" original="lit-localize-inputs" datatype="plaintext">
+<body>
+<trans-unit id="s8a4d6da58d9acb76">
+  <source>Welcome to Kanidm</source>
+  <target>欢迎使用 Kanidm</target>
+</trans-unit>
+<trans-unit id="sebe7fcdde2daf169">
+  <source>Sign in to continue</source>
+  <target>登录以继续</target>
+</trans-unit>
+<trans-unit id="sbbd340ef453ff7e4">
+  <source>Go to Dashboard</source>
+  <target>前往控制面板</target>
+</trans-unit>
+<trans-unit id="sa0edd3227b3addeb">
+  <source>Redirecting...</source>
+  <target>正在重定向...</target>
+</trans-unit>
+<trans-unit id="s5e94738a2eeb8943">
+  <source>Sign In</source>
+  <target>登录</target>
+</trans-unit>
+<trans-unit id="s424c654650973289">
+  <source>Change language</source>
+  <target>更改语言</target>
+</trans-unit>
+<trans-unit id="sef058092ccff6354">
+  <source>Authentication failed. No user session found.</source>
+  <target>身份验证失败。未找到用户会话。</target>
+</trans-unit>
+<trans-unit id="s10e7b6cfbe5c865e">
+  <source>Unknown error occurred</source>
+  <target>发生未知错误</target>
+</trans-unit>
+<trans-unit id="sffef1a8596bc58bb">
+  <source>Authenticating...</source>
+  <target>正在验证身份...</target>
+</trans-unit>
+<trans-unit id="scd5b45ca7378126e">
+  <source>Please wait while we complete the sign in process.</source>
+  <target>请稍候，我们正在完成登录过程。</target>
+</trans-unit>
+<trans-unit id="sc09939f2fc8b8be3">
+  <source>Success!</source>
+  <target>成功！</target>
+</trans-unit>
+<trans-unit id="s503b0848078dd117">
+  <source>You have been authenticated. Redirecting...</source>
+  <target>您已通过身份验证。正在重定向...</target>
+</trans-unit>
+<trans-unit id="sf3ba1de979a9b38e">
+  <source>Authentication Failed</source>
+  <target>身份验证失败</target>
+</trans-unit>
+<trans-unit id="s6a6528b527495513">
+  <source>Return to Home</source>
+  <target>返回首页</target>
+</trans-unit>
+<trans-unit id="s92a0d19a28995530">
+  <source>Success</source>
+  <target>成功</target>
+</trans-unit>
+<trans-unit id="s5f343a43e7ea9f91">
+  <source>Error</source>
+  <target>错误</target>
+</trans-unit>
+<trans-unit id="s34be76c6b1eadbef">
+  <source>Warning</source>
+  <target>警告</target>
+</trans-unit>
+<trans-unit id="s2063a9d17c280fe5">
+  <source>Info</source>
+  <target>信息</target>
+</trans-unit>
+<trans-unit id="scb832fc8958bf9e6">
+  <source>Notification</source>
+  <target>通知</target>
+</trans-unit>
+<trans-unit id="sa95b4224f685a36a">
+  <source>Close modal</source>
+  <target>关闭窗口</target>
+</trans-unit>
+<trans-unit id="s4a73273533c585d2">
+  <source>Close notification</source>
+  <target>关闭通知</target>
+</trans-unit>
+<trans-unit id="sae506e1a821a6d4b">
+  <source>Failed to sign out. Please try again.</source>
+  <target>退出失败。请重试。</target>
+</trans-unit>
+<trans-unit id="s5285ab86397ccb7f">
+  <source>Operation completed successfully!</source>
+  <target>操作成功完成！</target>
+</trans-unit>
+<trans-unit id="s9c274ca3aae0227e">
+  <source>An error occurred during the operation</source>
+  <target>操作过程中发生错误</target>
+</trans-unit>
+<trans-unit id="sc95aa17001f8e45c">
+  <source>This action requires your attention</source>
+  <target>此操作需要您的注意</target>
+</trans-unit>
+<trans-unit id="s5187bdebb3f4a25e">
+  <source>New information is available</source>
+  <target>有新信息可用</target>
+</trans-unit>
+<trans-unit id="sd53dfb57070970e2">
+  <source>The operation has been completed successfully! All user data has been synchronized with the remote server, and the local cache has been updated accordingly. Please verify the changes in your dashboard.</source>
+  <target>操作已成功完成！所有用户数据已与远程服务器同步，本地缓存已相应更新。请在控制面板中验证更改。</target>
+</trans-unit>
+<trans-unit id="sf3fda5790cfa46f6">
+  <source>Failed to connect to the authentication server. The connection was refused due to network timeout (error code: ETIMEDOUT). Please check your internet connection and try again. If the problem persists, contact your system administrator for assistance.</source>
+  <target>无法连接到身份验证服务器。由于网络超时，连接被拒绝（错误代码：ETIMEDOUT）。请检查您的互联网连接并重试。如果问题仍然存在，请联系系统管理员寻求帮助。</target>
+</trans-unit>
+<trans-unit id="s36c0017e9dc2414f">
+  <source>Your session is about to expire in 5 minutes. Any unsaved changes will be lost. Please save your work and refresh your session to continue working without interruption. This is an automated security measure to protect your account.</source>
+  <target>您的会话将在 5 分钟后过期。任何未保存的更改都将丢失。请保存您的工作并刷新会话以继续工作而不中断。这是保护您账户的自动安全措施。</target>
+</trans-unit>
+<trans-unit id="sb70a5cf1313da61a">
+  <source>System maintenance is scheduled for tonight between 2:00 AM and 4:00 AM UTC. During this time, the following services will be temporarily unavailable: user authentication, data synchronization, file uploads, and API access. We apologize for any inconvenience this may cause. All services are expected to be fully operational by 4:30 AM UTC. For emergency support during the maintenance window, please contact our 24/7 helpdesk at support@example.com or call +1-800-123-4567. Thank you for your patience and understanding.</source>
+  <target>系统维护计划于今晚 2:00 AM 至 4:00 AM UTC 之间进行。在此期间，以下服务将暂时不可用：用户身份验证、数据同步、文件上传和 API 访问。对此造成的不便深表歉意。预计所有服务将在 UTC 4:30 AM 之前完全恢复正常。如需在维护期间获得紧急支持，请通过 support@example.com 联系我们的 24/7 服务台或拨打 +1-800-123-4567。感谢您的耐心和理解。</target>
+</trans-unit>
+<trans-unit id="s7fee95b66225e1fb">
+  <source>Dashboard</source>
+  <target>控制面板</target>
+</trans-unit>
+<trans-unit id="s5eddcab87c38b6b6">
+  <source>Welcome to your protected area</source>
+  <target>欢迎来到您的受保护区域</target>
+</trans-unit>
+<trans-unit id="s551172bd09a2a438">
+  <source>User Information</source>
+  <target>用户信息</target>
+</trans-unit>
+<trans-unit id="s09240e07b5b8d640">
+  <source>ID</source>
+  <target>ID</target>
+</trans-unit>
+<trans-unit id="sd1f44f1a8bc20e67">
+  <source>Email</source>
+  <target>电子邮件</target>
+</trans-unit>
+<trans-unit id="s03f42eea72154959">
+  <source>Username</source>
+  <target>用户名</target>
+</trans-unit>
+<trans-unit id="s11b2e9ecce28690c">
+  <source>Display Name</source>
+  <target>显示名称</target>
+</trans-unit>
+<trans-unit id="s54fa6ceb8030c6ae">
+  <source>Loading user information...</source>
+  <target>正在加载用户信息...</target>
+</trans-unit>
+<trans-unit id="s74693aa15a1926a9">
+  <source>Test Notifications</source>
+  <target>测试通知</target>
+</trans-unit>
+<trans-unit id="s46e024afcbd27a75">
+  <source>Click buttons below to test different notification types</source>
+  <target>点击下面的按钮测试不同类型的通知</target>
+</trans-unit>
+<trans-unit id="se5da7e083aba2325">
+  <source>Test Long Notifications</source>
+  <target>测试长通知</target>
+</trans-unit>
+<trans-unit id="s05d67462a1797543">
+  <source>Click to test notifications with long messages (clickable to see full text)</source>
+  <target>点击测试长消息通知（可点击查看完整文本）</target>
+</trans-unit>
+<trans-unit id="s0e0f74677975e7fc">
+  <source>Long Success</source>
+  <target>长成功消息</target>
+</trans-unit>
+<trans-unit id="se6a30dcfa276174d">
+  <source>Long Error</source>
+  <target>长错误消息</target>
+</trans-unit>
+<trans-unit id="se2cfa296a74531fb">
+  <source>Long Warning</source>
+  <target>长警告消息</target>
+</trans-unit>
+<trans-unit id="s33e0ec252844c273">
+  <source>Very Long Info</source>
+  <target>很长的信息消息</target>
+</trans-unit>
+<trans-unit id="sea6ff86442041be6">
+  <source>Signing out...</source>
+  <target>正在退出...</target>
+</trans-unit>
+<trans-unit id="s8fa032cdafb3c9b0">
+  <source>Sign Out</source>
+  <target>退出</target>
+</trans-unit>
+<trans-unit id="sbacae193cb065a4c">
+  <source>Kanidm Admin</source>
+  <target>Kanidm 管理</target>
+</trans-unit>
+<trans-unit id="saea6a4171ae86e4b">
+  <source>Operational</source>
+  <target>运行正常</target>
+</trans-unit>
+<trans-unit id="sbb3cb2f217271ccb">
+  <source>v0.0.0</source>
+  <target>v0.0.0</target>
+</trans-unit>
+<trans-unit id="sa8c3b80277455232">
+  <source>GitHub</source>
+  <target>GitHub</target>
+</trans-unit>
+<trans-unit id="sdbf31fbe1f747f1a">
+  <source>Kanidm Docs</source>
+  <target>Kanidm 文档</target>
+</trans-unit>
+<trans-unit id="s631b1127429695aa">
+  <source>Kanidm GitHub</source>
+  <target>Kanidm GitHub</target>
+</trans-unit>
+</body>
+</file>
+</xliff>

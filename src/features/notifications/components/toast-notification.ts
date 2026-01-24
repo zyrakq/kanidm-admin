@@ -1,8 +1,11 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { msg } from '@lit/localize';
+import { localized } from '@/features/localization';
 import type { NotificationType } from '../types/notification.types.ts';
 
 @customElement('toast-notification')
+@localized()
 export class ToastNotification extends LitElement {
   @property({ type: String }) message = '';
   @property({ type: String }) type: NotificationType = 'info';
@@ -94,7 +97,7 @@ export class ToastNotification extends LitElement {
         <button
           class="toast-close"
           @click=${this.handleClose}
-          aria-label="Close notification"
+          aria-label=${msg('Close notification')}
         >
           ✕
         </button>

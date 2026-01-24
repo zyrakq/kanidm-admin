@@ -1,8 +1,11 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { msg } from '@lit/localize';
+import { localized } from '@/features/localization';
 import { authService } from '../services/auth.service';
 
 @customElement('oauth-callback')
+@localized()
 export class OAuthCallback extends LitElement {
   @state()
   private status: 'loading' | 'success' | 'error' = 'loading';
@@ -39,13 +42,15 @@ export class OAuthCallback extends LitElement {
       } else {
         console.error('[OAuthCallback] Authentication failed - no user found');
         this.status = 'error';
-        this.errorMessage = 'Authentication failed. No user session found.';
+        this.errorMessage = msg(
+          'Authentication failed. No user session found.'
+        );
       }
     } catch (error) {
       console.error('[OAuthCallback] Error processing callback:', error);
       this.status = 'error';
       this.errorMessage =
-        error instanceof Error ? error.message : 'Unknown error occurred';
+        error instanceof Error ? error.message : msg('Unknown error occurred');
     }
   }
 
@@ -56,24 +61,26 @@ export class OAuthCallback extends LitElement {
           ${this.status === 'loading'
             ? html`
                 <div class="spinner"></div>
-                <h2>Authenticating...</h2>
-                <p>Please wait while we complete the sign in process.</p>
+                <h2>${msg('Authenticating...')}</h2>
+                <p>
+                  ${msg('Please wait while we complete the sign in process.')}
+                </p>
               `
             : this.status === 'success'
               ? html`
                   <div class="success-icon">✓</div>
-                  <h2>Success!</h2>
-                  <p>You have been authenticated. Redirecting...</p>
+                  <h2>${msg('Success!')}</h2>
+                  <p>${msg('You have been authenticated. Redirecting...')}</p>
                 `
               : html`
                   <div class="error-icon">✕</div>
-                  <h2>Authentication Failed</h2>
+                  <h2>${msg('Authentication Failed')}</h2>
                   <p>${this.errorMessage}</p>
                   <button
                     class="btn"
                     @click=${() => (window.location.href = '/')}
                   >
-                    Return to Home
+                    ${msg('Return to Home')}
                   </button>
                 `}
         </div>

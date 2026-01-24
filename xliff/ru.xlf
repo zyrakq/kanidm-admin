@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+<file target-language="ru" source-language="en" original="lit-localize-inputs" datatype="plaintext">
+<body>
+<trans-unit id="s8a4d6da58d9acb76">
+  <source>Welcome to Kanidm</source>
+  <target>Добро пожаловать в Kanidm</target>
+</trans-unit>
+<trans-unit id="sebe7fcdde2daf169">
+  <source>Sign in to continue</source>
+  <target>Войдите, чтобы продолжить</target>
+</trans-unit>
+<trans-unit id="sbbd340ef453ff7e4">
+  <source>Go to Dashboard</source>
+  <target>Перейти к панели управления</target>
+</trans-unit>
+<trans-unit id="sa0edd3227b3addeb">
+  <source>Redirecting...</source>
+  <target>Перенаправление...</target>
+</trans-unit>
+<trans-unit id="s5e94738a2eeb8943">
+  <source>Sign In</source>
+  <target>Войти</target>
+</trans-unit>
+<trans-unit id="s424c654650973289">
+  <source>Change language</source>
+  <target>Изменить язык</target>
+</trans-unit>
+<trans-unit id="sef058092ccff6354">
+  <source>Authentication failed. No user session found.</source>
+  <target>Ошибка аутентификации. Пользовательская сессия не найдена.</target>
+</trans-unit>
+<trans-unit id="s10e7b6cfbe5c865e">
+  <source>Unknown error occurred</source>
+  <target>Произошла неизвестная ошибка</target>
+</trans-unit>
+<trans-unit id="sffef1a8596bc58bb">
+  <source>Authenticating...</source>
+  <target>Аутентификация...</target>
+</trans-unit>
+<trans-unit id="scd5b45ca7378126e">
+  <source>Please wait while we complete the sign in process.</source>
+  <target>Пожалуйста, подождите, пока мы завершаем процесс входа.</target>
+</trans-unit>
+<trans-unit id="sc09939f2fc8b8be3">
+  <source>Success!</source>
+  <target>Успешно!</target>
+</trans-unit>
+<trans-unit id="s503b0848078dd117">
+  <source>You have been authenticated. Redirecting...</source>
+  <target>Вы успешно аутентифицированы. Перенаправление...</target>
+</trans-unit>
+<trans-unit id="sf3ba1de979a9b38e">
+  <source>Authentication Failed</source>
+  <target>Ошибка аутентификации</target>
+</trans-unit>
+<trans-unit id="s6a6528b527495513">
+  <source>Return to Home</source>
+  <target>Вернуться на главную</target>
+</trans-unit>
+<trans-unit id="s92a0d19a28995530">
+  <source>Success</source>
+  <target>Успех</target>
+</trans-unit>
+<trans-unit id="s5f343a43e7ea9f91">
+  <source>Error</source>
+  <target>Ошибка</target>
+</trans-unit>
+<trans-unit id="s34be76c6b1eadbef">
+  <source>Warning</source>
+  <target>Предупреждение</target>
+</trans-unit>
+<trans-unit id="s2063a9d17c280fe5">
+  <source>Info</source>
+  <target>Информация</target>
+</trans-unit>
+<trans-unit id="scb832fc8958bf9e6">
+  <source>Notification</source>
+  <target>Уведомление</target>
+</trans-unit>
+<trans-unit id="sa95b4224f685a36a">
+  <source>Close modal</source>
+  <target>Закрыть окно</target>
+</trans-unit>
+<trans-unit id="s4a73273533c585d2">
+  <source>Close notification</source>
+  <target>Закрыть уведомление</target>
+</trans-unit>
+<trans-unit id="sae506e1a821a6d4b">
+  <source>Failed to sign out. Please try again.</source>
+  <target>Не удалось выйти. Пожалуйста, попробуйте снова.</target>
+</trans-unit>
+<trans-unit id="s5285ab86397ccb7f">
+  <source>Operation completed successfully!</source>
+  <target>Операция успешно выполнена!</target>
+</trans-unit>
+<trans-unit id="s9c274ca3aae0227e">
+  <source>An error occurred during the operation</source>
+  <target>Произошла ошибка во время операции</target>
+</trans-unit>
+<trans-unit id="sc95aa17001f8e45c">
+  <source>This action requires your attention</source>
+  <target>Это действие требует вашего внимания</target>
+</trans-unit>
+<trans-unit id="s5187bdebb3f4a25e">
+  <source>New information is available</source>
+  <target>Доступна новая информация</target>
+</trans-unit>
+<trans-unit id="sd53dfb57070970e2">
+  <source>The operation has been completed successfully! All user data has been synchronized with the remote server, and the local cache has been updated accordingly. Please verify the changes in your dashboard.</source>
+  <target>Операция успешно выполнена! Все пользовательские данные были синхронизированы с удаленным сервером, и локальный кэш был обновлен. Пожалуйста, проверьте изменения на панели управления.</target>
+</trans-unit>
+<trans-unit id="sf3fda5790cfa46f6">
+  <source>Failed to connect to the authentication server. The connection was refused due to network timeout (error code: ETIMEDOUT). Please check your internet connection and try again. If the problem persists, contact your system administrator for assistance.</source>
+  <target>Не удалось подключиться к серверу аутентификации. Подключение было отклонено из-за таймаута сети (код ошибки: ETIMEDOUT). Пожалуйста, проверьте подключение к интернету и попробуйте снова. Если проблема не исчезнет, обратитесь к системному администратору.</target>
+</trans-unit>
+<trans-unit id="s36c0017e9dc2414f">
+  <source>Your session is about to expire in 5 minutes. Any unsaved changes will be lost. Please save your work and refresh your session to continue working without interruption. This is an automated security measure to protect your account.</source>
+  <target>Ваша сессия истекает через 5 минут. Все несохраненные изменения будут потеряны. Пожалуйста, сохраните работу и обновите сессию для продолжения работы без прерываний. Это автоматическая мера безопасности для защиты вашего аккаунта.</target>
+</trans-unit>
+<trans-unit id="sb70a5cf1313da61a">
+  <source>System maintenance is scheduled for tonight between 2:00 AM and 4:00 AM UTC. During this time, the following services will be temporarily unavailable: user authentication, data synchronization, file uploads, and API access. We apologize for any inconvenience this may cause. All services are expected to be fully operational by 4:30 AM UTC. For emergency support during the maintenance window, please contact our 24/7 helpdesk at support@example.com or call +1-800-123-4567. Thank you for your patience and understanding.</source>
+  <target>Плановое техническое обслуживание запланировано на сегодня с 2:00 до 4:00 UTC. В это время будут недоступны: аутентификация пользователей, синхронизация данных, загрузка файлов и доступ к API. Приносим извинения за неудобства. Все сервисы будут полностью восстановлены к 4:30 UTC. Для экстренной поддержки обращайтесь на support@example.com или звоните +1-800-123-4567. Спасибо за понимание.</target>
+</trans-unit>
+<trans-unit id="s7fee95b66225e1fb">
+  <source>Dashboard</source>
+  <target>Панель управления</target>
+</trans-unit>
+<trans-unit id="s5eddcab87c38b6b6">
+  <source>Welcome to your protected area</source>
+  <target>Добро пожаловать в защищенную зону</target>
+</trans-unit>
+<trans-unit id="s551172bd09a2a438">
+  <source>User Information</source>
+  <target>Информация о пользователе</target>
+</trans-unit>
+<trans-unit id="s09240e07b5b8d640">
+  <source>ID</source>
+  <target>ID</target>
+</trans-unit>
+<trans-unit id="sd1f44f1a8bc20e67">
+  <source>Email</source>
+  <target>Email</target>
+</trans-unit>
+<trans-unit id="s03f42eea72154959">
+  <source>Username</source>
+  <target>Имя пользователя</target>
+</trans-unit>
+<trans-unit id="s11b2e9ecce28690c">
+  <source>Display Name</source>
+  <target>Отображаемое имя</target>
+</trans-unit>
+<trans-unit id="s54fa6ceb8030c6ae">
+  <source>Loading user information...</source>
+  <target>Загрузка информации о пользователе...</target>
+</trans-unit>
+<trans-unit id="s74693aa15a1926a9">
+  <source>Test Notifications</source>
+  <target>Тестовые уведомления</target>
+</trans-unit>
+<trans-unit id="s46e024afcbd27a75">
+  <source>Click buttons below to test different notification types</source>
+  <target>Нажмите кнопки ниже для проверки различных типов уведомлений</target>
+</trans-unit>
+<trans-unit id="se5da7e083aba2325">
+  <source>Test Long Notifications</source>
+  <target>Тестирование длинных уведомлений</target>
+</trans-unit>
+<trans-unit id="s05d67462a1797543">
+  <source>Click to test notifications with long messages (clickable to see full text)</source>
+  <target>Нажмите для проверки уведомлений с длинными сообщениями (нажмите для просмотра полного текста)</target>
+</trans-unit>
+<trans-unit id="s0e0f74677975e7fc">
+  <source>Long Success</source>
+  <target>Длинный успех</target>
+</trans-unit>
+<trans-unit id="se6a30dcfa276174d">
+  <source>Long Error</source>
+  <target>Длинная ошибка</target>
+</trans-unit>
+<trans-unit id="se2cfa296a74531fb">
+  <source>Long Warning</source>
+  <target>Длинное предупреждение</target>
+</trans-unit>
+<trans-unit id="s33e0ec252844c273">
+  <source>Very Long Info</source>
+  <target>Очень длинная информация</target>
+</trans-unit>
+<trans-unit id="sea6ff86442041be6">
+  <source>Signing out...</source>
+  <target>Выход...</target>
+</trans-unit>
+<trans-unit id="s8fa032cdafb3c9b0">
+  <source>Sign Out</source>
+  <target>Выйти</target>
+</trans-unit>
+<trans-unit id="sbacae193cb065a4c">
+  <source>Kanidm Admin</source>
+  <target>Kanidm Админ</target>
+</trans-unit>
+<trans-unit id="saea6a4171ae86e4b">
+  <source>Operational</source>
+  <target>Работает</target>
+</trans-unit>
+<trans-unit id="sbb3cb2f217271ccb">
+  <source>v0.0.0</source>
+  <target>v0.0.0</target>
+</trans-unit>
+<trans-unit id="sa8c3b80277455232">
+  <source>GitHub</source>
+  <target>GitHub</target>
+</trans-unit>
+<trans-unit id="sdbf31fbe1f747f1a">
+  <source>Kanidm Docs</source>
+  <target>Документация Kanidm</target>
+</trans-unit>
+<trans-unit id="s631b1127429695aa">
+  <source>Kanidm GitHub</source>
+  <target>Kanidm GitHub</target>
+</trans-unit>
+</body>
+</file>
+</xliff>

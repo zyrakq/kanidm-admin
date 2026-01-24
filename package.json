@@ -4,14 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bun dev:frontend & bun dev:backend",
-    "dev:frontend": "tsc && bun run build --watch",
+    "dev": "bun i18n:build && bun dev:frontend & bun dev:backend",
+    "dev:frontend": "bun i18n:build && tsc && bun run build --watch",
     "dev:backend": "trail run -a 0.0.0.0:4000 --public-dir dist --spa",
     "watch": "vite --host",
-    "build": "tsc && vite build"
+    "build": "bun i18n:build && tsc && vite build",
+    "i18n:extract": "lit-localize extract",
+    "i18n:build": "lit-localize build"
   },
   "dependencies": {
     "@lit-labs/router": "^0.1.4",
+    "@lit/localize": "^0.12.2",
+    "@lit/localize-tools": "^0.8.1",
     "lit": "^3.3.1",
     "urlpattern-polyfill": "^10.1.0"
   },

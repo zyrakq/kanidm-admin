@@ -1,10 +1,12 @@
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { localized } from '@/features/localization';
 import '@/shared/components/app-header';
 import '@/features/auth/components/auth-status';
 import '@/shared/components/footer-info';
 
 @customElement('welcome-page')
+@localized()
 export class WelcomePage extends LitElement {
   render() {
     return html`

@@ -1,7 +1,10 @@
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { msg } from '@lit/localize';
+import { localized } from '@/features/localization';
 
 @customElement('footer-info')
+@localized()
 export class FooterInfo extends LitElement {
   render() {
     return html`
@@ -9,10 +12,10 @@ export class FooterInfo extends LitElement {
         <div class="left">
           <span class="status">
             <span class="status-dot"></span>
-            Operational
+            ${msg('Operational')}
           </span>
           <span class="separator">•</span>
-          <span class="version">v0.0.0</span>
+          <span class="version">${msg('v0.0.0')}</span>
         </div>
         <div class="right">
           <a
@@ -20,7 +23,7 @@ export class FooterInfo extends LitElement {
             target="_blank"
             rel="noopener noreferrer"
           >
-            GitHub
+            ${msg('GitHub')}
           </a>
           <span class="separator">•</span>
           <a
@@ -28,7 +31,7 @@ export class FooterInfo extends LitElement {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Kanidm Docs
+            ${msg('Kanidm Docs')}
           </a>
           <span class="separator">•</span>
           <a
@@ -36,7 +39,7 @@ export class FooterInfo extends LitElement {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Kanidm GitHub
+            ${msg('Kanidm GitHub')}
           </a>
         </div>
       </footer>

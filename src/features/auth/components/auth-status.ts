@@ -1,5 +1,7 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { msg } from '@lit/localize';
+import { localized } from '@/features/localization';
 import { authService } from '../services/auth.service';
 import { notificationService } from '@/features/notifications';
 import type { User } from '@/features/auth';
@@ -8,6 +10,7 @@ import logoLight from '@/assets/logo-light.svg';
 import logoDark from '@/assets/logo-dark.svg';
 
 @customElement('auth-status')
+@localized()
 export class AuthStatus extends LitElement {
   private theme = new ThemeController(this);
 
@@ -54,8 +57,8 @@ export class AuthStatus extends LitElement {
       <div class="auth-card">
         <img src=${logo} alt="Kanidm" class="logo" />
 
-        <h1 class="title">Welcome to Kanidm</h1>
-        <p class="subtitle">Sign in to continue</p>
+        <h1 class="title">${msg('Welcome to Kanidm')}</h1>
+        <p class="subtitle">${msg('Sign in to continue')}</p>
 
         ${this.isAuthenticated
           ? html`
@@ -75,7 +78,7 @@ export class AuthStatus extends LitElement {
                   @click=${this.handleDashboardClick}
                   ?disabled=${this.loading}
                 >
-                  Go to Dashboard
+                  ${msg('Go to Dashboard')}
                 </button>
               `
             : html`
@@ -84,7 +87,7 @@ export class AuthStatus extends LitElement {
                   @click=${this.handleSignIn}
                   ?disabled=${this.loading}
                 >
-                  ${this.loading ? 'Redirecting...' : 'Sign In'}
+                  ${this.loading ? msg('Redirecting...') : msg('Sign In')}
                 </button>
               `}
         </div>
