@@ -153,15 +153,18 @@ export class NotificationModal extends LitElement {
     }
 
     .modal-card {
-      background: #ffffff;
+      background: var(--theme-color-surface-elevated);
       border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--theme-shadow-lg);
       max-width: 600px;
       width: 100%;
       max-height: 80vh;
       display: flex;
       flex-direction: column;
       animation: slideUp 0.3s ease-out;
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     @keyframes slideUp {
@@ -180,7 +183,8 @@ export class NotificationModal extends LitElement {
       align-items: center;
       justify-content: space-between;
       padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--theme-color-border);
+      transition: border-color 0.2s ease;
     }
 
     .modal-title {
@@ -224,7 +228,8 @@ export class NotificationModal extends LitElement {
     .modal-title-text {
       font-size: 1.125rem;
       font-weight: 600;
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
+      transition: color 0.2s ease;
     }
 
     .modal-close {
@@ -236,20 +241,22 @@ export class NotificationModal extends LitElement {
       padding: 0;
       border: none;
       background: transparent;
-      color: #6b7280;
+      color: var(--theme-color-text-secondary);
       font-size: 20px;
       cursor: pointer;
       border-radius: 6px;
-      transition: all 0.2s ease;
+      transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
     }
 
     .modal-close:hover {
-      background: #f3f4f6;
-      color: #1f2937;
+      background: var(--theme-color-background);
+      color: var(--theme-color-text-primary);
     }
 
     .modal-close:focus {
-      outline: 2px solid #ff6b35;
+      outline: 2px solid var(--theme-color-primary);
       outline-offset: 2px;
     }
 
@@ -261,11 +268,12 @@ export class NotificationModal extends LitElement {
 
     .modal-message {
       margin: 0;
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
       font-size: 0.9375rem;
       line-height: 1.6;
       white-space: pre-wrap;
       word-break: break-word;
+      transition: color 0.2s ease;
     }
 
     @media (max-width: 640px) {

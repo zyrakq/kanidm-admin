@@ -28,7 +28,8 @@ export class WelcomePage extends LitElement {
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      background: #f9fafb;
+      background: var(--theme-color-background);
+      transition: background-color 0.2s ease;
     }
 
     .main-content {

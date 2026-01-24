@@ -220,7 +220,8 @@ export class DashboardPage extends LitElement {
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      background: #f9fafb;
+      background: var(--theme-color-background);
+      transition: background-color 0.2s ease;
     }
 
     .main-content {
@@ -237,23 +238,28 @@ export class DashboardPage extends LitElement {
     }
 
     .dashboard-card {
-      background: white;
+      background: var(--theme-color-surface);
       border-radius: 8px;
       padding: 3rem 2.5rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      box-shadow: var(--theme-shadow-md);
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     .title {
       font-size: 2rem;
       font-weight: 700;
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
       margin: 0 0 0.5rem 0;
+      transition: color 0.2s ease;
     }
 
     .subtitle {
       font-size: 1rem;
-      color: #6b7280;
+      color: var(--theme-color-text-secondary);
       margin: 0 0 2rem 0;
+      transition: color 0.2s ease;
     }
 
     .user-section {
@@ -263,21 +269,24 @@ export class DashboardPage extends LitElement {
     .user-section h2 {
       font-size: 1.25rem;
       font-weight: 600;
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
       margin: 0 0 1rem 0;
+      transition: color 0.2s ease;
     }
 
     .user-details {
-      background: #f9fafb;
+      background: var(--theme-color-background);
       border-radius: 6px;
       padding: 1.5rem;
+      transition: background-color 0.2s ease;
     }
 
     .detail-row {
       display: flex;
       justify-content: space-between;
       padding: 0.75rem 0;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--theme-color-border);
+      transition: border-color 0.2s ease;
     }
 
     .detail-row:last-child {
@@ -286,18 +295,21 @@ export class DashboardPage extends LitElement {
 
     .label {
       font-weight: 600;
-      color: #4b5563;
+      color: var(--theme-color-text-secondary);
+      transition: color 0.2s ease;
     }
 
     .value {
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
       word-break: break-all;
+      transition: color 0.2s ease;
     }
 
     .loading-message {
       text-align: center;
       padding: 2rem;
-      color: #6b7280;
+      color: var(--theme-color-text-secondary);
+      transition: color 0.2s ease;
     }
 
     .actions {
@@ -323,7 +335,7 @@ export class DashboardPage extends LitElement {
     }
 
     .btn-danger {
-      background: #ef4444;
+      background: var(--theme-color-error);
       color: white;
     }
 
@@ -338,21 +350,24 @@ export class DashboardPage extends LitElement {
     .test-section {
       margin: 2rem 0;
       padding: 1.5rem;
-      background: #f9fafb;
+      background: var(--theme-color-background);
       border-radius: 6px;
+      transition: background-color 0.2s ease;
     }
 
     .test-section h2 {
       font-size: 1.25rem;
       font-weight: 600;
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
       margin: 0 0 0.5rem 0;
+      transition: color 0.2s ease;
     }
 
     .test-description {
       font-size: 0.875rem;
-      color: #6b7280;
+      color: var(--theme-color-text-secondary);
       margin: 0 0 1rem 0;
+      transition: color 0.2s ease;
     }
 
     .test-buttons {
@@ -362,7 +377,7 @@ export class DashboardPage extends LitElement {
     }
 
     .btn-success {
-      background: #10b981;
+      background: var(--theme-color-success);
       color: white;
     }
 
@@ -375,7 +390,7 @@ export class DashboardPage extends LitElement {
     }
 
     .btn-error {
-      background: #ef4444;
+      background: var(--theme-color-error);
       color: white;
     }
 
@@ -388,7 +403,7 @@ export class DashboardPage extends LitElement {
     }
 
     .btn-warning {
-      background: #f59e0b;
+      background: var(--theme-color-warning);
       color: white;
     }
 
@@ -401,7 +416,7 @@ export class DashboardPage extends LitElement {
     }
 
     .btn-info {
-      background: #3b82f6;
+      background: var(--theme-color-info);
       color: white;
     }
 

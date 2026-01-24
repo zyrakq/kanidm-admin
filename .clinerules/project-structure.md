@@ -30,3 +30,10 @@ Each feature contains:
 
 - Intra-feature: relative paths
 - Inter-feature: path aliases (`@/features/*`, `@/pages/*`, `@/shared/*`)
+
+## Component reusability
+
+- High-reuse components → `features/` (with own services, types)
+- Simple UI components → `shared/`
+- Examples: theme toggler, form inputs, modals, data tables
+- Always consider portability when designing components

@@ -54,10 +54,11 @@ export class FooterInfo extends LitElement {
       justify-content: space-between;
       align-items: center;
       padding: 1.5rem 2rem;
-      color: #6b7280;
+      color: var(--theme-color-text-secondary);
       font-size: 0.875rem;
       max-width: 1400px;
       margin: 0 auto;
+      transition: color 0.2s ease;
     }
 
     .left,
@@ -73,31 +74,35 @@ export class FooterInfo extends LitElement {
       align-items: center;
       gap: 0.375rem;
       font-weight: 500;
+      color: var(--theme-color-text-secondary);
+      transition: color 0.2s ease;
     }
 
     .status-dot {
       width: 8px;
       height: 8px;
-      background: #10b981;
+      background: var(--theme-color-success);
       border-radius: 50%;
     }
 
     .version {
-      color: #9ca3af;
+      color: var(--theme-color-text-muted);
+      transition: color 0.2s ease;
     }
 
     .separator {
-      color: #d1d5db;
+      color: var(--theme-color-border);
+      transition: color 0.2s ease;
     }
 
     a {
-      color: #6b7280;
+      color: var(--theme-color-text-secondary);
       text-decoration: none;
       transition: color 0.2s ease;
     }
 
     a:hover {
-      color: #ff6b35;
+      color: var(--theme-color-primary);
     }
 
     @media (max-width: 768px) {

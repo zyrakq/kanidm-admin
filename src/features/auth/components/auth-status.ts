@@ -3,10 +3,14 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { authService } from '../services/auth.service';
 import { notificationService } from '@/features/notifications';
 import type { User } from '@/features/auth';
+import { ThemeController } from '@/features/theme';
 import logoLight from '@/assets/logo-light.svg';
+import logoDark from '@/assets/logo-dark.svg';
 
 @customElement('auth-status')
 export class AuthStatus extends LitElement {
+  private theme = new ThemeController(this);
+
   @state()
   private isAuthenticated = false;
 
@@ -31,7 +35,6 @@ export class AuthStatus extends LitElement {
   private async handleSignIn() {
     try {
       this.loading = true;
-      // Redirect to /auth/callback after successful OAuth
       await authService.signIn('oidc0', '/auth/callback');
     } catch (error) {
       notificationService.error('Failed to sign in. Please try again.');
@@ -45,9 +48,11 @@ export class AuthStatus extends LitElement {
   }
 
   render() {
+    const logo = this.theme.theme === 'dark' ? logoDark : logoLight;
+
     return html`
       <div class="auth-card">
-        <img src=${logoLight} alt="Kanidm" class="logo" />
+        <img src=${logo} alt="Kanidm" class="logo" />
 
         <h1 class="title">Welcome to Kanidm</h1>
         <p class="subtitle">Sign in to continue</p>
@@ -95,11 +100,14 @@ export class AuthStatus extends LitElement {
     }
 
     .auth-card {
-      background: white;
+      background: var(--theme-color-surface);
       border-radius: 8px;
       padding: 3rem 2.5rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      box-shadow: var(--theme-shadow-md);
       text-align: center;
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     .logo {
@@ -111,27 +119,31 @@ export class AuthStatus extends LitElement {
     .title {
       font-size: 1.5rem;
       font-weight: 600;
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
       margin: 0 0 0.5rem 0;
+      transition: color 0.2s ease;
     }
 
     .subtitle {
       font-size: 0.9375rem;
-      color: #6b7280;
+      color: var(--theme-color-text-secondary);
       margin: 0 0 2rem 0;
+      transition: color 0.2s ease;
     }
 
     .user-info {
       margin: 1.5rem 0;
       padding: 0.75rem 1rem;
-      background: #f9fafb;
+      background: var(--theme-color-background);
       border-radius: 6px;
+      transition: background-color 0.2s ease;
     }
 
     .user-name {
       font-size: 0.9375rem;
       font-weight: 500;
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
+      transition: color 0.2s ease;
     }
 
     .actions {
@@ -156,16 +168,16 @@ export class AuthStatus extends LitElement {
     }
 
     .btn-primary {
-      background: #ff6b35;
+      background: var(--theme-color-primary);
       color: white;
     }
 
     .btn-primary:hover:not(:disabled) {
-      background: #e85d2a;
+      background: var(--theme-color-primary-hover);
     }
 
     .btn-primary:active:not(:disabled) {
-      background: #d94e1f;
+      background: var(--theme-color-primary-active);
     }
 
     @media (max-width: 640px) {

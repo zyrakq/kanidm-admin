@@ -139,30 +139,32 @@ export class ToastNotification extends LitElement {
       align-items: center;
       gap: 0.75rem;
       padding: 1rem;
-      background: white;
+      background: var(--theme-color-surface-elevated);
       border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--theme-shadow-lg);
       min-width: 320px;
       max-width: 420px;
       border-left: 4px solid;
       opacity: var(--toast-opacity, 1);
-      transition: opacity 0.05s linear;
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     .toast-success {
-      border-left-color: #10b981;
+      border-left-color: var(--theme-color-success);
     }
 
     .toast-error {
-      border-left-color: #ef4444;
+      border-left-color: var(--theme-color-error);
     }
 
     .toast-warning {
-      border-left-color: #f59e0b;
+      border-left-color: var(--theme-color-warning);
     }
 
     .toast-info {
-      border-left-color: #3b82f6;
+      border-left-color: var(--theme-color-info);
     }
 
     .toast-icon {
@@ -199,10 +201,11 @@ export class ToastNotification extends LitElement {
 
     .toast-message {
       flex: 1;
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
       font-size: 0.875rem;
       font-weight: 500;
       line-height: 1.4;
+      transition: color 0.2s ease;
     }
 
     .toast-message-truncated {
@@ -223,8 +226,8 @@ export class ToastNotification extends LitElement {
       height: 1.4rem;
       background: linear-gradient(
         to bottom,
-        rgba(255, 255, 255, 0),
-        rgba(255, 255, 255, 1)
+        transparent,
+        var(--theme-color-surface-elevated)
       );
       pointer-events: none;
     }
@@ -255,7 +258,7 @@ export class ToastNotification extends LitElement {
       padding: 0;
       border: none;
       background: transparent;
-      color: #6b7280;
+      color: var(--theme-color-text-secondary);
       font-size: 16px;
       cursor: pointer;
       flex-shrink: 0;
@@ -263,11 +266,11 @@ export class ToastNotification extends LitElement {
     }
 
     .toast-close:hover {
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
     }
 
     .toast-close:focus {
-      outline: 2px solid #ff6b35;
+      outline: 2px solid var(--theme-color-primary);
       outline-offset: 2px;
       border-radius: 2px;
     }

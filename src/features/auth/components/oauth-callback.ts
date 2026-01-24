@@ -85,7 +85,8 @@ export class OAuthCallback extends LitElement {
     :host {
       display: block;
       min-height: 100vh;
-      background: #f9fafb;
+      background: var(--theme-color-background);
+      transition: background-color 0.2s ease;
     }
 
     .callback-container {
@@ -97,36 +98,42 @@ export class OAuthCallback extends LitElement {
     }
 
     .callback-card {
-      background: white;
+      background: var(--theme-color-surface);
       border-radius: 8px;
       padding: 3rem 2.5rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      box-shadow: var(--theme-shadow-md);
       text-align: center;
       max-width: 420px;
       width: 100%;
+      transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     h2 {
       font-size: 1.5rem;
       font-weight: 600;
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
       margin: 1rem 0 0.5rem 0;
+      transition: color 0.2s ease;
     }
 
     p {
       font-size: 0.9375rem;
-      color: #6b7280;
+      color: var(--theme-color-text-secondary);
       margin: 0 0 1.5rem 0;
+      transition: color 0.2s ease;
     }
 
     .spinner {
-      border: 3px solid #f3f4f6;
-      border-top: 3px solid #ff6b35;
+      border: 3px solid var(--theme-color-border);
+      border-top: 3px solid var(--theme-color-primary);
       border-radius: 50%;
       width: 48px;
       height: 48px;
       animation: spin 1s linear infinite;
       margin: 0 auto 1.5rem;
+      transition: border-color 0.2s ease;
     }
 
     @keyframes spin {
@@ -142,7 +149,7 @@ export class OAuthCallback extends LitElement {
       width: 64px;
       height: 64px;
       border-radius: 50%;
-      background: #10b981;
+      background: var(--theme-color-success);
       color: white;
       font-size: 2.5rem;
       line-height: 64px;
@@ -153,7 +160,7 @@ export class OAuthCallback extends LitElement {
       width: 64px;
       height: 64px;
       border-radius: 50%;
-      background: #ef4444;
+      background: var(--theme-color-error);
       color: white;
       font-size: 2.5rem;
       line-height: 64px;
@@ -167,14 +174,14 @@ export class OAuthCallback extends LitElement {
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      background: #ff6b35;
+      background: var(--theme-color-primary);
       color: white;
       font-family: inherit;
       transition: background-color 0.2s ease;
     }
 
     .btn:hover {
-      background: #e85d2a;
+      background: var(--theme-color-primary-hover);
     }
 
     @media (max-width: 640px) {

@@ -1,0 +1,76 @@
+/**
+ * Theme CSS Custom Properties
+ *
+ * Import this file in your project's main CSS:
+ * @import '@/features/theme/styles/theme-variables.css';
+ *
+ * Or copy these variables to your own stylesheet.
+ */
+
+/* ========== Light Theme (Default) ========== */
+:root {
+  /* Primary colors */
+  --theme-color-primary: #ff6b35;
+  --theme-color-primary-hover: #e85d2a;
+  --theme-color-primary-active: #d94e1f;
+
+  /* Background colors */
+  --theme-color-background: #f9fafb;
+  --theme-color-surface: #ffffff;
+
+  /* Text colors */
+  --theme-color-text-primary: #1f2937;
+  --theme-color-text-secondary: #6b7280;
+  --theme-color-text-muted: #9ca3af;
+
+  /* Border colors */
+  --theme-color-border: #e5e7eb;
+
+  /* Semantic colors */
+  --theme-color-success: #10b981;
+  --theme-color-error: #ef4444;
+  --theme-color-warning: #f59e0b;
+  --theme-color-info: #3b82f6;
+
+  /* Shadows */
+  --theme-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --theme-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --theme-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  /* Elevated surface for modals and toasts */
+  --theme-color-surface-elevated: #ffffff;
+}
+
+/* ========== Dark Theme ========== */
+:root[theme="dark"] {
+  /* Primary colors - matching Kanidm logo design (green) */
+  --theme-color-primary: #10B981;
+  --theme-color-primary-hover: #059669;
+  --theme-color-primary-active: #047857;
+
+  /* Elevated surface for modals and toasts */
+  --theme-color-surface-elevated: #343a40;
+
+  /* Background colors - Kanidm dark theme colors */
+  --theme-color-background: #212529;
+  --theme-color-surface: #2c3136;
+
+  /* Text colors - Kanidm dark theme colors */
+  --theme-color-text-primary: #dee2e6;
+  --theme-color-text-secondary: #adb5bd;
+  --theme-color-text-muted: #6c757d;
+
+  /* Border colors */
+  --theme-color-border: #495057;
+
+  /* Semantic colors - adjusted for dark mode */
+  --theme-color-success: #34d399;
+  --theme-color-error: #f87171;
+  --theme-color-warning: #fbbf24;
+  --theme-color-info: #60a5fa;
+
+  /* Shadows - stronger in dark mode */
+  --theme-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --theme-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --theme-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.5);
+}

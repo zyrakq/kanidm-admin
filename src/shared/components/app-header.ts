@@ -1,19 +1,25 @@
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { ThemeController } from '@/features/theme';
 import logoLight from '@/assets/logo-light.svg';
+import logoDark from '@/assets/logo-dark.svg';
 
 @customElement('app-header')
 export class AppHeader extends LitElement {
+  private theme = new ThemeController(this);
+
   render() {
+    const logo = this.theme.theme === 'dark' ? logoDark : logoLight;
+
     return html`
       <header>
         <div class="header-content">
           <div class="logo-section">
-            <img src=${logoLight} alt="Kanidm Logo" class="logo" />
+            <img src=${logo} alt="Kanidm Logo" class="logo" />
             <span class="app-name">Kanidm Admin</span>
           </div>
           <div class="actions">
-            <!-- Placeholder for future theme/language switchers -->
+            <theme-toggler></theme-toggler>
           </div>
         </div>
       </header>
@@ -27,8 +33,11 @@ export class AppHeader extends LitElement {
     }
 
     header {
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
+      background: var(--theme-color-surface);
+      border-bottom: 1px solid var(--theme-color-border);
+      transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
     }
 
     .header-content {
@@ -54,7 +63,8 @@ export class AppHeader extends LitElement {
     .app-name {
       font-size: 1.25rem;
       font-weight: 600;
-      color: #1f2937;
+      color: var(--theme-color-text-primary);
+      transition: color 0.2s ease;
     }
 
     .actions {
