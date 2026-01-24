@@ -7,8 +7,8 @@
 export { ThemeToggler } from './components/theme-toggler';
 
 // Services
-export { themeService } from './services/theme.service';
-export { ThemeService } from './services/theme.service';
+export { themeService, ThemeService } from './services/theme.service';
+export { faviconService, FaviconService } from './services/favicon.service';
 
 // Controllers
 export { ThemeController } from './controllers/theme.controller';

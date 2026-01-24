@@ -12,6 +12,8 @@ Portable, zero-dependency theme management for Lit-based web applications.
 - CSS Custom Properties
 - Full TypeScript typing
 - Zero external dependencies
+- Dynamic favicon management with theme synchronization
+- PWA manifest support with multi-resolution icons
 
 ## Quick Start
 
@@ -65,6 +67,27 @@ customElements.define('my-component', class extends LitElement {
   }
 });
 ```
+
+### 5. Favicon setup (optional)
+
+For automatic favicon switching based on theme with PWA support:
+
+```bash
+# Generate PNG icons from SVG using Inkscape
+inkscape favicon-light.svg -w 180 -h 180 -o favicons/apple-light.png
+inkscape favicon-light.svg -w 192 -h 192 -o favicons/192-light.png
+inkscape favicon-light.svg -w 512 -h 512 -o favicons/512-light.png
+
+inkscape favicon-dark.svg -w 180 -h 180 -o favicons/apple-dark.png
+inkscape favicon-dark.svg -w 192 -h 192 -o favicons/192-dark.png
+inkscape favicon-dark.svg -w 512 -h 512 -o favicons/512-dark.png
+
+# Generate ICO files using ImageMagick
+convert favicons/32-light.png favicon-light.ico
+convert favicons/32-dark.png favicon-dark.ico
+```
+
+The FaviconService automatically initializes when imported and syncs with theme changes.
 
 ## Configuration
 
@@ -133,6 +156,18 @@ class MyComponent extends LitElement {
     return html`Theme: ${this.theme.theme}`;
   }
 }
+```
+
+### faviconService
+
+```typescript
+import { faviconService } from '@/features/theme';
+
+// Service auto-initializes on first import
+// Favicon changes automatically when themeService changes
+
+// Get current favicon path for a specific type
+const iconPath = faviconService.getFaviconPath('svg');
 ```
 
 ## License

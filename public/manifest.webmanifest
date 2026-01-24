@@ -1,0 +1,47 @@
+{
+  "name": "kanidm-admin",
+  "short_name": "kanidm",
+  "description": "Kanidm administration interface",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#ff6b35",
+  "background_color": "#111827",
+  "icons": [
+    {
+      "src": "/favicons/192-light.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicons/192-dark.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicons/512-light.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicons/512-dark.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicons/512-light.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicons/512-dark.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ]
+}
