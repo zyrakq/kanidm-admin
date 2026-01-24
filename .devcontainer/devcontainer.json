@@ -21,14 +21,18 @@
         "docker network ls | grep -q kanidm-admin-workspace-network || docker network create kanidm-admin-workspace-network"
     ],
     "features": {
+        "ghcr.io/zyrakq/arch-devcontainer-features/rust:2": {
+            "globalCrates": "cargo-audit"
+        },
         "ghcr.io/zyrakq/arch-devcontainer-features/bun:1": {
-            "globalPackages": "typescript,nodemon"
+            "globalPackages": "typescript"
         },
         "ghcr.io/zyrakq/arch-devcontainer-features/clone-repo:1": {
             "repoUrl": "git@github.com:zyrakq/kanidm-admin.git",
             "targetDir": "/workspace/kanidm-admin"
         }
     },
+    "postCreateCommand": "curl -sSL https://trailbase.io/install.sh | bash",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -52,5 +56,8 @@
                 "oven.bun-vscode"
             ]
         }
+    },
+    "containerEnv": {
+        "STEP_CA_TRUST": "true"
     }
 }

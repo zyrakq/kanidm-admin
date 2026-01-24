@@ -30,6 +30,7 @@
   },
   "markdownlint.config": {
     "MD033": false,
+    "MD036": false,
     "MD041": false
   }
 }
