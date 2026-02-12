@@ -1,0 +1,11 @@
+# Logs
+logs
+*.log
+
+node_modules
+build
+dist
+dist-ssr
+*.local
+
+.env

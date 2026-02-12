@@ -4,11 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bun i18n:build && tsc && bun dev:frontend & bun dev:backend",
-    "dev:frontend": "bun run build --watch",
-    "dev:backend": "trail run -a 0.0.0.0:4000 --public-dir dist --spa",
-    "watch": "vite --host",
-    "build": "bun i18n:build && tsc && vite build",
+    "watch": "bun run build --watch",
+    "build": "bun pre-build && bunx --bun vite build",
+    "pre-build": "bun i18n:build && tsc",
     "i18n:extract": "lit-localize extract",
     "i18n:build": "lit-localize build"
   },
