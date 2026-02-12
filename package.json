@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun i18n:build && tsc && bun dev:frontend & bun dev:backend",
     "dev:frontend": "bun run build --watch",
-    "dev:backend": "trail run -a 127.0.0.1:4000 --public-dir dist --spa",
+    "dev:backend": "trail run -a 0.0.0.0:4000 --public-dir dist --spa",
     "watch": "vite --host",
     "build": "bun i18n:build && tsc && vite build",
     "i18n:extract": "lit-localize extract",

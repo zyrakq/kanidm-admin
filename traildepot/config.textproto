@@ -12,9 +12,9 @@ auth {
       client_id: "kanidm-admin"
       client_secret: "<REDACTED>"
       provider_id: OIDC0
-      auth_url: "https://kanidm.ax/ui/oauth2"
-      token_url: "https://kanidm.ax/oauth2/token"
-      user_api_url: "https://kanidm.ax/oauth2/openid/kanidm-admin/userinfo"
+      auth_url: "https://idm.argiago.ru/ui/oauth2"
+      token_url: "https://idm.argiago.ru/oauth2/token"
+      user_api_url: "https://idm.argiago.ru/oauth2/openid/kanidm-admin/userinfo"
     }
   }]
 }
