@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -18,4 +18,8 @@ export default defineConfig({
       '@/assets': path.resolve(__dirname, './src/assets'),
     },
   },
-});
+  build: {
+    sourcemap: mode === 'development',
+    minify: mode === 'production',
+  },
+}));

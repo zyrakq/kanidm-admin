@@ -21,6 +21,10 @@
         "docker network ls | grep -q kanidm-admin-workspace-network || docker network create kanidm-admin-workspace-network"
     ],
     "features": {
+        "ghcr.io/zyrakq/arch-devcontainer-features/chaotic-aur:1": {
+            "mirror": "cdn",
+            "installPackages": "clang,protobuf"
+        },
         "ghcr.io/zyrakq/arch-devcontainer-features/rust:2": {
             "globalCrates": "cargo-audit"
         },

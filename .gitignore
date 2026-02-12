@@ -15,3 +15,7 @@ dist-ssr
 
 .env
 .plan
+
+
+target
+*.log
