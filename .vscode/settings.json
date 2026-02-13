@@ -12,6 +12,7 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },
+  "json.schemaDownload.enable": true,
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
