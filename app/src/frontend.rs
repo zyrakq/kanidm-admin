@@ -6,11 +6,34 @@
 use std::path::Path;
 use tracing::{info, warn};
 
+use crate::settings::FrontendSettings;
+
+/// Run the full frontend lifecycle based on settings.
+///
+/// - If `settings.build` is true: runs `bun run build` and returns an error on failure.
+/// - If `settings.watch` is true: spawns `bun watch` in the background.
+///
+/// Returns the watch child process, if started. Keep the returned value alive
+/// for the duration of the server — dropping it kills the watch process.
+pub fn start(
+    settings: &FrontendSettings,
+    ui_dir: &Path,
+) -> Result<Option<tokio::process::Child>, Box<dyn std::error::Error + Send + Sync>> {
+    if settings.build {
+        build(ui_dir)?;
+    }
+    Ok(if settings.watch {
+        spawn_watch(ui_dir)
+    } else {
+        None
+    })
+}
+
 /// Run `bun run build` once in the given UI directory.
 ///
 /// Returns an error if the command could not be launched or exited
 /// with a non-zero status.
-pub fn build(ui_dir: &Path) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+fn build(ui_dir: &Path) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     info!("Building frontend...");
     let status = std::process::Command::new("bun")
         .args(["run", "build"])
@@ -32,7 +55,7 @@ pub fn build(ui_dir: &Path) -> Result<(), Box<dyn std::error::Error + Send + Syn
 /// It is killed automatically when dropped (`kill_on_drop(true)`).
 ///
 /// Returns `None` if the process could not be launched (non-fatal, logged as warning).
-pub fn spawn_watch(ui_dir: &Path) -> Option<tokio::process::Child> {
+fn spawn_watch(ui_dir: &Path) -> Option<tokio::process::Child> {
     match tokio::process::Command::new("bun")
         .args(["watch"])
         .current_dir(ui_dir)

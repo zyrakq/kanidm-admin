@@ -18,6 +18,20 @@ wiring together modules in the correct order:
 clear single purpose (build frontend, serve routes, watch files, etc.)
 belongs in its own module.
 
+**No if/else in main.rs.** Conditional logic is an implementation detail
+that belongs inside methods and module functions. `main.rs` should read as
+a sequence of clean method calls that return values:
+
+```rust
+// Good
+let public_dir = settings.frontend.resolve_public_dir(&manifest_dir);
+let _bun_watch = frontend::start(&settings.frontend, &ui_dir)?;
+
+// Bad — if/else inline in main.rs leaks implementation details
+let public_dir = if settings.frontend.public_dir.is_empty() { ... };
+if settings.frontend.build { frontend::build(&ui_dir)?; }
+```
+
 ## Module extraction rules
 
 Extract to a separate file when:

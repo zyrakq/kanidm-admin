@@ -27,6 +27,23 @@ pub struct FrontendSettings {
 }
 
 // ---------------------------------------------------------------------------
+// Methods
+// ---------------------------------------------------------------------------
+
+impl FrontendSettings {
+    /// Resolve the directory from which static frontend assets are served.
+    ///
+    /// Uses `public_dir` when set; falls back to `<manifest_dir>/ui/dist`.
+    pub fn resolve_public_dir(&self, manifest_dir: &std::path::Path) -> std::path::PathBuf {
+        if self.public_dir.is_empty() {
+            manifest_dir.join("ui/dist")
+        } else {
+            std::path::PathBuf::from(&self.public_dir)
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Loader
 // ---------------------------------------------------------------------------
 

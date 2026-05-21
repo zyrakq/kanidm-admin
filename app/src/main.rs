@@ -17,21 +17,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let ui_dir = manifest_dir.join("ui");
-    let public_dir = if settings.frontend.public_dir.is_empty() {
-        manifest_dir.join("ui/dist")
-    } else {
-        PathBuf::from(&settings.frontend.public_dir)
-    };
-
-    if settings.frontend.build {
-        frontend::build(&ui_dir)?;
-    }
-
-    let _bun_watch = if settings.frontend.watch {
-        frontend::spawn_watch(&ui_dir)
-    } else {
-        None
-    };
+    let public_dir = settings.frontend.resolve_public_dir(&manifest_dir);
+    let _bun_watch = frontend::start(&settings.frontend, &ui_dir)?;
 
     let data_dir = manifest_dir.join("traildepot");
 
