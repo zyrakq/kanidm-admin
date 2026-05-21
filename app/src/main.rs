@@ -1,39 +1,19 @@
 mod components;
 mod frontend;
+mod logging;
 mod preflight;
 mod routes;
 mod settings;
 
-use colored::Colorize;
 use settings::Settings;
-use std::io::Write;
 use std::path::PathBuf;
 use tracing::info;
-use tracing::log::Level;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let _ = dotenvy::dotenv();
 
-    env_logger::Builder::from_env(
-        env_logger::Env::new().default_filter_or(
-            "info,trailbase_refinery=warn,tracing::span=warn,swc_ecma_codegen=off",
-        ),
-    )
-    .format(|buf, record| {
-        let time = chrono::Local::now().format("%H:%M:%S").to_string();
-        let level = match record.level() {
-            Level::Error => "ERROR".red().bold(),
-            Level::Warn => "WARN ".yellow(),
-            Level::Info => "INFO ".green(),
-            Level::Debug => "DEBUG".blue(),
-            Level::Trace => "TRACE".dimmed(),
-        };
-        let target = record.target().cyan().dimmed();
-        let arrow = "›".dimmed();
-        writeln!(buf, "{} {} {} {} {}", time.dimmed(), level, target, arrow, record.args())
-    })
-    .init();
+    logging::init();
 
     tokio_rustls::rustls::crypto::aws_lc_rs::default_provider()
         .install_default()
