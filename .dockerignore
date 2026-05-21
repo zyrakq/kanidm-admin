@@ -1,0 +1,26 @@
+# Build artifacts
+target/
+app/ui/dist/
+app/ui/node_modules/
+
+# TrailBase runtime state — sensitive and/or ephemeral
+app/traildepot/data/
+app/traildepot/backups/
+app/traildepot/secrets/
+app/traildepot/uploads/
+app/traildepot/wasm/
+app/traildepot/scripts/
+app/traildepot/metadata.textproto
+app/traildepot/trailbase.d.ts
+app/traildepot/trailbase.js
+app/traildepot/*.mmdb
+
+# Dev tooling
+.devcontainer/
+.clinerules/
+thoughts/
+
+# Local config overrides
+app/appsettings.local.toml
+.env
+.env.*
