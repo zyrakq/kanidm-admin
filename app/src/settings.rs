@@ -77,6 +77,7 @@ impl Settings {
 mod tests {
     use super::*;
     use config::{Config, FileFormat};
+    use indoc::indoc;
 
     /// Build a Settings from raw TOML strings without touching the filesystem.
     fn settings_from_toml(base: &str, overlay: &str) -> Result<Settings, ConfigError> {
@@ -87,25 +88,25 @@ mod tests {
             .try_deserialize()
     }
 
-    const BASE_TOML: &str = r#"
-[server]
-address = "0.0.0.0:4000"
+    const BASE_TOML: &str = indoc! {r#"
+        [server]
+        address = "0.0.0.0:4000"
 
-[frontend]
-build = false
-watch = false
-public_dir = ""
-"#;
+        [frontend]
+        build = false
+        watch = false
+        public_dir = ""
+    "#};
 
-    const DEV_TOML: &str = r#"
-[frontend]
-watch = true
-"#;
+    const DEV_TOML: &str = indoc! {r#"
+        [frontend]
+        watch = true
+    "#};
 
-    const PROD_TOML: &str = r#"
-[frontend]
-build = true
-"#;
+    const PROD_TOML: &str = indoc! {r#"
+        [frontend]
+        build = true
+    "#};
 
     #[test]
     fn development_env_enables_watch_disables_build() {
@@ -138,7 +139,10 @@ build = true
             .add_source(config::File::from_str(PROD_TOML, FileFormat::Toml))
             // Simulate the env var override with an in-memory TOML layer
             .add_source(config::File::from_str(
-                "[frontend]\nbuild = false",
+                indoc! {r#"
+                    [frontend]
+                    build = false
+                "#},
                 FileFormat::Toml,
             ))
             .build()

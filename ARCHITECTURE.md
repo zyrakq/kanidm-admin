@@ -22,7 +22,11 @@ and a TypeScript/Lit SPA frontend.
 ```
 kanidm-admin/
 ├── app/
-│   ├── src/main.rs          # Rust backend entry point
+│   ├── src/
+│   │   ├── main.rs          # Entry point — thin orchestration only
+│   │   ├── settings.rs      # Layered TOML config loading
+│   │   ├── frontend.rs      # Frontend build and watch helpers
+│   │   └── routes.rs        # Custom API handlers and router
 │   ├── Cargo.toml           # Rust package manifest
 │   ├── traildepot/          # TrailBase data (DB, migrations, secrets, uploads)
 │   ├── .env                 # Local environment variables
@@ -55,16 +59,27 @@ kanidm-admin/
 
 ## Core Components
 
-### Backend (`app/src/main.rs`)
+### Backend (`app/src/`)
 
-A minimal Axum server that:
+Modular Axum server. `main.rs` is thin orchestration — business logic lives
+in dedicated modules:
 
-- Initializes TrailBase on `0.0.0.0:4000` with `app/traildepot/` as data dir
-- Registers two custom routes: `GET /api/health`, `GET /api/hello`
-- Merges custom routes → TrailBase router → static file service
-- Serves the built SPA from `ui/dist/` (or `$PUBLIC_DIR`) with SPA fallback to `index.html`
+| Module | Responsibility |
+|---|---|
+| `main.rs` | Bootstrap, load config, wire modules, start server |
+| `settings.rs` | Layered TOML configuration (`Settings::load()`) |
+| `frontend.rs` | Frontend build (`bun run build`) and watch (`bun watch`) |
+| `routes.rs` | Custom API handlers and router assembly |
 
-TrailBase provides: auth API (`/api/auth/v1/*`), admin UI, SQLite ORM, and migrations.
+`main.rs` sequence:
+
+1. Load `.env` (dotenvy), init tracing
+2. Load settings (`Settings::load()`)
+3. Optionally build frontend (`frontend::build`)
+4. Optionally spawn watch process (`frontend::spawn_watch`)
+5. Init TrailBase with data dir and address
+6. Merge routers: `routes::build()` → TrailBase → static files
+7. Serve
 
 ### Frontend Features
 

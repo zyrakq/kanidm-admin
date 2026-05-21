@@ -14,3 +14,6 @@ tracing-subscriber = { workspace = true }
 trailbase = { workspace = true }
 dotenvy = { workspace = true }
 config = { workspace = true }
+
+[dev-dependencies]
+indoc = "2"
