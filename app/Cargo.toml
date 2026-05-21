@@ -16,3 +16,4 @@ config = { workspace = true }
 
 [dev-dependencies]
 indoc = "2"
+tempfile = "3"

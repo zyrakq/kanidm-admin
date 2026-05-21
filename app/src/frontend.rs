@@ -19,6 +19,9 @@ pub fn start(
     settings: &FrontendSettings,
     ui_dir: &Path,
 ) -> Result<Option<tokio::process::Child>, Box<dyn std::error::Error + Send + Sync>> {
+    if settings.build || settings.watch {
+        crate::preflight::check_dependency("bun", "https://bun.sh/docs/installation")?;
+    }
     if settings.build {
         build(ui_dir)?;
     }
