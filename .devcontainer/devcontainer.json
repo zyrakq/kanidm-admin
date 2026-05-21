@@ -23,7 +23,7 @@
     "features": {
         "ghcr.io/zyrakq/arch-devcontainer-features/chaotic-aur:1": {
             "mirror": "cdn",
-            "installPackages": "clang,protobuf"
+            "installPackages": "clang,protobuf,rust-analyzer,typescript-language-server"
         },
         "ghcr.io/zyrakq/arch-devcontainer-features/rust:2": {
             "globalCrates": "cargo-audit"
