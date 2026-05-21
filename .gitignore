@@ -8,14 +8,6 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
-
 .env
-.plan
-
 
 target
-*.log

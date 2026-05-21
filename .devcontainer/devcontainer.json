@@ -57,11 +57,15 @@
                 "runem.lit-plugin",
                 "dbaeumer.vscode-eslint",
                 "esbenp.prettier-vscode",
-                "oven.bun-vscode"
+                "oven.bun-vscode",
+                // Rust
+                "vadimcn.vscode-lldb",
+                "rust-lang.rust-analyzer",
+                "dustypomerleau.rust-syntax",
+                "barbosshack.crates-io",
+                "jscearcy.rust-doc-viewer",
+                "swellaby.vscode-rust-test-adapter"
             ]
         }
-    },
-    "containerEnv": {
-        "STEP_CA_TRUST": "true"
     }
 }
