@@ -7,6 +7,25 @@ use tracing::info;
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     info!("Starting server...");
 
+    #[cfg(debug_assertions)]
+    let _bun_watch = {
+        let ui_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui");
+        match std::process::Command::new("bun")
+            .args(["watch"])
+            .current_dir(&ui_dir)
+            .spawn()
+        {
+            Ok(child) => {
+                info!("Started bun watch (pid: {})", child.id());
+                Some(child)
+            }
+            Err(e) => {
+                tracing::warn!("Could not start bun watch: {}", e);
+                None
+            }
+        }
+    };
+
     let data_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("traildepot");
 
     // Determine public directory from env var or use default

@@ -1,6 +1,5 @@
-# Development mode: build frontend in watch mode + run backend
+# Development mode: run backend (automatically starts bun watch for frontend)
 dev:
-	cd app/ui && bun watch &
 	cd app && cargo run
 
 # Production mode: build frontend + run backend in release mode
