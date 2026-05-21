@@ -1,27 +1,34 @@
+mod settings;
+
+use settings::Settings;
 use axum::{routing::get, Router};
 use std::path::PathBuf;
 use tower_http::services::{ServeDir, ServeFile};
 use tracing::info;
 
-fn parse_bool_env(key: &str, default: bool) -> bool {
-    std::env::var(key)
-        .map(|v| matches!(v.to_lowercase().as_str(), "true" | "1" | "yes"))
-        .unwrap_or(default)
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    // Load .env file if present, errors are silently ignored
+    // Load .env file if present (for secrets - not configuration)
     let _ = dotenvy::dotenv();
+
+    // Initialise tracing before the first log line
+    tracing_subscriber::fmt::init();
 
     info!("Starting server...");
 
+    // Load layered TOML configuration
+    let settings = Settings::load()?;
+
+    // Resolve public_dir: empty string -> default relative to CARGO_MANIFEST_DIR
+    let public_dir = if settings.frontend.public_dir.is_empty() {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui/dist")
+    } else {
+        PathBuf::from(&settings.frontend.public_dir)
+    };
+
     let ui_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui");
 
-    let should_build = parse_bool_env("FRONTEND_BUILD", cfg!(not(debug_assertions)));
-    let should_watch = parse_bool_env("FRONTEND_WATCH", cfg!(debug_assertions));
-
-    if should_build {
+    if settings.frontend.build {
         info!("Building frontend...");
         let status = std::process::Command::new("bun")
             .args(["run", "build"])
@@ -34,7 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         }
     }
 
-    let _bun_watch = if should_watch {
+    let _bun_watch = if settings.frontend.watch {
         match tokio::process::Command::new("bun")
             .args(["watch"])
             .current_dir(&ui_dir)
@@ -56,11 +63,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     let data_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("traildepot");
 
-    // Determine public directory from env var or use default
-    let public_dir = std::env::var("PUBLIC_DIR")
-        .map(PathBuf::from)
-        .unwrap_or_else(|_| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui/dist"));
-
     info!("Serving static files from: {:?}", public_dir);
 
     let trailbase::Server {
@@ -70,7 +72,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         ..
     } = trailbase::Server::init(trailbase::ServerOptions {
         data_dir: trailbase::DataDir(data_dir),
-        address: "0.0.0.0:4000".to_string(),
+        address: settings.server.address.clone(),
         ..Default::default()
     })
     .await?;
@@ -90,7 +92,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         .merge(main_router.1)
         .fallback_service(static_service);
 
-    info!("Server running at http://localhost:4000");
+    info!("Server running at http://{}", settings.server.address);
 
     trailbase::api::serve((main_router.0, router), admin_router, tls).await?;
 

@@ -13,3 +13,4 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 trailbase = { workspace = true }
 dotenvy = { workspace = true }
+config = { workspace = true }

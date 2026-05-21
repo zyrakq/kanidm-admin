@@ -12,3 +12,4 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 trailbase = { git = "https://github.com/trailbaseio/trailbase" }
 dotenvy = "0.15"
+config = { version = "0.15", features = ["toml"] }

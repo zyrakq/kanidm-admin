@@ -1,0 +1,11 @@
+# Copy this file to appsettings.local.toml and customise for your machine.
+# This file is gitignored and will never be committed.
+# Values here override appsettings.toml and appsettings.{env}.toml.
+
+# [server]
+# address = "127.0.0.1:4000"
+
+# [frontend]
+# build = false
+# watch = false
+# public_dir = "/absolute/path/to/your/dist"

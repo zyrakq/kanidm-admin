@@ -1,0 +1,7 @@
+[server]
+address = "0.0.0.0:4000"
+
+[frontend]
+build = false
+watch = false
+public_dir = ""
