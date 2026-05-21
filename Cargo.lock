@@ -1539,6 +1539,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a1c3cc8e57274ec99de65301228b537f1e4eedc1b8e0f9411c6caac8ae7308f"
 dependencies = [
  "log",
+ "regex",
 ]
 
 [[package]]
@@ -4686,11 +4687,13 @@ dependencies = [
  "axum",
  "config",
  "dotenvy",
+ "env_logger",
  "indoc",
  "serde",
  "serde_json",
  "tempfile",
  "tokio",
+ "tokio-rustls 0.26.4",
  "tower-http",
  "tracing",
  "trailbase",

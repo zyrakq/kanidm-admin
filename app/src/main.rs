@@ -12,6 +12,16 @@ use tracing::info;
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let _ = dotenvy::dotenv();
 
+    env_logger::init_from_env(
+        env_logger::Env::new().default_filter_or(
+            "info,trailbase_refinery=warn,tracing::span=warn,swc_ecma_codegen=off",
+        ),
+    );
+
+    tokio_rustls::rustls::crypto::aws_lc_rs::default_provider()
+        .install_default()
+        .expect("Failed to install rustls crypto provider");
+
     let settings = Settings::load()?;
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
