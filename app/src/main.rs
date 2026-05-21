@@ -3,30 +3,58 @@ use std::path::PathBuf;
 use tower_http::services::{ServeDir, ServeFile};
 use tracing::info;
 
+fn parse_bool_env(key: &str, default: bool) -> bool {
+    std::env::var(key)
+        .map(|v| matches!(v.to_lowercase().as_str(), "true" | "1" | "yes"))
+        .unwrap_or(default)
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    // Load .env file if present, errors are silently ignored
+    let _ = dotenvy::dotenv();
+
     info!("Starting server...");
 
-    #[cfg(debug_assertions)]
-    let _bun_watch = {
-        let ui_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui");
-        match std::process::Command::new("bun")
+    let ui_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui");
+
+    let should_build = parse_bool_env("FRONTEND_BUILD", cfg!(not(debug_assertions)));
+    let should_watch = parse_bool_env("FRONTEND_WATCH", cfg!(debug_assertions));
+
+    if should_build {
+        info!("Building frontend...");
+        let status = std::process::Command::new("bun")
+            .args(["run", "build"])
+            .current_dir(&ui_dir)
+            .status();
+        match status {
+            Ok(s) if s.success() => info!("Frontend build completed successfully"),
+            Ok(s) => return Err(format!("Frontend build failed with exit status: {s}").into()),
+            Err(e) => return Err(format!("Failed to run `bun run build`: {e}").into()),
+        }
+    }
+
+    let _bun_watch = if should_watch {
+        match tokio::process::Command::new("bun")
             .args(["watch"])
             .current_dir(&ui_dir)
+            .kill_on_drop(true)
             .spawn()
         {
             Ok(child) => {
-                info!("Started bun watch (pid: {})", child.id());
+                info!("Started bun watch (pid: {:?})", child.id());
                 Some(child)
             }
             Err(e) => {
-                tracing::warn!("Could not start bun watch: {}", e);
+                tracing::warn!("Could not start bun watch: {e}");
                 None
             }
         }
+    } else {
+        None
     };
 
-    let data_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("traildepot");
+    let data_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("traildepot");
 
     // Determine public directory from env var or use default
     let public_dir = std::env::var("PUBLIC_DIR")
