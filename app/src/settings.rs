@@ -77,6 +77,7 @@ impl Settings {
             // Layer 4: environment variables  APP_SERVER__ADDRESS -> server.address
             .add_source(
                 Environment::with_prefix("APP")
+                    .prefix_separator("_")
                     .separator("__")
                     .try_parsing(true),
             )
@@ -150,22 +151,23 @@ mod tests {
 
     #[test]
     fn env_var_overrides_production_build_flag() {
-        // Simulate APP_FRONTEND__BUILD=false overriding production's build=true
+        // Set a real env var and verify it overrides the TOML value via the
+        // Environment source (prefix="APP", prefix_separator="_", separator="__").
+        std::env::set_var("APP_FRONTEND__BUILD", "false");
         let s = Config::builder()
             .add_source(config::File::from_str(BASE_TOML, FileFormat::Toml))
             .add_source(config::File::from_str(PROD_TOML, FileFormat::Toml))
-            // Simulate the env var override with an in-memory TOML layer
-            .add_source(config::File::from_str(
-                indoc! {r#"
-                    [frontend]
-                    build = false
-                "#},
-                FileFormat::Toml,
-            ))
+            .add_source(
+                config::Environment::with_prefix("APP")
+                    .prefix_separator("_")
+                    .separator("__")
+                    .try_parsing(true),
+            )
             .build()
             .unwrap()
             .try_deserialize::<Settings>()
             .expect("should deserialize");
+        std::env::remove_var("APP_FRONTEND__BUILD");
         assert!(!s.frontend.build, "env var should override production build=true");
     }
 
