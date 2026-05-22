@@ -5,17 +5,5 @@ server {
   site_url: "http://localhost:4000"
   logs_retention_sec: 604800
 }
-auth {
-  oauth_providers: [{
-    key: "oidc0"
-    value {
-      client_id: "kanidm-admin"
-      client_secret: "<REDACTED>"
-      provider_id: OIDC0
-      auth_url: "https://idm.argiago.ru/ui/oauth2"
-      token_url: "https://idm.argiago.ru/oauth2/token"
-      user_api_url: "https://idm.argiago.ru/oauth2/openid/kanidm-admin/userinfo"
-    }
-  }]
-}
+auth {}
 jobs {}
