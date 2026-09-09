@@ -1,0 +1,32 @@
+(% extends "login_base.html" %)
+
+(% block logincontainer %)
+<script
+    src="/pkg/external/base64.js?v=((crate::https::cache_buster::get_cache_buster_key()))"
+    async></script>
+<script
+    src="/pkg/pkhtml.js?v=((crate::https::cache_buster::get_cache_buster_key()))"
+    defer></script>
+
+<div class="justify-content-center">
+    (% if passkey %)
+    <form
+        id="cred-form"
+        action="/ui/login/passkey"
+        method="POST"
+        data-challenge="(( challenge ))"
+        >
+        <input hidden="hidden" name="cred" id="cred">
+        <button hx-disable type="button" autofocus class="btn btn-primary"
+            id="start-passkey-button">Use Passkey</button>
+    </form>
+    (% else %)
+    <form id="cred-form" action="/ui/login/seckey" method="POST">
+        <input hidden="hidden" name="cred" id="cred">
+        <button hx-disable type="button" autofocus class="btn btn-primary"
+             id="start-seckey-button">Use Security Key</button>
+    </form>
+    (% endif %)
+</div>
+
+(% endblock %)

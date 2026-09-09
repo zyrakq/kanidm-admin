@@ -1,0 +1,70 @@
+(% extends "login_base.html" %)
+
+(% block logincontainer %)
+(% if let Some(error) = display_ctx.error %)
+	<div class="alert alert-danger" role="alert">
+		(( error ))
+	</div>
+(% endif %)
+
+
+<label for="username" class="form-label">Username</label>
+<form id="login" action="/ui/login/begin" method="post">
+	<div class="input-group mb-3">
+		<input
+			autofocus=true
+			class="autofocus form-control"
+			id="username"
+			name="username"
+			type="text"
+			autocomplete="username"
+			value="(( username ))"
+			required=true
+		/>
+	</div>
+
+	<!-- BEGIN: allows a password manager to autocomplete these fields in the BG. -->
+	<input
+		class="d-none"
+		id="password"
+		name="password"
+		type="password"
+		autocomplete="current-password"
+		value=""
+	/>
+	<input
+		class="d-none"
+		id="totp"
+		name="totp"
+		type="text"
+		inputmode="numeric"
+		autocomplete="one-time-code"
+		value=""
+	/>
+	<!-- END -->
+
+	<div class="mb-3 form-check form-switch">
+		<input
+			type="checkbox"
+			name="remember_me"
+			class="form-check-input"
+			role="switch"
+			id="remember_me_check"
+			value="1"
+			(% if remember_me %)checked(% endif %)
+		/>
+		<label class="form-check-label" for="remember_me_check">Remember My Username</label>
+	</div>
+	<div class="input-group mb-3 justify-content-md-center">
+		<button
+			type="submit"
+			class="btn btn-primary"
+		>Begin</button>
+	</div>
+	(% if display_ctx.domain_info.allow_account_recovery() -%)
+	<div class="input-group mb-3 justify-content-md-center">
+		<a href="(( Urls::Recover ))">Recover Account</a>
+	</div>
+	(% endif -%)
+</form>
+(% endblock %)

@@ -1,0 +1,23 @@
+(% extends "login_base.html" %)
+
+(% block logincontainer %)
+<div class="container">
+	<p>Choose how to proceed:</p>
+</div>
+<div class="container">
+	<ul class="list-unstyled">
+		(% for mech in mechs %)
+		<li class="text-center mb-2">
+			<form id="login" action="/ui/login/mech_choose" method="post">
+				<input type="hidden" id="mech" name="mech" value="(( mech.value ))" />
+				<button
+					(% if mech.autofocus %)autofocus(% endif %)
+					type="submit"
+					class="btn btn-primary"
+				>(( mech.name ))</button>
+			</form>
+		</li>
+		(% endfor %)
+	</ul>
+</div>
+(% endblock %)

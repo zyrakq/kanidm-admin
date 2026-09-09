@@ -1,0 +1,104 @@
+[package]
+name = "kanidmd_core"
+description = "Kanidm Server Core and Library"
+documentation = "https://docs.rs/kanidm/latest/kanidm/"
+
+version = { workspace = true }
+authors = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+
+[lib]
+test = true
+doctest = false
+
+[features]
+default = []
+dev-oauth2-device-flow = []
+
+[dependencies]
+askama = { workspace = true }
+askama_web = { workspace = true, features = ["axum-0.8"] }
+axum = { workspace = true }
+axum-htmx = { workspace = true }
+axum-extra = { workspace = true, features = ["form"] }
+axum-macros = { workspace = true }
+base64 = { workspace = true }
+bytes = { workspace = true }
+cidr = { workspace = true, features = ["serde"] }
+chrono = { workspace = true }
+compact_jwt = { workspace = true }
+cron = { workspace = true }
+crypto-glue = { workspace = true }
+filetime = { workspace = true }
+futures = { workspace = true }
+futures-util = { workspace = true }
+haproxy-protocol = { workspace = true, features = ["tokio"] }
+hyper = { workspace = true }
+hyper-util = { workspace = true }
+kanidm_proto = { workspace = true }
+kanidm_utils_users = { workspace = true }
+kanidmd_lib = { workspace = true }
+kanidm_lib_crypto = { workspace = true }
+kanidm_lib_file_permissions = { workspace = true }
+ldap3_proto = { workspace = true }
+libc = { workspace = true }
+opentelemetry = { workspace = true, features = ["logs"] }
+qrcode = { workspace = true, features = ["svg"] }
+regex = { workspace = true }
+reqwest = { workspace = true }
+rustls = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde-hjson = { workspace = true }
+serde_json = { workspace = true }
+serde_with = { workspace = true }
+serde_urlencoded = { workspace = true }
+sketching = { workspace = true }
+sshkeys = { workspace = true }
+sshkey-attest = { workspace = true }
+time = { workspace = true, features = ["serde", "std", "local-offset"] }
+tokio = { workspace = true, features = ["net", "sync", "io-util", "macros"] }
+tokio-rustls = { workspace = true }
+tokio-util = { workspace = true, features = ["codec"] }
+toml = { workspace = true }
+tower = { workspace = true, features = ["tokio-stream", "tracing"] }
+tower-http = { workspace = true, features = [
+    "compression-gzip",
+    "fs",
+    "tokio",
+    "trace",
+    "tracing",
+    "timeout",
+    "uuid",
+] }
+tracing = { workspace = true, features = ["attributes"] }
+tracing-opentelemetry = { workspace = true }
+url = { workspace = true, features = ["serde"] }
+uuid = { workspace = true, features = ["serde", "v4"] }
+utoipa = { workspace = true, features = [
+    "axum_extras",
+    "openapi_extensions",
+    "preserve_order",     #  Preserve order of properties when serializing the schema for a component.
+    "time",
+    "url",
+    "uuid",
+] }
+utoipa-swagger-ui = { workspace = true, default-features = false, features = ["axum"] }
+
+webauthn-rs = { workspace = true, features = [
+    "resident-key-support",
+    "preview-features",
+    "danger-credential-internals",
+] }
+
+[dev-dependencies]
+walkdir = { workspace = true }
+tempfile = { workspace = true }
+kanidmd_lib = { workspace = true, features = ["test"] }
+
+[build-dependencies]
+kanidm_build_profiles = { workspace = true }
+

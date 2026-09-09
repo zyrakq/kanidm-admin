@@ -1,0 +1,146 @@
+use kanidm_client::KanidmClient;
+use kanidm_proto::internal::{IdentifyUserRequest, IdentifyUserResponse};
+use kanidmd_lib::prelude::Attribute;
+use kanidmd_testkit::ADMIN_TEST_PASSWORD;
+
+static UNIVERSAL_PW: &str = "eicieY7ahchaoCh0eeTa";
+
+static USER_A_NAME: &str = "valid_user_a";
+
+static USER_B_NAME: &str = "valid_user_b";
+
+// here we actually test the full idm flow by duplicating the server
+#[kanidmd_testkit::test]
+async fn test_full_identification_flow(rsclient: &KanidmClient) {
+    setup_server(rsclient).await;
+    let user_a_uuid = create_user(rsclient, USER_A_NAME).await;
+    let user_b_uuid = create_user(rsclient, USER_B_NAME).await;
+    //user A session
+    let valid_user_a_client = rsclient;
+    login_with_user(valid_user_a_client, USER_A_NAME).await;
+    //user B session
+    let valid_user_b_client = valid_user_a_client.new_session().unwrap();
+    login_with_user(&valid_user_b_client, USER_B_NAME).await;
+
+    // now we have to consider the two separate cases: first we address the case a has the lowest uuid
+
+    let (lower_user_client, lower_user_name, higher_user_client, higher_user_name) =
+        if user_a_uuid < user_b_uuid {
+            (
+                valid_user_a_client,
+                USER_A_NAME,
+                &valid_user_b_client,
+                USER_B_NAME,
+            )
+        } else {
+            (
+                &valid_user_b_client,
+                USER_B_NAME,
+                valid_user_a_client,
+                USER_A_NAME,
+            )
+        };
+
+    let lower_user_req_1 = lower_user_client
+        .idm_person_identify_user(higher_user_name, IdentifyUserRequest::Start)
+        .await
+        .unwrap();
+
+    let higher_user_req_1 = higher_user_client
+        .idm_person_identify_user(lower_user_name, IdentifyUserRequest::Start)
+        .await
+        .unwrap();
+
+    assert_eq!(lower_user_req_1, IdentifyUserResponse::WaitForCode);
+    // we check that the user A got a WaitForCode
+
+    let IdentifyUserResponse::ProvideCode { step: _, totp } = higher_user_req_1 else {
+        panic!();
+        // we check that the user B got the code
+    };
+    // we now try to submit the wrong code and we check that we get CodeFailure
+    // we now submit the received totp as the user A
+
+    let lower_user_req_2_wrong = lower_user_client
+        .idm_person_identify_user(
+            higher_user_name,
+            IdentifyUserRequest::SubmitCode {
+                other_totp: totp + 1,
+            },
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(lower_user_req_2_wrong, IdentifyUserResponse::CodeFailure);
+    // now we do it using the right totp
+    let lower_user_req_2_right = lower_user_client
+        .idm_person_identify_user(
+            higher_user_name,
+            IdentifyUserRequest::SubmitCode { other_totp: totp },
+        )
+        .await
+        .unwrap();
+    // if the totp was correct we must get a ProvideCode
+    let IdentifyUserResponse::ProvideCode { step: _, totp } = lower_user_req_2_right else {
+        panic!();
+    };
+    // we now try to do the same thing with user B: we first submit the wrong code expecting CodeFailure,
+    // and then we submit the right one expecting Success
+
+    let higher_user_req_2_wrong = higher_user_client
+        .idm_person_identify_user(
+            lower_user_name,
+            IdentifyUserRequest::SubmitCode {
+                other_totp: totp + 1,
+            },
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(higher_user_req_2_wrong, IdentifyUserResponse::CodeFailure);
+    // now we do it using the right totp
+    let higher_user_req_2_right = higher_user_client
+        .idm_person_identify_user(
+            lower_user_name,
+            IdentifyUserRequest::SubmitCode { other_totp: totp },
+        )
+        .await
+        .unwrap();
+    // since user B has already provided their code this is their last action and they must get a Success if
+    // the provided code is correct
+    assert_eq!(higher_user_req_2_right, IdentifyUserResponse::Success);
+}
+
+async fn setup_server(rsclient: &KanidmClient) {
+    // basically this function logs in
+    let res = rsclient
+        .auth_simple_password("admin", ADMIN_TEST_PASSWORD)
+        .await;
+
+    assert!(res.is_ok());
+}
+
+async fn create_user(rsclient: &KanidmClient, user: &str) -> String {
+    rsclient
+        .idm_person_account_create(user, &format!("dx{user}"))
+        .await
+        .expect("Unable to create person");
+
+    rsclient
+        .idm_person_account_primary_credential_set_password(user, UNIVERSAL_PW)
+        .await
+        .unwrap();
+
+    let r = rsclient
+        .idm_person_account_get_attr(user, Attribute::Uuid.as_ref())
+        .await
+        .unwrap();
+    r.unwrap().first().unwrap().to_owned()
+}
+
+async fn login_with_user(rsclient: &KanidmClient, id: &str) {
+    let _ = rsclient.logout().await;
+
+    let res = rsclient.auth_simple_password(id, UNIVERSAL_PW).await;
+    assert!(res.is_ok());
+}

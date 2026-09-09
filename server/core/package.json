@@ -1,0 +1,26 @@
+{
+  "name": "kanidm",
+  "version": "0.0.1-dev",
+  "description": "Kanidm UI Javascript - not a publishable package, just for development",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kanidm/kanidm.git"
+  },
+  "author": "",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/kanidm/kanidm/issues"
+  },
+  "homepage": "https://kanidm.com",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.3.0",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.3"
+  },
+  "scripts": {
+    "prettier": "pnpx prettier  --ignore-path 'prettier-ignore' ./static --check",
+    "prettier:fix": "pnpx prettier --ignore-path 'prettier-ignore' ./static --write"
+  }
+}

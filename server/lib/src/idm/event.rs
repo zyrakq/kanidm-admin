@@ -1,0 +1,536 @@
+use crate::idm::authentication::{AuthCredential, AuthState, AuthStep};
+use crate::prelude::*;
+use compact_jwt::JwsCompact;
+use kanidm_proto::v1::{AuthIssueSession, AuthMech};
+
+#[cfg(test)]
+use std::sync::Arc;
+#[cfg(test)]
+use webauthn_rs::prelude::PublicKeyCredential;
+
+#[cfg(test)]
+pub(crate) struct PasswordChangeEvent {
+    pub ident: Identity,
+    pub target: Uuid,
+    pub cleartext: String,
+}
+
+#[cfg(test)]
+impl PasswordChangeEvent {
+    pub fn new_internal(target: Uuid, cleartext: &str) -> Self {
+        PasswordChangeEvent {
+            ident: Identity::from_internal(),
+            target,
+            cleartext: cleartext.to_string(),
+        }
+    }
+}
+
+pub struct UnixPasswordChangeEvent {
+    pub ident: Identity,
+    pub target: Uuid,
+    pub cleartext: String,
+}
+
+impl UnixPasswordChangeEvent {
+    #[cfg(test)]
+    pub fn new_internal(target: Uuid, cleartext: &str) -> Self {
+        UnixPasswordChangeEvent {
+            ident: Identity::from_internal(),
+            target,
+            cleartext: cleartext.to_string(),
+        }
+    }
+
+    pub fn from_parts(
+        // qs: &QueryServerWriteTransaction,
+        ident: Identity,
+        target: Uuid,
+        cleartext: String,
+    ) -> Result<Self, OperationError> {
+        Ok(UnixPasswordChangeEvent {
+            ident,
+            target,
+            cleartext,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct GeneratePasswordEvent {
+    pub ident: Identity,
+    pub target: Uuid,
+}
+
+impl GeneratePasswordEvent {
+    pub fn from_parts(
+        // qs: &QueryServerWriteTransaction,
+        ident: Identity,
+        target: Uuid,
+    ) -> Result<Self, OperationError> {
+        Ok(GeneratePasswordEvent { ident, target })
+    }
+}
+
+#[derive(Debug)]
+pub struct RegenerateRadiusSecretEvent {
+    pub ident: Identity,
+    pub target: Uuid,
+}
+
+impl RegenerateRadiusSecretEvent {
+    pub fn from_parts(
+        // qs: &QueryServerWriteTransaction,
+        ident: Identity,
+        target: Uuid,
+    ) -> Result<Self, OperationError> {
+        Ok(RegenerateRadiusSecretEvent { ident, target })
+    }
+
+    #[cfg(test)]
+    pub fn new_internal(target: Uuid) -> Self {
+        let ident = Identity::from_internal();
+
+        RegenerateRadiusSecretEvent { ident, target }
+    }
+}
+
+#[derive(Debug)]
+pub struct RadiusAuthTokenEvent {
+    pub ident: Identity,
+    pub target: Uuid,
+}
+
+impl RadiusAuthTokenEvent {
+    pub fn from_parts(
+        // qs: &QueryServerReadTransaction,
+        ident: Identity,
+        target: Uuid,
+    ) -> Result<Self, OperationError> {
+        Ok(RadiusAuthTokenEvent { ident, target })
+    }
+
+    #[cfg(test)]
+    pub fn new_impersonate(e: Arc<Entry<EntrySealed, EntryCommitted>>, target: Uuid) -> Self {
+        let ident = Identity::from_impersonate_entry_readonly(e);
+
+        RadiusAuthTokenEvent { ident, target }
+    }
+}
+
+#[derive(Debug)]
+pub struct UnixUserTokenEvent {
+    pub ident: Identity,
+    pub target: Uuid,
+}
+
+impl UnixUserTokenEvent {
+    pub fn from_parts(
+        // qs: &QueryServerReadTransaction,
+        ident: Identity,
+        target: Uuid,
+    ) -> Result<Self, OperationError> {
+        Ok(UnixUserTokenEvent { ident, target })
+    }
+
+    #[cfg(test)]
+    pub fn new_internal(target: Uuid) -> Self {
+        let ident = Identity::from_internal();
+
+        UnixUserTokenEvent { ident, target }
+    }
+}
+
+#[derive(Debug)]
+pub struct UnixGroupTokenEvent {
+    pub ident: Identity,
+    pub target: Uuid,
+}
+
+impl UnixGroupTokenEvent {
+    pub fn from_parts(
+        // qs: &QueryServerReadTransaction,
+        ident: Identity,
+        target: Uuid,
+    ) -> Result<Self, OperationError> {
+        Ok(UnixGroupTokenEvent { ident, target })
+    }
+
+    #[cfg(test)]
+    pub fn new_impersonate(e: Arc<Entry<EntrySealed, EntryCommitted>>, target: Uuid) -> Self {
+        let ident = Identity::from_impersonate_entry_readonly(e);
+
+        UnixGroupTokenEvent { ident, target }
+    }
+}
+
+pub struct UnixUserAuthEvent {
+    pub ident: Identity,
+    pub target: Uuid,
+    pub cleartext: String,
+}
+
+impl std::fmt::Debug for UnixUserAuthEvent {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.debug_struct("UnixUserAuthEvent")
+            .field("ident", &self.ident)
+            .field("target", &self.target)
+            .finish()
+    }
+}
+
+impl UnixUserAuthEvent {
+    #[cfg(test)]
+    pub fn new_internal(target: Uuid, cleartext: &str) -> Self {
+        UnixUserAuthEvent {
+            ident: Identity::from_internal(),
+            target,
+            cleartext: cleartext.to_string(),
+        }
+    }
+
+    pub fn from_parts(
+        ident: Identity,
+        target: Uuid,
+        cleartext: String,
+    ) -> Result<Self, OperationError> {
+        Ok(UnixUserAuthEvent {
+            ident,
+            target,
+            cleartext,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct CredentialStatusEvent {
+    pub ident: Identity,
+    pub target: Uuid,
+}
+
+impl CredentialStatusEvent {
+    pub fn from_parts(
+        // qs: &QueryServerReadTransaction,
+        ident: Identity,
+        target: Uuid,
+    ) -> Result<Self, OperationError> {
+        Ok(CredentialStatusEvent { ident, target })
+    }
+
+    #[cfg(test)]
+    pub fn new_internal(target: Uuid) -> Self {
+        let ident = Identity::from_internal();
+
+        CredentialStatusEvent { ident, target }
+    }
+}
+
+pub struct LdapAuthEvent {
+    // pub ident: Identity,
+    pub target: Uuid,
+    pub cleartext: String,
+}
+
+impl LdapAuthEvent {
+    pub fn from_parts(target: Uuid, cleartext: String) -> Result<Self, OperationError> {
+        // let e = Event::from_ro_uat(audit, qs, uat)?;
+
+        Ok(LdapAuthEvent {
+            // event: e,
+            target,
+            cleartext,
+        })
+    }
+}
+
+pub struct LdapTokenAuthEvent {
+    pub token: JwsCompact,
+}
+
+impl LdapTokenAuthEvent {
+    pub fn from_parts(token: JwsCompact) -> Result<Self, OperationError> {
+        Ok(LdapTokenAuthEvent { token })
+    }
+}
+
+pub struct LdapApplicationAuthEvent {
+    pub application: String,
+    pub target: Uuid,
+    pub cleartext: String,
+}
+
+impl LdapApplicationAuthEvent {
+    pub fn new(app_name: &str, usr_uuid: Uuid, cleartext: String) -> Result<Self, OperationError> {
+        Ok(LdapApplicationAuthEvent {
+            application: app_name.to_string(),
+            target: usr_uuid,
+            cleartext,
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct AuthEventStepInit {
+    pub username: String,
+    pub issue: AuthIssueSession,
+    pub privileged: bool,
+}
+
+#[derive(Debug)]
+pub struct AuthEventStepCred {
+    pub sessionid: Uuid,
+    pub cred: AuthCredential,
+}
+
+#[derive(Debug)]
+pub struct AuthEventStepMech {
+    pub sessionid: Uuid,
+    pub mech: AuthMech,
+}
+
+#[derive(Debug)]
+pub enum AuthEventStep {
+    Init(AuthEventStepInit),
+    Begin(AuthEventStepMech),
+    Cred(AuthEventStepCred),
+}
+
+impl AuthEventStep {
+    fn from_authstep(aus: AuthStep, sid: Option<Uuid>) -> Result<Self, OperationError> {
+        match aus {
+            AuthStep::Init(username) => {
+                if username.trim().is_empty() {
+                    Err(OperationError::EmptyRequest)
+                } else {
+                    Ok(AuthEventStep::Init(AuthEventStepInit {
+                        username,
+                        issue: AuthIssueSession::Token,
+                        privileged: false,
+                    }))
+                }
+            }
+            AuthStep::Init2 {
+                username,
+                issue,
+                privileged,
+            } => {
+                if username.trim().is_empty() {
+                    Err(OperationError::EmptyRequest)
+                } else {
+                    Ok(AuthEventStep::Init(AuthEventStepInit {
+                        username,
+                        issue,
+                        privileged,
+                    }))
+                }
+            }
+
+            AuthStep::Begin(mech) => match sid {
+                Some(sessionid) => Ok(AuthEventStep::Begin(AuthEventStepMech { sessionid, mech })),
+                None => Err(OperationError::InvalidAuthState(
+                    "session id not present in cred presented to 'begin' step".to_string(),
+                )),
+            },
+            AuthStep::Cred(cred) => match sid {
+                Some(sessionid) => Ok(AuthEventStep::Cred(AuthEventStepCred { sessionid, cred })),
+                None => Err(OperationError::InvalidAuthState(
+                    "session id not present in cred to 'cred' step".to_string(),
+                )),
+            },
+        }
+    }
+
+    #[cfg(test)]
+    pub fn anonymous_init() -> Self {
+        AuthEventStep::Init(AuthEventStepInit {
+            username: "anonymous".to_string(),
+            issue: AuthIssueSession::Token,
+            privileged: false,
+        })
+    }
+
+    #[cfg(test)]
+    pub fn named_init(name: &str) -> Self {
+        AuthEventStep::Init(AuthEventStepInit {
+            username: name.to_string(),
+            issue: AuthIssueSession::Token,
+            privileged: false,
+        })
+    }
+
+    #[cfg(test)]
+    pub fn begin_mech(sessionid: Uuid, mech: AuthMech) -> Self {
+        AuthEventStep::Begin(AuthEventStepMech { sessionid, mech })
+    }
+
+    #[cfg(test)]
+    pub fn cred_step_anonymous(sid: Uuid) -> Self {
+        AuthEventStep::Cred(AuthEventStepCred {
+            sessionid: sid,
+            cred: AuthCredential::Anonymous,
+        })
+    }
+
+    #[cfg(test)]
+    pub fn cred_step_password(sid: Uuid, pw: &str) -> Self {
+        AuthEventStep::Cred(AuthEventStepCred {
+            sessionid: sid,
+            cred: AuthCredential::Password(pw.to_string()),
+        })
+    }
+
+    #[cfg(test)]
+    pub fn cred_step_totp(sid: Uuid, totp: u32) -> Self {
+        AuthEventStep::Cred(AuthEventStepCred {
+            sessionid: sid,
+            cred: AuthCredential::Totp(totp),
+        })
+    }
+
+    #[cfg(test)]
+    pub fn cred_step_backup_code(sid: Uuid, code: &str) -> Self {
+        AuthEventStep::Cred(AuthEventStepCred {
+            sessionid: sid,
+            cred: AuthCredential::BackupCode(code.to_string()),
+        })
+    }
+
+    #[cfg(test)]
+    pub fn cred_step_passkey(sid: Uuid, passkey_response: PublicKeyCredential) -> Self {
+        AuthEventStep::Cred(AuthEventStepCred {
+            sessionid: sid,
+            cred: AuthCredential::Passkey(Box::new(passkey_response)),
+        })
+    }
+}
+
+#[derive(Debug)]
+pub struct AuthEvent {
+    pub ident: Option<Identity>,
+    pub step: AuthEventStep,
+    // pub sessionid: Option<Uuid>,
+}
+
+impl AuthEvent {
+    pub fn from_message(
+        sessionid: Option<Uuid>,
+        req_step: AuthStep,
+    ) -> Result<Self, OperationError> {
+        Ok(AuthEvent {
+            ident: None,
+            step: AuthEventStep::from_authstep(req_step, sessionid)?,
+        })
+    }
+
+    #[cfg(test)]
+    pub fn anonymous_init() -> Self {
+        AuthEvent {
+            ident: None,
+            step: AuthEventStep::anonymous_init(),
+        }
+    }
+
+    #[cfg(test)]
+    pub fn named_init(name: &str) -> Self {
+        AuthEvent {
+            ident: None,
+            step: AuthEventStep::named_init(name),
+        }
+    }
+
+    #[cfg(test)]
+    pub fn begin_mech(sessionid: Uuid, mech: AuthMech) -> Self {
+        AuthEvent {
+            ident: None,
+            step: AuthEventStep::begin_mech(sessionid, mech),
+        }
+    }
+
+    #[cfg(test)]
+    pub fn cred_step_anonymous(sid: Uuid) -> Self {
+        AuthEvent {
+            ident: None,
+            step: AuthEventStep::cred_step_anonymous(sid),
+        }
+    }
+
+    #[cfg(test)]
+    pub fn cred_step_password(sid: Uuid, pw: &str) -> Self {
+        AuthEvent {
+            ident: None,
+            step: AuthEventStep::cred_step_password(sid, pw),
+        }
+    }
+
+    #[cfg(test)]
+    pub fn cred_step_totp(sid: Uuid, totp: u32) -> Self {
+        AuthEvent {
+            ident: None,
+            step: AuthEventStep::cred_step_totp(sid, totp),
+        }
+    }
+
+    #[cfg(test)]
+    pub fn cred_step_backup_code(sid: Uuid, code: &str) -> Self {
+        AuthEvent {
+            ident: None,
+            step: AuthEventStep::cred_step_backup_code(sid, code),
+        }
+    }
+
+    #[cfg(test)]
+    pub fn cred_step_passkey(sid: Uuid, passkey_response: PublicKeyCredential) -> Self {
+        AuthEvent {
+            ident: None,
+            step: AuthEventStep::cred_step_passkey(sid, passkey_response),
+        }
+    }
+}
+
+// Probably should be a struct with the session id present.
+#[derive(Debug)]
+pub struct AuthResult {
+    pub sessionid: Uuid,
+    pub state: AuthState,
+}
+
+impl std::fmt::Display for AuthResult {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.state {
+            AuthState::Choose(auth_mechs) => write!(
+                f,
+                "Choose({})",
+                auth_mechs
+                    .iter()
+                    .map(|m| m.to_value())
+                    .collect::<Vec<_>>()
+                    .join(",")
+            ),
+            AuthState::Continue(auth_alloweds) => write!(
+                f,
+                "Continue ({})",
+                auth_alloweds
+                    .iter()
+                    .map(|a| a.to_string())
+                    .collect::<Vec<_>>()
+                    .join(",")
+            ),
+            AuthState::External(auth_external) => write!(f, "External({:?})", auth_external),
+            AuthState::Denied(reason) => write!(f, "Denied: {}", reason),
+            AuthState::Success(_jws_compact, auth_issue_session) => {
+                write!(f, "Success({})", auth_issue_session)
+            }
+        }
+    }
+}
+
+/*
+impl AuthResult {
+    pub fn response(self) -> AuthResponse {
+        AuthResponse {
+            sessionid: self.sessionid,
+            state: self.state,
+        }
+    }
+}
+*/

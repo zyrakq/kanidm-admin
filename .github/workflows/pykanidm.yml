@@ -1,0 +1,32 @@
+---
+name: PyKanidm tests
+
+"on":
+  push:
+    branches:
+      - "master"
+  pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  python_tests:
+    runs-on: ubuntu-latest
+    env:
+      UV_LINK_MODE: "copy"
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install uv
+        run: pip install --root-user-action=ignore  uv
+      - name: Running type checks
+        run: make test/pykanidm/typecheck
+      - name: Running Linting
+        run: make test/pykanidm/lint
+      - name: Running pytest
+        run: |
+          cd pykanidm
+          uv run pytest -v -m 'not network and not openapi'

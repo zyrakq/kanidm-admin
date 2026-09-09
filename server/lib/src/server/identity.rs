@@ -1,0 +1,387 @@
+//! Contains structures related to the Identity that initiated an `Event` in the
+//! server. Generally this Identity is what will have access controls applied to
+//! and this provides the set of `Limits` to confine how many resources that the
+//! identity may consume during operations to prevent denial-of-service.
+
+use crate::be::Limits;
+use crate::prelude::*;
+use crate::value::Session;
+use kanidm_proto::internal::{ApiTokenPurpose, UatPurpose};
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeSet;
+use std::hash::Hash;
+use std::net::IpAddr;
+use std::sync::Arc;
+use time::OffsetDateTime;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Source {
+    Internal,
+    Https(IpAddr),
+    Ldaps(IpAddr),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AccessScope {
+    ReadOnly,
+    ReadWrite,
+    Synchronise,
+}
+
+impl std::fmt::Display for AccessScope {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            AccessScope::ReadOnly => write!(f, "read only"),
+            AccessScope::ReadWrite => write!(f, "read write"),
+            AccessScope::Synchronise => write!(f, "synchronise"),
+        }
+    }
+}
+
+impl From<&ApiTokenPurpose> for AccessScope {
+    fn from(purpose: &ApiTokenPurpose) -> Self {
+        match purpose {
+            ApiTokenPurpose::ReadOnly => AccessScope::ReadOnly,
+            ApiTokenPurpose::ReadWrite => AccessScope::ReadWrite,
+            ApiTokenPurpose::Synchronise => AccessScope::Synchronise,
+        }
+    }
+}
+
+impl From<&UatPurpose> for AccessScope {
+    fn from(purpose: &UatPurpose) -> Self {
+        match purpose {
+            UatPurpose::ReadOnly => AccessScope::ReadOnly,
+            UatPurpose::ReadWrite { .. } => AccessScope::ReadWrite,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+/// Metadata and the entry of the current Identity which is an external account/user.
+pub struct IdentUser {
+    pub entry: Arc<EntrySealedCommitted>,
+    // IpAddr?
+    // Other metadata?
+}
+
+#[derive(Debug, Clone)]
+/// The internal role being used for this operation.
+pub enum InternalRole {
+    /// The internal database system. This has unlimited crab power.
+    System,
+    /// A migration operation being performed on the system.
+    Migration,
+
+    /// An anonymous account action - this could be a credential reset
+    /// request, or a request to create a new account.
+    AccountRequest,
+
+    /// An internal role than can manage the outbound message queue.
+    MessageQueue,
+}
+
+impl std::fmt::Display for InternalRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::System => write!(f, "System"),
+            Self::Migration => write!(f, "Migration"),
+            Self::AccountRequest => write!(f, "AccountRequest"),
+            Self::MessageQueue => write!(f, "MessageQueue"),
+        }
+    }
+}
+
+impl InternalRole {
+    pub fn get_uuid(&self) -> Uuid {
+        match self {
+            Self::System => UUID_SYSTEM,
+            Self::Migration => UUID_INTERNAL_MIGRATION,
+            Self::AccountRequest => UUID_INTERNAL_ACCOUNT_REQUEST,
+            Self::MessageQueue => UUID_INTERNAL_MESSAGE_QUEUE,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+/// The type of Identity that is related to this session.
+pub enum IdentType {
+    User(IdentUser),
+    Synch(Uuid),
+    Internal(InternalRole),
+}
+
+#[derive(Debug, Clone, PartialEq, Hash, Ord, PartialOrd, Eq, Serialize, Deserialize)]
+/// A unique identifier of this Identity, that can be associated to various
+/// caching components.
+pub enum IdentityId {
+    // Time stamp of the originating event.
+    // The uuid of the originating user
+    User(Uuid),
+    Synch(Uuid),
+    Internal(Uuid),
+}
+
+impl From<&IdentityId> for Uuid {
+    fn from(ident: &IdentityId) -> Uuid {
+        match ident {
+            IdentityId::User(uuid) | IdentityId::Synch(uuid) | IdentityId::Internal(uuid) => *uuid,
+        }
+    }
+}
+
+impl From<&IdentType> for IdentityId {
+    fn from(idt: &IdentType) -> Self {
+        match idt {
+            IdentType::Internal(role) => IdentityId::Internal(role.get_uuid()),
+            IdentType::User(u) => IdentityId::User(u.entry.get_uuid()),
+            IdentType::Synch(u) => IdentityId::Synch(*u),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+/// An identity that initiated an `Event`. Contains extra details about the session
+/// and other info that can assist with server decision making.
+pub struct Identity {
+    pub origin: IdentType,
+    #[allow(dead_code)]
+    source: Source,
+    pub(crate) session_id: Uuid,
+    pub(crate) scope: AccessScope,
+    limits: Limits,
+    last_verified_at: Option<OffsetDateTime>,
+}
+
+impl std::fmt::Display for Identity {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match &self.origin {
+            IdentType::Internal(u) => write!(f, "Internal ({}) ({})", u, self.scope),
+            IdentType::Synch(u) => write!(f, "Synchronise ({}) ({})", u, self.scope),
+            IdentType::User(u) => {
+                let nv = u.entry.get_uuid2spn();
+                write!(
+                    f,
+                    "User( {}, {} ) ({}, {})",
+                    nv.to_proto_string_clone(),
+                    u.entry.get_uuid().as_hyphenated(),
+                    self.session_id,
+                    self.scope
+                )
+            }
+        }
+    }
+}
+
+impl Identity {
+    pub(crate) fn new(
+        origin: IdentType,
+        source: Source,
+        session_id: Uuid,
+        scope: AccessScope,
+        limits: Limits,
+        last_verified_at: Option<OffsetDateTime>,
+    ) -> Self {
+        Self {
+            origin,
+            source,
+            session_id,
+            scope,
+            limits,
+            last_verified_at,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn source(&self) -> &Source {
+        &self.source
+    }
+
+    pub(crate) fn limits(&self) -> &Limits {
+        &self.limits
+    }
+
+    #[cfg(test)]
+    pub(crate) fn limits_mut(&mut self) -> &mut Limits {
+        &mut self.limits
+    }
+
+    /// This is the time at which the session associated with this identity last
+    /// had it's credentials postively verified at.
+    pub(crate) fn last_verified_at(&self) -> Option<OffsetDateTime> {
+        self.last_verified_at
+    }
+
+    pub(crate) fn migration() -> Self {
+        Identity {
+            origin: IdentType::Internal(InternalRole::Migration),
+            source: Source::Internal,
+            session_id: UUID_INTERNAL_SESSION_ID,
+            scope: AccessScope::ReadWrite,
+            limits: Limits::unlimited(),
+            last_verified_at: None,
+        }
+    }
+
+    pub(crate) fn account_request() -> Self {
+        Identity {
+            origin: IdentType::Internal(InternalRole::AccountRequest),
+            source: Source::Internal,
+            session_id: UUID_INTERNAL_SESSION_ID,
+            scope: AccessScope::ReadOnly,
+            limits: Limits::unlimited(),
+            last_verified_at: None,
+        }
+    }
+
+    pub(crate) fn message_queue() -> Self {
+        Identity {
+            origin: IdentType::Internal(InternalRole::MessageQueue),
+            source: Source::Internal,
+            session_id: UUID_INTERNAL_SESSION_ID,
+            scope: AccessScope::ReadWrite,
+            limits: Limits::unlimited(),
+            last_verified_at: None,
+        }
+    }
+
+    pub(crate) fn from_internal() -> Self {
+        Identity {
+            origin: IdentType::Internal(InternalRole::System),
+            source: Source::Internal,
+            session_id: UUID_INTERNAL_SESSION_ID,
+            scope: AccessScope::ReadWrite,
+            limits: Limits::unlimited(),
+            last_verified_at: None,
+        }
+    }
+
+    #[cfg(test)]
+    pub(crate) fn from_impersonate_entry_readonly(
+        entry: Arc<Entry<EntrySealed, EntryCommitted>>,
+    ) -> Self {
+        Identity {
+            origin: IdentType::User(IdentUser { entry }),
+            source: Source::Internal,
+            session_id: UUID_INTERNAL_SESSION_ID,
+            scope: AccessScope::ReadOnly,
+            limits: Limits::unlimited(),
+            last_verified_at: None,
+        }
+    }
+
+    pub fn from_impersonate_entry_readwrite(
+        entry: Arc<Entry<EntrySealed, EntryCommitted>>,
+    ) -> Self {
+        Identity {
+            origin: IdentType::User(IdentUser { entry }),
+            source: Source::Internal,
+            session_id: UUID_INTERNAL_SESSION_ID,
+            scope: AccessScope::ReadWrite,
+            limits: Limits::unlimited(),
+            last_verified_at: None,
+        }
+    }
+
+    pub fn access_scope(&self) -> AccessScope {
+        self.scope
+    }
+
+    pub fn project_with_scope(&self, scope: AccessScope) -> Self {
+        let mut new = self.clone();
+        new.scope = scope;
+        new
+    }
+
+    pub fn get_session_id(&self) -> Uuid {
+        self.session_id
+    }
+
+    pub fn get_session(&self) -> Option<&Session> {
+        match &self.origin {
+            IdentType::Internal(_) | IdentType::Synch(_) => None,
+            IdentType::User(u) => u
+                .entry
+                .get_ava_as_session_map(Attribute::UserAuthTokenSession)
+                .and_then(|sessions| sessions.get(&self.session_id)),
+        }
+    }
+
+    pub fn get_user_entry(&self) -> Option<Arc<EntrySealedCommitted>> {
+        match &self.origin {
+            IdentType::Internal(_) | IdentType::Synch(_) => None,
+            IdentType::User(u) => Some(u.entry.clone()),
+        }
+    }
+
+    pub fn from_impersonate(ident: &Self) -> Self {
+        // TODO #64 ?: In the future, we could change some of this data
+        // to reflect the fact we are in fact impersonating the action
+        // rather than the user explicitly requesting it. Could matter
+        // to audits and logs to determine what happened.
+        ident.clone()
+    }
+
+    pub fn is_internal(&self) -> bool {
+        matches!(self.origin, IdentType::Internal(_))
+    }
+
+    pub fn get_uuid(&self) -> Uuid {
+        match &self.origin {
+            IdentType::Internal(role) => role.get_uuid(),
+            IdentType::User(u) => u.entry.get_uuid(),
+            IdentType::Synch(u) => *u,
+        }
+    }
+
+    /// Indicate if the session associated with this identity has a session
+    /// that can logout. Examples of sessions that *can not* logout are anonymous,
+    /// tokens, or PIV sessions.
+    pub fn can_logout(&self) -> bool {
+        match &self.origin {
+            IdentType::Internal(_) => false,
+            IdentType::User(u) => u.entry.get_uuid() != UUID_ANONYMOUS,
+            IdentType::Synch(_) => false,
+        }
+    }
+
+    pub fn get_event_origin_id(&self) -> IdentityId {
+        IdentityId::from(&self.origin)
+    }
+
+    #[cfg(test)]
+    pub fn has_claim(&self, claim: &str) -> bool {
+        match &self.origin {
+            IdentType::Internal(_) | IdentType::Synch(_) => false,
+            IdentType::User(u) => u
+                .entry
+                .attribute_equality(Attribute::Claim, &PartialValue::new_iutf8(claim)),
+        }
+    }
+
+    pub fn is_memberof(&self, group: Uuid) -> bool {
+        match &self.origin {
+            IdentType::Internal(_) | IdentType::Synch(_) => false,
+            IdentType::User(u) => u
+                .entry
+                .attribute_equality(Attribute::MemberOf, &PartialValue::Refer(group)),
+        }
+    }
+
+    pub fn get_memberof(&self) -> Option<&BTreeSet<Uuid>> {
+        match &self.origin {
+            IdentType::Internal(_) | IdentType::Synch(_) => None,
+            IdentType::User(u) => u.entry.get_ava_refer(Attribute::MemberOf),
+        }
+    }
+
+    pub fn get_oauth2_consent_scopes(&self, oauth2_rs: Uuid) -> Option<&BTreeSet<String>> {
+        match &self.origin {
+            IdentType::Internal(_) | IdentType::Synch(_) => None,
+            IdentType::User(u) => u
+                .entry
+                .get_ava_as_oauthscopemaps(Attribute::OAuth2ConsentScopeMap)
+                .and_then(|scope_map| scope_map.get(&oauth2_rs)),
+        }
+    }
+}

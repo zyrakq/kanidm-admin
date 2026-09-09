@@ -1,0 +1,13 @@
+.git
+.github
+.gitignore
+.mypy_cache
+.vscode
+*.md
+**/__pycache__/**
+docs
+kanidmd/sampledata
+Makefile
+target
+test.db
+Dockerfile

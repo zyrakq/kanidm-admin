@@ -1,0 +1,47 @@
+[package]
+name = "pam_kanidm"
+description = "Kanidm PAM module"
+
+version = { workspace = true }
+authors = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+
+[lib]
+name = "pam_kanidm"
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+pam_sparkle_common = { workspace = true }
+
+[build-dependencies]
+pkg-config = { workspace = true }
+
+## Debian packaging
+[package.metadata.deb]
+name = "libpam-kanidm"
+maintainer = "James Hodgkinson <james@terminaloutcomes.com>"
+depends = ["libc6", "libpam0g"]
+section = "network"
+priority = "optional"
+maintainer-scripts = "debian/"
+assets = [
+    [
+        "target/release/libpam_kanidm.so",
+        # This is not the final path as cargo-deb needs to be run with --multiarch=foreign
+        "usr/lib/security/pam_kanidm.so",
+        "644",
+    ],
+    [
+        "debian/kanidm.pam",
+        "usr/share/pam-configs/kanidm",
+        "644",
+    ],
+]
+
+[package.metadata.cargo-machete]
+ignored = ["pkg-config"]

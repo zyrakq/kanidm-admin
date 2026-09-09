@@ -1,0 +1,49 @@
+<nav hx-boost="false" class="navbar bg-body-tertiary navbar-expand-md mb-4">
+    <div class="container-lg">
+        <a class="navbar-brand d-flex align-items-center" href="/ui/apps">
+            (% if navbar_ctx.domain_info.image().is_some() %)
+            <img src="/ui/images/domain"
+                alt="(( navbar_ctx.domain_info.display_name() ))" width="auto" height="40" class="navbar-toggler-img" />
+            (% else %)
+            <img
+                src="/pkg/img/logo.svg?v=((crate::https::cache_buster::get_cache_buster_key()))"
+                alt="(( navbar_ctx.domain_info.display_name() ))" width="auto" height="40" class="navbar-toggler-img" />
+            (% endif %)
+            <div class="ps-2">(( navbar_ctx.domain_info.display_name() ))</div>
+        </a>
+
+        <!-- this shows a button on mobile devices to open the menu-->
+        <button class="navbar-toggler navbar-brand" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <svg class="navbar-toggle-icon" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'>
+                <path stroke='currentColor' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav">
+                <li>
+                    <a class="nav-link" href=((Urls::Apps))>
+                        <span data-feather="file"></span>Applications</a>
+                </li>
+                <li>
+                    <a class="nav-link" href=((Urls::Profile))>
+                        <span data-feather="file"></span>Profile</a>
+                </li>
+                (% if navbar_ctx.ui_hints.contains(&kanidm_proto::internal::UiHint::ExperimentalFeatures) %)
+                <li>
+                    <a class="nav-link" href=((Urls::Admin))>
+                        <span data-feather="file"></span>Admin</a>
+                </li>
+                (% endif %)
+            </ul>
+            <ul class="navbar-nav ms-md-auto">
+                <li>
+                    <a class="nav-link" href="#" data-bs-toggle="modal"
+                        data-bs-target="#signoutModal">Sign out</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
