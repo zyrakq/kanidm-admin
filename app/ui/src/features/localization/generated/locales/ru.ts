@@ -3,7 +3,7 @@
     // Re-generate this file by running lit-localize
 
     
-    
+    import {str} from '@lit/localize';
 
     /* eslint-disable no-irregular-whitespace */
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -26,6 +26,7 @@
 's5285ab86397ccb7f': `Операция успешно выполнена!`,
 's54fa6ceb8030c6ae': `Загрузка информации о пользователе...`,
 's551172bd09a2a438': `Информация о пользователе`,
+'s5e94738a2eeb8943': `Войти`,
 's5eddcab87c38b6b6': `Добро пожаловать в защищенную зону`,
 's5f343a43e7ea9f91': `Ошибка`,
 's631b1127429695aa': `Kanidm GitHub`,
@@ -62,5 +63,19 @@
 's03d2a87fc293ad66': `Elevated access granted.`,
 's45ee1d374a1606b3': `Your session has expired. Please sign in again.`,
 's28f342300c7fbcfe': `Sign In (coming soon)`,
+'sd16468ff83c1e843': `Your session expires in less than 5 minutes.`,
+'se70d5bb737ef7810': str`${0}h ${1}m`,
+'s98a2de18d8a6bcad': str`${0}:${1}`,
+'s748139d78ebaa5d8': `Session time remaining`,
+'s82f8493b0823a619': `Please fill in all fields.`,
+'s91e6aa07b4049238': `Invalid username or password.`,
+'s20e2103dce14e0b0': `Cannot reach the Kanidm server. Check your connection and try again.`,
+'sf249dcf6c6b6f8ed': `Sign in failed. Please try again.`,
+'sf6e1665c7022a1f8': `Password`,
+'sd4834a205d67ccdf': `Signing in...`,
+'s5df3d186616238c8': `Elevated access required`,
+'s5b3391e7ee5bc58a': `This operation requires elevated privileges. Enter your password to continue.`,
+'s2ceb11be2290bb1b': `Cancel`,
+'sb85774dc5d18ff0f': `Confirm`,
     };
   
