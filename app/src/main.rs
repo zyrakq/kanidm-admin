@@ -1,3 +1,4 @@
+mod auth;
 mod frontend;
 mod frontend_assets;
 mod logging;
