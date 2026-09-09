@@ -1,9 +1,0 @@
-# Auto-generated config.Config textproto
-email {}
-server {
-  application_name: "TrailBase"
-  site_url: "http://localhost:4000"
-  logs_retention_sec: 604800
-}
-auth {}
-jobs {}
