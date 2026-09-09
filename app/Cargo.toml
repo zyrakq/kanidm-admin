@@ -16,6 +16,13 @@ dotenvy = { workspace = true }
 config = { workspace = true }
 rust-embed = { workspace = true }
 mime_guess = { workspace = true }
+async-trait = { workspace = true }
+base64 = { workspace = true }
+kanidm_client = { workspace = true }
+kanidm_proto = { workspace = true }
+time = { workspace = true }
 
 [dev-dependencies]
 indoc = "2"
+tower = { workspace = true }
+uuid = { workspace = true }

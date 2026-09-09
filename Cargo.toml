@@ -1,5 +1,8 @@
 [workspace]
 members = ["app"]
+# vendor/ holds nested external workspaces (kanidm); excluded so their
+# `workspace = true` inheritance resolves against their own roots.
+exclude = ["vendor"]
 resolver = "2"
 
 [workspace.dependencies]
