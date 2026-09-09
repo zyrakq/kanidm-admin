@@ -3,7 +3,6 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '../services/auth.service';
-import { notificationService } from '@/features/notifications';
 import type { User } from '@/features/auth';
 import { ThemeController } from '@/features/theme';
 import logoLight from '@/assets/logo-light.svg';
@@ -33,17 +32,6 @@ export class AuthStatus extends LitElement {
     const authState = authService.getAuthState();
     this.isAuthenticated = authState.isAuthenticated;
     this.user = authState.user;
-  }
-
-  private async handleSignIn() {
-    try {
-      this.loading = true;
-      await authService.signIn('oidc0', '/auth/callback');
-    } catch (error) {
-      notificationService.error('Failed to sign in. Please try again.');
-    } finally {
-      this.loading = false;
-    }
   }
 
   private handleDashboardClick() {
@@ -82,12 +70,8 @@ export class AuthStatus extends LitElement {
                 </button>
               `
             : html`
-                <button
-                  class="btn btn-primary"
-                  @click=${this.handleSignIn}
-                  ?disabled=${this.loading}
-                >
-                  ${this.loading ? msg('Redirecting...') : msg('Sign In')}
+                <button class="btn btn-primary" disabled>
+                  ${msg('Sign In (coming soon)')}
                 </button>
               `}
         </div>

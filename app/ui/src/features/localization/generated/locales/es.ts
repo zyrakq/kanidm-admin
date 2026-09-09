@@ -27,7 +27,6 @@
 's5285ab86397ccb7f': `¡Operación completada con éxito!`,
 's54fa6ceb8030c6ae': `Cargando información del usuario...`,
 's551172bd09a2a438': `Información del Usuario`,
-'s5e94738a2eeb8943': `Iniciar Sesión`,
 's5eddcab87c38b6b6': `Bienvenido a tu área protegida`,
 's5f343a43e7ea9f91': `Error`,
 's631b1127429695aa': `GitHub de Kanidm`,
@@ -38,7 +37,6 @@
 's8fa032cdafb3c9b0': `Cerrar Sesión`,
 's92a0d19a28995530': `Éxito`,
 's9c274ca3aae0227e': `Ocurrió un error durante la operación`,
-'sa0edd3227b3addeb': `Redirigiendo...`,
 'sa8c3b80277455232': `GitHub`,
 'sa95b4224f685a36a': `Cerrar ventana`,
 'sae506e1a821a6d4b': `Error al cerrar sesión. Por favor intenta de nuevo.`,
@@ -63,5 +61,6 @@
 'sf3ba1de979a9b38e': `Error de Autenticación`,
 'sf3fda5790cfa46f6': `Error al conectar con el servidor de autenticación. La conexión fue rechazada debido a tiempo de espera de red (código de error: ETIMEDOUT). Por favor verifica tu conexión a internet e intenta de nuevo. Si el problema persiste, contacta a tu administrador del sistema.`,
 'sffef1a8596bc58bb': `Autenticando...`,
+'s28f342300c7fbcfe': `Sign In (coming soon)`,
     };
   
