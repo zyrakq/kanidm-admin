@@ -1,5 +1,4 @@
-const DEFAULT_FILTER: &str =
-    "info,trailbase_refinery=warn,tracing::span=warn,swc_ecma_codegen=off";
+const DEFAULT_FILTER: &str = "info,tracing::span=warn,swc_ecma_codegen=off";
 
 pub fn init() {
     std::env::set_var(
