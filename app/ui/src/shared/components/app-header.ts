@@ -4,6 +4,7 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { ThemeController } from '@/features/theme';
 import '@/features/localization/components/locale-switcher';
+import '@/features/auth/components/session-indicator';
 import logoLight from '@/assets/logo-light.svg';
 import logoDark from '@/assets/logo-dark.svg';
 import { appHeaderStyles } from './app-header.styles';
@@ -24,6 +25,7 @@ export class AppHeader extends LitElement {
             <span class="app-name">${msg('Kanidm Admin')}</span>
           </div>
           <div class="actions">
+            <session-indicator></session-indicator>
             <theme-toggler></theme-toggler>
             <locale-switcher></locale-switcher>
           </div>
