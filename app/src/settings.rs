@@ -5,6 +5,7 @@
 // sections as `#[serde(default)]` fields on Settings in loader.rs.
 
 pub mod frontend;
+pub mod kanidm;
 pub mod loader;
 pub mod server;
 

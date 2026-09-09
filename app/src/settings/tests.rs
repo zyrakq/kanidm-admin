@@ -44,6 +44,9 @@ const BASE_TOML: &str = indoc! {r#"
     serve_from = "disk"
     watch = false
     public_dir = ""
+
+    [kanidm]
+    url = "https://kanidm.example.com"
 "#};
 
 const DEV_TOML: &str = indoc! {r#"
@@ -107,6 +110,9 @@ fn serve_from_defaults_to_disk_when_absent() {
         [frontend]
         watch = false
         public_dir = ""
+
+        [kanidm]
+        url = "https://kanidm.example.com"
     "#};
     let s = settings_from_toml(base, "").expect("should deserialize");
     assert_eq!(
@@ -203,5 +209,71 @@ fn public_dir_set_resolves_to_literal_path() {
         s.frontend.resolve_public_dir(std::path::Path::new("/tmp/manifest")),
         std::path::PathBuf::from("/srv/static"),
         "set public_dir should resolve to the literal path"
+    );
+}
+
+#[test]
+fn kanidm_defaults_verify_ca_and_no_ca() {
+    let s = settings_from_toml(BASE_TOML, "").expect("should deserialize");
+    assert_eq!(s.kanidm.url, "https://kanidm.example.com");
+    assert!(s.kanidm.verify_ca, "verify_ca should default to true");
+    assert_eq!(s.kanidm.ca_path, None, "ca_path should default to None");
+}
+
+#[test]
+fn kanidm_ca_path_overlay_parses() {
+    let overlay = indoc! {r#"
+        [kanidm]
+        ca_path = "/etc/kanidm/ca.pem"
+    "#};
+    let s = settings_from_toml(BASE_TOML, overlay).expect("should deserialize");
+    assert_eq!(
+        s.kanidm.ca_path.as_deref(),
+        Some("/etc/kanidm/ca.pem"),
+        "overlay ca_path should parse"
+    );
+}
+
+#[test]
+fn env_var_overrides_kanidm_url() {
+    let env = HashMap::from([(
+        "APP_KANIDM__URL".to_string(),
+        "https://idm.local:8443".to_string(),
+    )]);
+    let s = settings_from_layers(BASE_TOML, "", Some(env)).expect("should deserialize");
+    assert_eq!(
+        s.kanidm.url, "https://idm.local:8443",
+        "APP_KANIDM__URL should override the TOML value"
+    );
+}
+
+#[test]
+fn env_var_disables_verify_ca() {
+    let env = HashMap::from([(
+        "APP_KANIDM__VERIFY_CA".to_string(),
+        "false".to_string(),
+    )]);
+    let s = settings_from_layers(BASE_TOML, "", Some(env)).expect("should deserialize");
+    assert!(
+        !s.kanidm.verify_ca,
+        "APP_KANIDM__VERIFY_CA=false should disable CA verification"
+    );
+}
+
+#[test]
+fn missing_kanidm_section_is_rejected() {
+    let base = indoc! {r#"
+        [server]
+        address = "0.0.0.0:4000"
+
+        [frontend]
+        serve_from = "disk"
+        watch = false
+        public_dir = ""
+    "#};
+    let result = settings_from_toml(base, "");
+    assert!(
+        result.is_err(),
+        "missing [kanidm] must fail deserialization (url is required)"
     );
 }

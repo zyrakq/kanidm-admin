@@ -2,12 +2,14 @@ use config::{Config, ConfigError, Environment, File};
 use serde::Deserialize;
 
 use super::frontend::FrontendSettings;
+use super::kanidm::KanidmSettings;
 use super::server::ServerSettings;
 
 #[derive(Debug, Deserialize)]
 pub struct Settings {
     pub server: ServerSettings,
     pub frontend: FrontendSettings,
+    pub kanidm: KanidmSettings,
 }
 
 impl Settings {

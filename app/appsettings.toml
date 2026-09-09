@@ -5,3 +5,6 @@ address = "0.0.0.0:4000"
 serve_from = "disk"
 watch = false
 public_dir = ""
+
+[kanidm]
+url = "https://localhost:8443"
