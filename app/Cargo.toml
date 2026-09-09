@@ -11,12 +11,9 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
 env_logger = { workspace = true }
-tokio-rustls = { workspace = true }
 pretty_env_logger = { workspace = true }
-trailbase = { workspace = true }
 dotenvy = { workspace = true }
 config = { workspace = true }
 
 [dev-dependencies]
 indoc = "2"
-tempfile = "3"
