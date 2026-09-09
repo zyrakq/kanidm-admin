@@ -7,8 +7,8 @@ import '@/features/theme/services/favicon.service';
 
 // Import components (they will be registered as custom elements)
 import '@/pages/welcome-page';
-import '@/features/auth/components/oauth-callback';
 import '@/pages/dashboard-page';
+import '@/features/auth/components/reauth-modal';
 import '@/features/notifications/components/toast-container';
 
 @customElement('app-component')
@@ -27,10 +27,6 @@ export class AppComponent extends LitElement {
         await authService.init();
         return true;
       },
-    },
-    {
-      path: '/auth/callback',
-      render: () => html`<oauth-callback></oauth-callback>`,
     },
     {
       path: '/dashboard',
