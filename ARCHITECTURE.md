@@ -3,19 +3,17 @@
 ## Overview
 
 **kanidm-admin** is a full-stack web application for administering a
-[Kanidm](https://github.com/kanidm/kanidm) identity provider. It consists of a
-thin Rust/Axum backend powered by [TrailBase](https://github.com/trailbaseio/trailbase)
-and a TypeScript/Lit SPA frontend.
+[Kanidm](https://github.com/kanidm/kanidm) identity provider. It consists of
+a thin Rust/Axum backend and a TypeScript/Lit SPA frontend.
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Backend | Rust, Axum 0.8, TrailBase, Tokio, tower-http |
+| Backend | Rust, Axum 0.8, Tokio, tower-http |
 | Frontend | TypeScript, Lit 3, Vite 7, `@lit/localize`, `@lit-labs/router` |
 | Package manager | Bun |
-| Database | SQLite (managed by TrailBase) |
-| Auth | OAuth 2.0 / OIDC via TrailBase proxy |
+| Auth | Stubbed (disabled) — pending a future Kanidm OIDC integration design |
 
 ## Directory Structure
 
@@ -26,9 +24,10 @@ kanidm-admin/
 │   │   ├── main.rs          # Entry point — thin orchestration only
 │   │   ├── settings.rs      # Layered TOML config loading
 │   │   ├── frontend.rs      # Frontend build and watch helpers
+│   │   ├── preflight.rs     # CLI dependency checks (e.g. `bun`)
+│   │   ├── logging.rs       # Tracing/env_logger init
 │   │   └── routes.rs        # Custom API handlers and router
 │   ├── Cargo.toml           # Rust package manifest
-│   ├── traildepot/          # TrailBase data (DB, migrations, secrets, uploads)
 │   ├── .env                 # Local environment variables
 │   └── ui/                  # TypeScript SPA
 │       ├── index.html       # HTML entry point
@@ -37,7 +36,7 @@ kanidm-admin/
 │       │   ├── index.css          # Global CSS entry point
 │       │   ├── assets/            # SVG logos (light/dark)
 │       │   ├── features/          # Feature modules (self-contained)
-│       │   │   ├── auth/          # Authentication (OAuth/OIDC)
+│       │   │   ├── auth/          # Authentication (stubbed, pending real OIDC design)
 │       │   │   ├── theme/         # Light/dark theme switching
 │       │   │   ├── localization/  # i18n (en, ru, es, zh-Hans)
 │       │   │   └── notifications/ # Toast + modal notifications
@@ -53,9 +52,27 @@ kanidm-admin/
 │       ├── tsconfig.json
 │       ├── lit-localize.json
 │       └── package.json
+├── vendor/
+│   └── kanidm/               # Vendored upstream Kanidm source — read-only reference
 ├── Cargo.toml               # Workspace manifest
 └── .justfile                # Task runner recipes
 ```
+
+## Vendored Reference
+
+`vendor/kanidm/` is a vendored copy (not a git submodule) of the upstream
+[Kanidm](https://github.com/kanidm/kanidm) identity provider — the actual
+server that kanidm-admin administers.
+
+- **Read-only.** Never edit, format, or lint files under `vendor/kanidm/`.
+- **Not a workspace member.** It is not listed in the root `Cargo.toml`
+  `[workspace] members`, and no crate under `app/` imports from it directly.
+- **Purpose.** It is the authoritative source for Kanidm's HTTP/OIDC API
+  contracts, data models, and behavior — consult it when implementing
+  kanidm-admin features that talk to a real Kanidm instance (most notably
+  the future real auth integration, see Open Questions below).
+- **Updates.** Refreshed by re-copying from upstream when needed; changes
+  are never hand-authored in place.
 
 ## Core Components
 
@@ -69,17 +86,18 @@ in dedicated modules:
 | `main.rs` | Bootstrap, load config, wire modules, start server |
 | `settings.rs` | Layered TOML configuration (`Settings::load()`) |
 | `frontend.rs` | Frontend build (`bun run build`) and watch (`bun watch`) |
+| `preflight.rs` | CLI dependency checks (currently: `bun`) |
+| `logging.rs` | Tracing filter + `pretty_env_logger` init |
 | `routes.rs` | Custom API handlers and router assembly |
 
 `main.rs` sequence:
 
 1. Load `.env` (dotenvy), init tracing
 2. Load settings (`Settings::load()`)
-3. Optionally build frontend (`frontend::build`)
-4. Optionally spawn watch process (`frontend::spawn_watch`)
-5. Init TrailBase with data dir and address
-6. Merge routers: `routes::build()` → TrailBase → static files
-7. Serve
+3. Optionally build frontend (`frontend::build`) / spawn watch (`frontend::spawn_watch`)
+4. Bind a `TcpListener` on `settings.server.address`
+5. Merge routers: `routes::build()` → SPA static-file fallback
+6. Serve via `axum::serve`
 
 ### Frontend Features
 
@@ -90,15 +108,19 @@ Each feature is self-contained under `src/features/<name>/` with this structure:
 ├── components/   # Lit web components
 ├── services/     # Business logic, singletons
 ├── types/        # TypeScript interfaces
-├── index.ts      # Public API (only export from here)
+└── index.ts      # Public API (only export from here)
 ```
 
-#### `auth`
+#### `auth` (stubbed)
 
-- **`TrailBaseService`** — raw HTTP client for `/api/auth/v1/*`; handles login redirect, JWT parsing, logout
-- **`AuthService`** — app-level state manager; wraps `TrailBaseService`, caches `AuthState`, dispatches notification events
-- **`<auth-status>`** — login card; shows Sign In or Go to Dashboard based on auth state
-- **`<oauth-callback>`** — handles OAuth redirect at `/auth/callback`; waits 500ms for cookie, then refreshes auth state
+- **`AuthService`** — app-level state manager; currently stubbed to always
+  report unauthenticated with **no network calls**, pending a future design
+  for real Kanidm OIDC integration
+- **`<auth-status>`** — login card; the "Sign In" action is disabled
+  ("coming soon") until real auth is implemented
+- **`<oauth-callback>`** — handles the `/auth/callback` route; currently
+  unreachable dead-end UI (nothing links to it while sign-in is disabled),
+  retained for the future auth integration
 
 #### `theme`
 
@@ -130,23 +152,18 @@ Each feature is self-contained under `src/features/<name>/` with this structure:
 
 ## Data Flow
 
-### Authentication Flow
+### Authentication Flow (stubbed)
 
 ```
 User visits /
   → <auth-status> mounts → authService.init()
-    → GET /api/auth/v1/status (cookies) → JWT decoded client-side
-  → renders "Sign In" or "Go to Dashboard"
-
-User clicks "Sign In"
-  → window.location.href = /api/auth/v1/oauth/oidc0/login?redirect_uri=/auth/callback
-    (browser redirects to Kanidm OIDC provider)
-
-Kanidm authenticates → redirects to /auth/callback
-  → <oauth-callback> mounts → 500ms wait → authService.refresh()
-    → GET /api/auth/v1/status → JWT decoded → User object
-  → 1500ms wait → window.location.href = /dashboard
+    → no network call; authState stays { isAuthenticated: false, user: null }
+  → renders a disabled "Sign In (coming soon)" button
 ```
+
+Real Kanidm OIDC integration (login redirect, callback handling, session
+refresh) is deferred to a follow-up design. `vendor/kanidm` is the reference
+for that work's API contracts.
 
 ### Notification Event Bus
 
@@ -179,8 +196,7 @@ ThemeController (in any component)
 
 | Service | Integration |
 |---|---|
-| TrailBase | Auth API (`/api/auth/v1/*`), admin UI, SQLite DB |
-| Kanidm OIDC | OAuth provider via TrailBase proxy |
+| Kanidm | Identity provider administered by this app — no live API integration yet (auth stubbed) |
 | GitHub | External links in footer |
 
 ## Configuration
@@ -188,7 +204,6 @@ ThemeController (in any component)
 | File | Purpose |
 |---|---|
 | `app/.env` | Local env vars (e.g., `PUBLIC_DIR`) |
-| `app/traildepot/config.textproto` | TrailBase server config |
 | `app/ui/vite.config.ts` | Path aliases, build options |
 | `app/ui/tsconfig.json` | TypeScript strict mode, path mappings |
 | `app/ui/lit-localize.json` | i18n source/target locales, XLIFF dir |
@@ -226,3 +241,10 @@ cargo build --release
 cargo run
 # Server starts at http://localhost:4000
 ```
+
+## Open Questions
+
+- Real Kanidm OIDC/API auth integration is a separate future design;
+  `vendor/kanidm` is the reference for its actual auth endpoints/contracts.
+- Whether kanidm-admin will eventually need any local persistent storage
+  (settings, audit log) is deferred until a concrete need arises.
