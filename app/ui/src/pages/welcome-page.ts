@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { localized } from '@/features/localization';
 import '@/shared/components/app-header';
-import '@/features/auth/components/auth-status';
+import '@/features/auth/components/login-form';
 import '@/shared/components/footer-info';
 import { welcomePageStyles } from './welcome-page.styles';
 
@@ -14,7 +14,7 @@ export class WelcomePage extends LitElement {
       <div class="page">
         <app-header></app-header>
         <main class="main-content">
-          <auth-status></auth-status>
+          <login-form></login-form>
         </main>
         <footer-info></footer-info>
       </div>
