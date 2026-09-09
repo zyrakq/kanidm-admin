@@ -18,7 +18,7 @@ export class AppComponent extends LitElement {
     localizationService.init();
   }
 
-  // Router - основной роутер с глобальными listeners (Router наследует от Routes)
+  // Router - primary router with global listeners (Router extends Routes)
   private _router = new Router(this, [
     {
       path: '/',
