@@ -14,18 +14,3 @@ services:
     logging: *default-logging
     ports:
       - 4000:4000
-    volumes:
-      - kanidm-admin-data:/workspace/app/traildepot/data
-      - kanidm-admin-backups:/workspace/app/traildepot/backups
-      - kanidm-admin-secrets:/workspace/app/traildepot/secrets
-      - kanidm-admin-uploads:/workspace/app/traildepot/uploads
-
-volumes:
-  kanidm-admin-data:
-    name: kanidm-admin-data
-  kanidm-admin-backups:
-    name: kanidm-admin-backups
-  kanidm-admin-secrets:
-    name: kanidm-admin-secrets
-  kanidm-admin-uploads:
-    name: kanidm-admin-uploads
