@@ -1,5 +1,7 @@
 set dotenv-load
 
+export APP_SKIP_FRONTEND_BUILD := "1"
+
 run:
     cargo run
 

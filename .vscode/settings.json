@@ -29,9 +29,25 @@
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "markdownlint.config": {
-    "MD033": false,
-    "MD036": false,
-    "MD041": false
+  "rust-analyzer.cachePriming.enable": false,
+  "rust-analyzer.check.workspace": false,
+  "rust-analyzer.procMacro.enable": true,
+  "rust-analyzer.lru.capacity": 64,
+  "rust-analyzer.checkOnSave": false,
+  "rust-analyzer.cargo.targetDir": "target/rust-analyzer",
+  "rust-analyzer.files.exclude": [
+    "vendor",
+    "target",
+    "app/ui"
+  ],
+  "rust-analyzer.server.extraEnv": {
+    "CARGO_BUILD_JOBS": "4",
+    "RUSTC_WRAPPER": "sccache",
+    "SCCACHE_DIR": "/home/archuser/.cache/sccache"
+  },
+  "rust-analyzer.cargo.extraEnv": {
+    "CARGO_BUILD_JOBS": "4",
+    "RUSTC_WRAPPER": "sccache",
+    "SCCACHE_DIR": "/home/archuser/.cache/sccache"
   }
 }
