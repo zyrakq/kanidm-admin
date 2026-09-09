@@ -1,21 +1,48 @@
+import { msg } from '@lit/localize';
+import { apiFetch, ApiError } from '@/shared/services/http-client';
+import { notificationService } from '@/features/notifications';
 import type { AuthState, User } from '../types/auth.types';
 
-// Authentication service.
-//
-// STUBBED: TrailBase (the previous auth backend) has been removed. Until a
-// follow-up design wires real Kanidm OIDC authentication, this service never
-// makes network calls and always reports an unauthenticated state.
+// Backend response shapes (epoch SECONDS — converted to ms on receipt).
+
+interface SessionUserResponse {
+  id: string;
+  username: string;
+  displayName: string;
+  email: string | null;
+}
+
+interface SessionResponse {
+  user: SessionUserResponse;
+  sessionExpiresAt: number | null;
+  writeUntil: number | null;
+}
+
+interface ReauthResponse {
+  writeUntil: number | null;
+}
+
+/** Maximum password attempts offered in one step-up flow. */
+const MAX_STEP_UP_ATTEMPTS = 3;
+
 class AuthService {
   private static instance: AuthService;
+
   private authState: AuthState = {
     isAuthenticated: false,
     user: null,
-    token: null,
+    sessionExpiresAt: null,
+    writeUntil: null,
   };
+
   private initPromise: Promise<void> | null = null;
+  private stepUpResolve: ((password: string | null) => void) | null = null;
 
   private constructor() {
-    // Don't initialize immediately, let components call init()
+    // The shared http client signals session expiry from any API call.
+    window.addEventListener('auth-session-expired', () => {
+      void this.handleSessionExpired();
+    });
   }
 
   static getInstance(): AuthService {
@@ -26,78 +53,189 @@ class AuthService {
   }
 
   /**
-   * Initialize auth state.
-   *
-   * STUBBED: resolves immediately with no network call. Auth state is
-   * always unauthenticated until real Kanidm OIDC integration lands.
+   * Initialize auth state. Safe to call from multiple components; the
+   * underlying session request runs once. A 401 here simply means "not
+   * authenticated" (no cookie) and is not an error.
    */
   async init(): Promise<void> {
     if (this.initPromise) {
       return this.initPromise;
     }
-
-    this.initPromise = Promise.resolve();
+    this.initPromise = this.restoreSession();
     return this.initPromise;
   }
 
-  /**
-   * Get current authentication state.
-   */
+  /** Re-fetch the session state from the backend. */
+  async refresh(): Promise<void> {
+    await this.restoreSession();
+  }
+
+  private async restoreSession(): Promise<void> {
+    try {
+      const session = await apiFetch<SessionResponse>('/api/auth/session', {
+        ignoreSessionExpired: true,
+      });
+      this.applySession(session);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        return;
+      }
+      throw error;
+    }
+  }
+
+  private applySession(session: SessionResponse): void {
+    this.authState = {
+      isAuthenticated: true,
+      user: {
+        id: session.user.id,
+        username: session.user.username,
+        displayName: session.user.displayName,
+        email: session.user.email ?? undefined,
+      },
+      sessionExpiresAt:
+        session.sessionExpiresAt !== null
+          ? session.sessionExpiresAt * 1000
+          : null,
+      writeUntil:
+        session.writeUntil !== null ? session.writeUntil * 1000 : null,
+    };
+  }
+
+  private resetState(): void {
+    this.authState = {
+      isAuthenticated: false,
+      user: null,
+      sessionExpiresAt: null,
+      writeUntil: null,
+    };
+  }
+
   getAuthState(): AuthState {
     return { ...this.authState };
   }
 
-  /**
-   * Check if user is authenticated. Always `false` while auth is stubbed.
-   */
   isAuthenticated(): boolean {
     return this.authState.isAuthenticated;
   }
 
-  /**
-   * Get current user. Always `null` while auth is stubbed.
-   */
   getUser(): User | null {
     return this.authState.user ? { ...this.authState.user } : null;
   }
 
-  /**
-   * Sign in.
-   *
-   * STUBBED: no backend exists to authenticate against. Kept as a no-op so
-   * callers don't need special-casing; the UI action that would call this
-   * (`<auth-status>`'s Sign In button) is disabled until real auth lands.
-   */
-  async signIn(): Promise<void> {
-    window.dispatchEvent(
-      new CustomEvent('notification-add', {
-        detail: {
-          id: `auth-unavailable-${Date.now()}`,
-          message: 'Sign in is not available yet.',
-          type: 'info' as const,
-        },
-        bubbles: true,
-        composed: true,
-      })
-    );
+  /** Sign in with username + password; throws ApiError on failure. */
+  async signIn(username: string, password: string): Promise<void> {
+    const session = await apiFetch<SessionResponse>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    });
+    this.applySession(session);
   }
 
-  /**
-   * Sign out. STUBBED: no session exists to end, resets local state only.
-   */
+  /** Sign out: revoke server-side, then reset local state either way. */
   async signOut(): Promise<void> {
+    try {
+      await apiFetch<void>('/api/auth/logout', { method: 'POST' });
+    } finally {
+      this.resetState();
+    }
+  }
+
+  /** Step-up reauth; refreshes the write window from the response. */
+  async reauth(password: string): Promise<void> {
+    const result = await apiFetch<ReauthResponse>('/api/auth/reauth', {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+    });
     this.authState = {
-      isAuthenticated: false,
-      user: null,
-      token: null,
+      ...this.authState,
+      writeUntil:
+        result.writeUntil !== null ? result.writeUntil * 1000 : null,
     };
   }
 
   /**
-   * Refresh auth state. STUBBED: no-op, no network call.
+   * Run a write operation with automatic step-up: on `reauth_required`
+   * the global password modal opens (via 'auth-step-up-open'), the reauth
+   * endpoint is called, and the original operation is retried.
    */
-  async refresh(): Promise<void> {
-    // No backend to refresh from while auth is stubbed.
+  async withStepUp<T>(operation: () => Promise<T>): Promise<T> {
+    try {
+      return await operation();
+    } catch (error) {
+      if (!(error instanceof ApiError) || error.code !== 'reauth_required') {
+        throw error;
+      }
+      return this.runStepUp(operation, error);
+    }
+  }
+
+  private async runStepUp<T>(
+    operation: () => Promise<T>,
+    originalError: ApiError
+  ): Promise<T> {
+    let attemptError: string | null = null;
+
+    for (let attempt = 0; attempt < MAX_STEP_UP_ATTEMPTS; attempt++) {
+      const password = await this.promptForStepUp(attemptError);
+      if (password === null) {
+        // User cancelled: surface the original reauth_required error.
+        throw originalError;
+      }
+      try {
+        await this.reauth(password);
+        notificationService.success(msg('Elevated access granted.'));
+        return await operation();
+      } catch (error) {
+        if (error instanceof ApiError && error.code === 'invalid_credentials') {
+          attemptError = error.message;
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    throw originalError;
+  }
+
+  private promptForStepUp(attemptError: string | null): Promise<string | null> {
+    return new Promise((resolve) => {
+      this.stepUpResolve = resolve;
+      window.dispatchEvent(
+        new CustomEvent('auth-step-up-open', {
+          detail: { error: attemptError },
+          bubbles: true,
+          composed: true,
+        })
+      );
+    });
+  }
+
+  /** Called by the reauth modal when the user submits a password. */
+  submitStepUp(password: string): void {
+    this.stepUpResolve?.(password);
+    this.stepUpResolve = null;
+  }
+
+  /** Called by the reauth modal when the user cancels. */
+  cancelStepUp(): void {
+    this.stepUpResolve?.(null);
+    this.stepUpResolve = null;
+  }
+
+  /**
+   * Local expiry handling (countdown hit zero or any API call returned
+   * session_expired): reset state, notify, return to the welcome page.
+   */
+  async handleSessionExpired(): Promise<void> {
+    if (!this.authState.isAuthenticated) {
+      return;
+    }
+    this.resetState();
+    notificationService.warning(
+      msg('Your session has expired. Please sign in again.')
+    );
+    window.location.assign('/');
   }
 }
 

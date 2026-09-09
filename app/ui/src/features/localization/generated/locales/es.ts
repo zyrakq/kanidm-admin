@@ -59,6 +59,8 @@
 'sf3ba1de979a9b38e': `Error de Autenticación`,
 'sf3fda5790cfa46f6': `Error al conectar con el servidor de autenticación. La conexión fue rechazada debido a tiempo de espera de red (código de error: ETIMEDOUT). Por favor verifica tu conexión a internet e intenta de nuevo. Si el problema persiste, contacta a tu administrador del sistema.`,
 'sffef1a8596bc58bb': `Autenticando...`,
+'s03d2a87fc293ad66': `Elevated access granted.`,
+'s45ee1d374a1606b3': `Your session has expired. Please sign in again.`,
 's28f342300c7fbcfe': `Sign In (coming soon)`,
     };
   

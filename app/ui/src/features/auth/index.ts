@@ -2,4 +2,4 @@
 export { AuthStatus } from './components/auth-status.ts';
 export { OAuthCallback } from './components/oauth-callback.ts';
 export { authService } from './services/auth.service.ts';
-export type { AuthState, User, OIDCConfig } from './types/auth.types.ts';
+export type { AuthState, User } from './types/auth.types.ts';

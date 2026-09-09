@@ -59,6 +59,8 @@
 'sf3ba1de979a9b38e': `身份验证失败`,
 'sf3fda5790cfa46f6': `无法连接到身份验证服务器。由于网络超时，连接被拒绝（错误代码：ETIMEDOUT）。请检查您的互联网连接并重试。如果问题仍然存在，请联系系统管理员寻求帮助。`,
 'sffef1a8596bc58bb': `正在验证身份...`,
+'s03d2a87fc293ad66': `Elevated access granted.`,
+'s45ee1d374a1606b3': `Your session has expired. Please sign in again.`,
 's28f342300c7fbcfe': `Sign In (coming soon)`,
     };
   
