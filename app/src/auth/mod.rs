@@ -7,6 +7,7 @@
 
 pub mod cookie;
 pub mod error;
+pub mod handlers;
 pub mod ops;
 pub mod token;
 
