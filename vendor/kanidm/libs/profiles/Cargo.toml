@@ -1,0 +1,34 @@
+[package]
+name = "kanidm_build_profiles"
+description = "Kanidm Build System Profiles"
+documentation = "https://docs.rs/kanidm/latest/kanidm/"
+# We do not have tests in this pkg
+autotests = false
+
+version = { workspace = true }
+authors = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+
+[lib]
+name = "profiles"
+path = "src/lib.rs"
+test = false
+doctest = false
+
+[dependencies]
+base64 = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+sha2 = { workspace = true }
+toml = { workspace = true }
+
+[build-dependencies]
+base64 = { workspace = true }
+gix = { workspace = true, default-features = false }
+
+
+[package.metadata.cargo-machete]
+ignored = ["gix"]

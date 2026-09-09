@@ -1,0 +1,12 @@
+(% extends "base_htmx_with_nav.html" %)
+
+(% block title %)Profile(% endblock %)
+
+(% block head %)
+<script src="/pkg/external/forms.js"></script>
+<script src="/pkg/external/htmx_bs_validation.js"></script>
+(% endblock %)
+
+(% block main %)
+(( profile_partial|safe ))
+(% endblock %)

@@ -1,0 +1,10 @@
+# Don't set the cpu_flags to autodetect for this platform
+# cpu_flags = "none"
+server_admin_bind_path = "/data/kanidmd.sock"
+server_ui_pkg_path = "/hpkg"
+server_config_path = "/data/server.toml"
+server_migration_path = "/data/migrations.d"
+client_config_path = "/data/config"
+resolver_config_path = "/data/unixd"
+resolver_service_account_token_path = "/data/kanidm-token"
+resolver_unix_shell_path = "/bin/false"

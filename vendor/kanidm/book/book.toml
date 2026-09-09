@@ -1,0 +1,19 @@
+[book]
+authors = ["William Brown", "James Hodgkinson", "Carla Schroder"]
+language = "en"
+#multilingual = false
+src = "src"
+title = "Kanidm Administration"
+
+[build]
+create-missing = true
+use-default-preprocessors = true
+
+[output.html]
+edit-url-template = "https://github.com/kanidm/kanidm/edit/master/book/{path}"
+git-repository-url = "https://github.com/kanidm/kanidm"
+additional-js = ["mermaid.min.js", "mermaid-init.js"]
+
+# # mermaid graph rendering, you need mdbook-mermaid
+[preprocessor.mermaid]
+command = "mdbook-mermaid"

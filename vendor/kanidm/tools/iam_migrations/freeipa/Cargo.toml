@@ -1,0 +1,51 @@
+[package]
+name = "kanidm-ipa-sync"
+description = "Kanidm Client Tools"
+documentation = "https://kanidm.github.io/kanidm/stable/"
+
+version = { workspace = true }
+authors = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+
+[[bin]]
+name = "kanidm-ipa-sync"
+test = false
+doctest = false
+
+[dependencies]
+clap = { workspace = true, features = ["derive", "env"] }
+chrono = { workspace = true }
+cron = { workspace = true }
+kanidm_client = { workspace = true }
+kanidm_proto = { workspace = true }
+kanidm_lib_crypto = { workspace = true }
+kanidm_lib_file_permissions = { workspace = true }
+rustls = { workspace = true, features = ["aws-lc-rs"] }
+tokio = { workspace = true, features = ["rt", "macros", "net"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter", "fmt"] }
+
+
+ldap3_client = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+toml = { workspace = true }
+url = { workspace = true, features = ["serde"] }
+uuid = { workspace = true, features = ["serde"] }
+
+# Currently only for attribute - should attribute be broken out?
+kanidmd_lib = { workspace = true }
+
+[target.'cfg(target_family = "unix")'.dependencies]
+kanidm_utils_users = { workspace = true }
+
+[build-dependencies]
+clap = { workspace = true, features = ["derive"] }
+clap_complete = { workspace = true }
+
+[package.metadata.cargo-machete]
+ignored = ["clap_complete"]

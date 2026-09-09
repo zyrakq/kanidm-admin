@@ -1,0 +1,519 @@
+use crate::actors::{QueryServerReadV1, QueryServerWriteV1};
+use crate::repl::ReplCtrl;
+use crate::CoreAction;
+use bytes::{BufMut, BytesMut};
+use crypto_glue::x509::x509b64;
+use futures::{SinkExt, StreamExt};
+pub use kanidm_proto::internal::{
+    DomainInfo as ProtoDomainInfo, DomainUpgradeCheckReport as ProtoDomainUpgradeCheckReport,
+    DomainUpgradeCheckStatus as ProtoDomainUpgradeCheckStatus,
+};
+use kanidm_utils_users::get_current_uid;
+use serde::{Deserialize, Serialize};
+use std::error::Error;
+use std::io;
+use std::time::Duration;
+use tokio::net::{UnixListener, UnixStream};
+use tokio::sync::broadcast;
+use tokio::sync::mpsc;
+use tokio::sync::oneshot;
+use tokio::time::timeout;
+use tokio_util::codec::{Decoder, Encoder, Framed};
+use tracing::{span, Instrument, Level};
+use uuid::Uuid;
+
+/// Don't hang forever waiting for a response
+const REPL_CTRL_TIMEOUT: Duration = Duration::from_secs(15);
+
+#[derive(Serialize, Deserialize, Debug)]
+pub enum AdminTaskRequest {
+    RecoverAccount { name: String },
+    DisableAccount { name: String },
+    ShowReplicationCertificate,
+    ShowReplicationCertificateMetadata,
+    RenewReplicationCertificate,
+    RefreshReplicationConsumer,
+    DomainShow,
+    DomainUpgradeCheck,
+    DomainRaise,
+    DomainRemigrate { level: Option<u32> },
+    Reload,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum AdminTaskResponse {
+    RecoverAccount {
+        password: String,
+    },
+    ShowReplicationCertificate {
+        cert: String,
+    },
+    ShowReplicationCertificateMetadata {
+        not_before: String,
+        not_after: String,
+        subject: String,
+        expired: bool,
+    },
+    DomainUpgradeCheck {
+        report: ProtoDomainUpgradeCheckReport,
+    },
+    DomainRaise {
+        level: u32,
+    },
+    DomainShow {
+        domain_info: ProtoDomainInfo,
+    },
+    Success,
+    Error,
+}
+
+impl std::fmt::Debug for AdminTaskResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            // the intent here is that we aren't sharing secret material in logs
+            AdminTaskResponse::RecoverAccount { .. } => write!(f, "RecoverAccount {{ .. }}"),
+            // the intent here is that we aren't sharing secret material in logs
+            AdminTaskResponse::ShowReplicationCertificate { .. } => {
+                write!(f, "ShowReplicationCertificate {{ .. }}",)
+            }
+            AdminTaskResponse::ShowReplicationCertificateMetadata {
+                not_before,
+                not_after,
+                subject,
+                expired,
+            } => {
+                write!(f, "ShowReplicationCertificateMetadata {{ not_before: {:?}, not_after: {:?}, subject: {:?}, expired: {} }}", not_before, not_after, subject, expired)
+            }
+            AdminTaskResponse::DomainUpgradeCheck { report } => {
+                write!(f, "DomainUpgradeCheck {{ report: {:?} }}", report)
+            }
+            AdminTaskResponse::DomainRaise { level } => {
+                write!(f, "DomainRaise {{ level: {} }}", level)
+            }
+            AdminTaskResponse::DomainShow { domain_info } => {
+                write!(f, "DomainShow {{ domain_info: {:?} }}", domain_info)
+            }
+            AdminTaskResponse::Success => write!(f, "Success"),
+            AdminTaskResponse::Error => write!(f, "Error"),
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct ClientCodec;
+
+impl Decoder for ClientCodec {
+    type Error = io::Error;
+    type Item = AdminTaskResponse;
+
+    fn decode(&mut self, src: &mut BytesMut) -> Result<Option<Self::Item>, Self::Error> {
+        trace!("Attempting to decode request ...");
+        match serde_json::from_slice::<AdminTaskResponse>(src) {
+            Ok(msg) => {
+                // Clear the buffer for the next message.
+                src.clear();
+                Ok(Some(msg))
+            }
+            _ => Ok(None),
+        }
+    }
+}
+
+impl Encoder<AdminTaskRequest> for ClientCodec {
+    type Error = io::Error;
+
+    fn encode(&mut self, msg: AdminTaskRequest, dst: &mut BytesMut) -> Result<(), Self::Error> {
+        trace!("Attempting to send response -> {:?} ...", msg);
+        let data = serde_json::to_vec(&msg).map_err(|e| {
+            error!("socket encoding error -> {:?}", e);
+            io::Error::other("JSON encode error")
+        })?;
+        dst.put(data.as_slice());
+        Ok(())
+    }
+}
+
+#[derive(Default)]
+struct ServerCodec;
+
+impl Decoder for ServerCodec {
+    type Error = io::Error;
+    type Item = AdminTaskRequest;
+
+    fn decode(&mut self, src: &mut BytesMut) -> Result<Option<Self::Item>, Self::Error> {
+        trace!("Attempting to decode request ...");
+        match serde_json::from_slice::<AdminTaskRequest>(src) {
+            Ok(msg) => {
+                // Clear the buffer for the next message.
+                src.clear();
+                Ok(Some(msg))
+            }
+            _ => Ok(None),
+        }
+    }
+}
+
+impl Encoder<AdminTaskResponse> for ServerCodec {
+    type Error = io::Error;
+
+    fn encode(&mut self, msg: AdminTaskResponse, dst: &mut BytesMut) -> Result<(), Self::Error> {
+        trace!("Attempting to send response -> {:?} ...", msg);
+        let data = serde_json::to_vec(&msg).map_err(|e| {
+            error!("socket encoding error -> {:?}", e);
+            io::Error::other("JSON encode error")
+        })?;
+        dst.put(data.as_slice());
+        Ok(())
+    }
+}
+
+pub(crate) struct AdminActor;
+
+impl AdminActor {
+    pub async fn create_admin_sock(
+        sock_path: &str,
+        server_rw: &'static QueryServerWriteV1,
+        server_ro: &'static QueryServerReadV1,
+        broadcast_tx: broadcast::Sender<CoreAction>,
+        repl_ctrl_tx: Option<mpsc::Sender<ReplCtrl>>,
+    ) -> Result<tokio::task::JoinHandle<()>, ()> {
+        debug!("🧹 Cleaning up sockets from previous invocations");
+        rm_if_exist(sock_path);
+
+        // Setup the unix socket.
+        let listener = match UnixListener::bind(sock_path) {
+            Ok(l) => l,
+            Err(e) => {
+                error!(err = ?e, "Failed to bind UNIX socket {}", sock_path);
+                return Err(());
+            }
+        };
+
+        let mut broadcast_rx = broadcast_tx.subscribe();
+
+        // what is the uid we are running as?
+        let cuid = get_current_uid();
+
+        let handle = tokio::spawn(async move {
+            loop {
+                tokio::select! {
+                    Ok(action) = broadcast_rx.recv() => {
+                        match action {
+                            CoreAction::Shutdown => break,
+                            CoreAction::Reload => {},
+                        }
+                    }
+                    accept_res = listener.accept() => {
+                        match accept_res {
+                            Ok((socket, _addr)) => {
+                                // Assert that the incoming connection is from root or
+                                // our own uid.
+                                // ⚠️  This underpins the security of this socket ⚠️
+                                if let Ok(ucred) = socket.peer_cred() {
+                                    let incoming_uid = ucred.uid();
+                                    if incoming_uid == 0 || incoming_uid == cuid {
+                                        // all good!
+                                        info!(pid = ?ucred.pid(), "Allowing admin socket access");
+                                    } else {
+                                        warn!(%incoming_uid, "unauthorised user");
+                                        continue;
+                                    }
+                                } else {
+                                    error!("unable to determine peer credentials");
+                                    continue;
+                                };
+
+                                // spawn the worker.
+                                let task_repl_ctrl_tx = repl_ctrl_tx.clone();
+                                let broadcast_tx_ = broadcast_tx.clone();
+                                tokio::spawn(async move {
+                                    if let Err(e) = handle_client(socket, server_rw, server_ro, task_repl_ctrl_tx, broadcast_tx_).await {
+                                        error!(err = ?e, "admin client error");
+                                    }
+                                });
+                            }
+                            Err(e) => {
+                                warn!(err = ?e, "admin socket accept error");
+                            }
+                        }
+                    }
+                }
+            }
+            info!("Stopped {}", super::TaskName::AdminSocket);
+        });
+        Ok(handle)
+    }
+}
+
+fn rm_if_exist(p: &str) {
+    debug!("Attempting to remove requested file {}", p);
+    let _ = std::fs::remove_file(p).map_err(|e| match e.kind() {
+        std::io::ErrorKind::NotFound => {
+            debug!("{} not present, no need to remove.", p);
+        }
+        _ => {
+            error!(
+                "Failure while attempting to attempting to remove {} -> {}",
+                p,
+                e.to_string()
+            );
+        }
+    });
+}
+
+async fn show_replication_certificate_metadata(
+    ctrl_tx: &mut mpsc::Sender<ReplCtrl>,
+) -> AdminTaskResponse {
+    let (tx, rx) = oneshot::channel();
+
+    if ctrl_tx
+        .send(ReplCtrl::GetCertificate { respond: tx })
+        .await
+        .is_err()
+    {
+        error!("replication control channel has shutdown");
+        AdminTaskResponse::Error
+    } else {
+        match timeout(REPL_CTRL_TIMEOUT, rx).await {
+            Ok(Ok(cert)) => {
+                let cert_not_after = cert.tbs_certificate.validity.not_after;
+                let cert_not_before = cert.tbs_certificate.validity.not_before;
+                let subject = cert.tbs_certificate.subject.to_string();
+
+                let expired = cert_not_after.to_system_time() < std::time::SystemTime::now();
+                AdminTaskResponse::ShowReplicationCertificateMetadata {
+                    expired,
+                    not_before: cert_not_before.to_string(),
+                    not_after: cert_not_after.to_string(),
+                    subject,
+                }
+            }
+            Ok(Err(_)) => {
+                error!("replication control channel did not respond with certificate.");
+                AdminTaskResponse::Error
+            }
+            Err(_) => {
+                error!("timed out waiting for replication certificate metadata.");
+                AdminTaskResponse::Error
+            }
+        }
+    }
+}
+
+async fn show_replication_certificate(ctrl_tx: &mut mpsc::Sender<ReplCtrl>) -> AdminTaskResponse {
+    let (tx, rx) = oneshot::channel();
+
+    if ctrl_tx
+        .send(ReplCtrl::GetCertificate { respond: tx })
+        .await
+        .is_err()
+    {
+        error!("replication control channel has shutdown");
+        return AdminTaskResponse::Error;
+    }
+
+    match timeout(REPL_CTRL_TIMEOUT, rx).await {
+        Ok(Ok(cert)) => x509b64::cert_to_string(&cert)
+            .map(|cert| AdminTaskResponse::ShowReplicationCertificate { cert })
+            .unwrap_or(AdminTaskResponse::Error),
+        Ok(Err(_)) => {
+            error!("replication control channel did not respond with certificate.");
+            AdminTaskResponse::Error
+        }
+        Err(_) => {
+            error!("timed out waiting for replication certificate response.");
+            AdminTaskResponse::Error
+        }
+    }
+}
+
+async fn renew_replication_certificate(ctrl_tx: &mut mpsc::Sender<ReplCtrl>) -> AdminTaskResponse {
+    let (tx, rx) = oneshot::channel();
+
+    if ctrl_tx
+        .send(ReplCtrl::RenewCertificate { respond: tx })
+        .await
+        .is_err()
+    {
+        error!("replication control channel has shutdown");
+        return AdminTaskResponse::Error;
+    }
+
+    match timeout(REPL_CTRL_TIMEOUT, rx).await {
+        Ok(Ok(success)) => {
+            if success {
+                show_replication_certificate(ctrl_tx).await
+            } else {
+                error!("replication control channel indicated that certificate renewal failed.");
+                AdminTaskResponse::Error
+            }
+        }
+        Ok(Err(_)) => {
+            error!("replication control channel did not respond with renewal status.");
+            AdminTaskResponse::Error
+        }
+        Err(_) => {
+            error!("timed out waiting for replication renewal status.");
+            AdminTaskResponse::Error
+        }
+    }
+}
+
+async fn replication_consumer_refresh(ctrl_tx: &mut mpsc::Sender<ReplCtrl>) -> AdminTaskResponse {
+    let (tx, rx) = oneshot::channel();
+
+    if ctrl_tx
+        .send(ReplCtrl::RefreshConsumer { respond: tx })
+        .await
+        .is_err()
+    {
+        error!("replication control channel has shutdown");
+        return AdminTaskResponse::Error;
+    }
+
+    match timeout(REPL_CTRL_TIMEOUT, rx).await {
+        Ok(Ok(mut refresh_rx)) => match timeout(REPL_CTRL_TIMEOUT, refresh_rx.recv()).await {
+            Ok(Some(())) => {
+                info!("Replication refresh success");
+                AdminTaskResponse::Success
+            }
+            Ok(None) => {
+                error!("Replication refresh failed. Please inspect the logs.");
+                AdminTaskResponse::Error
+            }
+            Err(_) => {
+                error!("timed out waiting for replication refresh completion.");
+                AdminTaskResponse::Error
+            }
+        },
+        Ok(Err(_)) => {
+            error!("replication control channel did not respond with refresh status.");
+            AdminTaskResponse::Error
+        }
+        Err(_) => {
+            error!("timed out waiting for replication refresh status.");
+            AdminTaskResponse::Error
+        }
+    }
+}
+
+async fn handle_client(
+    sock: UnixStream,
+    server_rw: &'static QueryServerWriteV1,
+    server_ro: &'static QueryServerReadV1,
+    mut repl_ctrl_tx: Option<mpsc::Sender<ReplCtrl>>,
+    broadcast_tx: broadcast::Sender<CoreAction>,
+) -> Result<(), Box<dyn Error>> {
+    debug!("Accepted admin socket connection");
+
+    let mut reqs = Framed::new(sock, ServerCodec);
+
+    trace!("Waiting for requests ...");
+    while let Some(Ok(req)) = reqs.next().await {
+        // Setup the logging span
+        let eventid = Uuid::new_v4();
+        let nspan = span!(Level::INFO, "handle_admin_client_request", uuid = ?eventid);
+
+        let resp = async {
+            match req {
+                AdminTaskRequest::RecoverAccount { name } => {
+                    match server_rw.handle_admin_recover_account(name, eventid).await {
+                        Ok(password) => AdminTaskResponse::RecoverAccount { password },
+                        Err(e) => {
+                            error!(err = ?e, "error during recover-account");
+                            AdminTaskResponse::Error
+                        }
+                    }
+                }
+                AdminTaskRequest::DisableAccount { name } => {
+                    match server_rw.handle_admin_disable_account(name, eventid).await {
+                        Ok(()) => AdminTaskResponse::Success,
+                        Err(e) => {
+                            error!(err = ?e, "error during disable-account");
+                            AdminTaskResponse::Error
+                        }
+                    }
+                }
+                AdminTaskRequest::ShowReplicationCertificate => match repl_ctrl_tx.as_mut() {
+                    Some(ctrl_tx) => show_replication_certificate(ctrl_tx).await,
+                    None => {
+                        error!("replication not configured, unable to display certificate.");
+                        AdminTaskResponse::Error
+                    }
+                },
+                AdminTaskRequest::ShowReplicationCertificateMetadata => match repl_ctrl_tx.as_mut() {
+                    Some(ctrl_tx) => {
+                        show_replication_certificate_metadata(ctrl_tx).await
+                    }
+                    None => {
+                        error!("replication not configured, unable to display certificate metadata.");
+                        AdminTaskResponse::Error
+                    }
+                },
+                AdminTaskRequest::RenewReplicationCertificate => match repl_ctrl_tx.as_mut() {
+                    Some(ctrl_tx) => renew_replication_certificate(ctrl_tx).await,
+                    None => {
+                        error!("replication not configured, unable to renew certificate.");
+                        AdminTaskResponse::Error
+                    }
+                },
+                AdminTaskRequest::RefreshReplicationConsumer => match repl_ctrl_tx.as_mut() {
+                    Some(ctrl_tx) => replication_consumer_refresh(ctrl_tx).await,
+                    None => {
+                        error!("replication not configured, unable to refresh consumer.");
+                        AdminTaskResponse::Error
+                    }
+                },
+
+                AdminTaskRequest::DomainShow => match server_ro.handle_domain_show(eventid).await {
+                    Ok(domain_info) => AdminTaskResponse::DomainShow { domain_info },
+                    Err(e) => {
+                        error!(err = ?e, "error during domain show");
+                        AdminTaskResponse::Error
+                    }
+                },
+                AdminTaskRequest::DomainUpgradeCheck => {
+                    match server_ro.handle_domain_upgrade_check(eventid).await {
+                        Ok(report) => AdminTaskResponse::DomainUpgradeCheck { report },
+                        Err(e) => {
+                            error!(err = ?e, "error during domain upgrade checkr");
+                            AdminTaskResponse::Error
+                        }
+                    }
+                }
+                AdminTaskRequest::DomainRaise => match server_rw.handle_domain_raise(eventid).await
+                {
+                    Ok(level) => AdminTaskResponse::DomainRaise { level },
+                    Err(e) => {
+                        error!(err = ?e, "error during domain raise");
+                        AdminTaskResponse::Error
+                    }
+                },
+                AdminTaskRequest::DomainRemigrate { level } => {
+                    match server_rw.handle_domain_remigrate(level, eventid).await {
+                        Ok(()) => AdminTaskResponse::Success,
+                        Err(e) => {
+                            error!(err = ?e, "error during domain remigrate");
+                            AdminTaskResponse::Error
+                        }
+                    }
+                }
+                AdminTaskRequest::Reload => match broadcast_tx.send(CoreAction::Reload) {
+                    Ok(_) => AdminTaskResponse::Success,
+                    Err(e) => {
+                        error!(err = ?e, "error during server reload");
+                        AdminTaskResponse::Error
+                    }
+                },
+            }
+        }
+        .instrument(nspan)
+        .await;
+
+        reqs.send(resp).await?;
+        reqs.flush().await?;
+    }
+
+    debug!("Disconnecting client ...");
+    Ok(())
+}

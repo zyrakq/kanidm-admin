@@ -1,0 +1,22 @@
+[package]
+name = "kanidmd_lib_macros"
+description = "Kanidm Server Library Support Macros"
+documentation = "https://docs.rs/kanidm/latest/kanidm/"
+
+version = { workspace = true }
+authors = { workspace = true }
+rust-version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+
+[lib]
+proc-macro = true
+test = false
+doctest = false
+
+[dependencies]
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
+syn = { workspace = true }

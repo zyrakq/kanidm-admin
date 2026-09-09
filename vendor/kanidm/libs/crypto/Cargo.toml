@@ -1,0 +1,36 @@
+[package]
+name = "kanidm_lib_crypto"
+version = { workspace = true }
+edition = { workspace = true }
+description = "Kanidm cryptographic functionality"
+license = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+
+[features]
+tpm = ["kanidm-hsm-crypto/tpm"]
+
+[lib]
+test = true
+doctest = false
+
+[dependencies]
+base64 = { workspace = true }
+base64urlsafedata = { workspace = true }
+crypto-glue = { workspace = true }
+hex = { workspace = true }
+kanidm-hsm-crypto = { workspace = true }
+rand = { workspace = true }
+md4 = { workspace = true }
+sha2 = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+tracing = { workspace = true }
+md-5 = { workspace = true }
+sha-crypt = { workspace = true }
+
+[dev-dependencies]
+sketching = { workspace = true }
+
+
+[package.metadata.cargo-machete]
+ignored = ["openssl-sys"]

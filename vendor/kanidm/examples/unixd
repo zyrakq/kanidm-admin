@@ -1,0 +1,191 @@
+## Kanidm Unixd Service Configuration - /etc/kanidm/unixd
+
+# The configuration file version.
+version = '2'
+
+# ⚠️  Ensure that you have the [kanidm] or other provider sections below
+# configured else accounts from remote sources will not be available.
+
+# Kanidm unix will bind all cached credentials to a local Hardware Security
+# Module (HSM) to prevent exfiltration and attacks against these. In addition,
+# any internal private keys will also be stored in this HSM.
+#
+# * soft: A software hsm that encrypts all local key material
+# * tpm: Use a tpm for all key storage and binding
+# * tpm_if_possible: If a hardware tpm exists it is used, otherwise fall back to the software tpm.
+#                    If the hardware tpm has previously been used, software tpm will not be used.
+#
+# Default: tpm_if_possible
+
+# hsm_type = "tpm"
+
+
+# If using `hsm_type = "tpm"`, this allows configuration of the TCTI name of
+# the tpm to use. For more, see: https://tpm2-tools.readthedocs.io/en/latest/man/common/tcti/
+#
+# You should leave this value as the default kernel resource manager.
+#
+# Default: device:/dev/tpmrm0
+
+# tpm_tcti_name = "device:/dev/tpmrm0"
+
+
+# Default shell for users if no value is set.
+#
+# Default: /bin/sh
+
+# default_shell = "/bin/sh"
+
+
+# The prefix prepended to where home directories are stored. Must end with a trailing `/`.
+#
+# Default: /home/
+
+# home_prefix = "/home/"
+
+
+# The attribute to use for the stable home directory path. Valid choices are
+# `uuid`, `name`, `spn`.
+
+# > **NOTICE:** All users in Kanidm can change their name (and their spn) at any time. If you change
+# > `home_attr` from `uuid` you _must_ have a plan on how to manage these directory renames in your
+# > system. We recommend that you have a stable ID (like the UUID), and symlinks from the name to the
+# > UUID folder. Automatic support is provided for this via the unixd tasks daemon, as documented
+# > here.
+
+# Default: uuid
+
+# home_attr = "uuid"
+
+
+# Controls the prefix that will be prepended to the home name when using mounted home directories from
+# a location that is outside of them `home_prefix`. Must end with a trailing `/`. If unset then home
+# directories will be created in `home_prefix`.
+#
+# This is option is useful when implementing a networked home directory layout. A common implementation
+# is to configure a networked filesystem that contains user directories mounted at `/u/` (eg /u/$user_uuid)
+# and then link the mounted directory into /home/$user_name when the user logs in. This can be accomplished
+# with a configuration that includes the following:
+#
+# > home_attr = "uuid"
+# > home_alias = "name"
+# > home_prefix = "/home/"
+# > home_mount_prefix = "/u/"
+#
+# ⚠️  If you expect directories to be created by kanidm unixd tasks in an alternate mount prefix, then
+# you need to run `systemctl edit kanidm-unixd-tasks` to allow the daemon to write to these locations.
+#
+# > [Service]
+# > ReadWritePaths=/home /var/run/kanidm-unixd /u
+#
+#
+# Default: unset
+#
+# home_mount_prefix = "/u/"
+
+
+# The default token attribute used for generating symlinks pointing to the user's home
+# directory. If set, this will become the value of the home path to nss calls. It is recommended you
+# choose a "human friendly" attribute here. Valid choices are `none`, `uuid`, `name`, `spn`. Defaults
+# to `spn`.
+#
+# Default: spn
+
+# home_alias = "spn"
+
+
+# The strategy used for management of home directory aliases. If the home_attr is "uuid" and the
+# home_alias is "name", then the system needs to redirect from /home/<name> to /home/<uuid> in some
+# transparent manner. This allows configuration of that method.
+#
+# * symlink: creates a symlink from the alias to the stable home directory path. Some applications
+#            may encounter issues with the strategy (e.g. cargo, snap).
+#
+# (linux only)
+# * bind_mount: bind mounts the alias directory to the stable path. This requires modification of
+#               .service file on linux to grant the needed permissions. For more details, see:
+#               systemctl edit kanidm-unixd-tasks.service
+#
+
+# Default: symlink
+
+# home_strategy = "symlink"
+
+
+# Controls if home directories should be prepopulated with the contents of `/etc/skel`
+# when first created.
+#
+# Default: false
+
+# use_etc_skel = false
+
+
+# Chooses which attribute is used for domain local users in presentation of the uid value.
+#
+# Default: spn
+# NOTE: Users from a trust will always use spn.
+
+# uid_attr_map = "spn"
+
+
+# Chooses which attribute is used for domain local groups in presentation of the gid value.
+
+# Default: spn
+# NOTE: Groups from a trust will always use spn.
+
+# gid_attr_map = "spn"
+
+
+# `selinux` controls whether the `kanidm_unixd_tasks` daemon should detect and enable SELinux runtime
+# compatibility features to ensure that newly created home directories are labeled correctly. This
+# setting as no bearing on systems without SELinux, as these features will automatically be disabled
+# if SELinux is not detected when the daemon starts. Note that `kanidm_unixd_tasks` must also be built
+# with the SELinux feature flag for this functionality.
+#
+# Default: true
+
+# selinux = true
+
+
+# allows kanidm to "override" the content of a user or group that is defined locally when a name
+# collision occurs. By default kanidm will detect when a user/group conflict with their entries from
+# `/etc/passwd` or `/etc/group` and will ignore the kanidm entry. However if you want kanidm to
+# override users or groups from the local system, you must list them in this field. Note that this can
+# have many unexpected consequences, so it is not recommended to enable this.
+#
+# Default: Empty set (no overrides)
+
+# allow_local_account_override = ["admin"]
+
+
+# ========================================
+# This section enables the Kanidm provider
+# If enabled, /etc/kanidm/config MUST have a valid `uri` setting for the daemon to start.
+[kanidm]
+
+# Defines a set of POSIX groups where membership of any of these groups
+# will be authorised to login via PAM. If you are NOT a member of any of
+# these groups you will NOT be able to login.
+# All POSIX users and groups can be resolved by NSS regardless of PAM
+# authorisation status. You may specify a group's name, SPN or UUID
+#
+# Default: empty set (no access allowed)
+
+pam_allowed_login_groups = ["posix_group"]
+
+# Allow extension (mapping) of a local system groups members with members from a
+# kanidm provided group. An example of this is that the local group
+# `libvirt` can have its membership extended with the members from
+# `virt-admins`. This section can be repeated many times.
+#
+# Default: empty set (no group maps)
+
+# [[kanidm.map_group]]
+# local = "libvirt"
+# with = "virt-admins"
+
+# [[kanidm.map_group]]
+# local = "admins"
+# with = "system-admins"
+
+

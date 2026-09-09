@@ -1,0 +1,274 @@
+---
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: "/rlm_python"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: pip
+    directory: "/pykanidm"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/libs/client"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/proto"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/server/core"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/server/testkit"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/server/testkit-macros"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/libs/crypto"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/server/lib"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/server/lib-macros"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/server/daemon"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/tools/cli"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/server/web_ui"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/unix_integration"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+  - package-ecosystem: cargo
+    directory: "/unix_integration/nss_kanidm"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/unix_integration/pam_kanidm"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/tools/orca"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/libs/file_permissions"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/libs/profiles"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/libs/sketching"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/libs/user"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/tools/iam_migrations/ldap"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  - package-ecosystem: cargo
+    directory: "/tools/iam_migrations/freeipa"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+      time: "06:00"
+      timezone: Australia/Brisbane
+    open-pull-requests-limit: 99
+    groups:
+      all: # group all the things
+        patterns:
+          - "*"

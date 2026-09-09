@@ -1,0 +1,139 @@
+---
+name: GitHub Pages
+
+"on":
+  push:
+    branches:
+      - "master"
+  pull_request:
+
+# yamllint disable-line rule:line-length
+# permissions list: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
+permissions:
+  id-token: write
+  actions: read
+  checks: read
+  contents: write
+  deployments: write
+  issues: read
+  pull-requests: read
+  statuses: read
+  pages: write
+
+env:
+  ACTIONS_RUNNER_DEBUG: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  pre_deploy:
+    runs-on: ubuntu-latest
+    outputs:
+      latest: ${{ steps.branchname.outputs.latest }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Latest branch
+        run: |
+          echo "latest=$(git branch -a  \
+            | awk '{print $1}' \
+            | sort -t. -k3n,3 -k4n,4 \
+            | awk -F'/' '{print $NF}' \
+            | grep -E '^[[:digit:]]\.[[:digit:]]\.[[:digit:]]' \
+            | sort -t. \
+            | tail -n1)" >> $GITHUB_OUTPUT
+        id: branchname
+      - name: Move redirector page
+        run: |
+          mkdir docs
+          cp book/index_redirect.html ./docs/index.html
+          find ./docs > docs/manifest.txt
+      - name: Upload redirector artifact
+        # https://github.com/actions/upload-artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: base
+          path: docs/index.html
+
+  fanout:
+    uses: './.github/workflows/kanidm_individual_book.yml'
+    needs: pre_deploy
+    # yamllint disable-line rule:line-length
+    strategy:
+      fail-fast: false
+      matrix:
+        tag:
+          - ${{ needs.pre_deploy.outputs.latest}}
+    with:
+      tag: ${{ matrix.tag }}
+      parent_id: ${{ github.ref }}
+  docs_master:
+    uses: './.github/workflows/kanidm_individual_book.yml'
+    with:
+      tag: "master"
+      parent_id: ${{ github.ref }}
+
+  deploy:
+    environment:
+      name: "github-pages"
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs:
+      - pre_deploy
+      - fanout
+      - docs_master
+    runs-on: ubuntu-latest
+    # yamllint disable-line rule:line-length
+    if: ${{ github.ref == 'refs/heads/master' && github.repository == 'kanidm/kanidm' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Download base artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: base
+          path: ./docs/
+        env:
+          ACTIONS_RUNNER_DEBUG: true
+      - name: Download master artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: individualmaster
+          path: ./docs/
+        env:
+          ACTIONS_RUNNER_DEBUG: true
+      - name: Download stable artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: "individual${{ needs.pre_deploy.outputs.latest }}"
+          path: ./docs/
+        env:
+          ACTIONS_RUNNER_DEBUG: true
+      - name: Extract the files
+        run: |
+          pwd
+          echo "doing find tar.gz ls"
+          find $(pwd) -name '*.tar.gz' -ls
+          echo "extracting"
+          find $(pwd) -name '*.tar.gz' -ls -exec tar zxvf "{}" \;
+          echo "Carrying on..."
+          mkdir -p docs
+          cd docs && cp -R "${{ needs.pre_deploy.outputs.latest}}" stable && cd ..
+          ls -la docs/
+          echo "Cleaning up docs archives"
+          rm docs/*.tar.gz
+        env:
+          ACTIONS_RUNNER_DEBUG: true
+      - name: Setup Pages
+        uses: actions/configure-pages@v6
+      - name: Upload pages artifacts
+        uses: actions/upload-pages-artifact@v5
+        with:
+          # Upload entire repository
+          path: 'docs/'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
