@@ -20,15 +20,18 @@ a thin Rust/Axum backend and a TypeScript/Lit SPA frontend.
 ```
 kanidm-admin/
 ├── app/
-│   ├── src/
-│   │   ├── main.rs          # Entry point — thin orchestration only
-│   │   ├── settings.rs      # Layered TOML config loading
-│   │   ├── frontend.rs      # Frontend build and watch helpers
-│   │   ├── preflight.rs     # CLI dependency checks (e.g. `bun`)
-│   │   ├── logging.rs       # Tracing/env_logger init
-│   │   └── routes.rs        # Custom API handlers and router
+│   ├── build.rs            # Compile-time frontend build (bun install + build)
 │   ├── Cargo.toml           # Rust package manifest
 │   ├── .env                 # Local environment variables
+│   ├── src/
+│   │   ├── main.rs          # Entry point — thin orchestration only
+│   │   ├── settings.rs      # Settings module root (declares settings/ sections)
+│   │   ├── settings/        # loader.rs, server.rs, frontend.rs, tests.rs
+│   │   ├── frontend.rs      # Serving-mode validation + bun watch (FrontendHandle)
+│   │   ├── frontend_assets.rs # rust-embed container over ui/dist
+│   │   ├── preflight.rs     # CLI dependency checks (e.g. `bun`)
+│   │   ├── logging.rs       # Tracing/env_logger init
+│   │   └── routes.rs        # API handlers + disk/embedded SPA fallbacks
 │   └── ui/                  # TypeScript SPA
 │       ├── index.html       # HTML entry point
 │       ├── src/
@@ -84,19 +87,21 @@ in dedicated modules:
 | Module | Responsibility |
 |---|---|
 | `main.rs` | Bootstrap, load config, wire modules, start server |
-| `settings.rs` | Layered TOML configuration (`Settings::load()`) |
-| `frontend.rs` | Frontend build (`bun run build`) and watch (`bun watch`) |
+| `build.rs` | Compile-time frontend build (bun install if stale, `bun run build`, skip flag) |
+| `settings.rs` + `settings/` | Layered TOML configuration (`Settings::load()` in `loader.rs`) |
+| `frontend.rs` | Serving-mode validation, `bun watch`, `FrontendHandle` |
+| `frontend_assets.rs` | rust-embed asset container over `ui/dist` |
 | `preflight.rs` | CLI dependency checks (currently: `bun`) |
 | `logging.rs` | Tracing filter + `pretty_env_logger` init |
-| `routes.rs` | Custom API handlers and router assembly |
+| `routes.rs` | Custom API handlers, disk/embedded SPA fallbacks, fallback chooser |
 
 `main.rs` sequence:
 
 1. Load `.env` (dotenvy), init tracing
 2. Load settings (`Settings::load()`)
-3. Optionally build frontend (`frontend::build`) / spawn watch (`frontend::spawn_watch`)
+3. Start frontend (`frontend::start`): validate serving mode, optionally spawn `bun watch`, return `FrontendHandle` held for the process lifetime
 4. Bind a `TcpListener` on `settings.server.address`
-5. Merge routers: `routes::build()` → SPA static-file fallback
+5. Attach SPA fallback (`routes::mount_fallback` — disk `ServeDir` or embedded handler, chosen by `frontend.serve_from`)
 6. Serve via `axum::serve`
 
 ### Frontend Features
@@ -203,6 +208,7 @@ ThemeController (in any component)
 
 | File | Purpose |
 |---|---|
+| `app/appsettings*.toml` | Layered backend config (base / env / local overlays) |
 | `app/.env` | Local env vars (e.g., `PUBLIC_DIR`) |
 | `app/ui/vite.config.ts` | Path aliases, build options |
 | `app/ui/tsconfig.json` | TypeScript strict mode, path mappings |
@@ -222,25 +228,29 @@ ThemeController (in any component)
 
 ## Build & Deploy
 
+The frontend is built at compile time: `cargo build` triggers `app/build.rs`,
+which runs `bun install` (only when `node_modules` is stale) and
+`bun run build` (i18n codegen → tsc → vite) into `app/ui/dist`.
+
 ```bash
-# Install frontend dependencies
-cd app/ui && bun install
+# Build backend + frontend together (from repo root)
+cargo build            # debug: dist read from disk at runtime
+cargo build --release  # release: dist embedded into the binary
 
-# Build frontend (runs i18n:build + tsc + vite build)
-cd app/ui && bun run build
+# Skip the frontend build (CI, Docker, or bun unavailable)
+APP_SKIP_FRONTEND_BUILD=1 cargo build
 
-# Watch mode
-cd app/ui && bun run watch
+# Dev loop: cargo run (development env) spawns `bun watch`;
+# source edits rebuild dist in place and ServeDir serves them live
+cargo run              # Server starts at http://localhost:4000
 
-# i18n workflow
+# i18n workflow (unchanged, run in app/ui)
 bun i18n:extract   # extract msg() strings → xliff/*.xlf
 bun i18n:build     # compile xliff → generated/locales/*.ts
-
-# Build and run backend
-cargo build --release
-cargo run
-# Server starts at http://localhost:4000
 ```
+
+Production (Docker) ships a single binary with assets embedded via
+rust-embed; the runtime stage contains no `ui/dist` directory.
 
 ## Open Questions
 

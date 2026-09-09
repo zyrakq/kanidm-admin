@@ -44,9 +44,22 @@ Current modules:
 
 | File | Responsibility |
 |---|---|
-| `settings.rs` | Layered TOML configuration loading |
-| `frontend.rs` | Frontend build (`bun run build`) and watch (`bun watch`) |
-| `routes.rs` | Custom API handlers and router assembly |
+| `build.rs` | Compile-time frontend build: ensure `ui/dist`, skip flag (`APP_SKIP_FRONTEND_BUILD=1`), stale-check `bun install`, `bun run build` |
+| `settings.rs` + `settings/` | Layered TOML configuration: `loader.rs` (layering), `server.rs`, `frontend.rs` (serve_from/watch/public_dir), `tests.rs` |
+| `frontend.rs` | Serving-mode validation, `bun watch` spawn, `FrontendHandle` lifetime |
+| `frontend_assets.rs` | rust-embed asset container over `ui/dist` (embedded in release, disk-read in debug) |
+| `routes.rs` | Custom API handlers, disk/embedded SPA fallbacks, `mount_fallback` chooser |
+| `preflight.rs` | CLI dependency checks |
+| `logging.rs` | Tracing filter + `pretty_env_logger` init |
+
+## build.rs — compile-time frontend build
+
+`app/build.rs` runs `bun install` (only when `node_modules` is stale) and
+`bun run build` before the crate compiles, so rust-embed can embed
+`ui/dist` into release binaries. `APP_SKIP_FRONTEND_BUILD=1` turns it into
+a fast no-op that still ensures `ui/dist` exists (Docker's Rust stage uses
+this). rerun-if-changed covers `ui/package.json` and `ui/bun.lock` only —
+dev rebuilds come from `bun watch`, not cargo.
 
 ## Test string formatting
 
