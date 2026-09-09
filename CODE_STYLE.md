@@ -317,6 +317,7 @@ try {
 - Use `ThemeController` for theme-reactive components
 - Register custom elements in `HTMLElementTagNameMap`
 - Use `bun` (not npm/yarn) for all package operations
+- Treat `vendor/kanidm/` as a read-only reference for upstream Kanidm behavior
 
 **Don't:**
 
@@ -326,3 +327,5 @@ try {
 - Edit files in `src/features/localization/generated/`
 - Add gradients or heavy shadows to backgrounds
 - Use `cd && command` — use `workdir` parameter instead
+- Edit, format, lint, or import from `vendor/kanidm/` — it's a vendored,
+  read-only copy of upstream Kanidm, not a workspace crate
