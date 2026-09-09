@@ -21,9 +21,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
     let _frontend_handle = frontend::start(&settings.frontend, &manifest_dir)?;
+    let state = auth::app_state_from_settings(&settings.kanidm)?;
 
     let listener = TcpListener::bind(&settings.server.address).await?;
-    let router = routes::mount_fallback(routes::build(), &settings.frontend, &manifest_dir);
+    let router = routes::mount_fallback(routes::build(state), &settings.frontend, &manifest_dir);
 
     info!("Server running at http://{}", settings.server.address);
     axum::serve(listener, router).await?;

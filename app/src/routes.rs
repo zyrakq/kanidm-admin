@@ -16,18 +16,26 @@ use axum::{
 };
 use tower_http::services::{ServeDir, ServeFile};
 
+use crate::auth::handlers::routes as auth_routes;
+use crate::auth::AppState;
 use crate::frontend_assets::Assets;
 use crate::settings::frontend::FrontendSettings;
 
 /// Build the custom API router.
 ///
 /// Routes:
-///   GET /api/health  — liveness probe
-///   GET /api/hello   — example JSON endpoint
-pub fn build() -> Router {
+///   GET  /api/health        — liveness probe
+///   GET  /api/hello         — example JSON endpoint
+///   POST /api/auth/login    — Kanidm password login (sets session cookie)
+///   GET  /api/auth/session  — local session state from the cookie
+///   POST /api/auth/logout   — revoke session, clear cookie
+///   POST /api/auth/reauth   — privilege step-up (refreshes cookie)
+pub fn build(state: AppState) -> Router {
     Router::new()
         .route("/api/health", get(health_check))
         .route("/api/hello", get(hello_handler))
+        .merge(auth_routes())
+        .with_state(state)
 }
 
 /// Attach the SPA fallback service chosen by `frontend.serve_from`.
