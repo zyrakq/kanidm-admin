@@ -74,14 +74,6 @@ export class DashboardPage extends LitElement {
     );
   }
 
-  private handleTestLongWarning() {
-    notificationService.warning(
-      msg(
-        'Your session is about to expire in 5 minutes. Any unsaved changes will be lost. Please save your work and refresh your session to continue working without interruption. This is an automated security measure to protect your account.'
-      )
-    );
-  }
-
   private handleTestVeryLongInfo() {
     notificationService.info(
       msg(
@@ -194,12 +186,6 @@ export class DashboardPage extends LitElement {
                     @click=${this.handleTestLongError}
                   >
                     ${msg('Long Error')}
-                  </button>
-                  <button
-                    class="btn btn-warning"
-                    @click=${this.handleTestLongWarning}
-                  >
-                    ${msg('Long Warning')}
                   </button>
                   <button
                     class="btn btn-info"
