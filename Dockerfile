@@ -18,13 +18,19 @@ RUN bun run build
 FROM rust:1-bookworm AS rust-builder
 
 # No system packages are required: the dependency graph (axum, tokio,
-# tower-http, serde, tracing, config, dotenvy) is 100% pure-Rust with no
-# OpenSSL/cmake/clang linkage and no git dependencies now that trailbase
-# is gone.
+# tower-http, serde, tracing, config, dotenvy, rust-embed) is 100% pure-Rust
+# with no OpenSSL/cmake/clang linkage and no git dependencies.
+
+# build.rs is a fast no-op in this stage: bun and ui sources are absent,
+# the prebuilt dist from stage 1 is embedded by rust-embed instead.
+ENV APP_SKIP_FRONTEND_BUILD=1
 
 # ── Dependency cache layer ────────────────────────────────────────────────
 # Compile all dependencies using a stub binary.
 # This layer is invalidated only when Cargo.lock changes, not on src edits.
+# build.rs is intentionally NOT copied here yet — the stub build does not
+# need it, and its absence keeps this layer independent of build script
+# edits.
 WORKDIR /workspace
 
 COPY Cargo.toml Cargo.lock ./
@@ -32,10 +38,15 @@ COPY app/Cargo.toml ./app/
 RUN mkdir -p app/src && printf 'fn main() {}' > app/src/main.rs
 RUN cargo build --release || true
 
-# ── Real build ────────────────────────────────────────────────────────────
-COPY app/src/                        ./app/src/
-COPY app/appsettings.toml            ./app/
-COPY app/appsettings.production.toml ./app/
+# ── Real build ────────────────────────────────────────────────────────────────
+COPY app/build.rs                      ./app/
+COPY app/src/                          ./app/src/
+COPY app/appsettings.toml              ./app/
+COPY app/appsettings.production.toml   ./app/
+
+# Prebuilt SPA assets from stage 1 — rust-embed inlines them into the
+# release binary at compile time.
+COPY --from=frontend-builder /build/dist ./app/ui/dist
 
 RUN touch app/src/main.rs && cargo build --release
 
@@ -49,26 +60,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # CARGO_MANIFEST_DIR = /workspace/app is compiled into the binary at build time.
-# Settings::load() and all manifest-relative path lookups depend on this path.
+# Settings::load() reads appsettings from this path.
 WORKDIR /workspace/app
 
-# ── Binary ────────────────────────────────────────────────────────────────
+# ── Binary (frontend assets are embedded — no dist directory needed) ──────
 COPY --from=rust-builder /workspace/target/release/server /usr/local/bin/server
 
-# ── Layered config ────────────────────────────────────────────────────────
+# ── Layered config ────────────────────────────────────────────────────────────
 # Settings::load() reads appsettings.toml then appsettings.production.toml
 # from CARGO_MANIFEST_DIR = /workspace/app
 COPY app/appsettings.toml            ./
 COPY app/appsettings.production.toml ./
 
-# ── Pre-built SPA assets ──────────────────────────────────────────────────
-COPY --from=frontend-builder /build/dist  ui/dist/
-
 EXPOSE 4000
 
 ENV APP_ENV=production
-# Frontend was pre-built in Stage 1 — skip runtime rebuild.
-# Overrides the build=true in appsettings.production.toml.
-ENV APP_FRONTEND__BUILD=false
 
 CMD ["server"]
