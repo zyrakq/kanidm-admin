@@ -1,13 +1,23 @@
 // app/src/routes.rs
 //
-// Custom API routes and static file service for the application.
+// Custom API routes and static file serving for the application.
+// Disk mode uses tower-http ServeDir; embedded mode serves rust-embed
+// assets with cache headers. mount_fallback picks between them so
+// main.rs stays free of conditionals.
 
 use std::path::Path;
 
-use axum::{routing::get, Router};
+use axum::{
+    body::Body,
+    http::{header, StatusCode, Uri},
+    response::Response,
+    routing::get,
+    Router,
+};
 use tower_http::services::{ServeDir, ServeFile};
 
-use crate::settings::FrontendSettings;
+use crate::frontend_assets::Assets;
+use crate::settings::frontend::FrontendSettings;
 
 /// Build the custom API router.
 ///
@@ -20,10 +30,77 @@ pub fn build() -> Router {
         .route("/api/hello", get(hello_handler))
 }
 
+/// Attach the SPA fallback service chosen by `frontend.serve_from`.
+///
+/// - `"disk"`:     `ServeDir` over the resolved public dir with an
+///                 `index.html` fallback file (dev hot reload).
+/// - `"embedded"`: embedded asset handler with SPA fallback and cache
+///                 headers (prod single binary).
+///
+/// Any other value has already been rejected by `frontend::start`, which
+/// runs before this in `main`; the disk arm is the safe default.
+pub fn mount_fallback(
+    router: Router,
+    settings: &FrontendSettings,
+    manifest_dir: &Path,
+) -> Router {
+    match settings.effective_serve_from() {
+        "embedded" => router.fallback_service(get(embedded_static_handler)),
+        _ => router.fallback_service(static_files(settings, manifest_dir)),
+    }
+}
+
 /// Build the static file service that serves the SPA with an index.html fallback.
 pub fn static_files(settings: &FrontendSettings, manifest_dir: &Path) -> ServeDir<ServeFile> {
     let public_dir = settings.resolve_public_dir(manifest_dir);
     ServeDir::new(&public_dir).fallback(ServeFile::new(public_dir.join("index.html")))
+}
+
+/// Serve a request from the compile-time embedded asset set.
+///
+/// - Exact asset lookup first (`Assets::get(path)`).
+/// - Extension-less paths fall back to `index.html` (SPA client-side
+///   routes); paths with an extension 404 so stale hashed names fail
+///   loudly instead of returning the app shell.
+/// - `index.html` is served with `no-cache`; hashed assets get a year of
+///   immutable caching.
+pub async fn embedded_static_handler(uri: Uri) -> Response {
+    let path = uri.path().trim_start_matches('/');
+    let path = if path.is_empty() { "index.html" } else { path };
+
+    if let Some(file) = Assets::get(path) {
+        return embedded_response(path, file);
+    }
+
+    if Path::new(path).extension().is_none() {
+        if let Some(file) = Assets::get("index.html") {
+            return embedded_response("index.html", file);
+        }
+    }
+
+    not_found().await
+}
+
+fn embedded_response(path: &str, file: rust_embed::EmbeddedFile) -> Response {
+    let mime = mime_guess::from_path(path).first_or_octet_stream();
+    let cache_control = if path == "index.html" {
+        "no-cache"
+    } else {
+        "public, max-age=31536000, immutable"
+    };
+
+    Response::builder()
+        .header(header::CONTENT_TYPE, mime.as_ref())
+        .header(header::CACHE_CONTROL, cache_control)
+        .body(Body::from(file.data.into_owned()))
+        .unwrap()
+}
+
+async fn not_found() -> Response {
+    Response::builder()
+        .status(StatusCode::NOT_FOUND)
+        .body(Body::from("404"))
+        .unwrap()
 }
 
 async fn health_check() -> &'static str {

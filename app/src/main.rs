@@ -1,10 +1,11 @@
 mod frontend;
+mod frontend_assets;
 mod logging;
 mod preflight;
 mod routes;
 mod settings;
 
-use settings::Settings;
+use settings::loader::Settings;
 use std::path::PathBuf;
 use tokio::net::TcpListener;
 use tracing::info;
@@ -18,11 +19,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let settings = Settings::load()?;
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
-    let _bun_watch = frontend::start(&settings.frontend, &manifest_dir.join("ui"))?;
+    let _frontend_handle = frontend::start(&settings.frontend, &manifest_dir)?;
 
     let listener = TcpListener::bind(&settings.server.address).await?;
-    let router =
-        routes::build().fallback_service(routes::static_files(&settings.frontend, &manifest_dir));
+    let router = routes::mount_fallback(routes::build(), &settings.frontend, &manifest_dir);
 
     info!("Server running at http://{}", settings.server.address);
     axum::serve(listener, router).await?;

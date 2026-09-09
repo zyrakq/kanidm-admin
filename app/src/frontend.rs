@@ -1,60 +1,100 @@
 // app/src/frontend.rs
 //
-// Frontend lifecycle helpers: one-shot build and background watch process.
-// Extracted from main.rs so the same logic can be reused in other projects.
+// Frontend lifecycle coordinator. Dispatches between disk mode (dev hot
+// reload via `bun watch` + ServeDir) and embedded mode (assets compiled
+// into the binary via rust-embed). The one-shot `bun run build` is no
+// longer done here - build.rs handles install + build at compile time.
 
 use std::path::Path;
-use tokio::io::{AsyncBufReadExt, BufReader};
-use tokio::process::ChildStderr;
-use tokio::process::ChildStdout;
 use std::process::Stdio;
+use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio::process::{Child, ChildStderr, ChildStdout};
 use tracing::{info, warn};
 
-use crate::settings::FrontendSettings;
+use crate::frontend_assets::Assets;
+use crate::settings::frontend::FrontendSettings;
 
-/// Run the full frontend lifecycle based on settings.
+/// Outcome of `start`: how the frontend is being served.
 ///
-/// - If `settings.build` is true: runs `bun run build` and returns an error on failure.
-/// - If `settings.watch` is true: spawns `bun watch` in the background.
+/// Keep the returned handle alive for the duration of the server - dropping
+/// `Disk { watch_child: Some(_) }` kills the `bun watch` process
+/// (`kill_on_drop(true)`).
+pub enum FrontendHandle {
+    /// Serve from `ui/dist/` on disk; `watch_child` is the background
+    /// `bun watch` process when `settings.watch` is true.
+    //
+    // `watch_child` is held but never read: dropping the handle kills the
+    // watcher (`kill_on_drop(true)`), so it must outlive `main`. The field
+    // is intentionally read-only-for-lifetime.
+    #[allow(dead_code)]
+    Disk { watch_child: Option<Child> },
+    /// Serve from assets embedded into the binary at compile time.
+    Embedded,
+}
+
+/// Start the frontend in the mode configured by `settings.serve_from`.
 ///
-/// Returns the watch child process, if started. Keep the returned value alive
-/// for the duration of the server — dropping it kills the watch process.
+/// - `disk`:     sanity-check `node_modules/`, optionally spawn `bun watch`.
+/// - `embedded`: sanity-check `Assets::get("index.html")` is present.
+///
+/// `manifest_dir` is `CARGO_MANIFEST_DIR` (the `app/` directory); the UI
+/// lives at `manifest_dir/ui`. No `bun run build` is run here - build.rs
+/// did it at compile time.
 pub fn start(
     settings: &FrontendSettings,
-    ui_dir: &Path,
-) -> Result<Option<tokio::process::Child>, Box<dyn std::error::Error + Send + Sync>> {
-    if settings.build || settings.watch {
-        crate::preflight::check_dependency("bun", "https://bun.sh/docs/installation")?;
+    manifest_dir: &Path,
+) -> Result<FrontendHandle, Box<dyn std::error::Error + Send + Sync>> {
+    let ui_dir = manifest_dir.join("ui");
+
+    match settings.effective_serve_from() {
+        "disk" => {
+            // build.rs already ran `bun install`, so node_modules should
+            // exist. Sanity-check anyway so the error is clear instead of a
+            // `bun watch` failure with an opaque message.
+            if !ui_dir.join("node_modules").exists() {
+                return Err(format!(
+                    "ui/node_modules is missing in disk mode.\n\
+                     Re-run `cargo run` - build.rs will run `bun install` \
+                     automatically.\n\
+                     (looked in {})",
+                    ui_dir.display()
+                )
+                .into());
+            }
+
+            if settings.watch {
+                crate::preflight::check_dependency("bun", "https://bun.sh/docs/installation")?;
+            }
+
+            let watch_child = if settings.watch {
+                spawn_watch(&ui_dir)
+            } else {
+                None
+            };
+            Ok(FrontendHandle::Disk { watch_child })
+        }
+        "embedded" => {
+            if Assets::get("index.html").is_none() {
+                return Err(
+                    "embedded mode selected but `index.html` is not present in \
+                     the compiled-in assets. The binary was built without \
+                     `ui/dist/` populated. Rebuild with `cargo build` after \
+                     ensuring `bun run build` succeeds in app/ui."
+                        .into(),
+                );
+            }
+            Ok(FrontendHandle::Embedded)
+        }
+        other => Err(format!(
+            "unknown frontend.serve_from value: {other:?}. Expected \"disk\" or \"embedded\"."
+        )
+        .into()),
     }
-    if settings.build {
-        build(ui_dir)?;
-    }
-    Ok(if settings.watch {
-        spawn_watch(ui_dir)
-    } else {
-        None
-    })
 }
 
-/// Run `bun run build` once in the given UI directory.
-///
-/// Returns an error if the command could not be launched or exited
-/// with a non-zero status.
-fn build(ui_dir: &Path) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    info!("Building frontend...");
-    let status = std::process::Command::new("bun")
-        .args(["run", "build"])
-        .current_dir(ui_dir)
-        .status();
-    match status {
-        Ok(s) if s.success() => {
-            info!("Frontend build completed successfully");
-            Ok(())
-        }
-        Ok(s) => Err(format!("Frontend build failed with exit status: {s}").into()),
-        Err(e) => Err(format!("Failed to run `bun run build`: {e}").into()),
-    }
-}
+// ---------------------------------------------------------------------------
+// bun watch (unchanged from the previous version of this file)
+// ---------------------------------------------------------------------------
 
 /// Spawn `bun watch` as a background process in the given UI directory.
 ///
