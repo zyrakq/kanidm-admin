@@ -1,2 +1,3 @@
 [frontend]
+serve_from = "disk"
 watch = true
