@@ -14,10 +14,6 @@
   <source>Go to Dashboard</source>
   <target>Ir al Panel de Control</target>
 </trans-unit>
-<trans-unit id="sa0edd3227b3addeb">
-  <source>Redirecting...</source>
-  <target>Redirigiendo...</target>
-</trans-unit>
 <trans-unit id="s5e94738a2eeb8943">
   <source>Sign In</source>
   <target>Iniciar Sesión</target>
@@ -25,38 +21,6 @@
 <trans-unit id="s424c654650973289">
   <source>Change language</source>
   <target>Cambiar idioma</target>
-</trans-unit>
-<trans-unit id="sef058092ccff6354">
-  <source>Authentication failed. No user session found.</source>
-  <target>Error de autenticación. No se encontró sesión de usuario.</target>
-</trans-unit>
-<trans-unit id="s10e7b6cfbe5c865e">
-  <source>Unknown error occurred</source>
-  <target>Ocurrió un error desconocido</target>
-</trans-unit>
-<trans-unit id="sffef1a8596bc58bb">
-  <source>Authenticating...</source>
-  <target>Autenticando...</target>
-</trans-unit>
-<trans-unit id="scd5b45ca7378126e">
-  <source>Please wait while we complete the sign in process.</source>
-  <target>Por favor espere mientras completamos el proceso de inicio de sesión.</target>
-</trans-unit>
-<trans-unit id="sc09939f2fc8b8be3">
-  <source>Success!</source>
-  <target>¡Éxito!</target>
-</trans-unit>
-<trans-unit id="s503b0848078dd117">
-  <source>You have been authenticated. Redirecting...</source>
-  <target>Has sido autenticado. Redirigiendo...</target>
-</trans-unit>
-<trans-unit id="sf3ba1de979a9b38e">
-  <source>Authentication Failed</source>
-  <target>Error de Autenticación</target>
-</trans-unit>
-<trans-unit id="s6a6528b527495513">
-  <source>Return to Home</source>
-  <target>Volver al Inicio</target>
 </trans-unit>
 <trans-unit id="s92a0d19a28995530">
   <source>Success</source>
@@ -113,10 +77,6 @@
 <trans-unit id="sf3fda5790cfa46f6">
   <source>Failed to connect to the authentication server. The connection was refused due to network timeout (error code: ETIMEDOUT). Please check your internet connection and try again. If the problem persists, contact your system administrator for assistance.</source>
   <target>Error al conectar con el servidor de autenticación. La conexión fue rechazada debido a tiempo de espera de red (código de error: ETIMEDOUT). Por favor verifica tu conexión a internet e intenta de nuevo. Si el problema persiste, contacta a tu administrador del sistema.</target>
-</trans-unit>
-<trans-unit id="s36c0017e9dc2414f">
-  <source>Your session is about to expire in 5 minutes. Any unsaved changes will be lost. Please save your work and refresh your session to continue working without interruption. This is an automated security measure to protect your account.</source>
-  <target>Tu sesión está a punto de expirar en 5 minutos. Los cambios no guardados se perderán. Por favor guarda tu trabajo y actualiza tu sesión para continuar trabajando sin interrupciones. Esta es una medida de seguridad automatizada para proteger tu cuenta.</target>
 </trans-unit>
 <trans-unit id="sb70a5cf1313da61a">
   <source>System maintenance is scheduled for tonight between 2:00 AM and 4:00 AM UTC. During this time, the following services will be temporarily unavailable: user authentication, data synchronization, file uploads, and API access. We apologize for any inconvenience this may cause. All services are expected to be fully operational by 4:30 AM UTC. For emergency support during the maintenance window, please contact our 24/7 helpdesk at support@example.com or call +1-800-123-4567. Thank you for your patience and understanding.</source>
@@ -178,10 +138,6 @@
   <source>Long Error</source>
   <target>Error Largo</target>
 </trans-unit>
-<trans-unit id="se2cfa296a74531fb">
-  <source>Long Warning</source>
-  <target>Advertencia Larga</target>
-</trans-unit>
 <trans-unit id="s33e0ec252844c273">
   <source>Very Long Info</source>
   <target>Información Muy Larga</target>
@@ -217,6 +173,70 @@
 <trans-unit id="s631b1127429695aa">
   <source>Kanidm GitHub</source>
   <target>GitHub de Kanidm</target>
+</trans-unit>
+<trans-unit id="s82f8493b0823a619">
+  <source>Please fill in all fields.</source>
+  <target>Rellene todos los campos.</target>
+</trans-unit>
+<trans-unit id="s91e6aa07b4049238">
+  <source>Invalid username or password.</source>
+  <target>Nombre de usuario o contraseña incorrectos.</target>
+</trans-unit>
+<trans-unit id="s20e2103dce14e0b0">
+  <source>Cannot reach the Kanidm server. Check your connection and try again.</source>
+  <target>No se puede conectar al servidor Kanidm. Compruebe su conexión e inténtelo de nuevo.</target>
+</trans-unit>
+<trans-unit id="sf249dcf6c6b6f8ed">
+  <source>Sign in failed. Please try again.</source>
+  <target>No se pudo iniciar sesión. Inténtelo de nuevo.</target>
+</trans-unit>
+<trans-unit id="sf6e1665c7022a1f8">
+  <source>Password</source>
+  <target>Contraseña</target>
+</trans-unit>
+<trans-unit id="sd4834a205d67ccdf">
+  <source>Signing in...</source>
+  <target>Iniciando sesión...</target>
+</trans-unit>
+<trans-unit id="s5df3d186616238c8">
+  <source>Elevated access required</source>
+  <target>Se requiere acceso elevado</target>
+</trans-unit>
+<trans-unit id="s5b3391e7ee5bc58a">
+  <source>This operation requires elevated privileges. Enter your password to continue.</source>
+  <target>Esta operación requiere privilegios elevados. Introduzca su contraseña para continuar.</target>
+</trans-unit>
+<trans-unit id="s2ceb11be2290bb1b">
+  <source>Cancel</source>
+  <target>Cancelar</target>
+</trans-unit>
+<trans-unit id="sb85774dc5d18ff0f">
+  <source>Confirm</source>
+  <target>Confirmar</target>
+</trans-unit>
+<trans-unit id="sd16468ff83c1e843">
+  <source>Your session expires in less than 5 minutes.</source>
+  <target>Su sesión caduca en menos de 5 minutos.</target>
+</trans-unit>
+<trans-unit id="se70d5bb737ef7810">
+  <source><ph id="0">${hours}</ph>h <ph id="1">${minutes}</ph>m</source>
+  <target><ph id="0">${hours}</ph>h <ph id="1">${minutes}</ph>m</target>
+</trans-unit>
+<trans-unit id="s98a2de18d8a6bcad">
+  <source><ph id="0">${minutes}</ph>:<ph id="1">${seconds}</ph></source>
+  <target><ph id="0">${minutes}</ph>:<ph id="1">${seconds}</ph></target>
+</trans-unit>
+<trans-unit id="s748139d78ebaa5d8">
+  <source>Session time remaining</source>
+  <target>Tiempo de sesión restante</target>
+</trans-unit>
+<trans-unit id="s03d2a87fc293ad66">
+  <source>Elevated access granted.</source>
+  <target>Acceso elevado concedido.</target>
+</trans-unit>
+<trans-unit id="s45ee1d374a1606b3">
+  <source>Your session has expired. Please sign in again.</source>
+  <target>Su sesión ha caducado. Inicie sesión de nuevo.</target>
 </trans-unit>
 </body>
 </file>

@@ -14,10 +14,6 @@
   <source>Go to Dashboard</source>
   <target>前往控制面板</target>
 </trans-unit>
-<trans-unit id="sa0edd3227b3addeb">
-  <source>Redirecting...</source>
-  <target>正在重定向...</target>
-</trans-unit>
 <trans-unit id="s5e94738a2eeb8943">
   <source>Sign In</source>
   <target>登录</target>
@@ -25,38 +21,6 @@
 <trans-unit id="s424c654650973289">
   <source>Change language</source>
   <target>更改语言</target>
-</trans-unit>
-<trans-unit id="sef058092ccff6354">
-  <source>Authentication failed. No user session found.</source>
-  <target>身份验证失败。未找到用户会话。</target>
-</trans-unit>
-<trans-unit id="s10e7b6cfbe5c865e">
-  <source>Unknown error occurred</source>
-  <target>发生未知错误</target>
-</trans-unit>
-<trans-unit id="sffef1a8596bc58bb">
-  <source>Authenticating...</source>
-  <target>正在验证身份...</target>
-</trans-unit>
-<trans-unit id="scd5b45ca7378126e">
-  <source>Please wait while we complete the sign in process.</source>
-  <target>请稍候，我们正在完成登录过程。</target>
-</trans-unit>
-<trans-unit id="sc09939f2fc8b8be3">
-  <source>Success!</source>
-  <target>成功！</target>
-</trans-unit>
-<trans-unit id="s503b0848078dd117">
-  <source>You have been authenticated. Redirecting...</source>
-  <target>您已通过身份验证。正在重定向...</target>
-</trans-unit>
-<trans-unit id="sf3ba1de979a9b38e">
-  <source>Authentication Failed</source>
-  <target>身份验证失败</target>
-</trans-unit>
-<trans-unit id="s6a6528b527495513">
-  <source>Return to Home</source>
-  <target>返回首页</target>
 </trans-unit>
 <trans-unit id="s92a0d19a28995530">
   <source>Success</source>
@@ -113,10 +77,6 @@
 <trans-unit id="sf3fda5790cfa46f6">
   <source>Failed to connect to the authentication server. The connection was refused due to network timeout (error code: ETIMEDOUT). Please check your internet connection and try again. If the problem persists, contact your system administrator for assistance.</source>
   <target>无法连接到身份验证服务器。由于网络超时，连接被拒绝（错误代码：ETIMEDOUT）。请检查您的互联网连接并重试。如果问题仍然存在，请联系系统管理员寻求帮助。</target>
-</trans-unit>
-<trans-unit id="s36c0017e9dc2414f">
-  <source>Your session is about to expire in 5 minutes. Any unsaved changes will be lost. Please save your work and refresh your session to continue working without interruption. This is an automated security measure to protect your account.</source>
-  <target>您的会话将在 5 分钟后过期。任何未保存的更改都将丢失。请保存您的工作并刷新会话以继续工作而不中断。这是保护您账户的自动安全措施。</target>
 </trans-unit>
 <trans-unit id="sb70a5cf1313da61a">
   <source>System maintenance is scheduled for tonight between 2:00 AM and 4:00 AM UTC. During this time, the following services will be temporarily unavailable: user authentication, data synchronization, file uploads, and API access. We apologize for any inconvenience this may cause. All services are expected to be fully operational by 4:30 AM UTC. For emergency support during the maintenance window, please contact our 24/7 helpdesk at support@example.com or call +1-800-123-4567. Thank you for your patience and understanding.</source>
@@ -178,10 +138,6 @@
   <source>Long Error</source>
   <target>长错误消息</target>
 </trans-unit>
-<trans-unit id="se2cfa296a74531fb">
-  <source>Long Warning</source>
-  <target>长警告消息</target>
-</trans-unit>
 <trans-unit id="s33e0ec252844c273">
   <source>Very Long Info</source>
   <target>很长的信息消息</target>
@@ -217,6 +173,70 @@
 <trans-unit id="s631b1127429695aa">
   <source>Kanidm GitHub</source>
   <target>Kanidm GitHub</target>
+</trans-unit>
+<trans-unit id="s82f8493b0823a619">
+  <source>Please fill in all fields.</source>
+  <target>请填写所有字段。</target>
+</trans-unit>
+<trans-unit id="s91e6aa07b4049238">
+  <source>Invalid username or password.</source>
+  <target>用户名或密码错误。</target>
+</trans-unit>
+<trans-unit id="s20e2103dce14e0b0">
+  <source>Cannot reach the Kanidm server. Check your connection and try again.</source>
+  <target>无法连接到 Kanidm 服务器。请检查网络连接后重试。</target>
+</trans-unit>
+<trans-unit id="sf249dcf6c6b6f8ed">
+  <source>Sign in failed. Please try again.</source>
+  <target>登录失败。请重试。</target>
+</trans-unit>
+<trans-unit id="sf6e1665c7022a1f8">
+  <source>Password</source>
+  <target>密码</target>
+</trans-unit>
+<trans-unit id="sd4834a205d67ccdf">
+  <source>Signing in...</source>
+  <target>正在登录...</target>
+</trans-unit>
+<trans-unit id="s5df3d186616238c8">
+  <source>Elevated access required</source>
+  <target>需要提升权限</target>
+</trans-unit>
+<trans-unit id="s5b3391e7ee5bc58a">
+  <source>This operation requires elevated privileges. Enter your password to continue.</source>
+  <target>此操作需要提升的权限。请输入密码以继续。</target>
+</trans-unit>
+<trans-unit id="s2ceb11be2290bb1b">
+  <source>Cancel</source>
+  <target>取消</target>
+</trans-unit>
+<trans-unit id="sb85774dc5d18ff0f">
+  <source>Confirm</source>
+  <target>确认</target>
+</trans-unit>
+<trans-unit id="sd16468ff83c1e843">
+  <source>Your session expires in less than 5 minutes.</source>
+  <target>您的会话将在 5 分钟内过期。</target>
+</trans-unit>
+<trans-unit id="se70d5bb737ef7810">
+  <source><ph id="0">${hours}</ph>h <ph id="1">${minutes}</ph>m</source>
+  <target><ph id="0">${hours}</ph>小时 <ph id="1">${minutes}</ph>分钟</target>
+</trans-unit>
+<trans-unit id="s98a2de18d8a6bcad">
+  <source><ph id="0">${minutes}</ph>:<ph id="1">${seconds}</ph></source>
+  <target><ph id="0">${minutes}</ph>:<ph id="1">${seconds}</ph></target>
+</trans-unit>
+<trans-unit id="s748139d78ebaa5d8">
+  <source>Session time remaining</source>
+  <target>剩余会话时间</target>
+</trans-unit>
+<trans-unit id="s03d2a87fc293ad66">
+  <source>Elevated access granted.</source>
+  <target>已授予提升权限。</target>
+</trans-unit>
+<trans-unit id="s45ee1d374a1606b3">
+  <source>Your session has expired. Please sign in again.</source>
+  <target>您的会话已过期。请重新登录。</target>
 </trans-unit>
 </body>
 </file>
