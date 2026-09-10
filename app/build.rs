@@ -15,6 +15,10 @@ fn main() {
     // flipping it always re-runs this script and is honored deterministically.
     println!("cargo::rerun-if-env-changed=APP_SKIP_FRONTEND_BUILD");
 
+    // Emitted before the skip early-return so APP_SKIP_FRONTEND_BUILD=1
+    // builds (Docker) still get the compile-time client version.
+    emit_kanidm_client_version(&manifest_dir);
+
     // Always ensure ui/dist exists so the rust-embed derive in
     // frontend_assets.rs compiles - even when the build is skipped
     // (APP_SKIP_FRONTEND_BUILD=1) or bun is unavailable. An empty dist
@@ -45,6 +49,54 @@ fn skip_frontend_build() -> bool {
         println!("cargo::warning=APP_SKIP_FRONTEND_BUILD=1: skipping frontend build");
     }
     skip
+}
+
+/// Emit the kanidm_client version from the workspace Cargo.lock as a
+/// rustc-env var, consumed by status.rs as the compile-time client
+/// version. A missing lockfile or a lockfile without kanidm_client
+/// leaves the var unset; status.rs then falls back to its pinned
+/// constant.
+fn emit_kanidm_client_version(manifest_dir: &Path) {
+    // Cargo.lock lives at the workspace root, one level above this
+    // package. rerun-if-changed paths resolve against the package root.
+    emit_rerun_if_changed(manifest_dir, "../Cargo.lock");
+
+    let lock_path = manifest_dir.join("../Cargo.lock");
+    let Ok(lock) = std::fs::read_to_string(&lock_path) else {
+        println!(
+            "cargo::warning={} not found; KANIDM_CLIENT_VERSION falls back to the status.rs constant",
+            lock_path.display()
+        );
+        return;
+    };
+    match extract_kanidm_client_version(&lock) {
+        Some(version) => println!("cargo::rustc-env=KANIDM_CLIENT_VERSION={version}"),
+        None => println!(
+            "cargo::warning=kanidm_client not found in {}; KANIDM_CLIENT_VERSION falls back to the status.rs constant",
+            lock_path.display()
+        ),
+    }
+}
+
+/// Extract the `kanidm_client` package version from Cargo.lock text.
+/// Pure function so status.rs tests can cover it (build scripts have no
+/// test target of their own; the file is included there as a module).
+/// pub(crate): visible to that test-only module include.
+pub(crate) fn extract_kanidm_client_version(lock: &str) -> Option<String> {
+    let mut in_kanidm_client_block = false;
+    for line in lock.lines() {
+        let line = line.trim();
+        if line == "[[package]]" {
+            in_kanidm_client_block = false;
+        } else if let Some(rest) = line.strip_prefix("name = ") {
+            in_kanidm_client_block = rest.trim_matches('"') == "kanidm_client";
+        } else if in_kanidm_client_block {
+            if let Some(rest) = line.strip_prefix("version = ") {
+                return Some(rest.trim_matches('"').to_string());
+            }
+        }
+    }
+    None
 }
 
 /// Install frontend dependencies if stale, then run `bun run build`.
