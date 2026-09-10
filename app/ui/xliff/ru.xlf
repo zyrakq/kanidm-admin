@@ -154,14 +154,6 @@
   <source>Kanidm Admin</source>
   <target>Kanidm Админ</target>
 </trans-unit>
-<trans-unit id="saea6a4171ae86e4b">
-  <source>Operational</source>
-  <target>Работает</target>
-</trans-unit>
-<trans-unit id="sbb3cb2f217271ccb">
-  <source>v0.0.0</source>
-  <target>v0.0.0</target>
-</trans-unit>
 <trans-unit id="sa8c3b80277455232">
   <source>GitHub</source>
   <target>GitHub</target>
@@ -237,6 +229,26 @@
 <trans-unit id="s45ee1d374a1606b3">
   <source>Your session has expired. Please sign in again.</source>
   <target>Ваша сессия истекла. Войдите снова.</target>
+</trans-unit>
+<trans-unit id="sae2ed051fd9d85dd">
+  <source>Kanidm v<ph id="0">${this.status.serverVersion}</ph></source>
+  <target>Kanidm v<ph id="0">${this.status.serverVersion}</ph></target>
+</trans-unit>
+<trans-unit id="sae0ec651fd6714df">
+  <source>Kanidm v—</source>
+  <target>Kanidm v—</target>
+</trans-unit>
+<trans-unit id="sfa99d5ddb956d351">
+  <source>Kanidm unavailable</source>
+  <target>Kanidm недоступен</target>
+</trans-unit>
+<trans-unit id="se0d04c05c5fec71a">
+  <source>Client <ph id="0">${this.status.clientVersion ?? '—'}</ph> / Server <ph id="1">${this.status.serverVersion ?? '—'}</ph></source>
+  <target>Клиент <ph id="0">${this.status.clientVersion ?? '—'}</ph> / Сервер <ph id="1">${this.status.serverVersion ?? '—'}</ph></target>
+</trans-unit>
+<trans-unit id="s8dda7bda0932ae5f">
+  <source>Version conflict</source>
+  <target>Конфликт версий</target>
 </trans-unit>
 </body>
 </file>
