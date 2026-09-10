@@ -30,6 +30,7 @@ pub fn routes() -> Router<AppState> {
         .route("/api/auth/session", get(session))
         .route("/api/auth/logout", post(logout))
         .route("/api/auth/reauth", post(reauth))
+        .merge(super::profile::routes())
 }
 
 // ---------------------------------------------------------------------------
@@ -100,7 +101,7 @@ pub(crate) fn cookie_token(headers: &HeaderMap) -> Option<&str> {
         .and_then(extract_session_token)
 }
 
-fn session_user(view: &SessionView) -> SessionUser {
+pub(crate) fn session_user(view: &SessionView) -> SessionUser {
     SessionUser {
         id: view.user_id.clone(),
         username: view.username.clone(),

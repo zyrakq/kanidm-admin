@@ -10,6 +10,7 @@ pub mod error;
 pub mod handlers;
 pub mod known_groups;
 pub mod ops;
+pub mod profile;
 pub mod token;
 
 use std::sync::Arc;
