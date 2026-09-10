@@ -65,7 +65,7 @@ impl ApiError {
             "Your session has expired. Please sign in again.",
         )
     }
-
+    #[cfg(test)]
     pub fn reauth_required() -> Self {
         Self::new(
             ApiErrorCode::ReauthRequired,

@@ -17,7 +17,6 @@ use time::OffsetDateTime;
 
 use super::cookie::{build_clear_cookie, build_set_cookie, extract_session_token};
 use super::error::{map_auth_error, ApiError, ApiErrorCode};
-use super::ops::KanidmAuthOps;
 use super::token::{
     decode_user_auth_token, is_active, remaining_session_secs, session_view, write_privilege,
     SessionView,
