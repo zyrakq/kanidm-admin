@@ -14,17 +14,19 @@ pub mod token;
 
 use std::sync::Arc;
 
+use crate::proxy::forwarder::{Forwarder, ReqwestForwarder};
 use crate::settings::kanidm::KanidmSettings;
 
-/// Shared axum state: auth operations behind the session proxy.
+/// Shared axum state: auth operations + the proxy forwarder.
 #[derive(Clone)]
 pub struct AppState {
     pub auth: Arc<dyn ops::KanidmAuthOps>,
+    pub proxy: Arc<dyn Forwarder>,
 }
 
 impl AppState {
-    pub fn new(auth: Arc<dyn ops::KanidmAuthOps>) -> Self {
-        Self { auth }
+    pub fn new(auth: Arc<dyn ops::KanidmAuthOps>, proxy: Arc<dyn Forwarder>) -> Self {
+        Self { auth, proxy }
     }
 }
 
@@ -35,5 +37,10 @@ pub fn app_state_from_settings(
 ) -> Result<AppState, Box<dyn std::error::Error + Send + Sync>> {
     let builder = ops::client_builder_from_settings(settings)
         .map_err(|error| format!("Kanidm client configuration error: {error:?}"))?;
-    Ok(AppState::new(Arc::new(ops::KanidmClientAuthOps::new(builder))))
+    let forwarder = ReqwestForwarder::from_settings(settings)
+        .map_err(|error| format!("Kanidm proxy configuration error: {error}"))?;
+    Ok(AppState::new(
+        Arc::new(ops::KanidmClientAuthOps::new(builder)),
+        Arc::new(forwarder),
+    ))
 }

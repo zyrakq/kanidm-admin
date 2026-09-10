@@ -93,7 +93,7 @@ fn validate_credentials(username: &str, password: &str) -> Result<(), ApiError> 
 // Helpers
 // ---------------------------------------------------------------------------
 
-fn cookie_token(headers: &HeaderMap) -> Option<&str> {
+pub(crate) fn cookie_token(headers: &HeaderMap) -> Option<&str> {
     headers
         .get(header::COOKIE)
         .and_then(|value| value.to_str().ok())
@@ -118,7 +118,7 @@ fn session_response_body(view: &SessionView) -> SessionResponse {
 }
 
 /// 401 session_expired plus a Set-Cookie that clears the stale cookie.
-fn expired_response() -> Response {
+pub(crate) fn expired_response() -> Response {
     let error = ApiError::session_expired();
     (
         error.code.status(),
@@ -286,7 +286,10 @@ mod tests {
     use tower::ServiceExt;
 
     fn router_with(mock: MockAuthOps) -> Router {
-        routes().with_state(AppState::new(Arc::new(mock)))
+        routes().with_state(AppState::new(
+            Arc::new(mock),
+            Arc::new(crate::proxy::forwarder::test_support::MockForwarder::default()),
+        ))
     }
 
     async fn json_body(response: Response) -> serde_json::Value {
