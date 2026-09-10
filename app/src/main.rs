@@ -1,6 +1,7 @@
 mod auth;
 mod frontend;
 mod frontend_assets;
+mod kanidm_container;
 mod logging;
 mod preflight;
 mod routes;
@@ -21,7 +22,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
     let _frontend_handle = frontend::start(&settings.frontend, &manifest_dir)?;
-    let state = auth::app_state_from_settings(&settings.kanidm)?;
+    let (kanidm_settings, _kanidm_handle) =
+        kanidm_container::start(&settings, &manifest_dir).await?;
+    let state = auth::app_state_from_settings(&kanidm_settings)?;
 
     let listener = TcpListener::bind(&settings.server.address).await?;
     let router = routes::mount_fallback(routes::build(state), &settings.frontend, &manifest_dir);
