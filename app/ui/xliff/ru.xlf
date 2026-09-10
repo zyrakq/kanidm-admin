@@ -1626,6 +1626,309 @@
 <trans-unit id="s12be33ebed5b71d0">
   <source>The denied names list is empty.</source>
 </trans-unit>
+<trans-unit id="sea2e8dad1ed23882">
+  <source>Failed to load applications</source>
+</trans-unit>
+<trans-unit id="s752387594e4e90af">
+  <source>Created application <ph id="0">${name}</ph></source>
+</trans-unit>
+<trans-unit id="s5e27300f1b6934f5">
+  <source>Failed to create application</source>
+</trans-unit>
+<trans-unit id="s28391031382152e6">
+  <source>Deleted application <ph id="0">${id}</ph></source>
+</trans-unit>
+<trans-unit id="s470bd63219bf5b4a">
+  <source>Failed to delete application</source>
+</trans-unit>
+<trans-unit id="sfc86fbef54d0d005">
+  <source>Failed to load application</source>
+</trans-unit>
+<trans-unit id="s59612865260ccc43">
+  <source>Linked group</source>
+</trans-unit>
+<trans-unit id="s15b45af096ab9493">
+  <source>Application <ph id="0">${this.detail.displayName}</ph></source>
+</trans-unit>
+<trans-unit id="sece3d3dfa7bef590">
+  <source>Linked groups</source>
+</trans-unit>
+<trans-unit id="s4a59154ed6132179">
+  <source>No linked groups.</source>
+</trans-unit>
+<trans-unit id="s16b9446e3a70e1f4">
+  <source>Attributes</source>
+</trans-unit>
+<trans-unit id="sbba865d4b437944f">
+  <source>Attribute</source>
+</trans-unit>
+<trans-unit id="s7c85a1ceeab1df6a">
+  <source>No additional attributes.</source>
+</trans-unit>
+<trans-unit id="s51b0102a7d31d0bf">
+  <source>Create application</source>
+</trans-unit>
+<trans-unit id="s40adc2034eb9122d">
+  <source>No applications found.</source>
+</trans-unit>
+<trans-unit id="s3be2267dad5baab1">
+  <source>My Application</source>
+</trans-unit>
+<trans-unit id="s1db7317ebdd37e07">
+  <source>Delete application "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.name}</ph>)? This cannot be undone.</source>
+</trans-unit>
+<trans-unit id="sf1e9d421f35b51e5">
+  <source>Application</source>
+</trans-unit>
+<trans-unit id="sbbfb8f45289508d5">
+  <source>Failed to load messages</source>
+</trans-unit>
+<trans-unit id="s9faa877c556d3724">
+  <source>Failed to load message</source>
+</trans-unit>
+<trans-unit id="sd36fac55ba227e6e">
+  <source>Marked message <ph id="0">${id}</ph> as sent</source>
+</trans-unit>
+<trans-unit id="sf5311b426518ac2b">
+  <source>Failed to mark message as sent</source>
+</trans-unit>
+<trans-unit id="s430313a7b60b4438">
+  <source>Person name is required.</source>
+</trans-unit>
+<trans-unit id="s96e1205fe74f58cf">
+  <source>Queued a test message for <ph id="0">${person}</ph></source>
+</trans-unit>
+<trans-unit id="s4aaeb947824d014c">
+  <source>Failed to send test message</source>
+</trans-unit>
+<trans-unit id="s09242e07b5b90ca0">
+  <source>Id</source>
+</trans-unit>
+<trans-unit id="se47baf2fd16b9d2b">
+  <source>Template</source>
+</trans-unit>
+<trans-unit id="s67c3f901c2f77771">
+  <source>Send after</source>
+</trans-unit>
+<trans-unit id="s57ade424d57c6edf">
+  <source>Sent</source>
+</trans-unit>
+<trans-unit id="s78636b92c1a3909c">
+  <source>Pending</source>
+</trans-unit>
+<trans-unit id="sd2d1b201126df5ae">
+  <source>Mail destination</source>
+</trans-unit>
+<trans-unit id="sb2bf4d1444ac4144">
+  <source>Intent id</source>
+</trans-unit>
+<trans-unit id="sacd23423a808f3bb">
+  <source>Expiry time</source>
+</trans-unit>
+<trans-unit id="seebb4169cec02994">
+  <source>Delete after</source>
+</trans-unit>
+<trans-unit id="s9151d07033f8bc10">
+  <source>Sent at</source>
+</trans-unit>
+<trans-unit id="s98d29e1feb3ed2ee">
+  <source>Not sent yet</source>
+</trans-unit>
+<trans-unit id="sf993bb199fefbe04">
+  <source>All</source>
+</trans-unit>
+<trans-unit id="s6183624814d4d5a9">
+  <source>Ready to send</source>
+</trans-unit>
+<trans-unit id="s102e276279c146e3">
+  <source>Person name</source>
+</trans-unit>
+<trans-unit id="s43cf256a3ea133ac">
+  <source>No messages found.</source>
+</trans-unit>
+<trans-unit id="s1b264494c69859bd">
+  <source>Message detail</source>
+</trans-unit>
+<trans-unit id="sa2996bc933bdbafe">
+  <source>Mark sent</source>
+</trans-unit>
+<trans-unit id="s45d7451b0c2a4a60">
+  <source>Mark message <ph id="0">${this.detail?.id ?? ''}</ph> as sent? No email will be delivered.</source>
+</trans-unit>
+<trans-unit id="s34f2d7789bb396f0">
+  <source>Failed to load the recycle bin</source>
+</trans-unit>
+<trans-unit id="s181f0670e933ae42">
+  <source>Revived entry <ph id="0">${id}</ph></source>
+</trans-unit>
+<trans-unit id="s36dc10ce090e322a">
+  <source>Failed to revive entry</source>
+</trans-unit>
+<trans-unit id="sc4a984de2d5720d1">
+  <source>Failed to load entry details</source>
+</trans-unit>
+<trans-unit id="s98b8b394811dd087">
+  <source>Classes</source>
+</trans-unit>
+<trans-unit id="sfc93e152aff28910">
+  <source>Revive</source>
+</trans-unit>
+<trans-unit id="sa8e9c7094910d6df">
+  <source>No attributes.</source>
+</trans-unit>
+<trans-unit id="s6524029e425ef697">
+  <source>Recycle bin</source>
+</trans-unit>
+<trans-unit id="s1bb3dc691ac2c9e5">
+  <source>The recycle bin is empty.</source>
+</trans-unit>
+<trans-unit id="seb789720b93dcc23">
+  <source>Revive entry "<ph id="0">${this.reviveTarget.id}</ph>" (<ph id="1">${this.reviveTarget.uuid ?? '—'}</ph>)? It will be restored to the live database.</source>
+</trans-unit>
+<trans-unit id="s2d536d0be525c731">
+  <source>Entry details</source>
+</trans-unit>
+<trans-unit id="s9639794dbb9ac1d1">
+  <source>Failed to load sync account</source>
+</trans-unit>
+<trans-unit id="s6555bccfaf0ba8f1">
+  <source>Credential portal updated.</source>
+</trans-unit>
+<trans-unit id="sfb278e7f9f8a18d4">
+  <source>Credential portal cleared.</source>
+</trans-unit>
+<trans-unit id="s54f4b14b7a29140b">
+  <source>Failed to update credential portal</source>
+</trans-unit>
+<trans-unit id="s73dc31668f6667b2">
+  <source>Yield attributes updated.</source>
+</trans-unit>
+<trans-unit id="s7d74d3aed2d088d4">
+  <source>Failed to update yield attributes</source>
+</trans-unit>
+<trans-unit id="s079ffc0734880df6">
+  <source>Label is required.</source>
+</trans-unit>
+<trans-unit id="s5fae62eb79deed60">
+  <source>Sync token generated.</source>
+</trans-unit>
+<trans-unit id="sa7de7573923351ce">
+  <source>Failed to generate sync token</source>
+</trans-unit>
+<trans-unit id="s0a0d6f2737e18433">
+  <source>Failed to copy token.</source>
+</trans-unit>
+<trans-unit id="s9ebd569789de56ca">
+  <source>Sync token destroyed.</source>
+</trans-unit>
+<trans-unit id="s441ece11be767453">
+  <source>Failed to destroy sync token</source>
+</trans-unit>
+<trans-unit id="s97ead8cafd039827">
+  <source>Force refresh requested.</source>
+</trans-unit>
+<trans-unit id="s10aa5dded06c9c15">
+  <source>Failed to force refresh</source>
+</trans-unit>
+<trans-unit id="s8ba6a0f9581a18bb">
+  <source>Destroy the sync token? The sync client will no longer be able to connect until a new token is issued.</source>
+</trans-unit>
+<trans-unit id="sf187dbd717af5fa9">
+  <source>Finalise this sync account? ALL synced entries will be converted into static persons and groups and will no longer be managed by the sync provider. This action is IRREVERSIBLE.</source>
+</trans-unit>
+<trans-unit id="s68f7bf02bad78ab2">
+  <source>Terminate this sync account? ALL synced entries (persons and groups) will be DELETED. This action is IRREVERSIBLE.</source>
+</trans-unit>
+<trans-unit id="s90a87bac099ea2d4">
+  <source>Destroy token</source>
+</trans-unit>
+<trans-unit id="s85d7080120c5394a">
+  <source>Finalise</source>
+</trans-unit>
+<trans-unit id="s354a1c02f1254bc4">
+  <source>Terminate</source>
+</trans-unit>
+<trans-unit id="s1e4952e6bb81f88a">
+  <source>Sync account finalised.</source>
+</trans-unit>
+<trans-unit id="se8c252dd7f6ee7d8">
+  <source>Sync account terminated.</source>
+</trans-unit>
+<trans-unit id="sde97b8ec4aebd0a0">
+  <source>Failed to finalise sync account</source>
+</trans-unit>
+<trans-unit id="sfbf8ca75d6512aa2">
+  <source>Failed to terminate sync account</source>
+</trans-unit>
+<trans-unit id="s1c0f118b6b85ad6e">
+  <source>Credential Portal</source>
+</trans-unit>
+<trans-unit id="sa10405062f8ce56a">
+  <source>URL of the credential portal where synced users can set their credentials.</source>
+</trans-unit>
+<trans-unit id="s210fd0deb39823a2">
+  <source>Portal URL</source>
+</trans-unit>
+<trans-unit id="s83718702f41dfa3f">
+  <source>Yield Attributes</source>
+</trans-unit>
+<trans-unit id="s970b136c4375749b">
+  <source>Attributes the sync provider yields authority over, one per line. Listed attributes can be modified locally.</source>
+</trans-unit>
+<trans-unit id="s722a06de923b913b">
+  <source>Sync Token</source>
+</trans-unit>
+<trans-unit id="s14442d8510a23ff7">
+  <source>Token used by the sync client (kanidm-sync) to connect to this account.</source>
+</trans-unit>
+<trans-unit id="s71cee58f96e23cbc">
+  <source>Token label</source>
+</trans-unit>
+<trans-unit id="s929d17283ed832c8">
+  <source>e.g. prod-sync-client</source>
+</trans-unit>
+<trans-unit id="sefb4291be01ef623">
+  <source>Generate token</source>
+</trans-unit>
+<trans-unit id="s2a15f95845e31799">
+  <source>Copy this token now — it will NOT be shown again.</source>
+</trans-unit>
+<trans-unit id="sa080f5eab1aa9100">
+  <source>Maintenance</source>
+</trans-unit>
+<trans-unit id="sdb0907f305a18122">
+  <source>This account cannot be deleted — Kanidm v1 does not support deleting sync accounts.</source>
+</trans-unit>
+<trans-unit id="sab4c7866fe790257">
+  <source>Force refresh</source>
+</trans-unit>
+<trans-unit id="s192d3771f3499db5">
+  <source>All sync accounts</source>
+</trans-unit>
+<trans-unit id="sc8cea42df5da32ba">
+  <source>Sync account not found.</source>
+</trans-unit>
+<trans-unit id="sde6ac115c7f70646">
+  <source>Failed to load sync accounts</source>
+</trans-unit>
+<trans-unit id="sff4a6360212b9a43">
+  <source>Created sync account <ph id="0">${name}</ph></source>
+</trans-unit>
+<trans-unit id="s60cfac3fe2eb5781">
+  <source>Failed to create sync account</source>
+</trans-unit>
+<trans-unit id="s154c10a18c1a4846">
+  <source>Sync Accounts</source>
+</trans-unit>
+<trans-unit id="s337076318719f95f">
+  <source>Create sync account</source>
+</trans-unit>
+<trans-unit id="sbf67813608796417">
+  <source>No sync accounts found.</source>
+</trans-unit>
+<trans-unit id="s7257e808ec48cd3f">
+  <source>Optional description</source>
+</trans-unit>
 </body>
 </file>
 </xliff>
