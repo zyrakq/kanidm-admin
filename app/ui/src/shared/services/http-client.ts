@@ -10,7 +10,13 @@ export type ApiErrorCode =
   | 'session_expired'
   | 'reauth_required'
   | 'kanidm_unreachable'
-  | 'validation_error';
+  | 'validation_error'
+  | 'access_denied'
+  | 'not_found'
+  | 'conflict'
+  | 'kanidm_bad_request'
+  | 'kanidm_rejected'
+  | 'kanidm_error';
 
 export class ApiError extends Error {
   readonly code: ApiErrorCode;
@@ -45,7 +51,13 @@ export async function apiFetch<T>(
 
   const headers = new Headers(init.headers);
   headers.set('Accept', 'application/json');
-  if (init.body !== undefined && !headers.has('Content-Type')) {
+  // FormData bodies must keep their browser-generated multipart
+  // Content-Type (boundary included); never force JSON on them.
+  if (
+    init.body !== undefined &&
+    !(init.body instanceof FormData) &&
+    !headers.has('Content-Type')
+  ) {
     headers.set('Content-Type', 'application/json');
   }
 
