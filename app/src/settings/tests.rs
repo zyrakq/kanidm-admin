@@ -53,6 +53,9 @@ const DEV_TOML: &str = indoc! {r#"
     [frontend]
     serve_from = "disk"
     watch = true
+
+    [kanidm_container]
+    enabled = true
 "#};
 
 const PROD_TOML: &str = indoc! {r#"
@@ -275,5 +278,64 @@ fn missing_kanidm_section_is_rejected() {
     assert!(
         result.is_err(),
         "missing [kanidm] must fail deserialization (url is required)"
+    );
+}
+
+#[test]
+fn kanidm_container_defaults_when_section_absent() {
+    let s = settings_from_toml(BASE_TOML, "").expect("should deserialize");
+    assert!(
+        !s.kanidm_container.enabled,
+        "container must default to disabled when the section is absent"
+    );
+    assert_eq!(s.kanidm_container.image, "kanidm/server:1.11.1");
+    assert_eq!(s.kanidm_container.effective_image(), "kanidm/server:1.11.1");
+}
+
+#[test]
+fn dev_overlay_enables_kanidm_container() {
+    let s = settings_from_toml(BASE_TOML, DEV_TOML).expect("should deserialize");
+    assert!(
+        s.kanidm_container.enabled,
+        "development overlay should enable the container"
+    );
+}
+
+#[test]
+fn kanidm_container_image_overlay_parses() {
+    let overlay = indoc! {r#"
+        [kanidm_container]
+        enabled = true
+        image = "kanidm/server:1.12.0"
+    "#};
+    let s = settings_from_toml(BASE_TOML, overlay).expect("should deserialize");
+    assert_eq!(s.kanidm_container.image, "kanidm/server:1.12.0");
+    assert_eq!(s.kanidm_container.effective_image(), "kanidm/server:1.12.0");
+}
+
+#[test]
+fn env_var_disables_kanidm_container() {
+    let env = HashMap::from([(
+        "APP_KANIDM_CONTAINER__ENABLED".to_string(),
+        "false".to_string(),
+    )]);
+    let s = settings_from_layers(BASE_TOML, DEV_TOML, Some(env)).expect("should deserialize");
+    assert!(
+        !s.kanidm_container.enabled,
+        "APP_KANIDM_CONTAINER__ENABLED=false should override the development overlay"
+    );
+}
+
+#[test]
+fn env_var_overrides_kanidm_container_image() {
+    let env = HashMap::from([(
+        "APP_KANIDM_CONTAINER__IMAGE".to_string(),
+        "kanidm/server:1.10.5".to_string(),
+    )]);
+    let s = settings_from_layers(BASE_TOML, DEV_TOML, Some(env)).expect("should deserialize");
+    assert_eq!(
+        s.kanidm_container.effective_image(),
+        "kanidm/server:1.10.5",
+        "APP_KANIDM_CONTAINER__IMAGE should override the default image"
     );
 }
