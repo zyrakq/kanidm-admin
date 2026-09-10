@@ -29,6 +29,9 @@
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "files.exclude": {
+    "**/.git": false
+  },
   "rust-analyzer.cachePriming.enable": false,
   "rust-analyzer.check.workspace": false,
   "rust-analyzer.procMacro.enable": true,
