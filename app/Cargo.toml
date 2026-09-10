@@ -21,6 +21,7 @@ base64 = { workspace = true }
 kanidm_client = { workspace = true }
 kanidm_proto = { workspace = true }
 time = { workspace = true }
+testcontainers = { path = "../vendor/testcontainers-rs/testcontainers", features = ["watchdog"] }
 
 [dev-dependencies]
 indoc = "2"
