@@ -6,6 +6,7 @@
 
 pub mod frontend;
 pub mod kanidm;
+pub mod kanidm_container;
 pub mod loader;
 pub mod server;
 
