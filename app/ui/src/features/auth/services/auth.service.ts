@@ -1,7 +1,7 @@
 import { msg } from '@lit/localize';
 import { apiFetch, ApiError } from '@/shared/services/http-client';
 import { notificationService } from '@/features/notifications';
-import type { AuthState, User } from '../types/auth.types';
+import type { AuthState, GroupInfo, User } from '../types/auth.types';
 
 // Backend response shapes (epoch SECONDS — converted to ms on receipt).
 
@@ -22,6 +22,16 @@ interface ReauthResponse {
   writeUntil: number | null;
 }
 
+interface ProfileGroupResponse {
+  uuid: string;
+  name: string | null;
+}
+
+interface ProfileResponse {
+  user: SessionUserResponse;
+  groups: ProfileGroupResponse[];
+}
+
 /** Maximum password attempts offered in one step-up flow. */
 const MAX_STEP_UP_ATTEMPTS = 3;
 
@@ -33,6 +43,7 @@ class AuthService {
     user: null,
     sessionExpiresAt: null,
     writeUntil: null,
+    groups: [],
   };
 
   private initPromise: Promise<void> | null = null;
@@ -78,10 +89,39 @@ class AuthService {
       this.applySession(session);
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
+        this.resetState();
         return;
       }
       throw error;
     }
+    await this.fetchProfile();
+  }
+
+  private async fetchProfile(): Promise<void> {
+    try {
+      const profile = await apiFetch<ProfileResponse>('/api/auth/profile', {
+        ignoreSessionExpired: true,
+      });
+      this.authState = {
+        ...this.authState,
+        groups: profile.groups.map((group) => ({
+          uuid: group.uuid,
+          name: group.name,
+        })),
+      };
+      this.notifyStateChanged();
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        this.resetState();
+        this.notifyStateChanged();
+      }
+      // Other failures: keep the session, leave groups empty.
+    }
+  }
+
+  /** Broadcast every auth state mutation to interested components (D7). */
+  private notifyStateChanged(): void {
+    window.dispatchEvent(new CustomEvent('auth-state-changed'));
   }
 
   private applySession(session: SessionResponse): void {
@@ -99,7 +139,9 @@ class AuthService {
           : null,
       writeUntil:
         session.writeUntil !== null ? session.writeUntil * 1000 : null,
+      groups: this.authState.groups,
     };
+    this.notifyStateChanged();
   }
 
   private resetState(): void {
@@ -108,7 +150,9 @@ class AuthService {
       user: null,
       sessionExpiresAt: null,
       writeUntil: null,
+      groups: [],
     };
+    this.notifyStateChanged();
   }
 
   getAuthState(): AuthState {
@@ -123,6 +167,22 @@ class AuthService {
     return this.authState.user ? { ...this.authState.user } : null;
   }
 
+  /** Resolved group names (null names dropped). */
+  getGroups(): string[] {
+    return this.authState.groups
+      .map((group) => group.name)
+      .filter((name): name is string => name !== null);
+  }
+
+  /** Raw profile groups (uuid + name|null). */
+  getGroupInfo(): GroupInfo[] {
+    return [...this.authState.groups];
+  }
+
+  hasGroup(name: string): boolean {
+    return this.getGroups().includes(name);
+  }
+
   /** Sign in with username + password; throws ApiError on failure. */
   async signIn(username: string, password: string): Promise<void> {
     const session = await apiFetch<SessionResponse>('/api/auth/login', {
@@ -130,6 +190,9 @@ class AuthService {
       body: JSON.stringify({ username, password }),
     });
     this.applySession(session);
+    // Fetch groups before resolving so the first navigation already
+    // knows the visible sections.
+    await this.fetchProfile();
   }
 
   /** Sign out: revoke server-side, then reset local state either way. */
