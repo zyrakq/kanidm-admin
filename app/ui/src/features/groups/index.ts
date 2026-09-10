@@ -9,3 +9,8 @@ export {
   toGroupSummary,
   toGroupDetail,
 } from './types/group.types.ts';
+
+// Side-effect imports: registering the custom elements when the feature
+// is imported.
+import './components/group-list-page.ts';
+import './components/group-detail-page.ts';

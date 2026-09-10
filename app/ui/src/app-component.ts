@@ -16,6 +16,8 @@ import '@/features/auth/components/reauth-modal';
 import '@/features/notifications/components/toast-container';
 import '@/features/persons/components/person-list-page';
 import '@/features/persons/components/person-detail-page';
+import '@/features/groups/components/group-list-page';
+import '@/features/groups/components/group-detail-page';
 
 @customElement('app-component')
 export class AppComponent extends LitElement {
@@ -62,6 +64,17 @@ export class AppComponent extends LitElement {
       render: ({ id }) =>
         html`<person-detail-page .id=${id ?? ''}></person-detail-page>`,
       enter: async () => this.guardSection('persons'),
+    },
+    {
+      path: '/admin/groups',
+      render: () => html`<group-list-page></group-list-page>`,
+      enter: async () => this.guardSection('groups'),
+    },
+    {
+      path: '/admin/groups/:id',
+      render: ({ id }) =>
+        html`<group-detail-page .id=${id ?? ''}></group-detail-page>`,
+      enter: async () => this.guardSection('groups'),
     },
     {
       path: '/admin/no-access',
