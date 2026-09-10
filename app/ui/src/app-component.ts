@@ -22,6 +22,8 @@ import '@/features/service-accounts/components/service-account-list-page';
 import '@/features/service-accounts/components/service-account-detail-page';
 import '@/features/oauth2/components/oauth2-list-page';
 import '@/features/oauth2/components/oauth2-detail-page';
+import '@/features/domain/components/domain-page';
+import '@/features/system/components/system-page';
 
 @customElement('app-component')
 export class AppComponent extends LitElement {
@@ -101,6 +103,16 @@ export class AppComponent extends LitElement {
       render: ({ id }) =>
         html`<oauth2-detail-page .id=${id ?? ''}></oauth2-detail-page>`,
       enter: async () => this.guardSection('oauth2'),
+    },
+    {
+      path: '/admin/domain',
+      render: () => html`<domain-page></domain-page>`,
+      enter: async () => this.guardSection('domain'),
+    },
+    {
+      path: '/admin/system',
+      render: () => html`<system-page></system-page>`,
+      enter: async () => this.guardSection('system'),
     },
     {
       path: '/admin/no-access',
