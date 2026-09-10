@@ -1470,6 +1470,162 @@
 <trans-unit id="s88e2338e08495a4a">
   <source>Failed to enable legacy crypto.</source>
 </trans-unit>
+<trans-unit id="s30493a6cb695008e">
+  <source>Failed to load domain settings</source>
+</trans-unit>
+<trans-unit id="s865a470bd8c5f923">
+  <source>Identity settings saved.</source>
+</trans-unit>
+<trans-unit id="s6ea72c1b51850289">
+  <source>Failed to save identity settings</source>
+</trans-unit>
+<trans-unit id="s53f63ab69499c6ed">
+  <source>Enter a non-negative whole number.</source>
+</trans-unit>
+<trans-unit id="s932899003882e3d9">
+  <source>Max queryable attributes updated.</source>
+</trans-unit>
+<trans-unit id="sdeb78b081567e951">
+  <source>Failed to update max queryable attributes</source>
+</trans-unit>
+<trans-unit id="sdb60f1e51a157f9b">
+  <source>Domain image updated.</source>
+</trans-unit>
+<trans-unit id="s2d9187cc823cc106">
+  <source>Failed to upload the domain image</source>
+</trans-unit>
+<trans-unit id="s0770abb59c563e96">
+  <source>Domain image removed.</source>
+</trans-unit>
+<trans-unit id="sad49528f3bba8f69">
+  <source>Failed to remove the domain image</source>
+</trans-unit>
+<trans-unit id="s19e4579af2dd84a3">
+  <source>Domain not available.</source>
+</trans-unit>
+<trans-unit id="s67dc3b212de49ba8">
+  <source>Domain name</source>
+</trans-unit>
+<trans-unit id="se6b60ffe67b19271">
+  <source>LDAP base DN</source>
+</trans-unit>
+<trans-unit id="s94d63573d312fe9b">
+  <source>Identity</source>
+</trans-unit>
+<trans-unit id="s15a4104c845f01f7">
+  <source>Changing this rebuilds the LDAP directory tree.</source>
+</trans-unit>
+<trans-unit id="s827167addf9f662c">
+  <source>Wireless network name (SSID)</source>
+</trans-unit>
+<trans-unit id="sb9621878e4655c94">
+  <source>Behaviour</source>
+</trans-unit>
+<trans-unit id="se8d62ffa29b8c9f3">
+  <source>Easter eggs</source>
+</trans-unit>
+<trans-unit id="se13fb722b234c83e">
+  <source>Enable seasonal kanidm easter eggs.</source>
+</trans-unit>
+<trans-unit id="s4f0c356368cc5c1a">
+  <source>Failed to update easter eggs</source>
+</trans-unit>
+<trans-unit id="s16ae81623bfe6dcb">
+  <source>Account recovery</source>
+</trans-unit>
+<trans-unit id="s35d1b6d57b28d44b">
+  <source>Enables self-service credential reset for persons. Enabling is a security-relevant change.</source>
+</trans-unit>
+<trans-unit id="s5f1e1541a7a7bf14">
+  <source>Failed to update account recovery</source>
+</trans-unit>
+<trans-unit id="sb43f8a8c10a12816">
+  <source>LDAP unix password bind</source>
+</trans-unit>
+<trans-unit id="s4ee68162f77a248d">
+  <source>Allow binding to LDAP with unix passwords.</source>
+</trans-unit>
+<trans-unit id="sab2a43c1fe61d577">
+  <source>Failed to update LDAP unix password bind</source>
+</trans-unit>
+<trans-unit id="s9cf668d20b4bf336">
+  <source>Max queryable attributes</source>
+</trans-unit>
+<trans-unit id="sb9736121699e8ba2">
+  <source>Maximum number of attributes an LDAP search may request.</source>
+</trans-unit>
+<trans-unit id="sd5226aa5e3063298">
+  <source>Domain image</source>
+</trans-unit>
+<trans-unit id="sb4e0e6114d7906f1">
+  <source>Shown on the login page and in emails.</source>
+</trans-unit>
+<trans-unit id="s34ccaa6074be1d85">
+  <source>Upload image...</source>
+</trans-unit>
+<trans-unit id="s5d322e513701f440">
+  <source>Change base DN</source>
+</trans-unit>
+<trans-unit id="s3bf34f2380072fe9">
+  <source>Changing the LDAP base DN from "<ph id="0">${this.info?.ldapBasedn ?? ''}</ph>" to "<ph id="1">${this.ldapBasedn.trim()}</ph>" rebuilds the LDAP directory tree. Clients may need reconfiguration. Continue?</source>
+</trans-unit>
+<trans-unit id="sb9ebdd08bb1dbe7c">
+  <source>Remove image</source>
+</trans-unit>
+<trans-unit id="s75ebd66e12b5b164">
+  <source>Remove the domain image?</source>
+</trans-unit>
+<trans-unit id="s0f8415c4b205b099">
+  <source>Failed to load system settings</source>
+</trans-unit>
+<trans-unit id="s885bd4259036748a">
+  <source>Enter at least one entry, one per line.</source>
+</trans-unit>
+<trans-unit id="s23f221c1c5c8aa20">
+  <source>Added <ph id="0">${entries.length}</ph> entr<ph id="1">${entries.length === 1 ? 'y' : 'ies'}</ph>.</source>
+</trans-unit>
+<trans-unit id="s00d3876cfa9cc983">
+  <source>Failed to update the list</source>
+</trans-unit>
+<trans-unit id="sc12be6d6478ba751">
+  <source>Removed "<ph id="0">${value}</ph>".</source>
+</trans-unit>
+<trans-unit id="sfda9cfb531099abc">
+  <source>Failed to remove the entry</source>
+</trans-unit>
+<trans-unit id="s41f7dca46d3f1b4a">
+  <source>Value</source>
+</trans-unit>
+<trans-unit id="se07cad5c64edf6fa">
+  <source>Add entries (one per line)</source>
+</trans-unit>
+<trans-unit id="s851de3a097b3a548">
+  <source>Remove "<ph id="0">${this.removeTarget.value}</ph>" from <ph id="1">${isBadlist ? msg('the password badlist') : msg('the denied names list')}</ph>?</source>
+</trans-unit>
+<trans-unit id="sfd3d7a5fded6560e">
+  <source>the password badlist</source>
+</trans-unit>
+<trans-unit id="s41ec279d115cb531">
+  <source>the denied names list</source>
+</trans-unit>
+<trans-unit id="s892a89c40a3a7f13">
+  <source>Password badlist</source>
+</trans-unit>
+<trans-unit id="s8a5f37f2a873c2cb">
+  <source>Passwords in this list are rejected when users set or reset their password.</source>
+</trans-unit>
+<trans-unit id="s4926c4d76f0ef98e">
+  <source>The badlist is empty.</source>
+</trans-unit>
+<trans-unit id="sbcaf81042df1bf2e">
+  <source>Denied names</source>
+</trans-unit>
+<trans-unit id="sc4b461bdfe328b1d">
+  <source>Names in this list cannot be used for persons, groups, or accounts.</source>
+</trans-unit>
+<trans-unit id="s12be33ebed5b71d0">
+  <source>The denied names list is empty.</source>
+</trans-unit>
 </body>
 </file>
 </xliff>
