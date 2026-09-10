@@ -3,11 +3,15 @@ import { customElement } from 'lit/decorators.js';
 import { Router } from '@lit-labs/router';
 import { authService } from '@/features/auth';
 import { localizationService } from '@/features/localization';
+import { canAccess, firstVisiblePath, type SectionId } from '@/shared/access/section-access';
 import '@/features/theme/services/favicon.service';
 
-// Import components (they will be registered as custom elements)
+// Route targets. Section features register their pages here as they are
+// implemented (batches 3-8); until then the routes below cover the
+// foundation pages only.
 import '@/pages/welcome-page';
-import '@/pages/dashboard-page';
+import '@/pages/admin-overview-page';
+import '@/pages/no-access-page';
 import '@/features/auth/components/reauth-modal';
 import '@/features/notifications/components/toast-container';
 
@@ -16,31 +20,78 @@ export class AppComponent extends LitElement {
   constructor() {
     super();
     localizationService.init();
+    // Reserved for section routes added by batches 3-8; referenced here so
+    // noUnusedLocals does not flag it until those routes land.
+    void this.guardSection;
   }
 
-  // Router - primary router with global listeners (Router extends Routes)
   private _router = new Router(this, [
     {
       path: '/',
       render: () => html`<welcome-page></welcome-page>`,
       enter: async () => {
         await authService.init();
-        return true;
-      },
-    },
-    {
-      path: '/dashboard',
-      render: () => html`<dashboard-page></dashboard-page>`,
-      enter: async () => {
-        await authService.init();
-        if (!authService.isAuthenticated()) {
-          this._router.goto('/');
+        if (authService.isAuthenticated()) {
+          const target = firstVisiblePath(authService.getGroups());
+          this._router.goto(target ?? '/admin/no-access');
           return false;
         }
         return true;
       },
     },
+    {
+      path: '/dashboard',
+      // Legacy bookmark: the dashboard was removed; land on /admin.
+      enter: async () => {
+        this._router.goto('/admin');
+        return false;
+      },
+      render: () => html``,
+    },
+    {
+      path: '/admin',
+      render: () => html`<admin-overview-page></admin-overview-page>`,
+      enter: async () => this.guardAdmin(),
+    },
+    {
+      path: '/admin/no-access',
+      render: () => html`<no-access-page></no-access-page>`,
+      enter: async () => this.guardAdmin(),
+    },
+    // Section routes are appended here by batches 3-8, each following:
+    //   {
+    //     path: '/admin/<section>',
+    //     render: () => html`<x-list-page></x-list-page>`,
+    //     enter: async () => this.guardSection('<section-id>'),
+    //   },
+    //   {
+    //     path: '/admin/<section>/:id',
+    //     render: ({ id }) => html`<x-detail-page .id=${id}></x-detail-page>`,
+    //     enter: async () => this.guardSection('<section-id>'),
+    //   },
   ]);
+
+  /** Authenticated users only; unauthenticated go to the welcome page. */
+  private async guardAdmin(): Promise<boolean> {
+    await authService.init();
+    if (!authService.isAuthenticated()) {
+      this._router.goto('/');
+      return false;
+    }
+    return true;
+  }
+
+  /** Authenticated AND authorized for the section; otherwise no-access. */
+  private async guardSection(section: SectionId): Promise<boolean> {
+    if (!(await this.guardAdmin())) {
+      return false;
+    }
+    if (!canAccess(authService.getGroups(), section)) {
+      this._router.goto('/admin/no-access');
+      return false;
+    }
+    return true;
+  }
 
   render() {
     return html`${this._router.outlet()}`;

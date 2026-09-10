@@ -4,6 +4,7 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { ThemeController } from '@/features/theme';
 import { authService } from '../services/auth.service';
+import { firstVisiblePath } from '@/shared/access/section-access';
 import { ApiError } from '@/shared/services/http-client';
 import type { User } from '../types/auth.types';
 import logoLight from '@/assets/logo-light.svg';
@@ -58,7 +59,8 @@ export class LoginForm extends LitElement {
 
     try {
       await authService.signIn(this.username.trim(), this.password);
-      window.location.assign('/dashboard');
+      const target = firstVisiblePath(authService.getGroups());
+      window.location.assign(target ?? '/admin/no-access');
     } catch (error) {
       this.error = this.describeError(error);
     } finally {
@@ -103,7 +105,10 @@ export class LoginForm extends LitElement {
               <div class="actions">
                 <button
                   class="btn btn-primary"
-                  @click=${() => window.location.assign('/dashboard')}
+                  @click=${() => {
+                    const target = firstVisiblePath(authService.getGroups());
+                    window.location.assign(target ?? '/admin/no-access');
+                  }}
                 >
                   ${msg('Go to Dashboard')}
                 </button>
