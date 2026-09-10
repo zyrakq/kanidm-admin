@@ -14,15 +14,14 @@ import '@/pages/admin-overview-page';
 import '@/pages/no-access-page';
 import '@/features/auth/components/reauth-modal';
 import '@/features/notifications/components/toast-container';
+import '@/features/persons/components/person-list-page';
+import '@/features/persons/components/person-detail-page';
 
 @customElement('app-component')
 export class AppComponent extends LitElement {
   constructor() {
     super();
     localizationService.init();
-    // Reserved for section routes added by batches 3-8; referenced here so
-    // noUnusedLocals does not flag it until those routes land.
-    void this.guardSection;
   }
 
   private _router = new Router(this, [
@@ -52,6 +51,17 @@ export class AppComponent extends LitElement {
       path: '/admin',
       render: () => html`<admin-overview-page></admin-overview-page>`,
       enter: async () => this.guardAdmin(),
+    },
+    {
+      path: '/admin/persons',
+      render: () => html`<person-list-page></person-list-page>`,
+      enter: async () => this.guardSection('persons'),
+    },
+    {
+      path: '/admin/persons/:id',
+      render: ({ id }) =>
+        html`<person-detail-page .id=${id ?? ''}></person-detail-page>`,
+      enter: async () => this.guardSection('persons'),
     },
     {
       path: '/admin/no-access',
