@@ -24,6 +24,13 @@ pub trait KanidmAuthOps: Send + Sync {
 
     /// Server-side session revocation (GET /v1/logout).
     async fn logout(&self, token: &str) -> Result<(), ClientError>;
+
+    /// Whoami roundtrip: the caller's own entry, or None when Kanidm
+    /// rejected the session (401). Used by /api/auth/profile.
+    async fn whoami_entry(
+        &self,
+        token: &str,
+    ) -> Result<Option<kanidm_proto::v1::Entry>, ClientError>;
 }
 
 /// Production implementation over kanidm_client.
@@ -75,6 +82,14 @@ impl KanidmAuthOps for KanidmClientAuthOps {
         let client = self.client_with_token(token).await?;
         client.logout().await
     }
+
+    async fn whoami_entry(
+        &self,
+        token: &str,
+    ) -> Result<Option<kanidm_proto::v1::Entry>, ClientError> {
+        let client = self.client_with_token(token).await?;
+        client.whoami().await
+    }
 }
 
 /// Build the startup client builder from the `[kanidm]` settings.
@@ -108,12 +123,24 @@ pub(crate) mod test_support {
         Unreachable,
     }
 
+    #[derive(Debug, Clone)]
+    pub(crate) enum MockWhoami {
+        /// Return this entry from whoami.
+        Entry(kanidm_proto::v1::Entry),
+        /// Kanidm said 401 -> Ok(None).
+        Unauthenticated,
+        /// Transport/server failure.
+        Unreachable,
+    }
+
     #[derive(Default)]
     pub(crate) struct MockAuthOps {
         pub login_token: Mutex<Option<String>>,
         pub reauth_token: Mutex<Option<String>>,
         pub login_outcome: Mutex<MockOutcome>,
         pub reauth_outcome: Mutex<MockOutcome>,
+        /// None = Unauthenticated (the default behavior).
+        pub whoami: Mutex<Option<MockWhoami>>,
     }
 
     #[async_trait]
@@ -154,6 +181,23 @@ pub(crate) mod test_support {
 
         async fn logout(&self, _token: &str) -> Result<(), ClientError> {
             Ok(())
+        }
+
+        async fn whoami_entry(
+            &self,
+            _token: &str,
+        ) -> Result<Option<kanidm_proto::v1::Entry>, ClientError> {
+            match self
+                .whoami
+                .lock()
+                .expect("whoami lock")
+                .clone()
+                .unwrap_or(MockWhoami::Unauthenticated)
+            {
+                MockWhoami::Entry(entry) => Ok(Some(entry)),
+                MockWhoami::Unauthenticated => Ok(None),
+                MockWhoami::Unreachable => Err(ClientError::SystemError),
+            }
         }
     }
 }
