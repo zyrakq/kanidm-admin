@@ -4,6 +4,7 @@ mod frontend_assets;
 mod kanidm_container;
 mod logging;
 mod preflight;
+mod proxy;
 mod routes;
 mod settings;
 mod status;

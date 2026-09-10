@@ -1,0 +1,6 @@
+// app/src/proxy/mod.rs
+//
+// Generic reverse proxy to Kanidm: allowlist, privilege precheck,
+// forwarding, error normalization. No per-endpoint handlers by design.
+
+pub mod allowlist;
