@@ -22,8 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
     let _frontend_handle = frontend::start(&settings.frontend, &manifest_dir)?;
-    let (kanidm_settings, _kanidm_handle) =
-        kanidm_container::start(&settings, &manifest_dir).await?;
+    let (kanidm_settings, _kanidm_handle) = kanidm_container::start(&settings).await?;
     let state = auth::app_state_from_settings(&kanidm_settings)?;
 
     let listener = TcpListener::bind(&settings.server.address).await?;
