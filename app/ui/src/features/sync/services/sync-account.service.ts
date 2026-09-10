@@ -7,7 +7,7 @@
 // ships without delete (deliberate), so this service intentionally has
 // no remove() either.
 
-import { apiFetch } from '@/shared/services/http-client';
+import { ApiError, apiFetch } from '@/shared/services/http-client';
 import { entryBody, type KanidmEntry } from '@/shared/types/kanidm';
 import type {
   SyncAccountDetail,
@@ -40,7 +40,13 @@ class SyncAccountService {
 
   /** Get one sync account by name or uuid (vendor idm_sync_account_get). */
   async get(id: string): Promise<SyncAccountDetail> {
-    const entry = await apiFetch<KanidmEntry>(`${BASE}/${encodeURIComponent(id)}`);
+    // Kanidm v1 returns HTTP 200 with body `null` for a missing entry.
+    const entry = await apiFetch<KanidmEntry | null>(
+      `${BASE}/${encodeURIComponent(id)}`
+    );
+    if (entry === null) {
+      throw new ApiError('not_found', 'Not found.', 404);
+    }
     return toSyncAccountDetail(entry);
   }
 

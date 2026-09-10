@@ -3,7 +3,7 @@
 // (libs/client/src/oauth.rs); writes are wrapped in withStepUp by the
 // calling components.
 
-import { apiFetch } from '@/shared/services/http-client';
+import { ApiError, apiFetch } from '@/shared/services/http-client';
 import { entryBody, type KanidmEntry } from '@/shared/types/kanidm';
 import type {
   Oauth2RsDetail,
@@ -44,7 +44,13 @@ class Oauth2Service {
 
   /** Get one resource server by name or uuid (vendor idm_oauth2_rs_get). */
   async get(id: string): Promise<Oauth2RsDetail> {
-    const entry = await apiFetch<KanidmEntry>(`${BASE}/${encodeURIComponent(id)}`);
+    // Kanidm v1 returns HTTP 200 with body `null` for a missing entry.
+    const entry = await apiFetch<KanidmEntry | null>(
+      `${BASE}/${encodeURIComponent(id)}`
+    );
+    if (entry === null) {
+      throw new ApiError('not_found', 'Not found.', 404);
+    }
     return toOauth2RsDetail(entry);
   }
 

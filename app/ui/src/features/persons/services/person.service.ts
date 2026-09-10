@@ -3,7 +3,7 @@
 // (libs/client/src/person.rs + lib.rs); writes are wrapped in
 // withStepUp by the calling components (D8).
 
-import { apiFetch } from '@/shared/services/http-client';
+import { ApiError, apiFetch } from '@/shared/services/http-client';
 import { entryBody, type KanidmEntry } from '@/shared/types/kanidm';
 import type {
   CredentialStatusView,
@@ -36,7 +36,13 @@ class PersonService {
 
   /** Get one person by name or uuid (vendor idm_person_account_get). */
   async get(id: string): Promise<PersonDetail> {
-    const entry = await apiFetch<KanidmEntry>(`${BASE}/person/${encodeURIComponent(id)}`);
+    // Kanidm v1 returns HTTP 200 with body `null` for a missing entry.
+    const entry = await apiFetch<KanidmEntry | null>(
+      `${BASE}/person/${encodeURIComponent(id)}`
+    );
+    if (entry === null) {
+      throw new ApiError('not_found', 'Not found.', 404);
+    }
     return toPersonDetail(entry);
   }
 
@@ -154,9 +160,10 @@ class PersonService {
    * required (v1 proto serialization: format!("{tag}: {pk}")).
    */
   async sshKeys(id: string): Promise<string[]> {
-    return apiFetch<string[]>(
+    // Empty attr returns HTTP 200 with body `null` (not []).
+    return (await apiFetch<string[] | null>(
       `${BASE}/person/${encodeURIComponent(id)}/_attr/ssh_publickey`
-    );
+    )) ?? [];
   }
 
   /** Add ssh key (vendor idm_person_account_post_ssh_pubkey: [tag, key]). */
