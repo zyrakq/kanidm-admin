@@ -81,9 +81,11 @@
 's05073d2537b45d1a': `Sync`,
 's5281e29da78ac637': `Recycle Bin`,
 'sbdeedc1c60306b35': `Messages`,
+'s5e8250fb85d64c23': `Close`,
+'s268ecd1cef45a9a8': `Are you sure?`,
+'s720c4d0f30ef914e': `Working...`,
 'sffa721bb6aa3128d': `Search...`,
 's49730f3d5751a433': `Loading...`,
 's17bb460c650d6608': `No entries found.`,
-'s5e8250fb85d64c23': `Close`,
     };
   

@@ -292,6 +292,12 @@
 <trans-unit id="s5e8250fb85d64c23">
   <source>Close</source>
 </trans-unit>
+<trans-unit id="s268ecd1cef45a9a8">
+  <source>Are you sure?</source>
+</trans-unit>
+<trans-unit id="s720c4d0f30ef914e">
+  <source>Working...</source>
+</trans-unit>
 </body>
 </file>
 </xliff>
