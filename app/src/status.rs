@@ -3,9 +3,9 @@
 // GET /api/status — Kanidm server version and reachability for the
 // footer. The backend is the only party allowed to talk to Kanidm (the
 // proxy architecture keeps TLS/CA config in [kanidm] settings), so this
-// module pings the server with a raw HTTP request, reads the KVERSION
-// response header (the same mechanism kanidm_client's expect_version
-// uses), compares it with the compile-time client version and returns a
+// module pings the server with a raw HTTP request, reads the
+// `X-KANIDM-VERSION` response header (the same mechanism kanidm_client's
+// expect_version uses), compares it with the compile-time client version and returns a
 // ready-to-render state. Always answers 200 JSON — the payload carries
 // the outcome, including `unreachable`.
 //
@@ -25,10 +25,10 @@ use crate::settings::kanidm::KanidmSettings;
 /// is unresponsive, so the footer never hangs on a dead server.
 const PING_TIMEOUT_SECS: u64 = 3;
 
-/// Header Kanidm sets on every response, carrying its server version
-/// (e.g. `1.11.1`). Header names are case-insensitive; reqwest stores
-/// them lowercase.
-const KVERSION_HEADER: &str = "kversion";
+/// `X-KANIDM-VERSION` header that Kanidm's version middleware sets on
+/// every response, carrying its server version (e.g. `1.11.1`). Header
+/// names are case-insensitive; reqwest stores them lowercase.
+const KVERSION_HEADER: &str = "x-kanidm-version";
 
 /// Fallback for the compile-time client version when build.rs could not
 /// extract it from Cargo.lock. Keep in sync with the kanidm_client
@@ -47,7 +47,7 @@ pub fn client_version() -> &'static str {
 // Version parsing and the conflict rule (pure functions, unit-tested)
 // ---------------------------------------------------------------------------
 
-/// Parsed `major.minor.patch` version — the KVERSION format.
+/// Parsed `major.minor.patch` version — the X-KANIDM-VERSION format.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Version {
     pub major: u64,
@@ -110,7 +110,7 @@ pub struct StatusResponse {
 pub struct ProbeOutcome {
     /// false = network error or timeout — no HTTP response at all.
     pub reachable: bool,
-    /// Parsed KVERSION header; None = header absent or malformed.
+    /// Parsed X-KANIDM-VERSION header; None = header absent or malformed.
     pub server_version: Option<Version>,
 }
 
@@ -215,7 +215,7 @@ fn compute_response(client_version: &str, outcome: ProbeOutcome) -> StatusRespon
     }
 
     let Some(server) = outcome.server_version else {
-        // Alive but version unknown (absent or malformed KVERSION):
+        // Alive but version unknown (absent or malformed X-KANIDM-VERSION):
         // no conflict check is possible.
         return StatusResponse {
             state: StatusState::Alive,
