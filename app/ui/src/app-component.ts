@@ -24,6 +24,11 @@ import '@/features/oauth2/components/oauth2-list-page';
 import '@/features/oauth2/components/oauth2-detail-page';
 import '@/features/domain/components/domain-page';
 import '@/features/system/components/system-page';
+import '@/features/applications/components/application-list-page';
+import '@/features/sync/components/sync-list-page';
+import '@/features/sync/components/sync-detail-page';
+import '@/features/recycle-bin/components/recycle-bin-page';
+import '@/features/messages/components/messages-page';
 
 @customElement('app-component')
 export class AppComponent extends LitElement {
@@ -113,6 +118,32 @@ export class AppComponent extends LitElement {
       path: '/admin/system',
       render: () => html`<system-page></system-page>`,
       enter: async () => this.guardSection('system'),
+    },
+    {
+      path: '/admin/applications',
+      render: () => html`<application-list-page></application-list-page>`,
+      enter: async () => this.guardSection('applications'),
+    },
+    {
+      path: '/admin/sync',
+      render: () => html`<sync-list-page></sync-list-page>`,
+      enter: async () => this.guardSection('sync'),
+    },
+    {
+      path: '/admin/sync/:id',
+      render: ({ id }) =>
+        html`<sync-detail-page .id=${id ?? ''}></sync-detail-page>`,
+      enter: async () => this.guardSection('sync'),
+    },
+    {
+      path: '/admin/recycle-bin',
+      render: () => html`<recycle-bin-page></recycle-bin-page>`,
+      enter: async () => this.guardSection('recycle-bin'),
+    },
+    {
+      path: '/admin/messages',
+      render: () => html`<messages-page></messages-page>`,
+      enter: async () => this.guardSection('messages'),
     },
     {
       path: '/admin/no-access',
