@@ -16,3 +16,8 @@ export {
   toServiceAccountSummary,
   toServiceAccountDetail,
 } from './types/service-account.types.ts';
+
+// Side-effect imports: registering the custom elements when the feature
+// is imported.
+import './components/service-account-list-page.ts';
+import './components/service-account-detail-page.ts';

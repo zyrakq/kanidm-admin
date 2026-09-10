@@ -18,6 +18,8 @@ import '@/features/persons/components/person-list-page';
 import '@/features/persons/components/person-detail-page';
 import '@/features/groups/components/group-list-page';
 import '@/features/groups/components/group-detail-page';
+import '@/features/service-accounts/components/service-account-list-page';
+import '@/features/service-accounts/components/service-account-detail-page';
 
 @customElement('app-component')
 export class AppComponent extends LitElement {
@@ -75,6 +77,17 @@ export class AppComponent extends LitElement {
       render: ({ id }) =>
         html`<group-detail-page .id=${id ?? ''}></group-detail-page>`,
       enter: async () => this.guardSection('groups'),
+    },
+    {
+      path: '/admin/service-accounts',
+      render: () => html`<service-account-list-page></service-account-list-page>`,
+      enter: async () => this.guardSection('service-accounts'),
+    },
+    {
+      path: '/admin/service-accounts/:id',
+      render: ({ id }) =>
+        html`<service-account-detail-page .id=${id ?? ''}></service-account-detail-page>`,
+      enter: async () => this.guardSection('service-accounts'),
     },
     {
       path: '/admin/no-access',
