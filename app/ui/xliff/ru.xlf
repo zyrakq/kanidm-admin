@@ -633,6 +633,258 @@
 <trans-unit id="s7a0e4cc6bfd9c40b">
   <source>Add Key</source>
 </trans-unit>
+<trans-unit id="s7c9c1dc02e7e906a">
+  <source>Auth session expiry (s)</source>
+</trans-unit>
+<trans-unit id="scbd7e2a1f89cc02f">
+  <source>Privilege expiry (s)</source>
+</trans-unit>
+<trans-unit id="s2743a95271562ea4">
+  <source>Minimum password length</source>
+</trans-unit>
+<trans-unit id="sf3ac3fa56911b610">
+  <source>Minimum credential type</source>
+</trans-unit>
+<trans-unit id="s28d46428e68b771a">
+  <source>Limit: search max results</source>
+</trans-unit>
+<trans-unit id="s9b94d8f0221cd862">
+  <source>Limit: search max filter test</source>
+</trans-unit>
+<trans-unit id="s458d835271649fab">
+  <source>Account policy enabled.</source>
+</trans-unit>
+<trans-unit id="s2e228660be00f5f3">
+  <source>Failed to enable account policy.</source>
+</trans-unit>
+<trans-unit id="s5338a4c8205ddb04">
+  <source>Account policy disabled.</source>
+</trans-unit>
+<trans-unit id="sc7f94dea2c5cedbe">
+  <source>Failed to disable account policy.</source>
+</trans-unit>
+<trans-unit id="s1da631cb3e71f385">
+  <source>Attestation CA list must be valid JSON.</source>
+</trans-unit>
+<trans-unit id="s227991d8366389ae">
+  <source>Policy attribute saved.</source>
+</trans-unit>
+<trans-unit id="s84a2fe92996681fa">
+  <source>Failed to save policy attribute.</source>
+</trans-unit>
+<trans-unit id="sfb89b0ebb2ca769f">
+  <source>Policy attribute removed.</source>
+</trans-unit>
+<trans-unit id="sfbaec89c26cdcf47">
+  <source>Failed to remove policy attribute.</source>
+</trans-unit>
+<trans-unit id="sb2174ddcc94ce779">
+  <source>true or false</source>
+</trans-unit>
+<trans-unit id="s9694b06d6c3c53cd">
+  <source>Leave empty to remove the attribute.</source>
+</trans-unit>
+<trans-unit id="s750fc773579e4804">
+  <source>Purge</source>
+</trans-unit>
+<trans-unit id="s9fc0a85580f440b0">
+  <source>Group not available.</source>
+</trans-unit>
+<trans-unit id="s2bb906f97ec08bb0">
+  <source>This group is not an account policy group.</source>
+</trans-unit>
+<trans-unit id="s9f36d993bc0506ae">
+  <source>Account policy</source>
+</trans-unit>
+<trans-unit id="s3c5d2cb2641e473c">
+  <source>Enabling turns this group into an account policy group: policy attributes applied to its members are managed here.</source>
+</trans-unit>
+<trans-unit id="s88eaeec32dbacbbd">
+  <source>Enabling...</source>
+</trans-unit>
+<trans-unit id="s2f7c8b4828b0d2f1">
+  <source>Enable account policy</source>
+</trans-unit>
+<trans-unit id="s6ed383bf7c66d150">
+  <source>Disable account policy...</source>
+</trans-unit>
+<trans-unit id="sf63b84ce5c29c8a1">
+  <source>Allow primary credential fallback</source>
+</trans-unit>
+<trans-unit id="s07a6bb2db1f2b5be">
+  <source>WebAuthn attestation CA list (JSON)</source>
+</trans-unit>
+<trans-unit id="s10c8e4cae4e11503">
+  <source>Disable</source>
+</trans-unit>
+<trans-unit id="s07e6c6b589b42a08">
+  <source>Disabling removes the account_policy class from this group. Policy attributes stop applying to its members. Continue?</source>
+</trans-unit>
+<trans-unit id="s879faca796406c8e">
+  <source>Account Policy</source>
+</trans-unit>
+<trans-unit id="sa901388a9f5d310c">
+  <source>Failed to load group</source>
+</trans-unit>
+<trans-unit id="s5c82363c1f9fa8a4">
+  <source>All groups</source>
+</trans-unit>
+<trans-unit id="se150817fa123ed8d">
+  <source>Group not found.</source>
+</trans-unit>
+<trans-unit id="s8a44928ccb5b1acd">
+  <source>Failed to load groups</source>
+</trans-unit>
+<trans-unit id="s6bc3dc685550852f">
+  <source>Name is required.</source>
+</trans-unit>
+<trans-unit id="sbceca9d5e93e9da2">
+  <source>Created group <ph id="0">${id}</ph></source>
+</trans-unit>
+<trans-unit id="s4ba5fefbcb97193c">
+  <source>Failed to create group</source>
+</trans-unit>
+<trans-unit id="sa0f63d04b4d36e87">
+  <source>Deleted group <ph id="0">${id}</ph></source>
+</trans-unit>
+<trans-unit id="s5eb07d8976d63fb7">
+  <source>Failed to delete group</source>
+</trans-unit>
+<trans-unit id="s09205907b5b56cda">
+  <source>No</source>
+</trans-unit>
+<trans-unit id="s7c5774fad9d050ce">
+  <source>Create group</source>
+</trans-unit>
+<trans-unit id="s618bc1300ebc3000">
+  <source>No groups found.</source>
+</trans-unit>
+<trans-unit id="sb5b7d3e2a43305d7">
+  <source>Development Team</source>
+</trans-unit>
+<trans-unit id="s96f9020c9ff73683">
+  <source>Delete group "<ph id="0">${this.deleteTarget.displayName ?? this.deleteTarget.id}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? The entry can be revived from the recycle bin.</source>
+</trans-unit>
+<trans-unit id="s4910b83d49dc4abb">
+  <source>Member removed.</source>
+</trans-unit>
+<trans-unit id="s58791d830f346d4b">
+  <source>Failed to remove member.</source>
+</trans-unit>
+<trans-unit id="s54c2815ea71656dd">
+  <source>Member added.</source>
+</trans-unit>
+<trans-unit id="s5a5b7d6c718ca112">
+  <source>Failed to add member.</source>
+</trans-unit>
+<trans-unit id="sdc11a0b5ff9bce73">
+  <source>Members updated.</source>
+</trans-unit>
+<trans-unit id="s6b5f0b71b558597c">
+  <source>Failed to set members.</source>
+</trans-unit>
+<trans-unit id="s9f5a5f23312798f0">
+  <source>Members</source>
+</trans-unit>
+<trans-unit id="s66d9e6d190e19dc0">
+  <source>This group has no members.</source>
+</trans-unit>
+<trans-unit id="s783b759229e4b018">
+  <source>Person or service account name</source>
+</trans-unit>
+<trans-unit id="s75ac7d15cf5d458e">
+  <source>Add member</source>
+</trans-unit>
+<trans-unit id="s8357e2cbcd5a2ad7">
+  <source>Advanced: replace all members</source>
+</trans-unit>
+<trans-unit id="s2d448b2b4fd4d83e">
+  <source>One member name per line. Saving replaces the entire member list.</source>
+</trans-unit>
+<trans-unit id="s01c66726924e520c">
+  <source>Set members</source>
+</trans-unit>
+<trans-unit id="s8ccbd5c57286c050">
+  <source>Failed to load POSIX details.</source>
+</trans-unit>
+<trans-unit id="s2729f5e85912ed22">
+  <source>This group is not POSIX-enabled.</source>
+</trans-unit>
+<trans-unit id="s9b6c4865d19795de">
+  <source>POSIX details</source>
+</trans-unit>
+<trans-unit id="s6de08134276519ac">
+  <source>Loading POSIX details...</source>
+</trans-unit>
+<trans-unit id="s97fc9f19fa5d5748">
+  <source>SPN</source>
+</trans-unit>
+<trans-unit id="s59d8123e24399879">
+  <source>Save GID number</source>
+</trans-unit>
+<trans-unit id="sc27956bf5639b218">
+  <source>Group settings saved.</source>
+</trans-unit>
+<trans-unit id="s76820bd326085570">
+  <source>Failed to save group settings.</source>
+</trans-unit>
+<trans-unit id="s6eb015dc7d475bf8">
+  <source>Group renamed.</source>
+</trans-unit>
+<trans-unit id="s241a49f85add0918">
+  <source>Failed to rename group.</source>
+</trans-unit>
+<trans-unit id="s9d8b8aa2b404c2c8">
+  <source>Settings</source>
+</trans-unit>
+<trans-unit id="s63d894b1ddb06289">
+  <source>Description</source>
+</trans-unit>
+<trans-unit id="s1b9762de936f65f3">
+  <source>Leave empty to remove the description.</source>
+</trans-unit>
+<trans-unit id="se42d96b2926414e0">
+  <source>Rename group</source>
+</trans-unit>
+<trans-unit id="sc2e8cc58ebd7f38d">
+  <source>Current name</source>
+</trans-unit>
+<trans-unit id="s1b38c2d6b9b9f248">
+  <source>New name</source>
+</trans-unit>
+<trans-unit id="s802cf69e05297d3f">
+  <source>Rename...</source>
+</trans-unit>
+<trans-unit id="s60320a18282b2b33">
+  <source>Rename</source>
+</trans-unit>
+<trans-unit id="s618f81534a095cc3">
+  <source>Renaming changes the group's name id. Memberships and references keep working, but the group will be reachable under the new name and the current URL becomes invalid. Continue?</source>
+</trans-unit>
+<trans-unit id="s3d197283cb019b5a">
+  <source>Overview</source>
+</trans-unit>
+<trans-unit id="sa817aa9f6f88a991">
+  <source>Credentials</source>
+</trans-unit>
+<trans-unit id="s5c18cae48b93138c">
+  <source>Sessions</source>
+</trans-unit>
+<trans-unit id="s5ab704ab2e2f1e6b">
+  <source>SSH keys</source>
+</trans-unit>
+<trans-unit id="s4cb5d98f4b3e12c8">
+  <source>POSIX</source>
+</trans-unit>
+<trans-unit id="s85df7d74afe62b60">
+  <source>Failed to load person</source>
+</trans-unit>
+<trans-unit id="s449dc36c90ae4afe">
+  <source>All persons</source>
+</trans-unit>
+<trans-unit id="sb852dd8f63a516d1">
+  <source>Person not found.</source>
+</trans-unit>
 </body>
 </file>
 </xliff>
