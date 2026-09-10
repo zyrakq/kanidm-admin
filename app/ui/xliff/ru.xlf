@@ -50,97 +50,9 @@
   <source>Close notification</source>
   <target>Закрыть уведомление</target>
 </trans-unit>
-<trans-unit id="sae506e1a821a6d4b">
-  <source>Failed to sign out. Please try again.</source>
-  <target>Не удалось выйти. Пожалуйста, попробуйте снова.</target>
-</trans-unit>
-<trans-unit id="s5285ab86397ccb7f">
-  <source>Operation completed successfully!</source>
-  <target>Операция успешно выполнена!</target>
-</trans-unit>
-<trans-unit id="s9c274ca3aae0227e">
-  <source>An error occurred during the operation</source>
-  <target>Произошла ошибка во время операции</target>
-</trans-unit>
-<trans-unit id="sc95aa17001f8e45c">
-  <source>This action requires your attention</source>
-  <target>Это действие требует вашего внимания</target>
-</trans-unit>
-<trans-unit id="s5187bdebb3f4a25e">
-  <source>New information is available</source>
-  <target>Доступна новая информация</target>
-</trans-unit>
-<trans-unit id="sd53dfb57070970e2">
-  <source>The operation has been completed successfully! All user data has been synchronized with the remote server, and the local cache has been updated accordingly. Please verify the changes in your dashboard.</source>
-  <target>Операция успешно выполнена! Все пользовательские данные были синхронизированы с удаленным сервером, и локальный кэш был обновлен. Пожалуйста, проверьте изменения на панели управления.</target>
-</trans-unit>
-<trans-unit id="sf3fda5790cfa46f6">
-  <source>Failed to connect to the authentication server. The connection was refused due to network timeout (error code: ETIMEDOUT). Please check your internet connection and try again. If the problem persists, contact your system administrator for assistance.</source>
-  <target>Не удалось подключиться к серверу аутентификации. Подключение было отклонено из-за таймаута сети (код ошибки: ETIMEDOUT). Пожалуйста, проверьте подключение к интернету и попробуйте снова. Если проблема не исчезнет, обратитесь к системному администратору.</target>
-</trans-unit>
-<trans-unit id="sb70a5cf1313da61a">
-  <source>System maintenance is scheduled for tonight between 2:00 AM and 4:00 AM UTC. During this time, the following services will be temporarily unavailable: user authentication, data synchronization, file uploads, and API access. We apologize for any inconvenience this may cause. All services are expected to be fully operational by 4:30 AM UTC. For emergency support during the maintenance window, please contact our 24/7 helpdesk at support@example.com or call +1-800-123-4567. Thank you for your patience and understanding.</source>
-  <target>Плановое техническое обслуживание запланировано на сегодня с 2:00 до 4:00 UTC. В это время будут недоступны: аутентификация пользователей, синхронизация данных, загрузка файлов и доступ к API. Приносим извинения за неудобства. Все сервисы будут полностью восстановлены к 4:30 UTC. Для экстренной поддержки обращайтесь на support@example.com или звоните +1-800-123-4567. Спасибо за понимание.</target>
-</trans-unit>
-<trans-unit id="s7fee95b66225e1fb">
-  <source>Dashboard</source>
-  <target>Панель управления</target>
-</trans-unit>
-<trans-unit id="s5eddcab87c38b6b6">
-  <source>Welcome to your protected area</source>
-  <target>Добро пожаловать в защищенную зону</target>
-</trans-unit>
-<trans-unit id="s551172bd09a2a438">
-  <source>User Information</source>
-  <target>Информация о пользователе</target>
-</trans-unit>
-<trans-unit id="s09240e07b5b8d640">
-  <source>ID</source>
-  <target>ID</target>
-</trans-unit>
-<trans-unit id="sd1f44f1a8bc20e67">
-  <source>Email</source>
-  <target>Email</target>
-</trans-unit>
 <trans-unit id="s03f42eea72154959">
   <source>Username</source>
   <target>Имя пользователя</target>
-</trans-unit>
-<trans-unit id="s11b2e9ecce28690c">
-  <source>Display Name</source>
-  <target>Отображаемое имя</target>
-</trans-unit>
-<trans-unit id="s54fa6ceb8030c6ae">
-  <source>Loading user information...</source>
-  <target>Загрузка информации о пользователе...</target>
-</trans-unit>
-<trans-unit id="s74693aa15a1926a9">
-  <source>Test Notifications</source>
-  <target>Тестовые уведомления</target>
-</trans-unit>
-<trans-unit id="s46e024afcbd27a75">
-  <source>Click buttons below to test different notification types</source>
-  <target>Нажмите кнопки ниже для проверки различных типов уведомлений</target>
-</trans-unit>
-<trans-unit id="se5da7e083aba2325">
-  <source>Test Long Notifications</source>
-  <target>Тестирование длинных уведомлений</target>
-</trans-unit>
-<trans-unit id="s05d67462a1797543">
-  <source>Click to test notifications with long messages (clickable to see full text)</source>
-  <target>Нажмите для проверки уведомлений с длинными сообщениями (нажмите для просмотра полного текста)</target>
-</trans-unit>
-<trans-unit id="s0e0f74677975e7fc">
-  <source>Long Success</source>
-  <target>Длинный успех</target>
-</trans-unit>
-<trans-unit id="se6a30dcfa276174d">
-  <source>Long Error</source>
-  <target>Длинная ошибка</target>
-</trans-unit>
-<trans-unit id="s33e0ec252844c273">
-  <source>Very Long Info</source>
-  <target>Очень длинная информация</target>
 </trans-unit>
 <trans-unit id="sea6ff86442041be6">
   <source>Signing out...</source>
@@ -339,6 +251,387 @@
 </trans-unit>
 <trans-unit id="se107fb127f0dddd8">
   <source>Admin sections</source>
+</trans-unit>
+<trans-unit id="sa9aea6d9b752c31b">
+  <source>Generated Password</source>
+</trans-unit>
+<trans-unit id="se5bd9ff649bb7e07">
+  <source>Passkey</source>
+</trans-unit>
+<trans-unit id="s12fd4d404fcd0a3d">
+  <source>Password (MFA)</source>
+</trans-unit>
+<trans-unit id="sa697db6a5a00072c">
+  <source>Failed to load credential status.</source>
+</trans-unit>
+<trans-unit id="see63721ca2c5bde9">
+  <source>Credential reset link created.</source>
+</trans-unit>
+<trans-unit id="s7e4304d66f419f85">
+  <source>Failed to create credential reset link.</source>
+</trans-unit>
+<trans-unit id="sf7cd44a482f8796b">
+  <source>Reset link copied to clipboard.</source>
+</trans-unit>
+<trans-unit id="s0792481a3b39a615">
+  <source>Failed to copy to clipboard.</source>
+</trans-unit>
+<trans-unit id="sb40728fb2a064595">
+  <source>Reset link sent to <ph id="0">${email}</ph>.</source>
+</trans-unit>
+<trans-unit id="s98c32b2bf2117718">
+  <source>Failed to send reset link.</source>
+</trans-unit>
+<trans-unit id="s2089aede509af1b9">
+  <source>Credential reset link</source>
+</trans-unit>
+<trans-unit id="s3687049d1af562c4">
+  <source>Copy</source>
+</trans-unit>
+<trans-unit id="scff8575341529db0">
+  <source>Email reset link</source>
+</trans-unit>
+<trans-unit id="s38887b94b3320533">
+  <source>Email address</source>
+</trans-unit>
+<trans-unit id="s57adf424d57c8a0f">
+  <source>Send</source>
+</trans-unit>
+<trans-unit id="s827ad52e6bf2e5e5">
+  <source>Loading credentials…</source>
+</trans-unit>
+<trans-unit id="s4daf3ee531da302b">
+  <source>Create credential reset link</source>
+</trans-unit>
+<trans-unit id="s4849fbb798045551">
+  <source>No credentials enrolled.</source>
+</trans-unit>
+<trans-unit id="s60ed4046e41b3149">
+  <source>Failed to load persons</source>
+</trans-unit>
+<trans-unit id="sb16740f612530c30">
+  <source>Both fields are required.</source>
+</trans-unit>
+<trans-unit id="sf138e672bd0df906">
+  <source>Created person <ph id="0">${this.createId.trim()}</ph></source>
+</trans-unit>
+<trans-unit id="scab9df9ebbc010b0">
+  <source>Failed to create person</source>
+</trans-unit>
+<trans-unit id="s62ddf5fc71b07cc5">
+  <source>Deleted person <ph id="0">${id}</ph></source>
+</trans-unit>
+<trans-unit id="s88e20d51e72fd6b1">
+  <source>Failed to delete person</source>
+</trans-unit>
+<trans-unit id="sef49aec68fd1dc66">
+  <source>Name</source>
+</trans-unit>
+<trans-unit id="se724e8e0ccb7f52c">
+  <source>Display name</source>
+</trans-unit>
+<trans-unit id="s49e765aed0087b0e">
+  <source>Mail</source>
+</trans-unit>
+<trans-unit id="sf02a455e4395e08a">
+  <source>Create person</source>
+</trans-unit>
+<trans-unit id="s3d7647e8b212553e">
+  <source>No persons found.</source>
+</trans-unit>
+<trans-unit id="sa62825389da8bbc1">
+  <source>Jane Doe</source>
+</trans-unit>
+<trans-unit id="s382a2aa3984474dd">
+  <source>Create</source>
+</trans-unit>
+<trans-unit id="s3d9193abf33999c5">
+  <source>Delete person "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? The entry can be revived from the recycle bin.</source>
+</trans-unit>
+<trans-unit id="sdc673e73b5c13aea">
+  <source>Delete</source>
+</trans-unit>
+<trans-unit id="s60ed7b46e41b958a">
+  <source>Failed to load person.</source>
+</trans-unit>
+<trans-unit id="s11298427716f01c3">
+  <source>Person updated.</source>
+</trans-unit>
+<trans-unit id="s8338f0ee9ee51d6b">
+  <source>Failed to update person.</source>
+</trans-unit>
+<trans-unit id="s992b17c4bb42c079">
+  <source>Account validity updated.</source>
+</trans-unit>
+<trans-unit id="sbbcf9e214b4e6479">
+  <source>Failed to update account validity.</source>
+</trans-unit>
+<trans-unit id="sa8c76aa4fe7f18bd">
+  <source>Added to group.</source>
+</trans-unit>
+<trans-unit id="sb472db07af14397a">
+  <source>Failed to add to group.</source>
+</trans-unit>
+<trans-unit id="sbe7b1fad778e8154">
+  <source>Removed from group.</source>
+</trans-unit>
+<trans-unit id="s46392747f3813acc">
+  <source>Failed to remove from group.</source>
+</trans-unit>
+<trans-unit id="sb061ff5a347a296e">
+  <source>Profile</source>
+</trans-unit>
+<trans-unit id="s8766ef916310c93d">
+  <source>Legal name</source>
+</trans-unit>
+<trans-unit id="se5940e81b806e057">
+  <source>Leave empty to remove the legal name.</source>
+</trans-unit>
+<trans-unit id="s6159f6d036f03e22">
+  <source>Mail addresses</source>
+</trans-unit>
+<trans-unit id="s4f4dc91a41a1b40c">
+  <source>Comma-separated list of mail addresses.</source>
+</trans-unit>
+<trans-unit id="s717d4a2cd3f7d66f">
+  <source>Saving...</source>
+</trans-unit>
+<trans-unit id="s33f85f24c0f5f008">
+  <source>Save</source>
+</trans-unit>
+<trans-unit id="s9554d121e1c4b056">
+  <source>Account validity</source>
+</trans-unit>
+<trans-unit id="seb9e5aea588c24df">
+  <source>Valid from</source>
+</trans-unit>
+<trans-unit id="se75bbde991943753">
+  <source>Empty value removes the restriction.</source>
+</trans-unit>
+<trans-unit id="sd924045605feea63">
+  <source>Expires</source>
+</trans-unit>
+<trans-unit id="s32dad2f57cf7a38a">
+  <source>Empty value removes the expiry.</source>
+</trans-unit>
+<trans-unit id="s18440df0416fc7f1">
+  <source>Applying...</source>
+</trans-unit>
+<trans-unit id="sb8f855b49234b81b">
+  <source>Apply</source>
+</trans-unit>
+<trans-unit id="s9b940d7ceb8a354c">
+  <source>Group membership</source>
+</trans-unit>
+<trans-unit id="s5095536ab117494f">
+  <source>Not a member of any group.</source>
+</trans-unit>
+<trans-unit id="s6210b400a0196334">
+  <source>Removing...</source>
+</trans-unit>
+<trans-unit id="sea4f08110bb8f15d">
+  <source>Remove</source>
+</trans-unit>
+<trans-unit id="se6732c14632bf27f">
+  <source>Group name or uuid</source>
+</trans-unit>
+<trans-unit id="s16a24e14fe11d2fa">
+  <source>Adding...</source>
+</trans-unit>
+<trans-unit id="sf9aee319a006c9b4">
+  <source>Add</source>
+</trans-unit>
+<trans-unit id="s405d19928789f37c">
+  <source>Person not available.</source>
+</trans-unit>
+<trans-unit id="scc171a7f1d4989dc">
+  <source>Failed to load POSIX status.</source>
+</trans-unit>
+<trans-unit id="sd09001727defd054">
+  <source>GID number must be a number.</source>
+</trans-unit>
+<trans-unit id="s0036a29aea71cb80">
+  <source>POSIX attributes saved.</source>
+</trans-unit>
+<trans-unit id="sbd97bf86c48d8c5c">
+  <source>Failed to save POSIX attributes.</source>
+</trans-unit>
+<trans-unit id="se0412f2bc8498876">
+  <source>Password must not be empty.</source>
+</trans-unit>
+<trans-unit id="sa4a09f04e4bb715d">
+  <source>POSIX password set.</source>
+</trans-unit>
+<trans-unit id="s923038cbdd905d3b">
+  <source>Failed to set POSIX password.</source>
+</trans-unit>
+<trans-unit id="s4239f421255a604c">
+  <source>GID number</source>
+</trans-unit>
+<trans-unit id="s84c0bc81c8e43dd2">
+  <source>Leave empty to let the server pick one.</source>
+</trans-unit>
+<trans-unit id="s0ce8eeaf9aa0c421">
+  <source>Shell</source>
+</trans-unit>
+<trans-unit id="s6cd42eea4fca492e">
+  <source>Leave empty to use the server default.</source>
+</trans-unit>
+<trans-unit id="s4f3fe8418a521c18">
+  <source>Save POSIX attributes</source>
+</trans-unit>
+<trans-unit id="s177625bf30d733d1">
+  <source>POSIX password</source>
+</trans-unit>
+<trans-unit id="sbfaec6b96f4d5757">
+  <source>Setting...</source>
+</trans-unit>
+<trans-unit id="sd435045e90a5d795">
+  <source>Set POSIX password</source>
+</trans-unit>
+<trans-unit id="s90cd519a1996c518">
+  <source>Loading POSIX status...</source>
+</trans-unit>
+<trans-unit id="s828d70f97d6c0d66">
+  <source>This account is not POSIX-enabled.</source>
+</trans-unit>
+<trans-unit id="saa0724be837e2ac9">
+  <source>Enable POSIX</source>
+</trans-unit>
+<trans-unit id="s597e2c449a2d9831">
+  <source>POSIX attributes</source>
+</trans-unit>
+<trans-unit id="sa0f681ef6ec189b2">
+  <source>UUID</source>
+</trans-unit>
+<trans-unit id="seaa7b319982a0b1b">
+  <source>GID</source>
+</trans-unit>
+<trans-unit id="sd26adca34bc33708">
+  <source>Failed to load the RADIUS secret.</source>
+</trans-unit>
+<trans-unit id="s5c0723a59f2372d3">
+  <source>RADIUS secret regenerated.</source>
+</trans-unit>
+<trans-unit id="s6c9bb8d6ae9f270e">
+  <source>Failed to regenerate the RADIUS secret.</source>
+</trans-unit>
+<trans-unit id="sf0ad716a3381f50a">
+  <source>RADIUS secret deleted.</source>
+</trans-unit>
+<trans-unit id="s3cdcdc0be7fc7489">
+  <source>Failed to delete the RADIUS secret.</source>
+</trans-unit>
+<trans-unit id="s6c98d1e4eff5c3a2">
+  <source>Copied to clipboard.</source>
+</trans-unit>
+<trans-unit id="s6ebc9bd6feae62a3">
+  <source>Loading…</source>
+</trans-unit>
+<trans-unit id="s0a9232b482fc0073">
+  <source>RADIUS</source>
+</trans-unit>
+<trans-unit id="sbf794d2acf4a54b0">
+  <source>No RADIUS secret is set for this account.</source>
+</trans-unit>
+<trans-unit id="s464a77b633bc9c0e">
+  <source>Generate secret</source>
+</trans-unit>
+<trans-unit id="s22cf60bdc16dbea4">
+  <source>New secret generated — copy it now, it will not be shown again.</source>
+</trans-unit>
+<trans-unit id="s9df212d89cab196d">
+  <source>Hide</source>
+</trans-unit>
+<trans-unit id="sd8c644529b574f90">
+  <source>Reveal</source>
+</trans-unit>
+<trans-unit id="s96c39cd5871006c9">
+  <source>Regenerate secret</source>
+</trans-unit>
+<trans-unit id="s74c2ab866a1002b6">
+  <source>Delete secret</source>
+</trans-unit>
+<trans-unit id="s0379fc73608ab971">
+  <source>Done</source>
+</trans-unit>
+<trans-unit id="s256632a5ade1c666">
+  <source>Failed to load sessions.</source>
+</trans-unit>
+<trans-unit id="sb39a4568efeeee71">
+  <source>Session revoked.</source>
+</trans-unit>
+<trans-unit id="s313a62cbdc561b95">
+  <source>Failed to revoke session.</source>
+</trans-unit>
+<trans-unit id="sfa9d8c928d994bf5">
+  <source>Revoked</source>
+</trans-unit>
+<trans-unit id="s7266c575062a3595">
+  <source>Never expires</source>
+</trans-unit>
+<trans-unit id="s250a7fc28124c361">
+  <source>Read only</source>
+</trans-unit>
+<trans-unit id="s4a4deea7188bad47">
+  <source>Read-write</source>
+</trans-unit>
+<trans-unit id="s5fc87fa4f0c1402c">
+  <source>Privilege capable</source>
+</trans-unit>
+<trans-unit id="s5590dbf7e425789d">
+  <source>Label</source>
+</trans-unit>
+<trans-unit id="sb7a2fcbc1dcf546c">
+  <source>Issued</source>
+</trans-unit>
+<trans-unit id="sf679b7a62808287e">
+  <source>Expiry</source>
+</trans-unit>
+<trans-unit id="s6d9e89e9aa685f21">
+  <source>Purpose</source>
+</trans-unit>
+<trans-unit id="s12934aa92776f6ca">
+  <source>Revoking...</source>
+</trans-unit>
+<trans-unit id="s0e871352ba4b17d3">
+  <source>Revoke</source>
+</trans-unit>
+<trans-unit id="s00c3709a3e1f88a1">
+  <source>No active sessions.</source>
+</trans-unit>
+<trans-unit id="s641dac2759a207bf">
+  <source>Failed to load SSH keys.</source>
+</trans-unit>
+<trans-unit id="s4080ca9dbd2fe844">
+  <source>Please provide both a tag and a public key.</source>
+</trans-unit>
+<trans-unit id="sf8f11cad8d6ea08e">
+  <source>SSH key added.</source>
+</trans-unit>
+<trans-unit id="sd6c2fcb6a019fbb7">
+  <source>Failed to add SSH key.</source>
+</trans-unit>
+<trans-unit id="s64e073ca7be76acc">
+  <source>SSH key removed.</source>
+</trans-unit>
+<trans-unit id="sc058d1cfdba45330">
+  <source>Failed to remove SSH key.</source>
+</trans-unit>
+<trans-unit id="s5d71cfffbb940396">
+  <source>SSH Public Keys</source>
+</trans-unit>
+<trans-unit id="s21c0d4a3f251b0ea">
+  <source>No SSH keys registered.</source>
+</trans-unit>
+<trans-unit id="s6ce0cb19e201b153">
+  <source>Tag</source>
+</trans-unit>
+<trans-unit id="se711d966fb247dff">
+  <source>Public key</source>
+</trans-unit>
+<trans-unit id="s7a0e4cc6bfd9c40b">
+  <source>Add Key</source>
 </trans-unit>
 </body>
 </file>
