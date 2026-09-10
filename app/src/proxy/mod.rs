@@ -7,3 +7,6 @@ pub mod allowlist;
 pub mod error_map;
 pub mod forwarder;
 pub mod handler;
+
+#[cfg(test)]
+mod integration;

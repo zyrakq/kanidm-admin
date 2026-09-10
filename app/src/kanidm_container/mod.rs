@@ -81,7 +81,7 @@ pub async fn start(
 /// Run the dev containers and derive the effective settings.
 /// Separate from `start` so the Docker-gated test can run it without
 /// a full Settings layer.
-async fn start_container(
+pub(crate) async fn start_container(
     settings: &KanidmContainerSettings,
 ) -> Result<(KanidmSettings, KanidmHandle), Box<dyn std::error::Error + Send + Sync>> {
     let server = image::run_server(settings.effective_image()).await?;
