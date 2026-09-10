@@ -298,6 +298,48 @@
 <trans-unit id="s720c4d0f30ef914e">
   <source>Working...</source>
 </trans-unit>
+<trans-unit id="saac6cc64d5c17b4f">
+  <source>Administration</source>
+</trans-unit>
+<trans-unit id="s62278f512692e037">
+  <source>Session</source>
+</trans-unit>
+<trans-unit id="s7deb0227a2773d97">
+  <source>Elevated access active</source>
+</trans-unit>
+<trans-unit id="s30677b9ca385caa5">
+  <source>Elevated access requires re-authentication</source>
+</trans-unit>
+<trans-unit id="s5afcaa918bbb91b2">
+  <source>Server</source>
+</trans-unit>
+<trans-unit id="s3e209ff4e5dcb02a">
+  <source>Kanidm is reachable</source>
+</trans-unit>
+<trans-unit id="s0e5ab642d4f56e0f">
+  <source>Kanidm is unreachable</source>
+</trans-unit>
+<trans-unit id="sdf235fd3192cb646">
+  <source>Checking server...</source>
+</trans-unit>
+<trans-unit id="s230cbc604f770eff">
+  <source>Quick stats</source>
+</trans-unit>
+<trans-unit id="s0337d90cf703df0d">
+  <source>Sections</source>
+</trans-unit>
+<trans-unit id="sd63c34d820d6fbf1">
+  <source>No admin sections available for your account.</source>
+</trans-unit>
+<trans-unit id="s955c3926930eb505">
+  <source>No admin access</source>
+</trans-unit>
+<trans-unit id="sf9afc810f52c20d1">
+  <source>Your account is not a member of any administration group. Ask your Kanidm administrator for access.</source>
+</trans-unit>
+<trans-unit id="se107fb127f0dddd8">
+  <source>Admin sections</source>
+</trans-unit>
 </body>
 </file>
 </xliff>
