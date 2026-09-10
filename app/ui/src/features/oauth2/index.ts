@@ -6,3 +6,8 @@ export type {
   ScopeMap,
   ClaimMap,
 } from './types/oauth2.types.ts';
+
+// Side-effect imports: registering the custom elements when the feature
+// is imported.
+import './components/oauth2-list-page.ts';
+import './components/oauth2-detail-page.ts';

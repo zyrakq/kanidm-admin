@@ -20,6 +20,8 @@ import '@/features/groups/components/group-list-page';
 import '@/features/groups/components/group-detail-page';
 import '@/features/service-accounts/components/service-account-list-page';
 import '@/features/service-accounts/components/service-account-detail-page';
+import '@/features/oauth2/components/oauth2-list-page';
+import '@/features/oauth2/components/oauth2-detail-page';
 
 @customElement('app-component')
 export class AppComponent extends LitElement {
@@ -88,6 +90,17 @@ export class AppComponent extends LitElement {
       render: ({ id }) =>
         html`<service-account-detail-page .id=${id ?? ''}></service-account-detail-page>`,
       enter: async () => this.guardSection('service-accounts'),
+    },
+    {
+      path: '/admin/oauth2',
+      render: () => html`<oauth2-list-page></oauth2-list-page>`,
+      enter: async () => this.guardSection('oauth2'),
+    },
+    {
+      path: '/admin/oauth2/:id',
+      render: ({ id }) =>
+        html`<oauth2-detail-page .id=${id ?? ''}></oauth2-detail-page>`,
+      enter: async () => this.guardSection('oauth2'),
     },
     {
       path: '/admin/no-access',
