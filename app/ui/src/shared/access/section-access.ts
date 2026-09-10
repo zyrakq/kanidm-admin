@@ -76,7 +76,7 @@ export const SECTIONS: SectionDef[] = [
     href: '/admin/system',
     icon: 'settings',
     label: () => msg('System'),
-    requiredGroups: ['domain_admins'],
+    requiredGroups: ['idm_account_policy_admins'],
   },
   {
     id: 'sync',
