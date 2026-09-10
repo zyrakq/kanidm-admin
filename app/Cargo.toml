@@ -19,6 +19,7 @@ mime_guess = { workspace = true }
 async-trait = { workspace = true }
 base64 = { workspace = true }
 kanidm_client = { workspace = true }
+reqwest = { workspace = true }
 kanidm_proto = { workspace = true }
 time = { workspace = true }
 testcontainers = { path = "../vendor/testcontainers-rs/testcontainers", features = ["watchdog"] }

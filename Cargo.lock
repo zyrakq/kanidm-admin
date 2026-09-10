@@ -4626,6 +4626,7 @@ dependencies = [
  "kanidm_proto",
  "mime_guess",
  "pretty_env_logger",
+ "reqwest",
  "rust-embed",
  "serde",
  "serde_json",

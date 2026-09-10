@@ -22,6 +22,7 @@ rust-embed = { version = "8.4", default-features = false, features = [
 mime_guess = "2"
 async-trait = "0.1"
 base64 = "0.22"
+reqwest = { version = "0.13", default-features = false, features = ["rustls"] }
 kanidm_client = "1.11.1"
 kanidm_proto = "1.11.1"
 time = { version = "0.3", features = ["serde"] }
