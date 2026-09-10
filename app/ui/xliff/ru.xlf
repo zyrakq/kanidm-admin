@@ -164,1770 +164,2359 @@
 </trans-unit>
 <trans-unit id="s91b085374c46aa29">
   <source>Persons</source>
+  <target>Персоны</target>
 </trans-unit>
 <trans-unit id="s9f26843287bb592d">
   <source>Groups</source>
+  <target>Группы</target>
 </trans-unit>
 <trans-unit id="s807682aafab5ce30">
   <source>Service Accounts</source>
+  <target>Сервисные аккаунты</target>
 </trans-unit>
 <trans-unit id="sfd7dcbb9413c5e12">
   <source>OAuth2</source>
+  <target>OAuth2</target>
 </trans-unit>
 <trans-unit id="s6ba50bb0842ba1e2">
   <source>Applications</source>
+  <target>Приложения</target>
 </trans-unit>
 <trans-unit id="s41706a202b6c40f1">
   <source>Domain</source>
+  <target>Домен</target>
 </trans-unit>
 <trans-unit id="sa81e2cdaf6921adc">
   <source>System</source>
+  <target>Система</target>
 </trans-unit>
 <trans-unit id="s05073d2537b45d1a">
   <source>Sync</source>
+  <target>Синхронизация</target>
 </trans-unit>
 <trans-unit id="s5281e29da78ac637">
   <source>Recycle Bin</source>
+  <target>Корзина</target>
 </trans-unit>
 <trans-unit id="sbdeedc1c60306b35">
   <source>Messages</source>
+  <target>Сообщения</target>
 </trans-unit>
 <trans-unit id="sffa721bb6aa3128d">
   <source>Search...</source>
+  <target>Поиск...</target>
 </trans-unit>
 <trans-unit id="s49730f3d5751a433">
   <source>Loading...</source>
+  <target>Загрузка...</target>
 </trans-unit>
 <trans-unit id="s17bb460c650d6608">
   <source>No entries found.</source>
+  <target>Записи не найдены.</target>
 </trans-unit>
 <trans-unit id="s5e8250fb85d64c23">
   <source>Close</source>
+  <target>Закрыть</target>
 </trans-unit>
 <trans-unit id="s268ecd1cef45a9a8">
   <source>Are you sure?</source>
+  <target>Вы уверены?</target>
 </trans-unit>
 <trans-unit id="s720c4d0f30ef914e">
   <source>Working...</source>
+  <target>Выполняется...</target>
 </trans-unit>
 <trans-unit id="saac6cc64d5c17b4f">
   <source>Administration</source>
+  <target>Администрирование</target>
 </trans-unit>
 <trans-unit id="s62278f512692e037">
   <source>Session</source>
+  <target>Сессия</target>
 </trans-unit>
 <trans-unit id="s7deb0227a2773d97">
   <source>Elevated access active</source>
+  <target>Повышенные права активны</target>
 </trans-unit>
 <trans-unit id="s30677b9ca385caa5">
   <source>Elevated access requires re-authentication</source>
+  <target>Повышенные права требуют повторной аутентификации</target>
 </trans-unit>
 <trans-unit id="s5afcaa918bbb91b2">
   <source>Server</source>
+  <target>Сервер</target>
 </trans-unit>
 <trans-unit id="s3e209ff4e5dcb02a">
   <source>Kanidm is reachable</source>
+  <target>Kanidm доступен</target>
 </trans-unit>
 <trans-unit id="s0e5ab642d4f56e0f">
   <source>Kanidm is unreachable</source>
+  <target>Kanidm недоступен</target>
 </trans-unit>
 <trans-unit id="sdf235fd3192cb646">
   <source>Checking server...</source>
+  <target>Проверка сервера...</target>
 </trans-unit>
 <trans-unit id="s230cbc604f770eff">
   <source>Quick stats</source>
+  <target>Быстрая статистика</target>
 </trans-unit>
 <trans-unit id="s0337d90cf703df0d">
   <source>Sections</source>
+  <target>Разделы</target>
 </trans-unit>
 <trans-unit id="sd63c34d820d6fbf1">
   <source>No admin sections available for your account.</source>
+  <target>Для вашей учётной записи нет доступных разделов администрирования.</target>
 </trans-unit>
 <trans-unit id="s955c3926930eb505">
   <source>No admin access</source>
+  <target>Нет доступа администратора</target>
 </trans-unit>
 <trans-unit id="sf9afc810f52c20d1">
   <source>Your account is not a member of any administration group. Ask your Kanidm administrator for access.</source>
+  <target>Ваша учётная запись не состоит ни в одной группе администрирования. Обратитесь к администратору Kanidm за доступом.</target>
 </trans-unit>
 <trans-unit id="se107fb127f0dddd8">
   <source>Admin sections</source>
+  <target>Разделы администрирования</target>
 </trans-unit>
 <trans-unit id="sa9aea6d9b752c31b">
   <source>Generated Password</source>
+  <target>Сгенерированный пароль</target>
 </trans-unit>
 <trans-unit id="se5bd9ff649bb7e07">
   <source>Passkey</source>
+  <target>Passkey</target>
 </trans-unit>
 <trans-unit id="s12fd4d404fcd0a3d">
   <source>Password (MFA)</source>
+  <target>Пароль (MFA)</target>
 </trans-unit>
 <trans-unit id="sa697db6a5a00072c">
   <source>Failed to load credential status.</source>
+  <target>Не удалось загрузить статус учётных данных.</target>
 </trans-unit>
 <trans-unit id="see63721ca2c5bde9">
   <source>Credential reset link created.</source>
+  <target>Ссылка для сброса учётных данных создана.</target>
 </trans-unit>
 <trans-unit id="s7e4304d66f419f85">
   <source>Failed to create credential reset link.</source>
+  <target>Не удалось создать ссылку для сброса учётных данных.</target>
 </trans-unit>
 <trans-unit id="sf7cd44a482f8796b">
   <source>Reset link copied to clipboard.</source>
+  <target>Ссылка для сброса скопирована в буфер обмена.</target>
 </trans-unit>
 <trans-unit id="s0792481a3b39a615">
   <source>Failed to copy to clipboard.</source>
+  <target>Не удалось скопировать в буфер обмена.</target>
 </trans-unit>
 <trans-unit id="sb40728fb2a064595">
   <source>Reset link sent to <ph id="0">${email}</ph>.</source>
+  <target>Ссылка для сброса отправлена на <ph id="0">${email}</ph>.</target>
 </trans-unit>
 <trans-unit id="s98c32b2bf2117718">
   <source>Failed to send reset link.</source>
+  <target>Не удалось отправить ссылку для сброса.</target>
 </trans-unit>
 <trans-unit id="s2089aede509af1b9">
   <source>Credential reset link</source>
+  <target>Ссылка для сброса учётных данных</target>
 </trans-unit>
 <trans-unit id="s3687049d1af562c4">
   <source>Copy</source>
+  <target>Копировать</target>
 </trans-unit>
 <trans-unit id="scff8575341529db0">
   <source>Email reset link</source>
+  <target>Отправить ссылку по email</target>
 </trans-unit>
 <trans-unit id="s38887b94b3320533">
   <source>Email address</source>
+  <target>Email-адрес</target>
 </trans-unit>
 <trans-unit id="s57adf424d57c8a0f">
   <source>Send</source>
+  <target>Отправить</target>
 </trans-unit>
 <trans-unit id="s827ad52e6bf2e5e5">
   <source>Loading credentials…</source>
+  <target>Загрузка учётных данных…</target>
 </trans-unit>
 <trans-unit id="s4daf3ee531da302b">
   <source>Create credential reset link</source>
+  <target>Создать ссылку для сброса учётных данных</target>
 </trans-unit>
 <trans-unit id="s4849fbb798045551">
   <source>No credentials enrolled.</source>
+  <target>Учётные данные не зарегистрированы.</target>
 </trans-unit>
 <trans-unit id="s60ed4046e41b3149">
   <source>Failed to load persons</source>
+  <target>Не удалось загрузить персон</target>
 </trans-unit>
 <trans-unit id="sb16740f612530c30">
   <source>Both fields are required.</source>
+  <target>Оба поля обязательны.</target>
 </trans-unit>
 <trans-unit id="sf138e672bd0df906">
   <source>Created person <ph id="0">${this.createId.trim()}</ph></source>
+  <target>Создана персона <ph id="0">${this.createId.trim()}</ph></target>
 </trans-unit>
 <trans-unit id="scab9df9ebbc010b0">
   <source>Failed to create person</source>
+  <target>Не удалось создать персону</target>
 </trans-unit>
 <trans-unit id="s62ddf5fc71b07cc5">
   <source>Deleted person <ph id="0">${id}</ph></source>
+  <target>Персона <ph id="0">${id}</ph> удалена</target>
 </trans-unit>
 <trans-unit id="s88e20d51e72fd6b1">
   <source>Failed to delete person</source>
+  <target>Не удалось удалить персону</target>
 </trans-unit>
 <trans-unit id="sef49aec68fd1dc66">
   <source>Name</source>
+  <target>Имя</target>
 </trans-unit>
 <trans-unit id="se724e8e0ccb7f52c">
   <source>Display name</source>
+  <target>Отображаемое имя</target>
 </trans-unit>
 <trans-unit id="s49e765aed0087b0e">
   <source>Mail</source>
+  <target>Email</target>
 </trans-unit>
 <trans-unit id="sf02a455e4395e08a">
   <source>Create person</source>
+  <target>Создать персону</target>
 </trans-unit>
 <trans-unit id="s3d7647e8b212553e">
   <source>No persons found.</source>
+  <target>Персоны не найдены.</target>
 </trans-unit>
 <trans-unit id="sa62825389da8bbc1">
   <source>Jane Doe</source>
+  <target>Jane Doe</target>
 </trans-unit>
 <trans-unit id="s382a2aa3984474dd">
   <source>Create</source>
+  <target>Создать</target>
 </trans-unit>
 <trans-unit id="s3d9193abf33999c5">
   <source>Delete person "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? The entry can be revived from the recycle bin.</source>
+  <target>Удалить персону "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? Запись можно восстановить из корзины.</target>
 </trans-unit>
 <trans-unit id="sdc673e73b5c13aea">
   <source>Delete</source>
+  <target>Удалить</target>
 </trans-unit>
 <trans-unit id="s60ed7b46e41b958a">
   <source>Failed to load person.</source>
+  <target>Не удалось загрузить персону.</target>
 </trans-unit>
 <trans-unit id="s11298427716f01c3">
   <source>Person updated.</source>
+  <target>Персона обновлена.</target>
 </trans-unit>
 <trans-unit id="s8338f0ee9ee51d6b">
   <source>Failed to update person.</source>
+  <target>Не удалось обновить персону.</target>
 </trans-unit>
 <trans-unit id="s992b17c4bb42c079">
   <source>Account validity updated.</source>
+  <target>Срок действия аккаунта обновлён.</target>
 </trans-unit>
 <trans-unit id="sbbcf9e214b4e6479">
   <source>Failed to update account validity.</source>
+  <target>Не удалось обновить срок действия аккаунта.</target>
 </trans-unit>
 <trans-unit id="sa8c76aa4fe7f18bd">
   <source>Added to group.</source>
+  <target>Добавлен в группу.</target>
 </trans-unit>
 <trans-unit id="sb472db07af14397a">
   <source>Failed to add to group.</source>
+  <target>Не удалось добавить в группу.</target>
 </trans-unit>
 <trans-unit id="sbe7b1fad778e8154">
   <source>Removed from group.</source>
+  <target>Удалён из группы.</target>
 </trans-unit>
 <trans-unit id="s46392747f3813acc">
   <source>Failed to remove from group.</source>
+  <target>Не удалось удалить из группы.</target>
 </trans-unit>
 <trans-unit id="sb061ff5a347a296e">
   <source>Profile</source>
+  <target>Профиль</target>
 </trans-unit>
 <trans-unit id="s8766ef916310c93d">
   <source>Legal name</source>
+  <target>Юридическое имя</target>
 </trans-unit>
 <trans-unit id="se5940e81b806e057">
   <source>Leave empty to remove the legal name.</source>
+  <target>Оставьте пустым, чтобы удалить юридическое имя.</target>
 </trans-unit>
 <trans-unit id="s6159f6d036f03e22">
   <source>Mail addresses</source>
+  <target>Email-адреса</target>
 </trans-unit>
 <trans-unit id="s4f4dc91a41a1b40c">
   <source>Comma-separated list of mail addresses.</source>
+  <target>Список email-адресов через запятую.</target>
 </trans-unit>
 <trans-unit id="s717d4a2cd3f7d66f">
   <source>Saving...</source>
+  <target>Сохранение...</target>
 </trans-unit>
 <trans-unit id="s33f85f24c0f5f008">
   <source>Save</source>
+  <target>Сохранить</target>
 </trans-unit>
 <trans-unit id="s9554d121e1c4b056">
   <source>Account validity</source>
+  <target>Срок действия аккаунта</target>
 </trans-unit>
 <trans-unit id="seb9e5aea588c24df">
   <source>Valid from</source>
+  <target>Действителен с</target>
 </trans-unit>
 <trans-unit id="se75bbde991943753">
   <source>Empty value removes the restriction.</source>
+  <target>Пустое значение снимает ограничение.</target>
 </trans-unit>
 <trans-unit id="sd924045605feea63">
   <source>Expires</source>
+  <target>Истекает</target>
 </trans-unit>
 <trans-unit id="s32dad2f57cf7a38a">
   <source>Empty value removes the expiry.</source>
+  <target>Пустое значение снимает срок действия.</target>
 </trans-unit>
 <trans-unit id="s18440df0416fc7f1">
   <source>Applying...</source>
+  <target>Применение...</target>
 </trans-unit>
 <trans-unit id="sb8f855b49234b81b">
   <source>Apply</source>
+  <target>Применить</target>
 </trans-unit>
 <trans-unit id="s9b940d7ceb8a354c">
   <source>Group membership</source>
+  <target>Членство в группах</target>
 </trans-unit>
 <trans-unit id="s5095536ab117494f">
   <source>Not a member of any group.</source>
+  <target>Не состоит ни в одной группе.</target>
 </trans-unit>
 <trans-unit id="s6210b400a0196334">
   <source>Removing...</source>
+  <target>Удаление...</target>
 </trans-unit>
 <trans-unit id="sea4f08110bb8f15d">
   <source>Remove</source>
+  <target>Удалить</target>
 </trans-unit>
 <trans-unit id="se6732c14632bf27f">
   <source>Group name or uuid</source>
+  <target>Имя группы или uuid</target>
 </trans-unit>
 <trans-unit id="s16a24e14fe11d2fa">
   <source>Adding...</source>
+  <target>Добавление...</target>
 </trans-unit>
 <trans-unit id="sf9aee319a006c9b4">
   <source>Add</source>
+  <target>Добавить</target>
 </trans-unit>
 <trans-unit id="s405d19928789f37c">
   <source>Person not available.</source>
+  <target>Персона недоступна.</target>
 </trans-unit>
 <trans-unit id="scc171a7f1d4989dc">
   <source>Failed to load POSIX status.</source>
+  <target>Не удалось загрузить статус POSIX.</target>
 </trans-unit>
 <trans-unit id="sd09001727defd054">
   <source>GID number must be a number.</source>
+  <target>Номер GID должен быть числом.</target>
 </trans-unit>
 <trans-unit id="s0036a29aea71cb80">
   <source>POSIX attributes saved.</source>
+  <target>Атрибуты POSIX сохранены.</target>
 </trans-unit>
 <trans-unit id="sbd97bf86c48d8c5c">
   <source>Failed to save POSIX attributes.</source>
+  <target>Не удалось сохранить атрибуты POSIX.</target>
 </trans-unit>
 <trans-unit id="se0412f2bc8498876">
   <source>Password must not be empty.</source>
+  <target>Пароль не должен быть пустым.</target>
 </trans-unit>
 <trans-unit id="sa4a09f04e4bb715d">
   <source>POSIX password set.</source>
+  <target>Пароль POSIX установлен.</target>
 </trans-unit>
 <trans-unit id="s923038cbdd905d3b">
   <source>Failed to set POSIX password.</source>
+  <target>Не удалось установить пароль POSIX.</target>
 </trans-unit>
 <trans-unit id="s4239f421255a604c">
   <source>GID number</source>
+  <target>Номер GID</target>
 </trans-unit>
 <trans-unit id="s84c0bc81c8e43dd2">
   <source>Leave empty to let the server pick one.</source>
+  <target>Оставьте пустым, чтобы сервер выбрал сам.</target>
 </trans-unit>
 <trans-unit id="s0ce8eeaf9aa0c421">
   <source>Shell</source>
+  <target>Оболочка</target>
 </trans-unit>
 <trans-unit id="s6cd42eea4fca492e">
   <source>Leave empty to use the server default.</source>
+  <target>Оставьте пустым, чтобы использовать значение сервера по умолчанию.</target>
 </trans-unit>
 <trans-unit id="s4f3fe8418a521c18">
   <source>Save POSIX attributes</source>
+  <target>Сохранить атрибуты POSIX</target>
 </trans-unit>
 <trans-unit id="s177625bf30d733d1">
   <source>POSIX password</source>
+  <target>Пароль POSIX</target>
 </trans-unit>
 <trans-unit id="sbfaec6b96f4d5757">
   <source>Setting...</source>
+  <target>Установка...</target>
 </trans-unit>
 <trans-unit id="sd435045e90a5d795">
   <source>Set POSIX password</source>
+  <target>Установить пароль POSIX</target>
 </trans-unit>
 <trans-unit id="s90cd519a1996c518">
   <source>Loading POSIX status...</source>
+  <target>Загрузка статуса POSIX...</target>
 </trans-unit>
 <trans-unit id="s828d70f97d6c0d66">
   <source>This account is not POSIX-enabled.</source>
+  <target>Этот аккаунт не поддерживает POSIX.</target>
 </trans-unit>
 <trans-unit id="saa0724be837e2ac9">
   <source>Enable POSIX</source>
+  <target>Включить POSIX</target>
 </trans-unit>
 <trans-unit id="s597e2c449a2d9831">
   <source>POSIX attributes</source>
+  <target>Атрибуты POSIX</target>
 </trans-unit>
 <trans-unit id="sa0f681ef6ec189b2">
   <source>UUID</source>
+  <target>UUID</target>
 </trans-unit>
 <trans-unit id="seaa7b319982a0b1b">
   <source>GID</source>
+  <target>GID</target>
 </trans-unit>
 <trans-unit id="sd26adca34bc33708">
   <source>Failed to load the RADIUS secret.</source>
+  <target>Не удалось загрузить секрет RADIUS.</target>
 </trans-unit>
 <trans-unit id="s5c0723a59f2372d3">
   <source>RADIUS secret regenerated.</source>
+  <target>Секрет RADIUS перегенерирован.</target>
 </trans-unit>
 <trans-unit id="s6c9bb8d6ae9f270e">
   <source>Failed to regenerate the RADIUS secret.</source>
+  <target>Не удалось перегенерировать секрет RADIUS.</target>
 </trans-unit>
 <trans-unit id="sf0ad716a3381f50a">
   <source>RADIUS secret deleted.</source>
+  <target>Секрет RADIUS удалён.</target>
 </trans-unit>
 <trans-unit id="s3cdcdc0be7fc7489">
   <source>Failed to delete the RADIUS secret.</source>
+  <target>Не удалось удалить секрет RADIUS.</target>
 </trans-unit>
 <trans-unit id="s6c98d1e4eff5c3a2">
   <source>Copied to clipboard.</source>
+  <target>Скопировано в буфер обмена.</target>
 </trans-unit>
 <trans-unit id="s6ebc9bd6feae62a3">
   <source>Loading…</source>
+  <target>Загрузка…</target>
 </trans-unit>
 <trans-unit id="s0a9232b482fc0073">
   <source>RADIUS</source>
+  <target>RADIUS</target>
 </trans-unit>
 <trans-unit id="sbf794d2acf4a54b0">
   <source>No RADIUS secret is set for this account.</source>
+  <target>Для этого аккаунта не задан секрет RADIUS.</target>
 </trans-unit>
 <trans-unit id="s464a77b633bc9c0e">
   <source>Generate secret</source>
+  <target>Сгенерировать секрет</target>
 </trans-unit>
 <trans-unit id="s22cf60bdc16dbea4">
   <source>New secret generated — copy it now, it will not be shown again.</source>
+  <target>Новый секрет сгенерирован — скопируйте его сейчас, он больше не будет показан.</target>
 </trans-unit>
 <trans-unit id="s9df212d89cab196d">
   <source>Hide</source>
+  <target>Скрыть</target>
 </trans-unit>
 <trans-unit id="sd8c644529b574f90">
   <source>Reveal</source>
+  <target>Показать</target>
 </trans-unit>
 <trans-unit id="s96c39cd5871006c9">
   <source>Regenerate secret</source>
+  <target>Перегенерировать секрет</target>
 </trans-unit>
 <trans-unit id="s74c2ab866a1002b6">
   <source>Delete secret</source>
+  <target>Удалить секрет</target>
 </trans-unit>
 <trans-unit id="s0379fc73608ab971">
   <source>Done</source>
+  <target>Готово</target>
 </trans-unit>
 <trans-unit id="s256632a5ade1c666">
   <source>Failed to load sessions.</source>
+  <target>Не удалось загрузить сессии.</target>
 </trans-unit>
 <trans-unit id="sb39a4568efeeee71">
   <source>Session revoked.</source>
+  <target>Сессия отозвана.</target>
 </trans-unit>
 <trans-unit id="s313a62cbdc561b95">
   <source>Failed to revoke session.</source>
+  <target>Не удалось отозвать сессию.</target>
 </trans-unit>
 <trans-unit id="sfa9d8c928d994bf5">
   <source>Revoked</source>
+  <target>Отозвана</target>
 </trans-unit>
 <trans-unit id="s7266c575062a3595">
   <source>Never expires</source>
+  <target>Без срока действия</target>
 </trans-unit>
 <trans-unit id="s250a7fc28124c361">
   <source>Read only</source>
+  <target>Только чтение</target>
 </trans-unit>
 <trans-unit id="s4a4deea7188bad47">
   <source>Read-write</source>
+  <target>Чтение и запись</target>
 </trans-unit>
 <trans-unit id="s5fc87fa4f0c1402c">
   <source>Privilege capable</source>
+  <target>Может повышать права</target>
 </trans-unit>
 <trans-unit id="s5590dbf7e425789d">
   <source>Label</source>
+  <target>Метка</target>
 </trans-unit>
 <trans-unit id="sb7a2fcbc1dcf546c">
   <source>Issued</source>
+  <target>Выдана</target>
 </trans-unit>
 <trans-unit id="sf679b7a62808287e">
   <source>Expiry</source>
+  <target>Истечение</target>
 </trans-unit>
 <trans-unit id="s6d9e89e9aa685f21">
   <source>Purpose</source>
+  <target>Назначение</target>
 </trans-unit>
 <trans-unit id="s12934aa92776f6ca">
   <source>Revoking...</source>
+  <target>Отзыв...</target>
 </trans-unit>
 <trans-unit id="s0e871352ba4b17d3">
   <source>Revoke</source>
+  <target>Отозвать</target>
 </trans-unit>
 <trans-unit id="s00c3709a3e1f88a1">
   <source>No active sessions.</source>
+  <target>Нет активных сессий.</target>
 </trans-unit>
 <trans-unit id="s641dac2759a207bf">
   <source>Failed to load SSH keys.</source>
+  <target>Не удалось загрузить SSH-ключи.</target>
 </trans-unit>
 <trans-unit id="s4080ca9dbd2fe844">
   <source>Please provide both a tag and a public key.</source>
+  <target>Укажите и тег, и публичный ключ.</target>
 </trans-unit>
 <trans-unit id="sf8f11cad8d6ea08e">
   <source>SSH key added.</source>
+  <target>SSH-ключ добавлен.</target>
 </trans-unit>
 <trans-unit id="sd6c2fcb6a019fbb7">
   <source>Failed to add SSH key.</source>
+  <target>Не удалось добавить SSH-ключ.</target>
 </trans-unit>
 <trans-unit id="s64e073ca7be76acc">
   <source>SSH key removed.</source>
+  <target>SSH-ключ удалён.</target>
 </trans-unit>
 <trans-unit id="sc058d1cfdba45330">
   <source>Failed to remove SSH key.</source>
+  <target>Не удалось удалить SSH-ключ.</target>
 </trans-unit>
 <trans-unit id="s5d71cfffbb940396">
   <source>SSH Public Keys</source>
+  <target>Публичные SSH-ключи</target>
 </trans-unit>
 <trans-unit id="s21c0d4a3f251b0ea">
   <source>No SSH keys registered.</source>
+  <target>SSH-ключи не зарегистрированы.</target>
 </trans-unit>
 <trans-unit id="s6ce0cb19e201b153">
   <source>Tag</source>
+  <target>Тег</target>
 </trans-unit>
 <trans-unit id="se711d966fb247dff">
   <source>Public key</source>
+  <target>Публичный ключ</target>
 </trans-unit>
 <trans-unit id="s7a0e4cc6bfd9c40b">
   <source>Add Key</source>
+  <target>Добавить ключ</target>
 </trans-unit>
 <trans-unit id="s7c9c1dc02e7e906a">
   <source>Auth session expiry (s)</source>
+  <target>Срок действия сессии аутентификации (с)</target>
 </trans-unit>
 <trans-unit id="scbd7e2a1f89cc02f">
   <source>Privilege expiry (s)</source>
+  <target>Срок действия привилегий (с)</target>
 </trans-unit>
 <trans-unit id="s2743a95271562ea4">
   <source>Minimum password length</source>
+  <target>Минимальная длина пароля</target>
 </trans-unit>
 <trans-unit id="sf3ac3fa56911b610">
   <source>Minimum credential type</source>
+  <target>Минимальный тип учётных данных</target>
 </trans-unit>
 <trans-unit id="s28d46428e68b771a">
   <source>Limit: search max results</source>
+  <target>Ограничение: макс. результатов поиска</target>
 </trans-unit>
 <trans-unit id="s9b94d8f0221cd862">
   <source>Limit: search max filter test</source>
+  <target>Ограничение: макс. тестов фильтра поиска</target>
 </trans-unit>
 <trans-unit id="s458d835271649fab">
   <source>Account policy enabled.</source>
+  <target>Политика аккаунтов включена.</target>
 </trans-unit>
 <trans-unit id="s2e228660be00f5f3">
   <source>Failed to enable account policy.</source>
+  <target>Не удалось включить политику аккаунтов.</target>
 </trans-unit>
 <trans-unit id="s5338a4c8205ddb04">
   <source>Account policy disabled.</source>
+  <target>Политика аккаунтов отключена.</target>
 </trans-unit>
 <trans-unit id="sc7f94dea2c5cedbe">
   <source>Failed to disable account policy.</source>
+  <target>Не удалось отключить политику аккаунтов.</target>
 </trans-unit>
 <trans-unit id="s1da631cb3e71f385">
   <source>Attestation CA list must be valid JSON.</source>
+  <target>Список аттестационных CA должен быть корректным JSON.</target>
 </trans-unit>
 <trans-unit id="s227991d8366389ae">
   <source>Policy attribute saved.</source>
+  <target>Атрибут политики сохранён.</target>
 </trans-unit>
 <trans-unit id="s84a2fe92996681fa">
   <source>Failed to save policy attribute.</source>
+  <target>Не удалось сохранить атрибут политики.</target>
 </trans-unit>
 <trans-unit id="sfb89b0ebb2ca769f">
   <source>Policy attribute removed.</source>
+  <target>Атрибут политики удалён.</target>
 </trans-unit>
 <trans-unit id="sfbaec89c26cdcf47">
   <source>Failed to remove policy attribute.</source>
+  <target>Не удалось удалить атрибут политики.</target>
 </trans-unit>
 <trans-unit id="sb2174ddcc94ce779">
   <source>true or false</source>
+  <target>true или false</target>
 </trans-unit>
 <trans-unit id="s9694b06d6c3c53cd">
   <source>Leave empty to remove the attribute.</source>
+  <target>Оставьте пустым, чтобы удалить атрибут.</target>
 </trans-unit>
 <trans-unit id="s750fc773579e4804">
   <source>Purge</source>
+  <target>Очистить</target>
 </trans-unit>
 <trans-unit id="s9fc0a85580f440b0">
   <source>Group not available.</source>
+  <target>Группа недоступна.</target>
 </trans-unit>
 <trans-unit id="s2bb906f97ec08bb0">
   <source>This group is not an account policy group.</source>
+  <target>Эта группа не является группой политики аккаунтов.</target>
 </trans-unit>
 <trans-unit id="s9f36d993bc0506ae">
   <source>Account policy</source>
+  <target>Политика аккаунтов</target>
 </trans-unit>
 <trans-unit id="s3c5d2cb2641e473c">
   <source>Enabling turns this group into an account policy group: policy attributes applied to its members are managed here.</source>
+  <target>Включение превращает эту группу в группу политики аккаунтов: атрибуты политики, применяемые к её участникам, управляются здесь.</target>
 </trans-unit>
 <trans-unit id="s88eaeec32dbacbbd">
   <source>Enabling...</source>
+  <target>Включение...</target>
 </trans-unit>
 <trans-unit id="s2f7c8b4828b0d2f1">
   <source>Enable account policy</source>
+  <target>Включить политику аккаунтов</target>
 </trans-unit>
 <trans-unit id="s6ed383bf7c66d150">
   <source>Disable account policy...</source>
+  <target>Отключить политику аккаунтов...</target>
 </trans-unit>
 <trans-unit id="sf63b84ce5c29c8a1">
   <source>Allow primary credential fallback</source>
+  <target>Разрешить откат к основным учётным данным</target>
 </trans-unit>
 <trans-unit id="s07a6bb2db1f2b5be">
   <source>WebAuthn attestation CA list (JSON)</source>
+  <target>Список аттестационных CA WebAuthn (JSON)</target>
 </trans-unit>
 <trans-unit id="s10c8e4cae4e11503">
   <source>Disable</source>
+  <target>Отключить</target>
 </trans-unit>
 <trans-unit id="s07e6c6b589b42a08">
   <source>Disabling removes the account_policy class from this group. Policy attributes stop applying to its members. Continue?</source>
+  <target>Отключение удалит класс account_policy из этой группы. Атрибуты политики перестанут применяться к её участникам. Продолжить?</target>
 </trans-unit>
 <trans-unit id="s879faca796406c8e">
   <source>Account Policy</source>
+  <target>Политика аккаунтов</target>
 </trans-unit>
 <trans-unit id="sa901388a9f5d310c">
   <source>Failed to load group</source>
+  <target>Не удалось загрузить группу</target>
 </trans-unit>
 <trans-unit id="s5c82363c1f9fa8a4">
   <source>All groups</source>
+  <target>Все группы</target>
 </trans-unit>
 <trans-unit id="se150817fa123ed8d">
   <source>Group not found.</source>
+  <target>Группа не найдена.</target>
 </trans-unit>
 <trans-unit id="s8a44928ccb5b1acd">
   <source>Failed to load groups</source>
+  <target>Не удалось загрузить группы</target>
 </trans-unit>
 <trans-unit id="s6bc3dc685550852f">
   <source>Name is required.</source>
+  <target>Имя обязательно.</target>
 </trans-unit>
 <trans-unit id="sbceca9d5e93e9da2">
   <source>Created group <ph id="0">${id}</ph></source>
+  <target>Группа <ph id="0">${id}</ph> создана</target>
 </trans-unit>
 <trans-unit id="s4ba5fefbcb97193c">
   <source>Failed to create group</source>
+  <target>Не удалось создать группу</target>
 </trans-unit>
 <trans-unit id="sa0f63d04b4d36e87">
   <source>Deleted group <ph id="0">${id}</ph></source>
+  <target>Группа <ph id="0">${id}</ph> удалена</target>
 </trans-unit>
 <trans-unit id="s5eb07d8976d63fb7">
   <source>Failed to delete group</source>
+  <target>Не удалось удалить группу</target>
 </trans-unit>
 <trans-unit id="s09205907b5b56cda">
   <source>No</source>
+  <target>Нет</target>
 </trans-unit>
 <trans-unit id="s7c5774fad9d050ce">
   <source>Create group</source>
+  <target>Создать группу</target>
 </trans-unit>
 <trans-unit id="s618bc1300ebc3000">
   <source>No groups found.</source>
+  <target>Группы не найдены.</target>
 </trans-unit>
 <trans-unit id="sb5b7d3e2a43305d7">
   <source>Development Team</source>
+  <target>Development Team</target>
 </trans-unit>
 <trans-unit id="s96f9020c9ff73683">
   <source>Delete group "<ph id="0">${this.deleteTarget.displayName ?? this.deleteTarget.id}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? The entry can be revived from the recycle bin.</source>
+  <target>Удалить группу "<ph id="0">${this.deleteTarget.displayName ?? this.deleteTarget.id}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? Запись можно восстановить из корзины.</target>
 </trans-unit>
 <trans-unit id="s4910b83d49dc4abb">
   <source>Member removed.</source>
+  <target>Участник удалён.</target>
 </trans-unit>
 <trans-unit id="s58791d830f346d4b">
   <source>Failed to remove member.</source>
+  <target>Не удалось удалить участника.</target>
 </trans-unit>
 <trans-unit id="s54c2815ea71656dd">
   <source>Member added.</source>
+  <target>Участник добавлен.</target>
 </trans-unit>
 <trans-unit id="s5a5b7d6c718ca112">
   <source>Failed to add member.</source>
+  <target>Не удалось добавить участника.</target>
 </trans-unit>
 <trans-unit id="sdc11a0b5ff9bce73">
   <source>Members updated.</source>
+  <target>Список участников обновлён.</target>
 </trans-unit>
 <trans-unit id="s6b5f0b71b558597c">
   <source>Failed to set members.</source>
+  <target>Не удалось задать участников.</target>
 </trans-unit>
 <trans-unit id="s9f5a5f23312798f0">
   <source>Members</source>
+  <target>Участники</target>
 </trans-unit>
 <trans-unit id="s66d9e6d190e19dc0">
   <source>This group has no members.</source>
+  <target>В этой группе нет участников.</target>
 </trans-unit>
 <trans-unit id="s783b759229e4b018">
   <source>Person or service account name</source>
+  <target>Имя персоны или сервисного аккаунта</target>
 </trans-unit>
 <trans-unit id="s75ac7d15cf5d458e">
   <source>Add member</source>
+  <target>Добавить участника</target>
 </trans-unit>
 <trans-unit id="s8357e2cbcd5a2ad7">
   <source>Advanced: replace all members</source>
+  <target>Дополнительно: заменить всех участников</target>
 </trans-unit>
 <trans-unit id="s2d448b2b4fd4d83e">
   <source>One member name per line. Saving replaces the entire member list.</source>
+  <target>Одно имя участника в строке. Сохранение заменяет весь список участников.</target>
 </trans-unit>
 <trans-unit id="s01c66726924e520c">
   <source>Set members</source>
+  <target>Задать участников</target>
 </trans-unit>
 <trans-unit id="s8ccbd5c57286c050">
   <source>Failed to load POSIX details.</source>
+  <target>Не удалось загрузить данные POSIX.</target>
 </trans-unit>
 <trans-unit id="s2729f5e85912ed22">
   <source>This group is not POSIX-enabled.</source>
+  <target>Эта группа не поддерживает POSIX.</target>
 </trans-unit>
 <trans-unit id="s9b6c4865d19795de">
   <source>POSIX details</source>
+  <target>Данные POSIX</target>
 </trans-unit>
 <trans-unit id="s6de08134276519ac">
   <source>Loading POSIX details...</source>
+  <target>Загрузка данных POSIX...</target>
 </trans-unit>
 <trans-unit id="s97fc9f19fa5d5748">
   <source>SPN</source>
+  <target>SPN</target>
 </trans-unit>
 <trans-unit id="s59d8123e24399879">
   <source>Save GID number</source>
+  <target>Сохранить номер GID</target>
 </trans-unit>
 <trans-unit id="sc27956bf5639b218">
   <source>Group settings saved.</source>
+  <target>Настройки группы сохранены.</target>
 </trans-unit>
 <trans-unit id="s76820bd326085570">
   <source>Failed to save group settings.</source>
+  <target>Не удалось сохранить настройки группы.</target>
 </trans-unit>
 <trans-unit id="s6eb015dc7d475bf8">
   <source>Group renamed.</source>
+  <target>Группа переименована.</target>
 </trans-unit>
 <trans-unit id="s241a49f85add0918">
   <source>Failed to rename group.</source>
+  <target>Не удалось переименовать группу.</target>
 </trans-unit>
 <trans-unit id="s9d8b8aa2b404c2c8">
   <source>Settings</source>
+  <target>Настройки</target>
 </trans-unit>
 <trans-unit id="s63d894b1ddb06289">
   <source>Description</source>
+  <target>Описание</target>
 </trans-unit>
 <trans-unit id="s1b9762de936f65f3">
   <source>Leave empty to remove the description.</source>
+  <target>Оставьте пустым, чтобы удалить описание.</target>
 </trans-unit>
 <trans-unit id="se42d96b2926414e0">
   <source>Rename group</source>
+  <target>Переименовать группу</target>
 </trans-unit>
 <trans-unit id="sc2e8cc58ebd7f38d">
   <source>Current name</source>
+  <target>Текущее имя</target>
 </trans-unit>
 <trans-unit id="s1b38c2d6b9b9f248">
   <source>New name</source>
+  <target>Новое имя</target>
 </trans-unit>
 <trans-unit id="s802cf69e05297d3f">
   <source>Rename...</source>
+  <target>Переименовать...</target>
 </trans-unit>
 <trans-unit id="s60320a18282b2b33">
   <source>Rename</source>
+  <target>Переименовать</target>
 </trans-unit>
 <trans-unit id="s618f81534a095cc3">
   <source>Renaming changes the group's name id. Memberships and references keep working, but the group will be reachable under the new name and the current URL becomes invalid. Continue?</source>
+  <target>Переименование изменяет имя (id) группы. Членство и ссылки продолжат работать, но группа будет доступна под новым именем, а текущий URL станет недействительным. Продолжить?</target>
 </trans-unit>
 <trans-unit id="s3d197283cb019b5a">
   <source>Overview</source>
+  <target>Обзор</target>
 </trans-unit>
 <trans-unit id="sa817aa9f6f88a991">
   <source>Credentials</source>
+  <target>Учётные данные</target>
 </trans-unit>
 <trans-unit id="s5c18cae48b93138c">
   <source>Sessions</source>
+  <target>Сессии</target>
 </trans-unit>
 <trans-unit id="s5ab704ab2e2f1e6b">
   <source>SSH keys</source>
+  <target>SSH-ключи</target>
 </trans-unit>
 <trans-unit id="s4cb5d98f4b3e12c8">
   <source>POSIX</source>
+  <target>POSIX</target>
 </trans-unit>
 <trans-unit id="s85df7d74afe62b60">
   <source>Failed to load person</source>
+  <target>Не удалось загрузить персону</target>
 </trans-unit>
 <trans-unit id="s449dc36c90ae4afe">
   <source>All persons</source>
+  <target>Все персоны</target>
 </trans-unit>
 <trans-unit id="sb852dd8f63a516d1">
   <source>Person not found.</source>
+  <target>Персона не найдена.</target>
 </trans-unit>
 <trans-unit id="sea43a8d36126f2e7">
   <source>Failed to load API tokens.</source>
+  <target>Не удалось загрузить API-токены.</target>
 </trans-unit>
 <trans-unit id="s8b07e413ed69ac04">
   <source>API token created.</source>
+  <target>API-токен создан.</target>
 </trans-unit>
 <trans-unit id="s43785fe48f17caa4">
   <source>Failed to create API token.</source>
+  <target>Не удалось создать API-токен.</target>
 </trans-unit>
 <trans-unit id="se269d40d1eda51d1">
   <source>Token copied to clipboard.</source>
+  <target>Токен скопирован в буфер обмена.</target>
 </trans-unit>
 <trans-unit id="s1c78aeeaee20b4ca">
   <source>API token revoked.</source>
+  <target>API-токен отозван.</target>
 </trans-unit>
 <trans-unit id="se01fb8241c2ee92e">
   <source>Failed to revoke API token.</source>
+  <target>Не удалось отозвать API-токен.</target>
 </trans-unit>
 <trans-unit id="s0e34b52b4e7437dc">
   <source>Create API token</source>
+  <target>Создать API-токен</target>
 </trans-unit>
 <trans-unit id="sb835500bf74f157d">
   <source>Expiry (optional)</source>
+  <target>Срок действия (необязательно)</target>
 </trans-unit>
 <trans-unit id="s99775221d3003db4">
   <source>Creating...</source>
+  <target>Создание...</target>
 </trans-unit>
 <trans-unit id="se5fe443f9abbf9c2">
   <source>API token created</source>
+  <target>API-токен создан</target>
 </trans-unit>
 <trans-unit id="s3a07841c9da6af12">
   <source>This token will not be shown again. Copy it now and store it securely.</source>
+  <target>Этот токен больше не будет показан. Скопируйте его сейчас и сохраните в надёжном месте.</target>
 </trans-unit>
 <trans-unit id="s26859a3167e20c22">
   <source>No API tokens.</source>
+  <target>Нет API-токенов.</target>
 </trans-unit>
 <trans-unit id="s02c66774e736745d">
   <source>Failed to generate password.</source>
+  <target>Не удалось сгенерировать пароль.</target>
 </trans-unit>
 <trans-unit id="scedcf8e660ba85f3">
   <source>Password copied to clipboard.</source>
+  <target>Пароль скопирован в буфер обмена.</target>
 </trans-unit>
 <trans-unit id="sabf9c3fc37c163fb">
   <source>Generated password</source>
+  <target>Сгенерированный пароль</target>
 </trans-unit>
 <trans-unit id="s326ed73aa4037f76">
   <source>This password will not be shown again. Copy it now and share it securely.</source>
+  <target>Этот пароль больше не будет показан. Скопируйте его сейчас и передайте безопасным способом.</target>
 </trans-unit>
 <trans-unit id="s8bf481a0b5d8a689">
   <source>Generating...</source>
+  <target>Генерация...</target>
 </trans-unit>
 <trans-unit id="s9b419aa580d5ee0b">
   <source>Generate password</source>
+  <target>Сгенерировать пароль</target>
 </trans-unit>
 <trans-unit id="s320e61bd8d52d5d7">
   <source>Failed to load service account.</source>
+  <target>Не удалось загрузить сервисный аккаунт.</target>
 </trans-unit>
 <trans-unit id="s9f139703c49ecd6e">
   <source>Service account updated.</source>
+  <target>Сервисный аккаунт обновлён.</target>
 </trans-unit>
 <trans-unit id="s044c2ac2dbd7ad48">
   <source>Failed to update service account.</source>
+  <target>Не удалось обновить сервисный аккаунт.</target>
 </trans-unit>
 <trans-unit id="s49f2451040235993">
   <source>Converted to person.</source>
+  <target>Преобразован в персону.</target>
 </trans-unit>
 <trans-unit id="s87abea6258ddbf46">
   <source>Failed to convert to person.</source>
+  <target>Не удалось преобразовать в персону.</target>
 </trans-unit>
 <trans-unit id="sd88250b5c22052ee">
   <source>Convert to person</source>
+  <target>Преобразовать в персону</target>
 </trans-unit>
 <trans-unit id="s1ddce3e2350a7ce9">
   <source>Turns this service account into a regular person account. This cannot be undone.</source>
+  <target>Превращает этот сервисный аккаунт в обычный аккаунт персоны. Это действие необратимо.</target>
 </trans-unit>
 <trans-unit id="s1b283cdcdcc0ec63">
   <source>Convert this service account into a person account? You will be taken to the person page.</source>
+  <target>Преобразовать этот сервисный аккаунт в аккаунт персоны? Вы будете перенаправлены на страницу персоны.</target>
 </trans-unit>
 <trans-unit id="sd1964fa8b0e8ec56">
   <source>Converting...</source>
+  <target>Преобразование...</target>
 </trans-unit>
 <trans-unit id="sfa0c605f107fc998">
   <source>Convert</source>
+  <target>Преобразовать</target>
 </trans-unit>
 <trans-unit id="s1f9cb93817b690d5">
   <source>Service account not available.</source>
+  <target>Сервисный аккаунт недоступен.</target>
 </trans-unit>
 <trans-unit id="s3269ce08a1e4b933">
   <source>API Tokens</source>
+  <target>API-токены</target>
 </trans-unit>
 <trans-unit id="sffb72673682d3d37">
   <source>Validity</source>
+  <target>Срок действия</target>
 </trans-unit>
 <trans-unit id="s2381932c92dce163">
   <source>Failed to load service account</source>
+  <target>Не удалось загрузить сервисный аккаунт</target>
 </trans-unit>
 <trans-unit id="s76cd46abfde5db85">
   <source>All service accounts</source>
+  <target>Все сервисные аккаунты</target>
 </trans-unit>
 <trans-unit id="s112756561ee833f8">
   <source>Service account not found.</source>
+  <target>Сервисный аккаунт не найден.</target>
 </trans-unit>
 <trans-unit id="s320e24bd8d526e30">
   <source>Failed to load service accounts</source>
+  <target>Не удалось загрузить сервисные аккаунты</target>
 </trans-unit>
 <trans-unit id="s4eb410b3b56b2b99">
   <source>Created service account <ph id="0">${this.createId.trim()}</ph></source>
+  <target>Сервисный аккаунт <ph id="0">${this.createId.trim()}</ph> создан</target>
 </trans-unit>
 <trans-unit id="s890ca99b561286d3">
   <source>Failed to create service account</source>
+  <target>Не удалось создать сервисный аккаунт</target>
 </trans-unit>
 <trans-unit id="sbeb437738d885770">
   <source>Deleted service account <ph id="0">${id}</ph></source>
+  <target>Сервисный аккаунт <ph id="0">${id}</ph> удалён</target>
 </trans-unit>
 <trans-unit id="s84b2cedaa417a2ec">
   <source>Failed to delete service account</source>
+  <target>Не удалось удалить сервисный аккаунт</target>
 </trans-unit>
 <trans-unit id="s86146cfee0e10210">
   <source>Service accounts</source>
+  <target>Сервисные аккаунты</target>
 </trans-unit>
 <trans-unit id="scf72690719b7a8a1">
   <source>Create service account</source>
+  <target>Создать сервисный аккаунт</target>
 </trans-unit>
 <trans-unit id="s274b49d90286cdff">
   <source>No service accounts found.</source>
+  <target>Сервисные аккаунты не найдены.</target>
 </trans-unit>
 <trans-unit id="se288b39a615f0039">
   <source>Application service account</source>
+  <target>Сервисный аккаунт приложения</target>
 </trans-unit>
 <trans-unit id="s601a0641ebd81ed0">
   <source>Delete service account "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? The entry can be revived from the recycle bin.</source>
+  <target>Удалить сервисный аккаунт "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? Запись можно восстановить из корзины.</target>
 </trans-unit>
 <trans-unit id="s73a25817b5107140">
   <source>Failed to load claim maps.</source>
+  <target>Не удалось загрузить карты утверждений.</target>
 </trans-unit>
 <trans-unit id="s563784ea63170d38">
   <source>Claim map saved.</source>
+  <target>Карта утверждений сохранена.</target>
 </trans-unit>
 <trans-unit id="s890b52570031c0f7">
   <source>Failed to save the claim map.</source>
+  <target>Не удалось сохранить карту утверждений.</target>
 </trans-unit>
 <trans-unit id="s2a105da7c8461df1">
   <source>Join strategy updated.</source>
+  <target>Стратегия объединения обновлена.</target>
 </trans-unit>
 <trans-unit id="s51ed89c2167b1cea">
   <source>Failed to update the join strategy.</source>
+  <target>Не удалось обновить стратегию объединения.</target>
 </trans-unit>
 <trans-unit id="sf4b5b5ae6a34a8a5">
   <source>Claim map removed.</source>
+  <target>Карта утверждений удалена.</target>
 </trans-unit>
 <trans-unit id="s6212e7cdae8caf64">
   <source>Failed to remove the claim map.</source>
+  <target>Не удалось удалить карту утверждений.</target>
 </trans-unit>
 <trans-unit id="s7aa56c6c5a0e8722">
   <source>Client not available.</source>
+  <target>Клиент недоступен.</target>
 </trans-unit>
 <trans-unit id="s3ec19b38caafc6ce">
   <source>Claim maps</source>
+  <target>Карты утверждений</target>
 </trans-unit>
 <trans-unit id="sd385bdb89536a4dd">
   <source>Custom claims added to tokens based on group membership.</source>
+  <target>Пользовательские утверждения добавляются в токены на основе членства в группах.</target>
 </trans-unit>
 <trans-unit id="s0fe7bf559d63cef7">
   <source>No claim maps configured.</source>
+  <target>Карты утверждений не настроены.</target>
 </trans-unit>
 <trans-unit id="s90b34efba1c2832f">
   <source>Claim</source>
+  <target>Утверждение</target>
 </trans-unit>
 <trans-unit id="s98b1cb8fb62909ec">
   <source>Group</source>
+  <target>Группа</target>
 </trans-unit>
 <trans-unit id="s57472465a23b41db">
   <source>Values</source>
+  <target>Значения</target>
 </trans-unit>
 <trans-unit id="s6c6bf3ea2ad3d219">
   <source>Join</source>
+  <target>Объединение</target>
 </trans-unit>
 <trans-unit id="s8af61807443f32a4">
   <source>Actions</source>
+  <target>Действия</target>
 </trans-unit>
 <trans-unit id="s81592a84e96c982f">
   <source>The join strategy applies per claim: csv/ssv join values into one string, array emits a JSON array.</source>
+  <target>Стратегия объединения применяется к каждому утверждению: csv/ssv объединяют значения в одну строку, array выдаёт JSON-массив.</target>
 </trans-unit>
 <trans-unit id="sc1d5623e8c452a96">
   <source>Add claim map</source>
+  <target>Добавить карту утверждений</target>
 </trans-unit>
 <trans-unit id="se10c015087d851be">
   <source>Claim name</source>
+  <target>Имя утверждения</target>
 </trans-unit>
 <trans-unit id="s48ad54096478f077">
   <source>Comma-separated list of values.</source>
+  <target>Список значений через запятую.</target>
 </trans-unit>
 <trans-unit id="s674953e33d86f1e7">
   <source>Remove this claim map? The claim will no longer be included in tokens.</source>
+  <target>Удалить эту карту утверждений? Утверждение больше не будет включаться в токены.</target>
 </trans-unit>
 <trans-unit id="sbcdba31d691defd4">
   <source>Origins</source>
+  <target>Источники</target>
 </trans-unit>
 <trans-unit id="s0ab7b37abb6b33ba">
   <source>Scope Maps</source>
+  <target>Карты областей</target>
 </trans-unit>
 <trans-unit id="s694e9c44cc1e87ae">
   <source>Claim Maps</source>
+  <target>Карты утверждений</target>
 </trans-unit>
 <trans-unit id="s3d93f9ea0c5a13fa">
   <source>Image</source>
+  <target>Изображение</target>
 </trans-unit>
 <trans-unit id="sd5c688de734bde0d">
   <source>Keys</source>
+  <target>Ключи</target>
 </trans-unit>
 <trans-unit id="see8988a7af61bd5e">
   <source>Failed to load client</source>
+  <target>Не удалось загрузить клиент</target>
 </trans-unit>
 <trans-unit id="sec0c1d01ccba9303">
   <source>All OAuth2 clients</source>
+  <target>Все клиенты OAuth2</target>
 </trans-unit>
 <trans-unit id="s1fe33be353e48d63">
   <source>Client not found.</source>
+  <target>Клиент не найден.</target>
 </trans-unit>
 <trans-unit id="s20d64f6aeb8499a4">
   <source>Image uploaded.</source>
+  <target>Изображение загружено.</target>
 </trans-unit>
 <trans-unit id="s09f4096031d76f36">
   <source>Failed to upload the image.</source>
+  <target>Не удалось загрузить изображение.</target>
 </trans-unit>
 <trans-unit id="s71e2272165490aac">
   <source>Image removed.</source>
+  <target>Изображение удалено.</target>
 </trans-unit>
 <trans-unit id="s319540adbb6afa91">
   <source>Failed to remove the image.</source>
+  <target>Не удалось удалить изображение.</target>
 </trans-unit>
 <trans-unit id="s5c795b9a5c13fdcf">
   <source>Client image</source>
+  <target>Изображение клиента</target>
 </trans-unit>
 <trans-unit id="sceccb3e807e13c59">
   <source>Shown on the consent screen next to the client name.</source>
+  <target>Отображается на экране согласия рядом с именем клиента.</target>
 </trans-unit>
 <trans-unit id="sc8d6855822afde83">
   <source>No image</source>
+  <target>Нет изображения</target>
 </trans-unit>
 <trans-unit id="se7692167f1edeef2">
   <source>Uploading...</source>
+  <target>Загрузка...</target>
 </trans-unit>
 <trans-unit id="sd24aaff71404c9e1">
   <source>Upload image</source>
+  <target>Загрузить изображение</target>
 </trans-unit>
 <trans-unit id="s4aaf6d4c84136e72">
   <source>Remove image...</source>
+  <target>Удалить изображение...</target>
 </trans-unit>
 <trans-unit id="sdcd6ca55db86ec31">
   <source>Remove the client image?</source>
+  <target>Удалить изображение клиента?</target>
 </trans-unit>
 <trans-unit id="s699e2a6c8d2fea61">
   <source>Key rotation scheduled.</source>
+  <target>Ротация ключей запланирована.</target>
 </trans-unit>
 <trans-unit id="s45a82013e0fcb1b9">
   <source>Failed to rotate the keys.</source>
+  <target>Не удалось выполнить ротацию ключей.</target>
 </trans-unit>
 <trans-unit id="scf0b43bc77f51afc">
   <source>Key revoked.</source>
+  <target>Ключ отозван.</target>
 </trans-unit>
 <trans-unit id="s458e663b2727ccd1">
   <source>Failed to revoke the key.</source>
+  <target>Не удалось отозвать ключ.</target>
 </trans-unit>
 <trans-unit id="sc017b156adfb5b07">
   <source>Rotate signing keys</source>
+  <target>Ротировать ключи подписи</target>
 </trans-unit>
 <trans-unit id="s6e7531427c24da8e">
   <source>Generates a new signing key. Tokens signed with the old key stop working after the rotation time.</source>
+  <target>Создаёт новый ключ подписи. Токены, подписанные старым ключом, перестанут работать после времени ротации.</target>
 </trans-unit>
 <trans-unit id="saa089ee6bf51dcfb">
   <source>Rotate at</source>
+  <target>Ротация в</target>
 </trans-unit>
 <trans-unit id="s511e13ca1398cc1e">
   <source>Defaults to now when left unchanged.</source>
+  <target>Если не изменить, по умолчанию — сейчас.</target>
 </trans-unit>
 <trans-unit id="s9af68daf5c8e14f0">
   <source>Rotate keys...</source>
+  <target>Ротировать ключи...</target>
 </trans-unit>
 <trans-unit id="s50a5d9d846f92da0">
   <source>Revoke key</source>
+  <target>Отозвать ключ</target>
 </trans-unit>
 <trans-unit id="sde8c2a587eda8908">
   <source>Revokes a signing key by id. Tokens signed with it become invalid immediately.</source>
+  <target>Отзывает ключ подписи по id. Токены, подписанные им, становятся недействительными немедленно.</target>
 </trans-unit>
 <trans-unit id="sb5b5d175571d3689">
   <source>Key id</source>
+  <target>Id ключа</target>
 </trans-unit>
 <trans-unit id="s9c2a7570f7111ca6">
   <source>Revoke key...</source>
+  <target>Отозвать ключ...</target>
 </trans-unit>
 <trans-unit id="s7e71f2ea422b8fe2">
   <source>Rotate keys</source>
+  <target>Ротировать ключи</target>
 </trans-unit>
 <trans-unit id="s1e86ca35619586aa">
   <source>Rotate the signing keys? Clients must fetch the new keys; tokens signed with the old key stop working after the rotation time.</source>
+  <target>Выполнить ротацию ключей подписи? Клиенты должны получить новые ключи; токены, подписанные старым ключом, перестанут работать после времени ротации.</target>
 </trans-unit>
 <trans-unit id="s9c1edcea8acf0f6e">
   <source>Revoke this key? Tokens signed with it become invalid immediately.</source>
+  <target>Отозвать этот ключ? Токены, подписанные им, станут недействительными немедленно.</target>
 </trans-unit>
 <trans-unit id="s660a7257b5030b82">
   <source>Failed to load OAuth2 clients</source>
+  <target>Не удалось загрузить клиенты OAuth2</target>
 </trans-unit>
 <trans-unit id="sd6f04a707f63e41e">
   <source>All fields are required.</source>
+  <target>Все поля обязательны.</target>
 </trans-unit>
 <trans-unit id="s7fcfd859dab980a7">
   <source>Created OAuth2 client <ph id="0">${name}</ph></source>
+  <target>Клиент OAuth2 <ph id="0">${name}</ph> создан</target>
 </trans-unit>
 <trans-unit id="s75493f44b69c8195">
   <source>Failed to create OAuth2 client</source>
+  <target>Не удалось создать клиент OAuth2</target>
 </trans-unit>
 <trans-unit id="s80e27f9b220703b2">
   <source>Deleted OAuth2 client <ph id="0">${id}</ph></source>
+  <target>Клиент OAuth2 <ph id="0">${id}</ph> удалён</target>
 </trans-unit>
 <trans-unit id="s278a3ff2f8bae3fa">
   <source>Failed to delete OAuth2 client</source>
+  <target>Не удалось удалить клиент OAuth2</target>
 </trans-unit>
 <trans-unit id="s399cc2d67d92e957">
   <source>Confidential</source>
+  <target>Конфиденциальный</target>
 </trans-unit>
 <trans-unit id="sdd1ff479d04ac140">
   <source>Public</source>
+  <target>Публичный</target>
 </trans-unit>
 <trans-unit id="sd2223afb7d6b100d">
   <source>Type</source>
+  <target>Тип</target>
 </trans-unit>
 <trans-unit id="sb14553fb015d2d62">
   <source>OAuth2 Clients</source>
+  <target>Клиенты OAuth2</target>
 </trans-unit>
 <trans-unit id="sa3a576250520d613">
   <source>Create OAuth2 client</source>
+  <target>Создать клиент OAuth2</target>
 </trans-unit>
 <trans-unit id="sb0feaa79d3b943b1">
   <source>No OAuth2 clients found.</source>
+  <target>Клиенты OAuth2 не найдены.</target>
 </trans-unit>
 <trans-unit id="s9c53044165a001a2">
   <source>My Client</source>
+  <target>Мой клиент</target>
 </trans-unit>
 <trans-unit id="s6d80e49125d501cb">
   <source>Delete OAuth2 client "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? This cannot be undone.</source>
+  <target>Удалить клиент OAuth2 "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? Это действие необратимо.</target>
 </trans-unit>
 <trans-unit id="sa959e07d83fe9f6e">
   <source>Failed to load origins.</source>
+  <target>Не удалось загрузить источники.</target>
 </trans-unit>
 <trans-unit id="s96e933ebc30aedf9">
   <source>Origin added.</source>
+  <target>Источник добавлен.</target>
 </trans-unit>
 <trans-unit id="s518cb6aaf380f1ad">
   <source>Failed to add the origin.</source>
+  <target>Не удалось добавить источник.</target>
 </trans-unit>
 <trans-unit id="s1e989b609bed1d57">
   <source>Origin removed.</source>
+  <target>Источник удалён.</target>
 </trans-unit>
 <trans-unit id="s70112ab6acbbf53c">
   <source>Failed to remove the origin.</source>
+  <target>Не удалось удалить источник.</target>
 </trans-unit>
 <trans-unit id="sde5787dd9e415ada">
   <source>Redirect origins</source>
+  <target>Источники перенаправления</target>
 </trans-unit>
 <trans-unit id="sdcb1c5f211d94cbe">
   <source>Origins the client may redirect to after authentication.</source>
+  <target>Источники, на которые клиент может перенаправлять после аутентификации.</target>
 </trans-unit>
 <trans-unit id="sefe61e6fbdd0b3ef">
   <source>No origins configured.</source>
+  <target>Источники не настроены.</target>
 </trans-unit>
 <trans-unit id="s9eecb8124fb09eaf">
   <source>Origin</source>
+  <target>Источник</target>
 </trans-unit>
 <trans-unit id="s873b8850ddffc206">
   <source>Add origin</source>
+  <target>Добавить источник</target>
 </trans-unit>
 <trans-unit id="s0d355b30132c8c96">
   <source>Origin URL</source>
+  <target>URL источника</target>
 </trans-unit>
 <trans-unit id="sd8426b72a41644c9">
   <source>Remove this origin? Clients redirecting to it will stop working.</source>
+  <target>Удалить этот источник? Клиенты, перенаправляемые на него, перестанут работать.</target>
 </trans-unit>
 <trans-unit id="sa55e30fe05813c3c">
   <source>Failed to load scope maps.</source>
+  <target>Не удалось загрузить карты областей.</target>
 </trans-unit>
 <trans-unit id="s5453672999cff13c">
   <source>Supplemental scope map saved.</source>
+  <target>Дополнительная карта областей сохранена.</target>
 </trans-unit>
 <trans-unit id="sfd2e642fe1c59c94">
   <source>Scope map saved.</source>
+  <target>Карта областей сохранена.</target>
 </trans-unit>
 <trans-unit id="s88241c4b2447f0e7">
   <source>Failed to save the supplemental scope map.</source>
+  <target>Не удалось сохранить дополнительную карту областей.</target>
 </trans-unit>
 <trans-unit id="s845d83d3bdc1249b">
   <source>Failed to save the scope map.</source>
+  <target>Не удалось сохранить карту областей.</target>
 </trans-unit>
 <trans-unit id="s3bb21aef2772aab9">
   <source>Scope map removed.</source>
+  <target>Карта областей удалена.</target>
 </trans-unit>
 <trans-unit id="s87648c24e289a7fc">
   <source>Failed to remove the scope map.</source>
+  <target>Не удалось удалить карту областей.</target>
 </trans-unit>
 <trans-unit id="se59837d0d00ebad0">
   <source>No entries.</source>
+  <target>Нет записей.</target>
 </trans-unit>
 <trans-unit id="s2e3ef41a0edd8608">
   <source>Scopes</source>
+  <target>Области</target>
 </trans-unit>
 <trans-unit id="seaa05694d668417a">
   <source>Comma-separated list of scopes.</source>
+  <target>Список областей через запятую.</target>
 </trans-unit>
 <trans-unit id="se38fb26ebcdde8da">
   <source>Scope maps</source>
+  <target>Карты областей</target>
 </trans-unit>
 <trans-unit id="se96047011609917a">
   <source>Scopes granted to members of a group.</source>
+  <target>Области, предоставляемые участникам группы.</target>
 </trans-unit>
 <trans-unit id="s47a626a027f4e4be">
   <source>Add scope map</source>
+  <target>Добавить карту областей</target>
 </trans-unit>
 <trans-unit id="seaa67f27e4fe0252">
   <source>Supplemental scope maps</source>
+  <target>Дополнительные карты областей</target>
 </trans-unit>
 <trans-unit id="s45b95237673ab95b">
   <source>Scopes granted to all users, regardless of group membership.</source>
+  <target>Области, предоставляемые всем пользователям независимо от членства в группах.</target>
 </trans-unit>
 <trans-unit id="s393ca618babd58e0">
   <source>Add supplemental scope map</source>
+  <target>Добавить дополнительную карту областей</target>
 </trans-unit>
 <trans-unit id="s554841c66071bcb7">
   <source>Remove the scope map for this group? Clients can no longer request its scopes.</source>
+  <target>Удалить карту областей для этой группы? Клиенты больше не смогут запрашивать её области.</target>
 </trans-unit>
 <trans-unit id="s8519b9e7ce380af7">
   <source>Settings saved.</source>
+  <target>Настройки сохранены.</target>
 </trans-unit>
 <trans-unit id="s16cc0c31cc93bc6f">
   <source>Failed to save settings.</source>
+  <target>Не удалось сохранить настройки.</target>
 </trans-unit>
 <trans-unit id="s59f0d896575c1f27">
   <source>No basic secret available.</source>
+  <target>Базовый секрет недоступен.</target>
 </trans-unit>
 <trans-unit id="s28b83e60bd08d7a2">
   <source>Failed to load the secret.</source>
+  <target>Не удалось загрузить секрет.</target>
 </trans-unit>
 <trans-unit id="sc23e837cb059c543">
   <source>New secret generated. Store it now — it is shown only once.</source>
+  <target>Новый секрет сгенерирован. Сохраните его сейчас — он показывается только один раз.</target>
 </trans-unit>
 <trans-unit id="s35dc8b5fa7f2378f">
   <source>Failed to reset the secret.</source>
+  <target>Не удалось сбросить секрет.</target>
 </trans-unit>
 <trans-unit id="s8c74781d9b9a26de">
   <source>Enter a non-negative number of seconds.</source>
+  <target>Введите неотрицательное количество секунд.</target>
 </trans-unit>
 <trans-unit id="s422ca383cf4c1543">
   <source>Refresh token expiry updated.</source>
+  <target>Срок действия refresh-токена обновлён.</target>
 </trans-unit>
 <trans-unit id="s7642b74bd2fb9438">
   <source>Failed to update the refresh token expiry.</source>
+  <target>Не удалось обновить срок действия refresh-токена.</target>
 </trans-unit>
 <trans-unit id="sacaf3f8416b0dc76">
   <source>Setting updated.</source>
+  <target>Настройка обновлена.</target>
 </trans-unit>
 <trans-unit id="s4f6f20211d3f801f">
   <source>Basic secret</source>
+  <target>Базовый секрет</target>
 </trans-unit>
 <trans-unit id="s70c5f9407d156bbf">
   <source>Used for the client-credentials flow. Shown only when requested — store it in a safe place.</source>
+  <target>Используется для flow client-credentials. Показывается только по запросу — храните в надёжном месте.</target>
 </trans-unit>
 <trans-unit id="sdfb2b12b255de30c">
   <source>Copied!</source>
+  <target>Скопировано!</target>
 </trans-unit>
 <trans-unit id="se454913204a1e598">
   <source>Show secret</source>
+  <target>Показать секрет</target>
 </trans-unit>
 <trans-unit id="s9880ab93287dce22">
   <source>Reset secret...</source>
+  <target>Сбросить секрет...</target>
 </trans-unit>
 <trans-unit id="sc3ac225273c8316b">
   <source>General</source>
+  <target>Общие</target>
 </trans-unit>
 <trans-unit id="s874b12b387f6211e">
   <source>Landing origin</source>
+  <target>Начальный источник</target>
 </trans-unit>
 <trans-unit id="sde55fa9d0ac36f32">
   <source>Where the user is redirected after login.</source>
+  <target>Куда перенаправляется пользователь после входа.</target>
 </trans-unit>
 <trans-unit id="s78fd8c03f8c967f3">
   <source>Tokens</source>
+  <target>Токены</target>
 </trans-unit>
 <trans-unit id="sbf40c4c4e4e47684">
   <source>Refresh token expiry (seconds)</source>
+  <target>Срок действия refresh-токена (секунды)</target>
 </trans-unit>
 <trans-unit id="s76d2d86412848292">
   <source>Leave empty for no expiry.</source>
+  <target>Оставьте пустым для бессрочного действия.</target>
 </trans-unit>
 <trans-unit id="sb4f1dffbb6be6302">
   <source>Clear</source>
+  <target>Очистить</target>
 </trans-unit>
 <trans-unit id="s01a8d45397ec133b">
   <source>Security</source>
+  <target>Безопасность</target>
 </trans-unit>
 <trans-unit id="s835ae18bf04bd801">
   <source>Strict redirect URI validation</source>
+  <target>Строгая проверка URI перенаправления</target>
 </trans-unit>
 <trans-unit id="s8a72e23f4aee0824">
   <source>Only exact redirect origins are accepted.</source>
+  <target>Принимаются только точные источники перенаправления.</target>
 </trans-unit>
 <trans-unit id="s76f3e0240a09d0f2">
   <source>Failed to update strict redirect validation.</source>
+  <target>Не удалось обновить строгую проверку перенаправления.</target>
 </trans-unit>
 <trans-unit id="sc1049d191df0cf28">
   <source>PKCE</source>
+  <target>PKCE</target>
 </trans-unit>
 <trans-unit id="s7d949e77ca4bd124">
   <source>Proof Key for Code Exchange. Disabling is insecure.</source>
+  <target>Proof Key for Code Exchange. Отключение небезопасно.</target>
 </trans-unit>
 <trans-unit id="s4d76bd11f1385f0d">
   <source>Failed to enable PKCE.</source>
+  <target>Не удалось включить PKCE.</target>
 </trans-unit>
 <trans-unit id="s6312a0033126aac6">
   <source>Allow localhost redirects</source>
+  <target>Разрешить перенаправления на localhost</target>
 </trans-unit>
 <trans-unit id="sbbcfafc564140496">
   <source>Permit loopback redirects for native apps.</source>
+  <target>Разрешает loopback-перенаправления для нативных приложений.</target>
 </trans-unit>
 <trans-unit id="s98fcbaec877cca5c">
   <source>Failed to update localhost redirects.</source>
+  <target>Не удалось обновить перенаправления на localhost.</target>
 </trans-unit>
 <trans-unit id="s624db1701ad74a47">
   <source>Legacy crypto</source>
+  <target>Устаревшая криптография</target>
 </trans-unit>
 <trans-unit id="s3a312b7556ee0036">
   <source>Allow legacy signing algorithms. Enabling is insecure.</source>
+  <target>Разрешает устаревшие алгоритмы подписи. Включение небезопасно.</target>
 </trans-unit>
 <trans-unit id="s12ad3bc1f66123f9">
   <source>Failed to disable legacy crypto.</source>
+  <target>Не удалось отключить устаревшую криптографию.</target>
 </trans-unit>
 <trans-unit id="sc928b2e85a70d127">
   <source>Prefer short username</source>
+  <target>Предпочитать короткое имя пользователя</target>
 </trans-unit>
 <trans-unit id="sc6bc1e03fbc61428">
   <source>Use the name instead of the spn in tokens.</source>
+  <target>Использовать имя вместо SPN в токенах.</target>
 </trans-unit>
 <trans-unit id="sd8c786abd869bf1f">
   <source>Failed to update username preference.</source>
+  <target>Не удалось обновить предпочтение имени пользователя.</target>
 </trans-unit>
 <trans-unit id="sb0fadd621d9f98bd">
   <source>Consent prompt</source>
+  <target>Запрос согласия</target>
 </trans-unit>
 <trans-unit id="s4d5e43474ff11f64">
   <source>Ask the user to confirm access on each login.</source>
+  <target>Просить пользователя подтверждать доступ при каждом входе.</target>
 </trans-unit>
 <trans-unit id="s6b435ff5b3e2019b">
   <source>Failed to update the consent prompt.</source>
+  <target>Не удалось обновить запрос согласия.</target>
 </trans-unit>
 <trans-unit id="s21ec5b3e917555c9">
   <source>Device flow</source>
+  <target>Device flow</target>
 </trans-unit>
 <trans-unit id="s66b38523da84bbac">
   <source>Allow sign-in on input-limited devices.</source>
+  <target>Разрешает вход на устройствах с ограниченным вводом.</target>
 </trans-unit>
 <trans-unit id="sa9d77539af6b30c3">
   <source>Failed to update the device flow.</source>
+  <target>Не удалось обновить device flow.</target>
 </trans-unit>
 <trans-unit id="s3cd25c9a62591d4c">
   <source>Reset secret</source>
+  <target>Сбросить секрет</target>
 </trans-unit>
 <trans-unit id="s8b38d47d9ae31270">
   <source>Resetting invalidates the current basic secret immediately. Clients using it will no longer be able to authenticate. Continue?</source>
+  <target>Сброс немедленно делает текущий базовый секрет недействительным. Клиенты, использующие его, больше не смогут аутентифицироваться. Продолжить?</target>
 </trans-unit>
 <trans-unit id="s4ae5302766975c34">
   <source>Disable PKCE</source>
+  <target>Отключить PKCE</target>
 </trans-unit>
 <trans-unit id="sf179b6dbf06c79ad">
   <source>Disabling PKCE removes replay protection for the authorization code flow and is insecure. Continue?</source>
+  <target>Отключение PKCE убирает защиту от повторного воспроизведения для flow authorization code и небезопасно. Продолжить?</target>
 </trans-unit>
 <trans-unit id="s2d912feeacce25d0">
   <source>Failed to disable PKCE.</source>
+  <target>Не удалось отключить PKCE.</target>
 </trans-unit>
 <trans-unit id="sebdcfa1ed71af032">
   <source>Enable legacy crypto</source>
+  <target>Включить устаревшую криптографию</target>
 </trans-unit>
 <trans-unit id="sbf12e6b1c399c44e">
   <source>Legacy crypto allows weaker signing algorithms and is insecure. Continue?</source>
+  <target>Устаревшая криптография допускает более слабые алгоритмы подписи и небезопасна. Продолжить?</target>
 </trans-unit>
 <trans-unit id="s88e2338e08495a4a">
   <source>Failed to enable legacy crypto.</source>
+  <target>Не удалось включить устаревшую криптографию.</target>
 </trans-unit>
 <trans-unit id="s30493a6cb695008e">
   <source>Failed to load domain settings</source>
+  <target>Не удалось загрузить настройки домена</target>
 </trans-unit>
 <trans-unit id="s865a470bd8c5f923">
   <source>Identity settings saved.</source>
+  <target>Настройки идентификации сохранены.</target>
 </trans-unit>
 <trans-unit id="s6ea72c1b51850289">
   <source>Failed to save identity settings</source>
+  <target>Не удалось сохранить настройки идентификации</target>
 </trans-unit>
 <trans-unit id="s53f63ab69499c6ed">
   <source>Enter a non-negative whole number.</source>
+  <target>Введите неотрицательное целое число.</target>
 </trans-unit>
 <trans-unit id="s932899003882e3d9">
   <source>Max queryable attributes updated.</source>
+  <target>Максимальное число запрашиваемых атрибутов обновлено.</target>
 </trans-unit>
 <trans-unit id="sdeb78b081567e951">
   <source>Failed to update max queryable attributes</source>
+  <target>Не удалось обновить максимальное число запрашиваемых атрибутов</target>
 </trans-unit>
 <trans-unit id="sdb60f1e51a157f9b">
   <source>Domain image updated.</source>
+  <target>Изображение домена обновлено.</target>
 </trans-unit>
 <trans-unit id="s2d9187cc823cc106">
   <source>Failed to upload the domain image</source>
+  <target>Не удалось загрузить изображение домена</target>
 </trans-unit>
 <trans-unit id="s0770abb59c563e96">
   <source>Domain image removed.</source>
+  <target>Изображение домена удалено.</target>
 </trans-unit>
 <trans-unit id="sad49528f3bba8f69">
   <source>Failed to remove the domain image</source>
+  <target>Не удалось удалить изображение домена</target>
 </trans-unit>
 <trans-unit id="s19e4579af2dd84a3">
   <source>Domain not available.</source>
+  <target>Домен недоступен.</target>
 </trans-unit>
 <trans-unit id="s67dc3b212de49ba8">
   <source>Domain name</source>
+  <target>Имя домена</target>
 </trans-unit>
 <trans-unit id="se6b60ffe67b19271">
   <source>LDAP base DN</source>
+  <target>Базовый DN LDAP</target>
 </trans-unit>
 <trans-unit id="s94d63573d312fe9b">
   <source>Identity</source>
+  <target>Идентификация</target>
 </trans-unit>
 <trans-unit id="s15a4104c845f01f7">
   <source>Changing this rebuilds the LDAP directory tree.</source>
+  <target>Изменение перестраивает дерево каталогов LDAP.</target>
 </trans-unit>
 <trans-unit id="s827167addf9f662c">
   <source>Wireless network name (SSID)</source>
+  <target>Имя беспроводной сети (SSID)</target>
 </trans-unit>
 <trans-unit id="sb9621878e4655c94">
   <source>Behaviour</source>
+  <target>Поведение</target>
 </trans-unit>
 <trans-unit id="se8d62ffa29b8c9f3">
   <source>Easter eggs</source>
+  <target>Пасхалки</target>
 </trans-unit>
 <trans-unit id="se13fb722b234c83e">
   <source>Enable seasonal kanidm easter eggs.</source>
+  <target>Включает сезонные пасхалки kanidm.</target>
 </trans-unit>
 <trans-unit id="s4f0c356368cc5c1a">
   <source>Failed to update easter eggs</source>
+  <target>Не удалось обновить пасхалки</target>
 </trans-unit>
 <trans-unit id="s16ae81623bfe6dcb">
   <source>Account recovery</source>
+  <target>Восстановление аккаунтов</target>
 </trans-unit>
 <trans-unit id="s35d1b6d57b28d44b">
   <source>Enables self-service credential reset for persons. Enabling is a security-relevant change.</source>
+  <target>Включает самостоятельный сброс учётных данных для персон. Включение — изменение, влияющее на безопасность.</target>
 </trans-unit>
 <trans-unit id="s5f1e1541a7a7bf14">
   <source>Failed to update account recovery</source>
+  <target>Не удалось обновить восстановление аккаунтов</target>
 </trans-unit>
 <trans-unit id="sb43f8a8c10a12816">
   <source>LDAP unix password bind</source>
+  <target>Привязка к LDAP по unix-паролю</target>
 </trans-unit>
 <trans-unit id="s4ee68162f77a248d">
   <source>Allow binding to LDAP with unix passwords.</source>
+  <target>Разрешает привязку к LDAP с unix-паролями.</target>
 </trans-unit>
 <trans-unit id="sab2a43c1fe61d577">
   <source>Failed to update LDAP unix password bind</source>
+  <target>Не удалось обновить привязку к LDAP по unix-паролю</target>
 </trans-unit>
 <trans-unit id="s9cf668d20b4bf336">
   <source>Max queryable attributes</source>
+  <target>Макс. запрашиваемых атрибутов</target>
 </trans-unit>
 <trans-unit id="sb9736121699e8ba2">
   <source>Maximum number of attributes an LDAP search may request.</source>
+  <target>Максимальное число атрибутов, которое может запросить поиск LDAP.</target>
 </trans-unit>
 <trans-unit id="sd5226aa5e3063298">
   <source>Domain image</source>
+  <target>Изображение домена</target>
 </trans-unit>
 <trans-unit id="sb4e0e6114d7906f1">
   <source>Shown on the login page and in emails.</source>
+  <target>Отображается на странице входа и в письмах.</target>
 </trans-unit>
 <trans-unit id="s34ccaa6074be1d85">
   <source>Upload image...</source>
+  <target>Загрузить изображение...</target>
 </trans-unit>
 <trans-unit id="s5d322e513701f440">
   <source>Change base DN</source>
+  <target>Изменить базовый DN</target>
 </trans-unit>
 <trans-unit id="s3bf34f2380072fe9">
   <source>Changing the LDAP base DN from "<ph id="0">${this.info?.ldapBasedn ?? ''}</ph>" to "<ph id="1">${this.ldapBasedn.trim()}</ph>" rebuilds the LDAP directory tree. Clients may need reconfiguration. Continue?</source>
+  <target>Изменение базового DN LDAP с "<ph id="0">${this.info?.ldapBasedn ?? ''}</ph>" на "<ph id="1">${this.ldapBasedn.trim()}</ph>" перестроит дерево каталогов LDAP. Клиенты могут потребовать перенастройки. Продолжить?</target>
 </trans-unit>
 <trans-unit id="sb9ebdd08bb1dbe7c">
   <source>Remove image</source>
+  <target>Удалить изображение</target>
 </trans-unit>
 <trans-unit id="s75ebd66e12b5b164">
   <source>Remove the domain image?</source>
+  <target>Удалить изображение домена?</target>
 </trans-unit>
 <trans-unit id="s0f8415c4b205b099">
   <source>Failed to load system settings</source>
+  <target>Не удалось загрузить системные настройки</target>
 </trans-unit>
 <trans-unit id="s885bd4259036748a">
   <source>Enter at least one entry, one per line.</source>
+  <target>Введите хотя бы одну запись, по одной в строке.</target>
 </trans-unit>
 <trans-unit id="s23f221c1c5c8aa20">
   <source>Added <ph id="0">${entries.length}</ph> entr<ph id="1">${entries.length === 1 ? 'y' : 'ies'}</ph>.</source>
+  <target>Добавлено записей: <ph id="0">${entries.length}</ph><ph id="1">${entries.length === 1 ? 'y' : 'ies'}</ph>.</target>
 </trans-unit>
 <trans-unit id="s00d3876cfa9cc983">
   <source>Failed to update the list</source>
+  <target>Не удалось обновить список</target>
 </trans-unit>
 <trans-unit id="sc12be6d6478ba751">
   <source>Removed "<ph id="0">${value}</ph>".</source>
+  <target>Удалено "<ph id="0">${value}</ph>".</target>
 </trans-unit>
 <trans-unit id="sfda9cfb531099abc">
   <source>Failed to remove the entry</source>
+  <target>Не удалось удалить запись</target>
 </trans-unit>
 <trans-unit id="s41f7dca46d3f1b4a">
   <source>Value</source>
+  <target>Значение</target>
 </trans-unit>
 <trans-unit id="se07cad5c64edf6fa">
   <source>Add entries (one per line)</source>
+  <target>Добавить записи (по одной в строке)</target>
 </trans-unit>
 <trans-unit id="s851de3a097b3a548">
   <source>Remove "<ph id="0">${this.removeTarget.value}</ph>" from <ph id="1">${isBadlist ? msg('the password badlist') : msg('the denied names list')}</ph>?</source>
+  <target>Удалить "<ph id="0">${this.removeTarget.value}</ph>" из <ph id="1">${isBadlist ? msg('the password badlist') : msg('the denied names list')}</ph>?</target>
 </trans-unit>
 <trans-unit id="sfd3d7a5fded6560e">
   <source>the password badlist</source>
+  <target>стоп-листа паролей</target>
 </trans-unit>
 <trans-unit id="s41ec279d115cb531">
   <source>the denied names list</source>
+  <target>списка запрещённых имён</target>
 </trans-unit>
 <trans-unit id="s892a89c40a3a7f13">
   <source>Password badlist</source>
+  <target>Стоп-лист паролей</target>
 </trans-unit>
 <trans-unit id="s8a5f37f2a873c2cb">
   <source>Passwords in this list are rejected when users set or reset their password.</source>
+  <target>Пароли из этого списка отклоняются при установке или сбросе пароля пользователями.</target>
 </trans-unit>
 <trans-unit id="s4926c4d76f0ef98e">
   <source>The badlist is empty.</source>
+  <target>Стоп-лист пуст.</target>
 </trans-unit>
 <trans-unit id="sbcaf81042df1bf2e">
   <source>Denied names</source>
+  <target>Запрещённые имена</target>
 </trans-unit>
 <trans-unit id="sc4b461bdfe328b1d">
   <source>Names in this list cannot be used for persons, groups, or accounts.</source>
+  <target>Имена из этого списка нельзя использовать для персон, групп или аккаунтов.</target>
 </trans-unit>
 <trans-unit id="s12be33ebed5b71d0">
   <source>The denied names list is empty.</source>
+  <target>Список запрещённых имён пуст.</target>
 </trans-unit>
 <trans-unit id="sea2e8dad1ed23882">
   <source>Failed to load applications</source>
+  <target>Не удалось загрузить приложения</target>
 </trans-unit>
 <trans-unit id="s752387594e4e90af">
   <source>Created application <ph id="0">${name}</ph></source>
+  <target>Приложение <ph id="0">${name}</ph> создано</target>
 </trans-unit>
 <trans-unit id="s5e27300f1b6934f5">
   <source>Failed to create application</source>
+  <target>Не удалось создать приложение</target>
 </trans-unit>
 <trans-unit id="s28391031382152e6">
   <source>Deleted application <ph id="0">${id}</ph></source>
+  <target>Приложение <ph id="0">${id}</ph> удалено</target>
 </trans-unit>
 <trans-unit id="s470bd63219bf5b4a">
   <source>Failed to delete application</source>
+  <target>Не удалось удалить приложение</target>
 </trans-unit>
 <trans-unit id="sfc86fbef54d0d005">
   <source>Failed to load application</source>
+  <target>Не удалось загрузить приложение</target>
 </trans-unit>
 <trans-unit id="s59612865260ccc43">
   <source>Linked group</source>
+  <target>Связанная группа</target>
 </trans-unit>
 <trans-unit id="s15b45af096ab9493">
   <source>Application <ph id="0">${this.detail.displayName}</ph></source>
+  <target>Приложение <ph id="0">${this.detail.displayName}</ph></target>
 </trans-unit>
 <trans-unit id="sece3d3dfa7bef590">
   <source>Linked groups</source>
+  <target>Связанные группы</target>
 </trans-unit>
 <trans-unit id="s4a59154ed6132179">
   <source>No linked groups.</source>
+  <target>Нет связанных групп.</target>
 </trans-unit>
 <trans-unit id="s16b9446e3a70e1f4">
   <source>Attributes</source>
+  <target>Атрибуты</target>
 </trans-unit>
 <trans-unit id="sbba865d4b437944f">
   <source>Attribute</source>
+  <target>Атрибут</target>
 </trans-unit>
 <trans-unit id="s7c85a1ceeab1df6a">
   <source>No additional attributes.</source>
+  <target>Нет дополнительных атрибутов.</target>
 </trans-unit>
 <trans-unit id="s51b0102a7d31d0bf">
   <source>Create application</source>
+  <target>Создать приложение</target>
 </trans-unit>
 <trans-unit id="s40adc2034eb9122d">
   <source>No applications found.</source>
+  <target>Приложения не найдены.</target>
 </trans-unit>
 <trans-unit id="s3be2267dad5baab1">
   <source>My Application</source>
+  <target>Моё приложение</target>
 </trans-unit>
 <trans-unit id="s1db7317ebdd37e07">
   <source>Delete application "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.name}</ph>)? This cannot be undone.</source>
+  <target>Удалить приложение "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.name}</ph>)? Это действие необратимо.</target>
 </trans-unit>
 <trans-unit id="sf1e9d421f35b51e5">
   <source>Application</source>
+  <target>Приложение</target>
 </trans-unit>
 <trans-unit id="sbbfb8f45289508d5">
   <source>Failed to load messages</source>
+  <target>Не удалось загрузить сообщения</target>
 </trans-unit>
 <trans-unit id="s9faa877c556d3724">
   <source>Failed to load message</source>
+  <target>Не удалось загрузить сообщение</target>
 </trans-unit>
 <trans-unit id="sd36fac55ba227e6e">
   <source>Marked message <ph id="0">${id}</ph> as sent</source>
+  <target>Сообщение <ph id="0">${id}</ph> отмечено как отправленное</target>
 </trans-unit>
 <trans-unit id="sf5311b426518ac2b">
   <source>Failed to mark message as sent</source>
+  <target>Не удалось отметить сообщение как отправленное</target>
 </trans-unit>
 <trans-unit id="s430313a7b60b4438">
   <source>Person name is required.</source>
+  <target>Требуется имя персоны.</target>
 </trans-unit>
 <trans-unit id="s96e1205fe74f58cf">
   <source>Queued a test message for <ph id="0">${person}</ph></source>
+  <target>Тестовое сообщение для <ph id="0">${person}</ph> поставлено в очередь</target>
 </trans-unit>
 <trans-unit id="s4aaeb947824d014c">
   <source>Failed to send test message</source>
+  <target>Не удалось отправить тестовое сообщение</target>
 </trans-unit>
 <trans-unit id="s09242e07b5b90ca0">
   <source>Id</source>
+  <target>Id</target>
 </trans-unit>
 <trans-unit id="se47baf2fd16b9d2b">
   <source>Template</source>
+  <target>Шаблон</target>
 </trans-unit>
 <trans-unit id="s67c3f901c2f77771">
   <source>Send after</source>
+  <target>Отправить после</target>
 </trans-unit>
 <trans-unit id="s57ade424d57c6edf">
   <source>Sent</source>
+  <target>Отправлено</target>
 </trans-unit>
 <trans-unit id="s78636b92c1a3909c">
   <source>Pending</source>
+  <target>В очереди</target>
 </trans-unit>
 <trans-unit id="sd2d1b201126df5ae">
   <source>Mail destination</source>
+  <target>Email-получатель</target>
 </trans-unit>
 <trans-unit id="sb2bf4d1444ac4144">
   <source>Intent id</source>
+  <target>Id намерения</target>
 </trans-unit>
 <trans-unit id="sacd23423a808f3bb">
   <source>Expiry time</source>
+  <target>Время истечения</target>
 </trans-unit>
 <trans-unit id="seebb4169cec02994">
   <source>Delete after</source>
+  <target>Удалить после</target>
 </trans-unit>
 <trans-unit id="s9151d07033f8bc10">
   <source>Sent at</source>
+  <target>Отправлено в</target>
 </trans-unit>
 <trans-unit id="s98d29e1feb3ed2ee">
   <source>Not sent yet</source>
+  <target>Ещё не отправлено</target>
 </trans-unit>
 <trans-unit id="sf993bb199fefbe04">
   <source>All</source>
+  <target>Все</target>
 </trans-unit>
 <trans-unit id="s6183624814d4d5a9">
   <source>Ready to send</source>
+  <target>Готово к отправке</target>
 </trans-unit>
 <trans-unit id="s102e276279c146e3">
   <source>Person name</source>
+  <target>Имя персоны</target>
 </trans-unit>
 <trans-unit id="s43cf256a3ea133ac">
   <source>No messages found.</source>
+  <target>Сообщения не найдены.</target>
 </trans-unit>
 <trans-unit id="s1b264494c69859bd">
   <source>Message detail</source>
+  <target>Сведения о сообщении</target>
 </trans-unit>
 <trans-unit id="sa2996bc933bdbafe">
   <source>Mark sent</source>
+  <target>Отметить отправленным</target>
 </trans-unit>
 <trans-unit id="s45d7451b0c2a4a60">
   <source>Mark message <ph id="0">${this.detail?.id ?? ''}</ph> as sent? No email will be delivered.</source>
+  <target>Отметить сообщение <ph id="0">${this.detail?.id ?? ''}</ph> как отправленное? Письмо доставлено не будет.</target>
 </trans-unit>
 <trans-unit id="s34f2d7789bb396f0">
   <source>Failed to load the recycle bin</source>
+  <target>Не удалось загрузить корзину</target>
 </trans-unit>
 <trans-unit id="s181f0670e933ae42">
   <source>Revived entry <ph id="0">${id}</ph></source>
+  <target>Запись <ph id="0">${id}</ph> восстановлена</target>
 </trans-unit>
 <trans-unit id="s36dc10ce090e322a">
   <source>Failed to revive entry</source>
+  <target>Не удалось восстановить запись</target>
 </trans-unit>
 <trans-unit id="sc4a984de2d5720d1">
   <source>Failed to load entry details</source>
+  <target>Не удалось загрузить сведения о записи</target>
 </trans-unit>
 <trans-unit id="s98b8b394811dd087">
   <source>Classes</source>
+  <target>Классы</target>
 </trans-unit>
 <trans-unit id="sfc93e152aff28910">
   <source>Revive</source>
+  <target>Восстановить</target>
 </trans-unit>
 <trans-unit id="sa8e9c7094910d6df">
   <source>No attributes.</source>
+  <target>Нет атрибутов.</target>
 </trans-unit>
 <trans-unit id="s6524029e425ef697">
   <source>Recycle bin</source>
+  <target>Корзина</target>
 </trans-unit>
 <trans-unit id="s1bb3dc691ac2c9e5">
   <source>The recycle bin is empty.</source>
+  <target>Корзина пуста.</target>
 </trans-unit>
 <trans-unit id="seb789720b93dcc23">
   <source>Revive entry "<ph id="0">${this.reviveTarget.id}</ph>" (<ph id="1">${this.reviveTarget.uuid ?? '—'}</ph>)? It will be restored to the live database.</source>
+  <target>Восстановить запись "<ph id="0">${this.reviveTarget.id}</ph>" (<ph id="1">${this.reviveTarget.uuid ?? '—'}</ph>)? Она будет возвращена в рабочую базу данных.</target>
 </trans-unit>
 <trans-unit id="s2d536d0be525c731">
   <source>Entry details</source>
+  <target>Сведения о записи</target>
 </trans-unit>
 <trans-unit id="s9639794dbb9ac1d1">
   <source>Failed to load sync account</source>
+  <target>Не удалось загрузить аккаунт синхронизации</target>
 </trans-unit>
 <trans-unit id="s6555bccfaf0ba8f1">
   <source>Credential portal updated.</source>
+  <target>Портал учётных данных обновлён.</target>
 </trans-unit>
 <trans-unit id="sfb278e7f9f8a18d4">
   <source>Credential portal cleared.</source>
+  <target>Портал учётных данных очищен.</target>
 </trans-unit>
 <trans-unit id="s54f4b14b7a29140b">
   <source>Failed to update credential portal</source>
+  <target>Не удалось обновить портал учётных данных</target>
 </trans-unit>
 <trans-unit id="s73dc31668f6667b2">
   <source>Yield attributes updated.</source>
+  <target>Передаваемые атрибуты обновлены.</target>
 </trans-unit>
 <trans-unit id="s7d74d3aed2d088d4">
   <source>Failed to update yield attributes</source>
+  <target>Не удалось обновить передаваемые атрибуты</target>
 </trans-unit>
 <trans-unit id="s079ffc0734880df6">
   <source>Label is required.</source>
+  <target>Требуется метка.</target>
 </trans-unit>
 <trans-unit id="s5fae62eb79deed60">
   <source>Sync token generated.</source>
+  <target>Токен синхронизации сгенерирован.</target>
 </trans-unit>
 <trans-unit id="sa7de7573923351ce">
   <source>Failed to generate sync token</source>
+  <target>Не удалось сгенерировать токен синхронизации</target>
 </trans-unit>
 <trans-unit id="s0a0d6f2737e18433">
   <source>Failed to copy token.</source>
+  <target>Не удалось скопировать токен.</target>
 </trans-unit>
 <trans-unit id="s9ebd569789de56ca">
   <source>Sync token destroyed.</source>
+  <target>Токен синхронизации уничтожен.</target>
 </trans-unit>
 <trans-unit id="s441ece11be767453">
   <source>Failed to destroy sync token</source>
+  <target>Не удалось уничтожить токен синхронизации</target>
 </trans-unit>
 <trans-unit id="s97ead8cafd039827">
   <source>Force refresh requested.</source>
+  <target>Запрошено принудительное обновление.</target>
 </trans-unit>
 <trans-unit id="s10aa5dded06c9c15">
   <source>Failed to force refresh</source>
+  <target>Не удалось выполнить принудительное обновление</target>
 </trans-unit>
 <trans-unit id="s8ba6a0f9581a18bb">
   <source>Destroy the sync token? The sync client will no longer be able to connect until a new token is issued.</source>
+  <target>Уничтожить токен синхронизации? Клиент синхронизации не сможет подключаться, пока не будет выдан новый токен.</target>
 </trans-unit>
 <trans-unit id="sf187dbd717af5fa9">
   <source>Finalise this sync account? ALL synced entries will be converted into static persons and groups and will no longer be managed by the sync provider. This action is IRREVERSIBLE.</source>
+  <target>Завершить этот аккаунт синхронизации? ВСЕ синхронизированные записи будут преобразованы в статичные персоны и группы и больше не будут управляться провайдером синхронизации. Это действие НЕОБРАТИМО.</target>
 </trans-unit>
 <trans-unit id="s68f7bf02bad78ab2">
   <source>Terminate this sync account? ALL synced entries (persons and groups) will be DELETED. This action is IRREVERSIBLE.</source>
+  <target>Прекратить этот аккаунт синхронизации? ВСЕ синхронизированные записи (персоны и группы) будут УДАЛЕНЫ. Это действие НЕОБРАТИМО.</target>
 </trans-unit>
 <trans-unit id="s90a87bac099ea2d4">
   <source>Destroy token</source>
+  <target>Уничтожить токен</target>
 </trans-unit>
 <trans-unit id="s85d7080120c5394a">
   <source>Finalise</source>
+  <target>Завершить</target>
 </trans-unit>
 <trans-unit id="s354a1c02f1254bc4">
   <source>Terminate</source>
+  <target>Прекратить</target>
 </trans-unit>
 <trans-unit id="s1e4952e6bb81f88a">
   <source>Sync account finalised.</source>
+  <target>Аккаунт синхронизации завершён.</target>
 </trans-unit>
 <trans-unit id="se8c252dd7f6ee7d8">
   <source>Sync account terminated.</source>
+  <target>Аккаунт синхронизации прекращён.</target>
 </trans-unit>
 <trans-unit id="sde97b8ec4aebd0a0">
   <source>Failed to finalise sync account</source>
+  <target>Не удалось завершить аккаунт синхронизации</target>
 </trans-unit>
 <trans-unit id="sfbf8ca75d6512aa2">
   <source>Failed to terminate sync account</source>
+  <target>Не удалось прекратить аккаунт синхронизации</target>
 </trans-unit>
 <trans-unit id="s1c0f118b6b85ad6e">
   <source>Credential Portal</source>
+  <target>Портал учётных данных</target>
 </trans-unit>
 <trans-unit id="sa10405062f8ce56a">
   <source>URL of the credential portal where synced users can set their credentials.</source>
+  <target>URL портала учётных данных, где синхронизированные пользователи могут задать свои учётные данные.</target>
 </trans-unit>
 <trans-unit id="s210fd0deb39823a2">
   <source>Portal URL</source>
+  <target>URL портала</target>
 </trans-unit>
 <trans-unit id="s83718702f41dfa3f">
   <source>Yield Attributes</source>
+  <target>Передаваемые атрибуты</target>
 </trans-unit>
 <trans-unit id="s970b136c4375749b">
   <source>Attributes the sync provider yields authority over, one per line. Listed attributes can be modified locally.</source>
+  <target>Атрибуты, управление которыми передаёт провайдер синхронизации, по одному в строке. Перечисленные атрибуты можно изменять локально.</target>
 </trans-unit>
 <trans-unit id="s722a06de923b913b">
   <source>Sync Token</source>
+  <target>Токен синхронизации</target>
 </trans-unit>
 <trans-unit id="s14442d8510a23ff7">
   <source>Token used by the sync client (kanidm-sync) to connect to this account.</source>
+  <target>Токен, используемый клиентом синхронизации (kanidm-sync) для подключения к этому аккаунту.</target>
 </trans-unit>
 <trans-unit id="s71cee58f96e23cbc">
   <source>Token label</source>
+  <target>Метка токена</target>
 </trans-unit>
 <trans-unit id="s929d17283ed832c8">
   <source>e.g. prod-sync-client</source>
+  <target>напр. prod-sync-client</target>
 </trans-unit>
 <trans-unit id="sefb4291be01ef623">
   <source>Generate token</source>
+  <target>Сгенерировать токен</target>
 </trans-unit>
 <trans-unit id="s2a15f95845e31799">
   <source>Copy this token now — it will NOT be shown again.</source>
+  <target>Скопируйте этот токен сейчас — он НЕ будет показан снова.</target>
 </trans-unit>
 <trans-unit id="sa080f5eab1aa9100">
   <source>Maintenance</source>
+  <target>Обслуживание</target>
 </trans-unit>
 <trans-unit id="sdb0907f305a18122">
   <source>This account cannot be deleted — Kanidm v1 does not support deleting sync accounts.</source>
+  <target>Этот аккаунт нельзя удалить — Kanidm v1 не поддерживает удаление аккаунтов синхронизации.</target>
 </trans-unit>
 <trans-unit id="sab4c7866fe790257">
   <source>Force refresh</source>
+  <target>Принудительное обновление</target>
 </trans-unit>
 <trans-unit id="s192d3771f3499db5">
   <source>All sync accounts</source>
+  <target>Все аккаунты синхронизации</target>
 </trans-unit>
 <trans-unit id="sc8cea42df5da32ba">
   <source>Sync account not found.</source>
+  <target>Аккаунт синхронизации не найден.</target>
 </trans-unit>
 <trans-unit id="sde6ac115c7f70646">
   <source>Failed to load sync accounts</source>
+  <target>Не удалось загрузить аккаунты синхронизации</target>
 </trans-unit>
 <trans-unit id="sff4a6360212b9a43">
   <source>Created sync account <ph id="0">${name}</ph></source>
+  <target>Аккаунт синхронизации <ph id="0">${name}</ph> создан</target>
 </trans-unit>
 <trans-unit id="s60cfac3fe2eb5781">
   <source>Failed to create sync account</source>
+  <target>Не удалось создать аккаунт синхронизации</target>
 </trans-unit>
 <trans-unit id="s154c10a18c1a4846">
   <source>Sync Accounts</source>
+  <target>Аккаунты синхронизации</target>
 </trans-unit>
 <trans-unit id="s337076318719f95f">
   <source>Create sync account</source>
+  <target>Создать аккаунт синхронизации</target>
 </trans-unit>
 <trans-unit id="sbf67813608796417">
   <source>No sync accounts found.</source>
+  <target>Аккаунты синхронизации не найдены.</target>
 </trans-unit>
 <trans-unit id="s7257e808ec48cd3f">
   <source>Optional description</source>
+  <target>Необязательное описание</target>
 </trans-unit>
 </body>
 </file>
