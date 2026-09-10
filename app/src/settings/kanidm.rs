@@ -6,7 +6,9 @@
 
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+// Clone: kanidm_container::start returns an owned copy of these
+// settings in the disabled (non-container) path.
+#[derive(Debug, Clone, Deserialize)]
 pub struct KanidmSettings {
     /// Base URL of the Kanidm server, e.g. `https://idm.example.com:8443`.
     pub url: String,
