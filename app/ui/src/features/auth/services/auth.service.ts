@@ -167,11 +167,15 @@ class AuthService {
     return this.authState.user ? { ...this.authState.user } : null;
   }
 
-  /** Resolved group names (null names dropped). */
+  /**
+   * Resolved group names (null names dropped, realm suffix stripped —
+   * Kanidm returns spn-shaped names like 'idm_people_admins@localhost').
+   */
   getGroups(): string[] {
     return this.authState.groups
       .map((group) => group.name)
-      .filter((name): name is string => name !== null);
+      .filter((name): name is string => name !== null)
+      .map((name) => name.split('@')[0]);
   }
 
   /** Raw profile groups (uuid + name|null). */
