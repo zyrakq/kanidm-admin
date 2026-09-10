@@ -3,7 +3,7 @@
 // (libs/client/src/service_account.rs + lib.rs); writes are wrapped in
 // withStepUp by the calling components (D8).
 
-import { apiFetch } from '@/shared/services/http-client';
+import { ApiError, apiFetch } from '@/shared/services/http-client';
 import { entryBody, type KanidmEntry } from '@/shared/types/kanidm';
 import type {
   ApiTokenView,
@@ -38,20 +38,39 @@ class ServiceAccountService {
     return entries.map(toServiceAccountSummary);
   }
 
-  /** Get one service account by name or uuid (vendor idm_service_account_get). */
+  /**
+   * Get one service account by name or uuid (vendor idm_service_account_get).
+   * Kanidm returns 200 `null` for missing entries — map that to 404.
+   */
   async get(id: string): Promise<ServiceAccountDetail> {
-    const entry = await apiFetch<KanidmEntry>(
+    const entry = await apiFetch<KanidmEntry | null>(
       `${BASE}/service_account/${encodeURIComponent(id)}`
     );
+    if (entry === null) {
+      throw new ApiError('not_found', 'Not found.', 404);
+    }
     return toServiceAccountDetail(entry);
   }
 
-  /** Create (vendor idm_service_account_create: attrs name+displayname). */
-  async create(id: string, displayName: string): Promise<void> {
+  /**
+   * Create (vendor idm_service_account_create: attrs name+displayname+
+   * entry_managed_by). entryManagedBy is required: without an EntryManager
+   * group, Kanidm's ACP prevents anyone from generating API tokens or
+   * managing credentials for the account.
+   */
+  async create(
+    id: string,
+    displayName: string,
+    entryManagedBy: string
+  ): Promise<void> {
     await apiFetch<void>(`${BASE}/service_account`, {
       method: 'POST',
       body: JSON.stringify(
-        entryBody({ name: [id], displayname: [displayName] })
+        entryBody({
+          name: [id],
+          displayname: [displayName],
+          entry_managed_by: [entryManagedBy],
+        })
       ),
     });
   }
@@ -177,8 +196,11 @@ class ServiceAccountService {
    * required (v1 proto serialization: format!("{tag}: {pk}")).
    */
   async sshKeys(id: string): Promise<string[]> {
-    return apiFetch<string[]>(
-      `${BASE}/service_account/${encodeURIComponent(id)}/_attr/ssh_publickey`
+    // Kanidm returns 200 `null` when the attribute is empty.
+    return (
+      (await apiFetch<string[] | null>(
+        `${BASE}/service_account/${encodeURIComponent(id)}/_attr/ssh_publickey`
+      )) ?? []
     );
   }
 

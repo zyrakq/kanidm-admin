@@ -6,6 +6,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
+import { groupService, type GroupSummary } from '@/features/groups';
 import { notificationService } from '@/features/notifications';
 import { ApiError } from '@/shared/services/http-client';
 import '@/shared/components/admin-layout';
@@ -28,6 +29,8 @@ export class ServiceAccountListPage extends LitElement {
   @state() private createBusy = false;
   @state() private createId = '';
   @state() private createDisplayName = '';
+  @state() private createEntryManagedBy = '';
+  @state() private createGroups: GroupSummary[] = [];
   @state() private deleteTarget: ServiceAccountSummary | null = null;
   @state() private deleteBusy = false;
 
@@ -55,12 +58,24 @@ export class ServiceAccountListPage extends LitElement {
   private openCreate(): void {
     this.createId = '';
     this.createDisplayName = '';
+    this.createEntryManagedBy = '';
     this.createOpen = true;
+    // Entry managed by is required (Kanidm EntryManager ACP: without it
+    // nobody can generate API tokens or manage credentials for the
+    // account). Populate the group select from the groups feature.
+    void groupService
+      .list()
+      .then((groups) => (this.createGroups = groups))
+      .catch(() => (this.createGroups = []));
   }
 
   private async submitCreate(): Promise<void> {
-    if (!this.createId.trim() || !this.createDisplayName.trim()) {
-      notificationService.error(msg('Both fields are required.'));
+    if (
+      !this.createId.trim() ||
+      !this.createDisplayName.trim() ||
+      !this.createEntryManagedBy.trim()
+    ) {
+      notificationService.error(msg('All fields are required.'));
       return;
     }
     this.createBusy = true;
@@ -68,7 +83,8 @@ export class ServiceAccountListPage extends LitElement {
       await authService.withStepUp(() =>
         serviceAccountService.create(
           this.createId.trim(),
-          this.createDisplayName.trim()
+          this.createDisplayName.trim(),
+          this.createEntryManagedBy.trim()
         )
       );
       notificationService.success(
@@ -163,6 +179,18 @@ export class ServiceAccountListPage extends LitElement {
             placeholder=${msg('Application service account')}
             @field-input=${(e: CustomEvent<{ value: string }>) =>
               (this.createDisplayName = e.detail.value)}
+          ></form-field>
+          <form-field
+            label=${msg('Entry managed by')}
+            fieldId="service-account-create-managed-by"
+            type="select"
+            .value=${this.createEntryManagedBy}
+            .options=${this.createGroups.map((group) => ({
+              value: group.id,
+              label: group.displayName,
+            }))}
+            @field-input=${(e: CustomEvent<{ value: string }>) =>
+              (this.createEntryManagedBy = e.detail.value)}
           ></form-field>
           <div slot="footer">
             <button
