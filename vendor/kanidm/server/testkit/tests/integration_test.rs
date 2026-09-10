@@ -1,3 +1,0 @@
-#![deny(warnings)]
-
-mod testkit;
