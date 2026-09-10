@@ -40,11 +40,27 @@ export const footerInfoStyles = css`
     height: 8px;
     background: var(--theme-color-success);
     border-radius: 50%;
+    transition: background-color 0.2s ease;
   }
 
-  .version {
-    color: var(--theme-color-text-muted);
-    transition: color 0.2s ease;
+  .status[data-state='loading'] .status-dot {
+    background: var(--theme-color-text-muted);
+  }
+
+  .status[data-state='unreachable'] {
+    color: var(--theme-color-error);
+  }
+
+  .status[data-state='unreachable'] .status-dot {
+    background: var(--theme-color-error);
+  }
+
+  .status[data-state='version_conflict'] {
+    color: var(--theme-color-warning);
+  }
+
+  .status[data-state='version_conflict'] .status-dot {
+    background: var(--theme-color-warning);
   }
 
   .separator {
