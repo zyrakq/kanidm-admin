@@ -958,10 +958,6 @@
   <source>No groups found.</source>
   <target>Группы не найдены.</target>
 </trans-unit>
-<trans-unit id="sb5b7d3e2a43305d7">
-  <source>Development Team</source>
-  <target>Development Team</target>
-</trans-unit>
 <trans-unit id="s96f9020c9ff73683">
   <source>Delete group "<ph id="0">${this.deleteTarget.displayName ?? this.deleteTarget.id}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? The entry can be revived from the recycle bin.</source>
   <target>Удалить группу "<ph id="0">${this.deleteTarget.displayName ?? this.deleteTarget.id}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? Запись можно восстановить из корзины.</target>
@@ -2517,6 +2513,10 @@
 <trans-unit id="s7257e808ec48cd3f">
   <source>Optional description</source>
   <target>Необязательное описание</target>
+</trans-unit>
+<trans-unit id="s46323608c04dc677">
+  <source>Entry managed by</source>
+  <target>Управляется группой</target>
 </trans-unit>
 </body>
 </file>
