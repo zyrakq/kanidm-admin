@@ -1,3 +1,6 @@
 [frontend]
 serve_from = "disk"
 watch = true
+
+[kanidm_container]
+enabled = true
