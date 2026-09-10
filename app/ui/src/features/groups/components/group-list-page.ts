@@ -27,7 +27,6 @@ export class GroupListPage extends LitElement {
   @state() private createOpen = false;
   @state() private createBusy = false;
   @state() private createId = '';
-  @state() private createDisplayName = '';
   @state() private deleteTarget: GroupSummary | null = null;
   @state() private deleteBusy = false;
 
@@ -54,7 +53,6 @@ export class GroupListPage extends LitElement {
 
   private openCreate(): void {
     this.createId = '';
-    this.createDisplayName = '';
     this.createOpen = true;
   }
 
@@ -66,10 +64,7 @@ export class GroupListPage extends LitElement {
     this.createBusy = true;
     try {
       const id = this.createId.trim();
-      const displayName = this.createDisplayName.trim();
-      await authService.withStepUp(() =>
-        groupService.create(id, displayName || undefined)
-      );
+      await authService.withStepUp(() => groupService.create(id));
       notificationService.success(msg(str`Created group ${id}`));
       this.createOpen = false;
       await this.load();
@@ -163,14 +158,6 @@ export class GroupListPage extends LitElement {
             placeholder="team-devs"
             @field-input=${(e: CustomEvent<{ value: string }>) =>
               (this.createId = e.detail.value)}
-          ></form-field>
-          <form-field
-            label=${msg('Display name')}
-            fieldId="group-create-display"
-            .value=${this.createDisplayName}
-            placeholder=${msg('Development Team')}
-            @field-input=${(e: CustomEvent<{ value: string }>) =>
-              (this.createDisplayName = e.detail.value)}
           ></form-field>
           <div slot="footer">
             <button

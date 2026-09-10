@@ -3,7 +3,7 @@
 // (libs/client/src/group.rs + lib.rs group section); writes are wrapped
 // in withStepUp by the calling components.
 
-import { apiFetch } from '@/shared/services/http-client';
+import { ApiError, apiFetch } from '@/shared/services/http-client';
 import { entryBody, type KanidmEntry } from '@/shared/types/kanidm';
 import type { GroupDetail, GroupSummary } from '../types/group.types';
 import { toGroupDetail, toGroupSummary } from '../types/group.types';
@@ -30,19 +30,25 @@ class GroupService {
 
   /** Get one group by name or uuid (vendor idm_group_get). */
   async get(id: string): Promise<GroupDetail> {
-    const entry = await apiFetch<KanidmEntry>(`${BASE}/group/${encodeURIComponent(id)}`);
+    // Kanidm returns 200 with a null body for missing entries.
+    const entry = await apiFetch<KanidmEntry | null>(
+      `${BASE}/group/${encodeURIComponent(id)}`
+    );
+    if (entry === null) {
+      throw new ApiError('not_found', 'Not found.', 404);
+    }
     return toGroupDetail(entry);
   }
 
-  /** Create (vendor idm_group_create: POST /v1/group, attrs name). */
-  async create(id: string, displayName?: string): Promise<void> {
-    const attrs: Record<string, string[]> = { name: [id] };
-    if (displayName !== undefined) {
-      attrs.displayname = [displayName];
-    }
+  /**
+   * Create (vendor idm_group_create: POST /v1/group, attrs name).
+   * Kanidm 1.12 groups have no writable displayname attribute — sending
+   * it returns 403 access_denied, so only the name is sent.
+   */
+  async create(id: string): Promise<void> {
     await apiFetch<void>(`${BASE}/group`, {
       method: 'POST',
-      body: JSON.stringify(entryBody(attrs)),
+      body: JSON.stringify(entryBody({ name: [id] })),
     });
   }
 
