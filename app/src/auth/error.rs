@@ -18,6 +18,12 @@ pub enum ApiErrorCode {
     ReauthRequired,
     KanidmUnreachable,
     ValidationError,
+    AccessDenied,
+    NotFound,
+    Conflict,
+    KanidmBadRequest,
+    KanidmRejected,
+    KanidmError,
 }
 
 impl ApiErrorCode {
@@ -28,6 +34,12 @@ impl ApiErrorCode {
             Self::ReauthRequired => "reauth_required",
             Self::KanidmUnreachable => "kanidm_unreachable",
             Self::ValidationError => "validation_error",
+            Self::AccessDenied => "access_denied",
+            Self::NotFound => "not_found",
+            Self::Conflict => "conflict",
+            Self::KanidmBadRequest => "kanidm_bad_request",
+            Self::KanidmRejected => "kanidm_rejected",
+            Self::KanidmError => "kanidm_error",
         }
     }
 
@@ -37,6 +49,12 @@ impl ApiErrorCode {
             Self::ReauthRequired => StatusCode::FORBIDDEN,
             Self::KanidmUnreachable => StatusCode::BAD_GATEWAY,
             Self::ValidationError => StatusCode::BAD_REQUEST,
+            Self::AccessDenied => StatusCode::FORBIDDEN,
+            Self::NotFound => StatusCode::NOT_FOUND,
+            Self::Conflict => StatusCode::CONFLICT,
+            Self::KanidmBadRequest => StatusCode::BAD_REQUEST,
+            Self::KanidmRejected => StatusCode::UNPROCESSABLE_ENTITY,
+            Self::KanidmError => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }

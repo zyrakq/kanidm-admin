@@ -4,3 +4,4 @@
 // forwarding, error normalization. No per-endpoint handlers by design.
 
 pub mod allowlist;
+pub mod error_map;
