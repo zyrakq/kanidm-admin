@@ -3,10 +3,7 @@
 #
 # The official kanidm/server image is FROM scratch (no shell) and the
 # server refuses to start without pre-existing TLS files, so a wrapper
-# entrypoint is the only single-container way. The official image is
-# itself built on opensuse/tumbleweed, so overlaying its content onto
-# a current tumbleweed keeps the dynamically linked /sbin/kanidmd
-# working (its bundled libs land in /lib and /lib64).
+# entrypoint is the only single-container way.
 #
 # Build context: dev/kanidm/ (this file, entrypoint.sh, server.toml).
 # The base tag arrives as a build arg from [kanidm_container].image,
@@ -18,20 +15,23 @@ FROM ${BASE_IMAGE} AS kanidm
 
 FROM opensuse/tumbleweed:latest
 
-# Overlay the official image content: /sbin/kanidmd, bundled libs in
-# /lib and /lib64, web assets in /hpkg, CA certs. Copying the whole
-# root avoids per-path existence assumptions (COPY fails on missing
-# source paths).
-# Fallback if the current tumbleweed userland breaks against the
-# image-era bundled libs: copy only /sbin, /hpkg and /etc/ssl/certs,
-# then resolve any missing shared libs via zypper.
-COPY --from=kanidm / /
+# Copy only the server binary and the web assets from the official
+# image. A whole-root overlay does not work here: current tumbleweed
+# is a merged-usr distro where /sbin, /lib and /lib64 are symlinks
+# into /usr (and /etc/ssl/certs is a symlink to the CA store), so
+# copying the scratch image's real directories over them fails with
+# "cannot copy to non-directory".
+# kanidmd is statically linked except for glibc core (libc, libm,
+# libgcc_s, ld-linux), which the base image already provides as a
+# matched set — no LD_LIBRARY_PATH and no bundled libs are needed.
+# The base image also ships the same CA store the official image
+# bundles, so /etc/ssl/certs needs no copying either.
+COPY --from=kanidm /sbin/kanidmd /usr/sbin/kanidmd
+COPY --from=kanidm /hpkg/ /hpkg/
 
 # Image config (ENV/EXPOSE/WORKDIR/HEALTHCHECK) is NOT carried over
-# by COPY --from, so re-declare what matters. LD_LIBRARY_PATH is
-# required for kanidmd to find its bundled libs in /lib (see the
-# official image's Dockerfile).
-ENV LD_LIBRARY_PATH=/lib
+# by COPY --from, so re-declare what matters. /sbin/kanidmd resolves
+# to /usr/sbin/kanidmd through the merged-usr symlink.
 ENV RUST_BACKTRACE=1
 
 HEALTHCHECK \
