@@ -147,10 +147,15 @@ class PersonService {
     );
   }
 
-  /** List ssh keys (vendor idm_account_get_ssh_pubkeys — Vec<String>). */
+  /**
+   * List ssh keys as "tag: key" strings. Uses the entry attr endpoint:
+   * the dedicated _ssh_pubkeys list returns bare keys without tags, but
+   * removal is tag-based (DELETE /_ssh_pubkeys/{tag}), so tags are
+   * required (v1 proto serialization: format!("{tag}: {pk}")).
+   */
   async sshKeys(id: string): Promise<string[]> {
     return apiFetch<string[]>(
-      `/api/kanidm/v1/account/${encodeURIComponent(id)}/_ssh_pubkeys`
+      `${BASE}/person/${encodeURIComponent(id)}/_attr/ssh_publickey`
     );
   }
 
