@@ -58,9 +58,9 @@ async fn start_container(
 ) -> Result<(KanidmSettings, KanidmHandle), Box<dyn std::error::Error + Send + Sync>> {
     let started = image::build_and_run(settings.effective_image(), manifest_dir).await?;
 
-    let admin_password = image::recover_admin_password(&started.container).await?;
+    let idm_admin_password = image::recover_idm_admin_password(&started.container).await?;
     let url = format!("https://{}:{}", started.host, started.port);
-    provision::provision_dev_person(&url, &admin_password).await?;
+    provision::provision_dev_person(&url, &idm_admin_password).await?;
 
     info!(url = %url, "dev Kanidm container ready");
     Ok((
@@ -78,7 +78,7 @@ mod tests {
     use std::path::PathBuf;
 
     /// Full flow against a real Docker daemon: build, start, wait for
-    /// readiness, recover the admin password, provision the dev
+    /// readiness, recover the idm_admin password, provision the dev
     /// person, then authenticate as the dev person. Ignored by default
     /// (needs Docker); run explicitly with `cargo test -- --ignored`.
     #[tokio::test]

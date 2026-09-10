@@ -3,7 +3,7 @@
 // Container side of the dev Kanidm: build the dev image from the
 // dev/kanidm/ context, start it on a dynamic host port, wait for the
 // readiness log line, mirror container logs into tracing, and run
-// commands inside the running container (admin password recovery).
+// commands inside the running container (idm_admin password recovery).
 
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -43,8 +43,10 @@ const CONTAINER_LABEL_VALUE: &str = "true";
 const STARTUP_TIMEOUT: Duration = Duration::from_secs(120);
 
 /// Account recovered inside the container to drive provisioning.
-/// Duplicated in provision.rs so both files compile independently.
-const ADMIN_USERNAME: &str = "admin";
+/// idm_admin (not admin) holds the person-management privileges
+/// provisioning needs. Duplicated in provision.rs so both files
+/// compile independently.
+const IDM_ADMIN_USERNAME: &str = "idm_admin";
 
 /// Bounded retry for the recover-account exec: the command talks to
 /// the server's admin socket, which can lag the readiness line by a
@@ -134,14 +136,14 @@ async fn exec_stdout(
     Ok(exec.stdout_to_vec().await?)
 }
 
-/// Recover the admin password by exec'ing `kanidmd scripting
-/// recover-account admin` inside the running container, with bounded
+/// Recover the idm_admin password by exec'ing `kanidmd scripting
+/// recover-account idm_admin` inside the running container, with bounded
 /// retry. The command prints JSON status lines on stdout; the password
 /// is the `output` field of the ok line.
-pub(super) async fn recover_admin_password(
+pub(super) async fn recover_idm_admin_password(
     container: &ContainerAsync<GenericImage>,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-    let command = ["/sbin/kanidmd", "scripting", "recover-account", ADMIN_USERNAME];
+    let command = ["/sbin/kanidmd", "scripting", "recover-account", IDM_ADMIN_USERNAME];
 
     let mut last_error = String::from("no attempt made");
     for attempt in 0..RETRY_ATTEMPTS {
@@ -169,7 +171,7 @@ pub(super) async fn recover_admin_password(
     .into())
 }
 
-/// Extract the admin password from `recover-account` stdout: scan the
+/// Extract the idm_admin password from `recover-account` stdout: scan the
 /// lines for a `{"status":"ok","output":...}` JSON object (kanidmd
 /// also logs to stdout, so other lines are skipped).
 pub fn parse_recover_account_password(stdout: &[u8]) -> Option<String> {
