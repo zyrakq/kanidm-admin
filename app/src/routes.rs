@@ -6,6 +6,7 @@
 // main.rs stays free of conditionals.
 
 use std::path::Path;
+use std::sync::Arc;
 
 use axum::{
     body::Body,
@@ -20,20 +21,26 @@ use crate::auth::handlers::routes as auth_routes;
 use crate::auth::AppState;
 use crate::frontend_assets::Assets;
 use crate::settings::frontend::FrontendSettings;
+use crate::status::{self, KanidmStatusProbe};
 
 /// Build the custom API router.
 ///
 /// Routes:
 ///   GET  /api/health        — liveness probe
 ///   GET  /api/hello         — example JSON endpoint
+///   GET  /api/status        — Kanidm server version & state for the footer
 ///   POST /api/auth/login    — Kanidm password login (sets session cookie)
 ///   GET  /api/auth/session  — local session state from the cookie
 ///   POST /api/auth/logout   — revoke session, clear cookie
 ///   POST /api/auth/reauth   — privilege step-up (refreshes cookie)
-pub fn build(state: AppState) -> Router {
+pub fn build(state: AppState, status_probe: Arc<dyn KanidmStatusProbe>) -> Router {
     Router::new()
         .route("/api/health", get(health_check))
         .route("/api/hello", get(hello_handler))
+        .route(
+            "/api/status",
+            get(status::status_handler).with_state(status_probe),
+        )
         .merge(auth_routes())
         .with_state(state)
 }

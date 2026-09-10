@@ -6,6 +6,7 @@ mod logging;
 mod preflight;
 mod routes;
 mod settings;
+mod status;
 
 use settings::loader::Settings;
 use std::path::PathBuf;
@@ -24,9 +25,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let _frontend_handle = frontend::start(&settings.frontend, &manifest_dir)?;
     let (kanidm_settings, _kanidm_handle) = kanidm_container::start(&settings).await?;
     let state = auth::app_state_from_settings(&kanidm_settings)?;
+    let status_probe = status::probe_from_settings(&kanidm_settings)?;
 
     let listener = TcpListener::bind(&settings.server.address).await?;
-    let router = routes::mount_fallback(routes::build(state), &settings.frontend, &manifest_dir);
+    let router = routes::mount_fallback(
+        routes::build(state, status_probe),
+        &settings.frontend,
+        &manifest_dir,
+    );
 
     info!("Server running at http://{}", settings.server.address);
     axum::serve(listener, router).await?;
