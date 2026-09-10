@@ -3,6 +3,7 @@ use serde::Deserialize;
 
 use super::frontend::FrontendSettings;
 use super::kanidm::KanidmSettings;
+use super::kanidm_container::KanidmContainerSettings;
 use super::server::ServerSettings;
 
 #[derive(Debug, Deserialize)]
@@ -10,6 +11,10 @@ pub struct Settings {
     pub server: ServerSettings,
     pub frontend: FrontendSettings,
     pub kanidm: KanidmSettings,
+    /// Optional: ephemeral dev Kanidm container. An absent section
+    /// means defaults (disabled); see settings/kanidm_container.rs.
+    #[serde(default)]
+    pub kanidm_container: KanidmContainerSettings,
 }
 
 impl Settings {
