@@ -250,6 +250,48 @@
   <source>Version conflict</source>
   <target>版本冲突</target>
 </trans-unit>
+<trans-unit id="s91b085374c46aa29">
+  <source>Persons</source>
+</trans-unit>
+<trans-unit id="s9f26843287bb592d">
+  <source>Groups</source>
+</trans-unit>
+<trans-unit id="s807682aafab5ce30">
+  <source>Service Accounts</source>
+</trans-unit>
+<trans-unit id="sfd7dcbb9413c5e12">
+  <source>OAuth2</source>
+</trans-unit>
+<trans-unit id="s6ba50bb0842ba1e2">
+  <source>Applications</source>
+</trans-unit>
+<trans-unit id="s41706a202b6c40f1">
+  <source>Domain</source>
+</trans-unit>
+<trans-unit id="sa81e2cdaf6921adc">
+  <source>System</source>
+</trans-unit>
+<trans-unit id="s05073d2537b45d1a">
+  <source>Sync</source>
+</trans-unit>
+<trans-unit id="s5281e29da78ac637">
+  <source>Recycle Bin</source>
+</trans-unit>
+<trans-unit id="sbdeedc1c60306b35">
+  <source>Messages</source>
+</trans-unit>
+<trans-unit id="sffa721bb6aa3128d">
+  <source>Search...</source>
+</trans-unit>
+<trans-unit id="s49730f3d5751a433">
+  <source>Loading...</source>
+</trans-unit>
+<trans-unit id="s17bb460c650d6608">
+  <source>No entries found.</source>
+</trans-unit>
+<trans-unit id="s5e8250fb85d64c23">
+  <source>Close</source>
+</trans-unit>
 </body>
 </file>
 </xliff>
