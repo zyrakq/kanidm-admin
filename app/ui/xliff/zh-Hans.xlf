@@ -885,6 +885,138 @@
 <trans-unit id="sb852dd8f63a516d1">
   <source>Person not found.</source>
 </trans-unit>
+<trans-unit id="sea43a8d36126f2e7">
+  <source>Failed to load API tokens.</source>
+</trans-unit>
+<trans-unit id="s8b07e413ed69ac04">
+  <source>API token created.</source>
+</trans-unit>
+<trans-unit id="s43785fe48f17caa4">
+  <source>Failed to create API token.</source>
+</trans-unit>
+<trans-unit id="se269d40d1eda51d1">
+  <source>Token copied to clipboard.</source>
+</trans-unit>
+<trans-unit id="s1c78aeeaee20b4ca">
+  <source>API token revoked.</source>
+</trans-unit>
+<trans-unit id="se01fb8241c2ee92e">
+  <source>Failed to revoke API token.</source>
+</trans-unit>
+<trans-unit id="s0e34b52b4e7437dc">
+  <source>Create API token</source>
+</trans-unit>
+<trans-unit id="sb835500bf74f157d">
+  <source>Expiry (optional)</source>
+</trans-unit>
+<trans-unit id="s99775221d3003db4">
+  <source>Creating...</source>
+</trans-unit>
+<trans-unit id="se5fe443f9abbf9c2">
+  <source>API token created</source>
+</trans-unit>
+<trans-unit id="s3a07841c9da6af12">
+  <source>This token will not be shown again. Copy it now and store it securely.</source>
+</trans-unit>
+<trans-unit id="s26859a3167e20c22">
+  <source>No API tokens.</source>
+</trans-unit>
+<trans-unit id="s02c66774e736745d">
+  <source>Failed to generate password.</source>
+</trans-unit>
+<trans-unit id="scedcf8e660ba85f3">
+  <source>Password copied to clipboard.</source>
+</trans-unit>
+<trans-unit id="sabf9c3fc37c163fb">
+  <source>Generated password</source>
+</trans-unit>
+<trans-unit id="s326ed73aa4037f76">
+  <source>This password will not be shown again. Copy it now and share it securely.</source>
+</trans-unit>
+<trans-unit id="s8bf481a0b5d8a689">
+  <source>Generating...</source>
+</trans-unit>
+<trans-unit id="s9b419aa580d5ee0b">
+  <source>Generate password</source>
+</trans-unit>
+<trans-unit id="s320e61bd8d52d5d7">
+  <source>Failed to load service account.</source>
+</trans-unit>
+<trans-unit id="s9f139703c49ecd6e">
+  <source>Service account updated.</source>
+</trans-unit>
+<trans-unit id="s044c2ac2dbd7ad48">
+  <source>Failed to update service account.</source>
+</trans-unit>
+<trans-unit id="s49f2451040235993">
+  <source>Converted to person.</source>
+</trans-unit>
+<trans-unit id="s87abea6258ddbf46">
+  <source>Failed to convert to person.</source>
+</trans-unit>
+<trans-unit id="sd88250b5c22052ee">
+  <source>Convert to person</source>
+</trans-unit>
+<trans-unit id="s1ddce3e2350a7ce9">
+  <source>Turns this service account into a regular person account. This cannot be undone.</source>
+</trans-unit>
+<trans-unit id="s1b283cdcdcc0ec63">
+  <source>Convert this service account into a person account? You will be taken to the person page.</source>
+</trans-unit>
+<trans-unit id="sd1964fa8b0e8ec56">
+  <source>Converting...</source>
+</trans-unit>
+<trans-unit id="sfa0c605f107fc998">
+  <source>Convert</source>
+</trans-unit>
+<trans-unit id="s1f9cb93817b690d5">
+  <source>Service account not available.</source>
+</trans-unit>
+<trans-unit id="s3269ce08a1e4b933">
+  <source>API Tokens</source>
+</trans-unit>
+<trans-unit id="sffb72673682d3d37">
+  <source>Validity</source>
+</trans-unit>
+<trans-unit id="s2381932c92dce163">
+  <source>Failed to load service account</source>
+</trans-unit>
+<trans-unit id="s76cd46abfde5db85">
+  <source>All service accounts</source>
+</trans-unit>
+<trans-unit id="s112756561ee833f8">
+  <source>Service account not found.</source>
+</trans-unit>
+<trans-unit id="s320e24bd8d526e30">
+  <source>Failed to load service accounts</source>
+</trans-unit>
+<trans-unit id="s4eb410b3b56b2b99">
+  <source>Created service account <ph id="0">${this.createId.trim()}</ph></source>
+</trans-unit>
+<trans-unit id="s890ca99b561286d3">
+  <source>Failed to create service account</source>
+</trans-unit>
+<trans-unit id="sbeb437738d885770">
+  <source>Deleted service account <ph id="0">${id}</ph></source>
+</trans-unit>
+<trans-unit id="s84b2cedaa417a2ec">
+  <source>Failed to delete service account</source>
+</trans-unit>
+<trans-unit id="s86146cfee0e10210">
+  <source>Service accounts</source>
+</trans-unit>
+<trans-unit id="scf72690719b7a8a1">
+  <source>Create service account</source>
+</trans-unit>
+<trans-unit id="s274b49d90286cdff">
+  <source>No service accounts found.</source>
+</trans-unit>
+<trans-unit id="se288b39a615f0039">
+  <source>Application service account</source>
+</trans-unit>
+<trans-unit id="s601a0641ebd81ed0">
+  <source>Delete service account "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? The entry can be revived from the recycle bin.</source>
+</trans-unit>
 </body>
 </file>
 </xliff>
