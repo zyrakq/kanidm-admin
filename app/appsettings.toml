@@ -8,3 +8,7 @@ public_dir = ""
 
 [kanidm]
 url = "https://localhost:8443"
+
+[kanidm_container]
+enabled = false
+image = "kanidm/server:1.11.1"
