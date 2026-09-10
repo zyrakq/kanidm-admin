@@ -8,6 +8,7 @@
 pub mod cookie;
 pub mod error;
 pub mod handlers;
+pub mod known_groups;
 pub mod ops;
 pub mod token;
 
