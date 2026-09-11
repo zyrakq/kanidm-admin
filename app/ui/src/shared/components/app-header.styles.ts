@@ -91,5 +91,20 @@ export const appHeaderStyles = css`
     .burger-btn {
       display: flex;
     }
+
+    /* The session drawer (z 1550) and locale sheet (z 1590/1595) are
+       fixed inside the header's stacking context; the header must sit
+       above the admin sidebar (1500) and backdrop (1400) so they paint
+       over them (velora z-ladder). */
+    header {
+      z-index: 1600;
+    }
+
+    /* Theme + language live in the session drawer on mobile; the right
+       cluster reduces to the session avatar. */
+    .right-cluster theme-toggler,
+    .right-cluster locale-switcher {
+      display: none;
+    }
   }
 `;
