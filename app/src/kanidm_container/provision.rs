@@ -169,7 +169,7 @@ pub(super) async fn smoke_auth(
     }
     Err(format!(
         "idm_admin smoke auth did not succeed after {RETRY_ATTEMPTS} attempts: {last_error} \
-         (container logs above show the server side)"
+         (full container logs are captured under logs/kanidm-dev/server/)"
     )
     .into())
 }
