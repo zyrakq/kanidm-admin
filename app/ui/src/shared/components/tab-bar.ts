@@ -1,6 +1,6 @@
 // Tab bar for detail pages. Emits 'tab-change' with the tab id.
 
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { localized } from '@/features/localization';
 
@@ -44,6 +44,14 @@ export class TabBar extends LitElement {
     `;
   }
 
+  protected updated(changed: PropertyValues): void {
+    if (changed.has('active')) {
+      this.renderRoot
+        .querySelector<HTMLButtonElement>('.tab.active')
+        ?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
+    }
+  }
+
   static styles = css`
     .tabs {
       display: flex;
@@ -69,6 +77,26 @@ export class TabBar extends LitElement {
     .tab.active {
       color: var(--theme-color-primary);
       border-bottom-color: var(--theme-color-primary);
+    }
+    @media (max-width: 768px) {
+      .tab {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    @media (max-width: 640px) {
+      .tab {
+        padding: 8px 12px;
+        font-size: 0.875rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .tab {
+        padding: 6px 10px;
+        font-size: 0.8125rem;
+      }
     }
   `;
 }
