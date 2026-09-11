@@ -2566,6 +2566,54 @@
   <source>Section menu</source>
   <target>Меню раздела</target>
 </trans-unit>
+<trans-unit id="seff2fb16b71b16ea">
+  <source>Session menu</source>
+  <target>Меню сессии</target>
+</trans-unit>
+<trans-unit id="s57ed4d0e053c4318">
+  <source>Dark mode</source>
+  <target>Тёмная тема</target>
+</trans-unit>
+<trans-unit id="sefcf950b3cc4fc3b">
+  <source>Language</source>
+  <target>Язык</target>
+</trans-unit>
+<trans-unit id="sa64925faa6fc6919">
+  <source>Select language</source>
+  <target>Выбрать язык</target>
+</trans-unit>
+<trans-unit id="s17f5e242b25b3a6e">
+  <source>Avatar uploaded.</source>
+  <target>Аватар загружен.</target>
+</trans-unit>
+<trans-unit id="s2ced012679d781a0">
+  <source>Failed to upload the avatar.</source>
+  <target>Не удалось загрузить аватар.</target>
+</trans-unit>
+<trans-unit id="s09d12899cbbaa7b2">
+  <source>Avatar removed.</source>
+  <target>Аватар удалён.</target>
+</trans-unit>
+<trans-unit id="sc65578f56f2c906d">
+  <source>Failed to remove the avatar.</source>
+  <target>Не удалось удалить аватар.</target>
+</trans-unit>
+<trans-unit id="s1967faf9ed8d3504">
+  <source>Avatar</source>
+  <target>Аватар</target>
+</trans-unit>
+<trans-unit id="se77f00ac0b8573b5">
+  <source>Shown in person lists and the site header.</source>
+  <target>Отображается в списках персон и в шапке сайта.</target>
+</trans-unit>
+<trans-unit id="s6abff64e7ff7fde9">
+  <source>Avatar image</source>
+  <target>Изображение аватара</target>
+</trans-unit>
+<trans-unit id="s324e2ced62ce31d8">
+  <source>Remove the avatar?</source>
+  <target>Удалить аватар?</target>
+</trans-unit>
 </body>
 </file>
 </xliff>
