@@ -1,10 +1,12 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { notificationService } from '@/features/notifications';
 import { authService } from '../services/auth.service';
 import type { User } from '../types/auth.types';
+import '@/shared/components/avatar';
+import '@/shared/components/ui-icon';
 import { sessionIndicatorStyles } from './session-indicator.styles';
 
 /** Below this remaining time the countdown switches to warning styling. */
@@ -16,6 +18,7 @@ export class SessionIndicator extends LitElement {
   @state() private user: User | null = null;
   @state() private remainingMs: number | null = null;
   @state() private warning = false;
+  @state() private menuOpen = false;
 
   private ticker: number | null = null;
   private warningNotified = false;
@@ -34,6 +37,7 @@ export class SessionIndicator extends LitElement {
       window.clearInterval(this.ticker);
       this.ticker = null;
     }
+    document.removeEventListener('click', this.handleDocumentClick);
   }
 
   private remainingOf(expiresAt: number | null): number | null {
@@ -92,6 +96,10 @@ export class SessionIndicator extends LitElement {
     return msg(str`${minutes}:${seconds}`);
   }
 
+  private get avatarName(): string {
+    return this.user?.displayName || this.user?.username || '';
+  }
+
   render() {
     if (!this.user) {
       return nothing;
@@ -107,16 +115,76 @@ export class SessionIndicator extends LitElement {
         : nothing;
 
     return html`
-      <div class="indicator">
-        <span class="user-chip"
-          >${this.user.displayName || this.user.username}</span
+      <div class="indicator" @keydown=${this.handleKeyDown}>
+        <button
+          class="avatar-btn"
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded=${this.menuOpen ? 'true' : 'false'}
+          aria-label=${this.avatarName}
+          @click=${() => (this.menuOpen = !this.menuOpen)}
         >
-        ${countdown}
-        <button class="sign-out" @click=${this.handleSignOut}>
+          <ui-avatar .name=${this.avatarName} size="32"></ui-avatar>
+          <ui-icon name="chevron-down" size="16"></ui-icon>
+          ${countdown}
+        </button>
+        ${this.menuOpen ? this.renderMenu() : nothing}
+      </div>
+    `;
+  }
+
+  private renderMenu() {
+    const user = this.user;
+    if (!user) {
+      return nothing;
+    }
+    return html`
+      <div class="menu" role="menu">
+        <div class="menu-header">
+          <p class="display-name">${user.displayName || user.username}</p>
+          <p class="user-meta">${user.username}</p>
+          ${user.email
+            ? html`<p class="user-meta">${user.email}</p>`
+            : nothing}
+        </div>
+        <div class="divider"></div>
+        <div class="session-row">
+          <span class="session-label">${msg('Session')}</span>
+          ${this.remainingMs !== null
+            ? html`<span
+                class="countdown ${this.warning ? 'warning' : ''}"
+                >${this.formatRemaining(this.remainingMs)}</span
+              >`
+            : nothing}
+        </div>
+        <div class="divider"></div>
+        <button class="sign-out" role="menuitem" @click=${this.handleSignOut}>
           ${msg('Sign Out')}
         </button>
       </div>
     `;
+  }
+
+  private handleKeyDown(e: KeyboardEvent): void {
+    if (e.key === 'Escape' && this.menuOpen) {
+      this.menuOpen = false;
+    }
+  }
+
+  private handleDocumentClick = (e: Event): void => {
+    if (!e.composedPath().includes(this)) {
+      this.menuOpen = false;
+    }
+  };
+
+  protected updated(changed: PropertyValues): void {
+    if (changed.has('menuOpen')) {
+      if (this.menuOpen) {
+        document.addEventListener('click', this.handleDocumentClick);
+      } else {
+        document.removeEventListener('click', this.handleDocumentClick);
+      }
+    }
   }
 
   static styles = sessionIndicatorStyles;
