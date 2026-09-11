@@ -10,7 +10,7 @@ export const appHeaderStyles = css`
     position: sticky;
     top: 0;
     z-index: 900;
-    min-height: var(--header-height, auto);
+    height: 64px;
     background: var(--theme-color-surface);
     border-bottom: 1px solid var(--theme-color-border);
     transition:
@@ -20,52 +20,50 @@ export const appHeaderStyles = css`
 
   .header-content {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .logo-section {
-    display: flex;
-    align-items: center;
+    height: 100%;
+    padding: 0 24px;
     gap: 0.75rem;
   }
 
+  .left-cluster {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+
+  .right-cluster {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .logo {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
   }
 
   .app-name {
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--theme-color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     transition: color 0.2s ease;
-  }
-
-  .actions {
-    display: flex;
-    gap: 1rem;
   }
 
   @media (max-width: 640px) {
     .header-content {
-      padding: 0.75rem 1rem;
+      padding: 0 12px;
     }
 
-    .app-name {
-      font-size: 1.125rem;
-    }
-
-    .logo {
-      width: 40px;
-      height: 40px;
-    }
-  }
-
-  @media (max-width: 540px) {
     .app-name {
       display: none;
     }

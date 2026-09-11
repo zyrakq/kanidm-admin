@@ -42,11 +42,12 @@ export class AppHeader extends LitElement {
                 </button>
               `
             : nothing}
-          <div class="logo-section">
+          <div class="left-cluster">
             <img src=${logo} alt="Kanidm Logo" class="logo" />
             <span class="app-name">${msg('Kanidm Admin')}</span>
           </div>
-          <div class="actions">
+          <div class="spacer"></div>
+          <div class="right-cluster">
             <session-indicator></session-indicator>
             <theme-toggler></theme-toggler>
             <locale-switcher></locale-switcher>
