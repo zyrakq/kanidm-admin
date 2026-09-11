@@ -35,6 +35,7 @@ use crate::status::{self, KanidmStatusProbe};
 ///   POST /api/auth/reauth   — privilege step-up (refreshes cookie)
 ///   GET  /api/auth/profile  — signed-in user plus their Kanidm groups
 ///   ANY  /api/kanidm/{*path} — authenticated proxy to the Kanidm server
+///   GET/POST/DELETE /api/avatar/{id} — local person avatars
 pub fn build(state: AppState, status_probe: Arc<dyn KanidmStatusProbe>) -> Router {
     Router::new()
         .route("/api/health", get(health_check))
@@ -45,6 +46,7 @@ pub fn build(state: AppState, status_probe: Arc<dyn KanidmStatusProbe>) -> Route
         )
         .merge(auth_routes())
         .merge(crate::proxy::handler::routes())
+        .merge(crate::avatars::routes())
         .with_state(state)
 }
 
