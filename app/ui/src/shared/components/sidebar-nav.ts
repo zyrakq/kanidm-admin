@@ -44,6 +44,9 @@ export class SidebarNav extends LitElement {
   }
 
   private navigate(href: string): void {
+    this.dispatchEvent(
+      new CustomEvent('nav-click', { bubbles: true, composed: true })
+    );
     window.location.assign(href);
   }
 
@@ -99,6 +102,18 @@ export class SidebarNav extends LitElement {
     .item.active {
       background: var(--theme-color-background);
       color: var(--theme-color-primary);
+    }
+    @media (max-width: 768px) {
+      nav {
+        gap: 8px;
+        padding: 1rem;
+      }
+      .item {
+        padding: 1rem 1.25rem;
+        font-size: 1.125rem;
+        gap: 1rem;
+        border-radius: 8px;
+      }
     }
   `;
 }
