@@ -82,7 +82,7 @@ export class AdminLayout extends LitElement {
 
   static styles = css`
     :host {
-      --header-height: 80px;
+      --header-height: 64px;
     }
     .layout {
       display: flex;
@@ -153,11 +153,6 @@ export class AdminLayout extends LitElement {
       }
       .content {
         padding: 16px;
-      }
-    }
-    @media (max-width: 640px) {
-      :host {
-        --header-height: 64px;
       }
     }
     @media (max-width: 480px) {
