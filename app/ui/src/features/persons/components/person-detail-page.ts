@@ -23,15 +23,6 @@ import type { PersonDetail } from '../types/person.types';
 import { personService } from '../services/person.service';
 import { personDetailPageStyles } from './person-detail-page.styles';
 
-const TABS: TabDef[] = [
-  { id: 'overview', label: msg('Overview') },
-  { id: 'credentials', label: msg('Credentials') },
-  { id: 'sessions', label: msg('Sessions') },
-  { id: 'ssh', label: msg('SSH keys') },
-  { id: 'posix', label: msg('POSIX') },
-  { id: 'radius', label: msg('RADIUS') },
-];
-
 @customElement('person-detail-page')
 @localized()
 export class PersonDetailPage extends LitElement {
@@ -91,6 +82,18 @@ export class PersonDetailPage extends LitElement {
     }
   }
 
+  /** Built per render so labels re-evaluate msg() after locale switches. */
+  private get tabs(): TabDef[] {
+    return [
+      { id: 'overview', label: msg('Overview') },
+      { id: 'credentials', label: msg('Credentials') },
+      { id: 'sessions', label: msg('Sessions') },
+      { id: 'ssh', label: msg('SSH keys') },
+      { id: 'posix', label: msg('POSIX') },
+      { id: 'radius', label: msg('RADIUS') },
+    ];
+  }
+
   render() {
     return html`
       <admin-layout>
@@ -114,7 +117,7 @@ export class PersonDetailPage extends LitElement {
                   </div>
                 </header>
                 <tab-bar
-                  .tabs=${TABS}
+                  .tabs=${this.tabs}
                   .active=${this.activeTab}
                   @tab-change=${this.handleTabChange}
                 ></tab-bar>
