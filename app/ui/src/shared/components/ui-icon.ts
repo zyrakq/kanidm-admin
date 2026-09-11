@@ -8,9 +8,10 @@ import { unsafeStatic } from 'lit/static-html.js';
 
 export const ICON_NAMES = [
   'persons', 'groups', 'bot', 'key', 'grid', 'globe', 'settings', 'sync',
-  'trash', 'mail', 'home', 'server', 'shield', 'search', 'plus', 'x',
-  'clock', 'check', 'warning', 'upload', 'chevron-right', 'terminal',
-  'lock', 'refresh', 'external-link', 'user',
+  'trash', 'mail', 'home', 'menu', 'server', 'shield', 'search', 'plus',
+  'x', 'clock', 'check', 'warning', 'upload', 'chevron-right',
+  'chevron-down', 'chevron-up', 'terminal', 'lock', 'refresh',
+  'external-link', 'user',
 ] as const;
 
 export type IconName = (typeof ICON_NAMES)[number];
@@ -32,6 +33,8 @@ const ICONS: Record<IconName, string> = {
     '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
   mail: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
   home: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  menu:
+    '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>',
   server:
     '<rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
@@ -45,6 +48,8 @@ const ICONS: Record<IconName, string> = {
   upload:
     '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
   'chevron-right': '<polyline points="9 18 15 12 9 6"/>',
+  'chevron-down': '<polyline points="6 9 12 15 18 9"/>',
+  'chevron-up': '<polyline points="18 15 12 9 6 15"/>',
   terminal: '<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>',
   lock: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
   refresh:
