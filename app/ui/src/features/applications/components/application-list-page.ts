@@ -309,7 +309,7 @@ export class ApplicationListPage extends LitElement {
           <form-field
             label=${msg('Linked group')}
             fieldId="application-create-group"
-            type="select"
+            type="combobox"
             .value=${this.createLinkedGroup}
             .options=${this.groupOptions}
             @field-input=${(e: CustomEvent<{ value: string }>) =>
