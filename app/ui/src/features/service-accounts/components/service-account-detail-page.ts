@@ -25,16 +25,6 @@ import type { ServiceAccountDetail } from '../types/service-account.types';
 import { serviceAccountService } from '../services/service-account.service';
 import { serviceAccountDetailPageStyles } from './service-account-detail-page.styles';
 
-const TABS: TabDef[] = [
-  { id: 'overview', label: msg('Overview') },
-  { id: 'credentials', label: msg('Credentials') },
-  { id: 'api-tokens', label: msg('API Tokens') },
-  { id: 'sessions', label: msg('Sessions') },
-  { id: 'ssh', label: msg('SSH keys') },
-  { id: 'posix', label: msg('POSIX') },
-  { id: 'validity', label: msg('Validity') },
-];
-
 @customElement('service-account-detail-page')
 @localized()
 export class ServiceAccountDetailPage extends LitElement {
@@ -102,6 +92,19 @@ export class ServiceAccountDetailPage extends LitElement {
     }
   }
 
+  /** Built per render so labels re-evaluate msg() after locale switches. */
+  private get tabs(): TabDef[] {
+    return [
+      { id: 'overview', label: msg('Overview') },
+      { id: 'credentials', label: msg('Credentials') },
+      { id: 'api-tokens', label: msg('API Tokens') },
+      { id: 'sessions', label: msg('Sessions') },
+      { id: 'ssh', label: msg('SSH keys') },
+      { id: 'posix', label: msg('POSIX') },
+      { id: 'validity', label: msg('Validity') },
+    ];
+  }
+
   render() {
     return html`
       <admin-layout>
@@ -125,7 +128,7 @@ export class ServiceAccountDetailPage extends LitElement {
                   </div>
                 </header>
                 <tab-bar
-                  .tabs=${TABS}
+                  .tabs=${this.tabs}
                   .active=${this.activeTab}
                   @tab-change=${this.handleTabChange}
                 ></tab-bar>
