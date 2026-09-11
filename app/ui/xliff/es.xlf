@@ -2520,30 +2520,39 @@
 </trans-unit>
 <trans-unit id="sc122bfc9e9614719">
   <source>Select a group</source>
+  <target>Seleccionar un grupo</target>
 </trans-unit>
 <trans-unit id="s1d5d2564d7aae78e">
   <source>Close menu</source>
+  <target>Cerrar menú</target>
 </trans-unit>
 <trans-unit id="s8d91340b5caa2d5c">
   <source>Open menu</source>
+  <target>Abrir menú</target>
 </trans-unit>
 <trans-unit id="s991d216e6efc157c">
   <source>No results</source>
+  <target>Sin resultados</target>
 </trans-unit>
 <trans-unit id="s370e44cc8c6c311b">
   <source>Toggle options</source>
+  <target>Mostrar u ocultar opciones</target>
 </trans-unit>
 <trans-unit id="s5373e0bf1dfbbdbf">
   <source><ph id="0">${from}</ph>–<ph id="1">${to}</ph> of <ph id="2">${this.total}</ph></source>
+  <target><ph id="0">${from}</ph>–<ph id="1">${to}</ph> de <ph id="2">${this.total}</ph></target>
 </trans-unit>
 <trans-unit id="sf3ff78cc329d3528">
   <source>Previous</source>
+  <target>Anterior</target>
 </trans-unit>
 <trans-unit id="s0fbf6dc6a1966408">
   <source>Next</source>
+  <target>Siguiente</target>
 </trans-unit>
 <trans-unit id="s90a641043aa30c1e">
   <source>Rows per page</source>
+  <target>Filas por página</target>
 </trans-unit>
 </body>
 </file>
