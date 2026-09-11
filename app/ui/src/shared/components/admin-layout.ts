@@ -3,7 +3,7 @@
 // one of these.
 
 import { LitElement, css, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { localized } from '@/features/localization';
 import '@/shared/components/app-header';
 import '@/shared/components/sidebar-nav';
@@ -12,24 +12,78 @@ import '@/shared/components/footer-info';
 @customElement('admin-layout')
 @localized()
 export class AdminLayout extends LitElement {
+  @state() private drawerOpen = false;
+  @state() private drawerAnimated = false;
+  private mq = window.matchMedia('(max-width: 768px)');
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    document.addEventListener('keydown', this.handleKeyDown);
+    this.mq.addEventListener('change', this.handleBreakpointChange);
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    document.removeEventListener('keydown', this.handleKeyDown);
+    this.mq.removeEventListener('change', this.handleBreakpointChange);
+    document.body.style.overflow = '';
+  }
+
+  private handleBreakpointChange = (e: MediaQueryListEvent): void => {
+    if (!e.matches) {
+      this.closeDrawer();
+      this.drawerAnimated = false; // first desktop->mobile re-open has no transition
+    }
+  };
+
+  private handleKeyDown = (e: KeyboardEvent): void => {
+    if (e.key === 'Escape' && this.drawerOpen) this.closeDrawer();
+  };
+
+  private closeDrawer = (): void => {
+    this.drawerOpen = false;
+    document.body.style.overflow = '';
+  };
+
+  private handleDrawerToggle = (): void => {
+    this.drawerAnimated = true;
+    this.drawerOpen = !this.drawerOpen;
+    document.body.style.overflow = this.drawerOpen ? 'hidden' : '';
+  };
+
+  private handleNavClick = (): void => {
+    if (this.drawerOpen) this.closeDrawer();
+  };
+
   render() {
+    const layoutClass = `layout${this.drawerOpen ? ' drawer-open' : ''}${
+      this.drawerAnimated ? ' drawer-animated' : ''
+    }`;
     return html`
-      <div class="layout">
-        <app-header></app-header>
+      <div class=${layoutClass}>
+        <app-header
+          .burger=${true}
+          .drawerOpen=${this.drawerOpen}
+          @admin-drawer-toggle=${this.handleDrawerToggle}
+        ></app-header>
         <div class="body">
           <aside class="sidebar">
-            <sidebar-nav></sidebar-nav>
+            <sidebar-nav @nav-click=${this.handleNavClick}></sidebar-nav>
           </aside>
           <main class="content">
             <slot></slot>
           </main>
         </div>
         <footer-info></footer-info>
+        <div class="backdrop" @click=${this.closeDrawer}></div>
       </div>
     `;
   }
 
   static styles = css`
+    :host {
+      --header-height: 80px;
+    }
     .layout {
       display: flex;
       flex-direction: column;
@@ -52,14 +106,63 @@ export class AdminLayout extends LitElement {
       min-width: 0;
       background: var(--theme-color-background);
     }
-    @media (max-width: 900px) {
-      .body {
-        flex-direction: column;
-      }
+    .backdrop {
+      display: none;
+    }
+    @media (max-width: 768px) {
       .sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid var(--theme-color-border);
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto;
+        transform: translateX(-100%);
+        visibility: hidden;
+        z-index: 1500;
+        background: var(--theme-color-surface);
+        box-shadow: var(--theme-shadow-lg);
+        overflow-y: auto;
+      }
+      .layout.drawer-open .sidebar {
+        transform: translateX(0);
+        visibility: visible;
+      }
+      .layout.drawer-animated .sidebar {
+        transition: transform 0.3s ease, visibility 0s linear 0.3s;
+      }
+      .layout.drawer-animated.drawer-open .sidebar {
+        transition: transform 0.3s ease;
+      }
+      .backdrop {
+        display: block;
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1400;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+      .layout.drawer-open .backdrop {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .content {
+        padding: 16px;
+      }
+    }
+    @media (max-width: 640px) {
+      :host {
+        --header-height: 64px;
+      }
+    }
+    @media (max-width: 480px) {
+      .content {
+        padding: 12px;
       }
     }
   `;
