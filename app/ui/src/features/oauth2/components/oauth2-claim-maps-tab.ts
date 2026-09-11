@@ -6,6 +6,8 @@ import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
+import '@/shared/components/data-table';
+import type { TableColumn } from '@/shared/components/data-table';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { groupService, type GroupSummary } from '@/features/groups';
@@ -125,6 +127,69 @@ export class Oauth2ClaimMapsTab extends LitElement {
     }
   }
 
+  private mono(value: string) {
+    return html`<span
+      style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px; word-break: break-all;"
+      >${value}</span
+    >`;
+  }
+
+  private renderClaimTable(maps: ClaimMap[]) {
+    const columns: TableColumn[] = [
+      { key: 'claim', header: msg('Claim'), render: (row) => this.mono(String(row.claim)) },
+      { key: 'group', header: msg('Group'), render: (row) => this.mono(String(row.group)) },
+      { key: 'values', header: msg('Values'), render: (row) => this.mono(String(row.values)) },
+      {
+        key: 'join',
+        header: msg('Join'),
+        render: (row) => {
+          const map = row.raw as ClaimMap;
+          return html`
+            <form-field
+              style="--field-margin: 0"
+              field-id=${'join-' + map.claim}
+              type="select"
+              ?disabled=${this.busy}
+              .options=${JOIN_OPTIONS}
+              @field-input=${(e: CustomEvent<{ value: string }>) => {
+                void this.setJoin(map.claim, e.detail.value as Oauth2ClaimMapJoin);
+              }}
+            ></form-field>
+          `;
+        },
+      },
+      {
+        key: 'actions',
+        header: msg('Actions'),
+        render: (row) => html`
+          <button
+            class="remove-btn"
+            type="button"
+            ?disabled=${this.busy}
+            @click=${() => {
+              this.deleteTarget = row.raw as ClaimMap;
+            }}
+          >
+            ${msg('Remove')}
+          </button>
+        `,
+      },
+    ];
+    return html`
+      <data-table
+        .columns=${columns}
+        .rows=${maps.map((map) => ({
+          claim: map.claim,
+          group: map.group,
+          values: map.values.join(', '),
+          raw: map,
+        }))}
+        .emptyMessage=${msg('No claim maps configured.')}
+      ></data-table>
+    `;
+  }
+
   render() {
     if (this.loading) {
       return html`<p class="muted">${msg('Loading...')}</p>`;
@@ -144,63 +209,12 @@ export class Oauth2ClaimMapsTab extends LitElement {
         <p class="muted">
           ${msg('Custom claims added to tokens based on group membership.')}
         </p>
-        ${maps.length === 0
-          ? html`<p class="muted">${msg('No claim maps configured.')}</p>`
-          : html`
-              <table>
-                <thead>
-                  <tr>
-                    <th>${msg('Claim')}</th>
-                    <th>${msg('Group')}</th>
-                    <th>${msg('Values')}</th>
-                    <th>${msg('Join')}</th>
-                    <th class="col-actions">${msg('Actions')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${maps.map(
-                    (map) => html`
-                      <tr>
-                        <td class="mono">${map.claim}</td>
-                        <td class="mono">${map.group}</td>
-                        <td class="mono">${map.values.join(', ')}</td>
-                        <td>
-                          <form-field
-                            style="--field-margin: 0"
-                            field-id=${'join-' + map.claim}
-                            type="select"
-                            ?disabled=${this.busy}
-                            .options=${JOIN_OPTIONS}
-                            @field-input=${(e: CustomEvent<{ value: string }>) => {
-                              void this.setJoin(
-                                map.claim,
-                                e.detail.value as Oauth2ClaimMapJoin
-                              );
-                            }}
-                          ></form-field>
-                        </td>
-                        <td class="col-actions">
-                          <button
-                            class="remove-btn"
-                            ?disabled=${this.busy}
-                            @click=${() => {
-                              this.deleteTarget = map;
-                            }}
-                          >
-                            ${msg('Remove')}
-                          </button>
-                        </td>
-                      </tr>
-                    `
-                  )}
-                </tbody>
-              </table>
-              <p class="muted hint">
-                ${msg(
-                  'The join strategy applies per claim: csv/ssv join values into one string, array emits a JSON array.'
-                )}
-              </p>
-            `}
+        ${this.renderClaimTable(maps)}
+        <p class="muted hint">
+          ${msg(
+            'The join strategy applies per claim: csv/ssv join values into one string, array emits a JSON array.'
+          )}
+        </p>
       </section>
       <section class="card">
         <h2>${msg('Add claim map')}</h2>
@@ -291,32 +305,6 @@ export class Oauth2ClaimMapsTab extends LitElement {
       font-size: 16px;
       font-weight: 600;
       color: var(--theme-color-text-primary);
-    }
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 13px;
-      color: var(--theme-color-text-primary);
-      word-break: break-all;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 8px;
-    }
-    th,
-    td {
-      text-align: left;
-      padding: 10px 8px;
-      border-bottom: 1px solid var(--theme-color-border);
-      font-size: 14px;
-    }
-    th {
-      font-weight: 600;
-      color: var(--theme-color-text-secondary);
-    }
-    .col-actions {
-      width: 100px;
-      text-align: right;
     }
     .actions {
       display: flex;
