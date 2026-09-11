@@ -23,15 +23,6 @@ import type { Oauth2RsDetail } from '../types/oauth2.types';
 import { oauth2Service } from '../services/oauth2.service';
 import { oauth2DetailPageStyles } from './oauth2-detail-page.styles';
 
-const TABS: TabDef[] = [
-  { id: 'settings', label: msg('Settings') },
-  { id: 'origins', label: msg('Origins') },
-  { id: 'scope-maps', label: msg('Scope Maps') },
-  { id: 'claim-maps', label: msg('Claim Maps') },
-  { id: 'image', label: msg('Image') },
-  { id: 'keys', label: msg('Keys') },
-];
-
 @customElement('oauth2-detail-page')
 @localized()
 export class Oauth2DetailPage extends LitElement {
@@ -91,6 +82,18 @@ export class Oauth2DetailPage extends LitElement {
     }
   }
 
+  /** Built per render so labels re-evaluate msg() after locale switches. */
+  private get tabs(): TabDef[] {
+    return [
+      { id: 'settings', label: msg('Settings') },
+      { id: 'origins', label: msg('Origins') },
+      { id: 'scope-maps', label: msg('Scope Maps') },
+      { id: 'claim-maps', label: msg('Claim Maps') },
+      { id: 'image', label: msg('Image') },
+      { id: 'keys', label: msg('Keys') },
+    ];
+  }
+
   render() {
     return html`
       <admin-layout>
@@ -113,7 +116,7 @@ export class Oauth2DetailPage extends LitElement {
                   </div>
                 </header>
                 <tab-bar
-                  .tabs=${TABS}
+                  .tabs=${this.tabs}
                   .active=${this.activeTab}
                   @tab-change=${this.handleTabChange}
                 ></tab-bar>
