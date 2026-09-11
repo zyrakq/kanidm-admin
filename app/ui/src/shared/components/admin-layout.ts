@@ -20,12 +20,14 @@ export class AdminLayout extends LitElement {
     super.connectedCallback();
     document.addEventListener('keydown', this.handleKeyDown);
     this.mq.addEventListener('change', this.handleBreakpointChange);
+    window.addEventListener('session-drawer-open', this.handleSessionDrawerOpen);
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener('keydown', this.handleKeyDown);
     this.mq.removeEventListener('change', this.handleBreakpointChange);
+    window.removeEventListener('session-drawer-open', this.handleSessionDrawerOpen);
     document.body.style.overflow = '';
   }
 
@@ -48,7 +50,17 @@ export class AdminLayout extends LitElement {
   private handleDrawerToggle = (): void => {
     this.drawerAnimated = true;
     this.drawerOpen = !this.drawerOpen;
+    // Mutual-close FIRST, scroll lock after: the session drawer's
+    // closer clears body.overflow, this opener re-locks it below.
+    if (this.drawerOpen) {
+      window.dispatchEvent(new CustomEvent('admin-drawer-open'));
+    }
     document.body.style.overflow = this.drawerOpen ? 'hidden' : '';
+  };
+
+  /** The session drawer opened: close our burger drawer if it is open. */
+  private handleSessionDrawerOpen = (): void => {
+    if (this.drawerOpen) this.closeDrawer();
   };
 
   private handleNavClick = (): void => {
