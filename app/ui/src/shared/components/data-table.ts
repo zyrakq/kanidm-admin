@@ -7,6 +7,7 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import type { TemplateResult } from 'lit';
 import './ui-icon';
+import './list-pager';
 
 export interface TableColumn {
   /** Key used for search matching and default cell rendering. */
@@ -31,9 +32,12 @@ export class DataTable extends LitElement {
   @property() searchPlaceholder = '';
 
   @state() private searchTerm = '';
+  @state() private page = 1;
+  @state() private pageSize = 10;
 
   private handleSearch(e: Event): void {
     this.searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
+    this.page = 1;
   }
 
   private visibleRows(): Record<string, unknown>[] {
@@ -61,6 +65,13 @@ export class DataTable extends LitElement {
   }
 
   render() {
+    const filtered = this.visibleRows();
+    const pageCount = Math.max(1, Math.ceil(filtered.length / this.pageSize));
+    const safePage = Math.min(this.page, pageCount);
+    const pageRows = filtered.slice(
+      (safePage - 1) * this.pageSize,
+      safePage * this.pageSize
+    );
     return html`
       ${this.searchable
         ? html`
@@ -90,13 +101,13 @@ export class DataTable extends LitElement {
               ? html`<tr class="state-row">
                   <td colspan=${this.columns.length}>${msg('Loading...')}</td>
                 </tr>`
-              : this.visibleRows().length === 0
+              : filtered.length === 0
                 ? html`<tr class="state-row">
                     <td colspan=${this.columns.length}>
                       ${this.emptyMessage || msg('No entries found.')}
                     </td>
                   </tr>`
-                : this.visibleRows().map(
+                : pageRows.map(
                     (row) => html`
                       <tr class="data-row" @click=${() => this.handleRowClick(row)}>
                         ${this.columns.map(
@@ -108,6 +119,17 @@ export class DataTable extends LitElement {
           </tbody>
         </table>
       </div>
+      <list-pager
+        .total=${filtered.length}
+        .page=${safePage}
+        .pageSize=${this.pageSize}
+        @page-change=${(e: CustomEvent<{ page: number }>) =>
+          (this.page = e.detail.page)}
+        @page-size-change=${(e: CustomEvent<{ pageSize: number }>) => {
+          this.pageSize = e.detail.pageSize;
+          this.page = 1;
+        }}
+      ></list-pager>
     `;
   }
 
@@ -126,6 +148,7 @@ export class DataTable extends LitElement {
       color: var(--theme-color-text-muted);
     }
     .search input {
+      box-sizing: border-box;
       border: none;
       outline: none;
       background: transparent;
