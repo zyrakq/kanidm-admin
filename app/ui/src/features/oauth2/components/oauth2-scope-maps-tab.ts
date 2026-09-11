@@ -158,13 +158,13 @@ export class Oauth2ScopeMapsTab extends LitElement {
     const scopes = sup ? this.supScopes : this.scopeScopes;
     const options = this.groups.map((group) => ({
       value: group.id,
-      label: group.displayName,
+      label: group.displayName ?? group.id,
     }));
     return html`
       <form-field
         field-id=${sup ? 'sup-group' : 'scope-group'}
         label=${msg('Group')}
-        type="select"
+        type="combobox"
         .value=${group}
         .options=${options}
         @field-input=${(e: CustomEvent<{ value: string }>) => {
