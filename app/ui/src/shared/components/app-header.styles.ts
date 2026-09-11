@@ -100,10 +100,11 @@ export const appHeaderStyles = css`
       z-index: 1600;
     }
 
-    /* Theme + language live in the session drawer on mobile; the right
-       cluster reduces to the session avatar. */
-    .right-cluster theme-toggler,
-    .right-cluster locale-switcher {
+    /* Theme + language live in the session drawer on mobile; the theme
+       toggler hides in the left cluster and the right cluster reduces
+       to the session avatar. */
+    .right-cluster locale-switcher,
+    .left-cluster theme-toggler {
       display: none;
     }
   }

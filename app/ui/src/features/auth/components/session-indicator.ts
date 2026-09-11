@@ -199,12 +199,12 @@ export class SessionIndicator extends LitElement {
           aria-label=${this.avatarName}
           @click=${this.handleTriggerClick}
         >
+          ${countdown}
           <ui-avatar
             .name=${this.avatarName}
             size="32"
           ></ui-avatar>
           <ui-icon name="chevron-down" size="16"></ui-icon>
-          ${countdown}
         </button>
         ${this.menuOpen ? this.renderMenu() : nothing}
         ${this.renderDrawer()}
