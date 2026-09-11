@@ -4,6 +4,7 @@ import { msg } from '@lit/localize';
 import { LocaleController } from '../controllers/locale.controller';
 import { localizationService } from '../services/localization.service';
 import { LOCALE_METADATA } from '../data/locale-metadata';
+import '@/shared/components/ui-icon';
 import { localeSwitcherStyles } from './locale-switcher.styles';
 import type { LocaleCode, LocaleMetadata } from '../types/localization.types';
 
@@ -30,10 +31,17 @@ export class LocaleSwitcher extends LitElement {
           class="trigger"
           @click=${this._toggleDropdown}
           aria-label=${msg('Change language')}
+          aria-haspopup="menu"
+          aria-expanded=${this._isOpen ? 'true' : 'false'}
         >
-          <span class="flag">${this._currentLocaleData.flag}</span>
-          <span class="name">${this._currentLocaleData.name}</span>
-          <span class="arrow ${this._isOpen ? 'open' : ''}">▼</span>
+          <ui-icon name="globe" size="20"></ui-icon>
+          <span class="code">
+            ${this._currentLocaleData.code.split('-')[0].toUpperCase()}
+          </span>
+          <ui-icon
+            name=${this._isOpen ? 'chevron-up' : 'chevron-down'}
+            size="14"
+          ></ui-icon>
         </button>
 
         ${this._isOpen ? this._renderDropdown() : null}

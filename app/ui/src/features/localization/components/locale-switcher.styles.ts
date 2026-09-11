@@ -14,40 +14,31 @@ export const localeSwitcherStyles = css`
   .trigger {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: var(--theme-color-surface);
-    border: 1px solid var(--theme-color-border);
+    gap: 4px;
+    height: 40px;
+    padding: 0 8px;
+    background: transparent;
+    border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--theme-color-text-primary);
-    transition: all 0.2s ease;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--theme-color-text-secondary);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   .trigger:hover {
     background: var(--theme-color-background);
-    border-color: var(--theme-color-primary);
-  }
-
-  .flag {
-    font-size: 1.25rem;
-    line-height: 1;
-  }
-
-  .name {
     color: var(--theme-color-text-primary);
   }
 
-  .arrow {
-    font-size: 0.625rem;
-    transition: transform 0.2s ease;
-    color: var(--theme-color-text-muted);
+  .trigger:focus-visible {
+    outline: 2px solid var(--theme-color-primary);
+    outline-offset: 2px;
   }
 
-  .arrow.open {
-    transform: rotate(180deg);
+  .code {
+    letter-spacing: 0.02em;
   }
 
   .dropdown {
@@ -73,7 +64,7 @@ export const localeSwitcherStyles = css`
     align-items: center;
     gap: 0.75rem;
     width: 100%;
-    padding: 0.625rem 0.75rem;
+    padding: 8px 14px;
     border: none;
     border-radius: 4px;
     background: transparent;
@@ -90,7 +81,7 @@ export const localeSwitcherStyles = css`
 
   .locale-item.active {
     background: var(--theme-color-primary);
-    color: white;
+    color: #ffffff;
   }
 
   .locale-item .flag {
@@ -104,5 +95,19 @@ export const localeSwitcherStyles = css`
   .checkmark {
     font-size: 1rem;
     font-weight: 700;
+  }
+
+  @media (max-width: 480px) {
+    .trigger .code {
+      display: none;
+    }
+    .trigger {
+      width: 40px;
+      padding: 0;
+      justify-content: center;
+    }
+    .trigger ui-icon:last-child {
+      display: none;
+    }
   }
 `;
