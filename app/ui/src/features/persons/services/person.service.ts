@@ -257,6 +257,24 @@ class PersonService {
       { method: 'DELETE', body: JSON.stringify([personId]) }
     );
   }
+
+  /** Upload the person avatar (local backend POST /api/avatar/{id};
+   *  multipart part named "image", mirroring the oauth2 upload). */
+  async setImage(id: string, file: File): Promise<void> {
+    const form = new FormData();
+    form.append('image', file, file.name);
+    await apiFetch<void>(`/api/avatar/${encodeURIComponent(id)}`, {
+      method: 'POST',
+      body: form,
+    });
+  }
+
+  /** Remove the person avatar (local backend DELETE /api/avatar/{id}). */
+  async removeImage(id: string): Promise<void> {
+    await apiFetch<void>(`/api/avatar/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const personService = PersonService.getInstance();
