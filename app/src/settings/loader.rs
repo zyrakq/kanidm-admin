@@ -1,7 +1,6 @@
 use config::{Config, ConfigError, Environment, File};
 use serde::Deserialize;
 
-use super::avatars::AvatarSettings;
 use super::frontend::FrontendSettings;
 use super::kanidm::KanidmSettings;
 use super::kanidm_container::KanidmContainerSettings;
@@ -16,10 +15,6 @@ pub struct Settings {
     /// means defaults (disabled); see settings/kanidm_container.rs.
     #[serde(default)]
     pub kanidm_container: KanidmContainerSettings,
-    /// Optional: local person avatar storage. An absent section means
-    /// defaults (see settings/avatars.rs).
-    #[serde(default)]
-    pub avatars: AvatarSettings,
 }
 
 impl Settings {

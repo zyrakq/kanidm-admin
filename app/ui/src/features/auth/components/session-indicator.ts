@@ -4,7 +4,6 @@ import { msg, str } from '@lit/localize';
 import { localized, LocaleController, LOCALE_METADATA } from '@/features/localization';
 import { notificationService } from '@/features/notifications';
 import { ThemeController, themeService } from '@/features/theme';
-import { avatarUrl } from '@/shared/services/avatar-url';
 import { authService } from '../services/auth.service';
 import type { User } from '../types/auth.types';
 import '@/shared/components/avatar';
@@ -201,7 +200,6 @@ export class SessionIndicator extends LitElement {
           @click=${this.handleTriggerClick}
         >
           <ui-avatar
-            .src=${avatarUrl(this.user.id)}
             .name=${this.avatarName}
             size="32"
           ></ui-avatar>
@@ -263,7 +261,6 @@ export class SessionIndicator extends LitElement {
       >
         <div class="drawer-profile">
           <ui-avatar
-            .src=${avatarUrl(user.id)}
             .name=${this.avatarName}
             size="56"
           ></ui-avatar>

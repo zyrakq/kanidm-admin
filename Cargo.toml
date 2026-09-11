@@ -6,7 +6,7 @@ exclude = ["vendor"]
 resolver = "2"
 
 [workspace.dependencies]
-axum = { version = "0.8", features = ["json", "multipart"] }
+axum = { version = "0.8", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 tower-http = { version = "0.6", features = ["fs", "cors"] }
 serde = { version = "1.0", features = ["derive"] }

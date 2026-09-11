@@ -196,7 +196,6 @@ mod tests {
         routes().with_state(AppState::new(
             Arc::new(MockAuthOps::default()),
             forwarder,
-            Arc::new(crate::avatars::store::test_support::MemoryAvatarStore::default()),
         ))
     }
 

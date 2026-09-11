@@ -2582,38 +2582,6 @@
   <source>Select language</source>
   <target>Seleccionar idioma</target>
 </trans-unit>
-<trans-unit id="s17f5e242b25b3a6e">
-  <source>Avatar uploaded.</source>
-  <target>Avatar subido.</target>
-</trans-unit>
-<trans-unit id="s2ced012679d781a0">
-  <source>Failed to upload the avatar.</source>
-  <target>No se pudo subir el avatar.</target>
-</trans-unit>
-<trans-unit id="s09d12899cbbaa7b2">
-  <source>Avatar removed.</source>
-  <target>Avatar eliminado.</target>
-</trans-unit>
-<trans-unit id="sc65578f56f2c906d">
-  <source>Failed to remove the avatar.</source>
-  <target>No se pudo eliminar el avatar.</target>
-</trans-unit>
-<trans-unit id="s1967faf9ed8d3504">
-  <source>Avatar</source>
-  <target>Avatar</target>
-</trans-unit>
-<trans-unit id="se77f00ac0b8573b5">
-  <source>Shown in person lists and the site header.</source>
-  <target>Se muestra en las listas de personas y en el encabezado del sitio.</target>
-</trans-unit>
-<trans-unit id="s6abff64e7ff7fde9">
-  <source>Avatar image</source>
-  <target>Imagen del avatar</target>
-</trans-unit>
-<trans-unit id="s324e2ced62ce31d8">
-  <source>Remove the avatar?</source>
-  <target>¿Eliminar el avatar?</target>
-</trans-unit>
 </body>
 </file>
 </xliff>

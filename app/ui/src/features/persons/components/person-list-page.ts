@@ -13,8 +13,6 @@ import '@/shared/components/data-table';
 import '@/shared/components/modal-dialog';
 import '@/shared/components/confirm-dialog';
 import '@/shared/components/form-field';
-import { avatarUrl } from '@/shared/services/avatar-url';
-import '@/shared/components/avatar';
 import '@/shared/components/ui-icon';
 import type { TableColumn } from '@/shared/components/data-table';
 import type { PersonSummary } from '../types/person.types';
@@ -105,16 +103,8 @@ export class PersonListPage extends LitElement {
       {
         key: 'id',
         header: msg('Name'),
-        render: (row) => html`
-          <span class="name-cell">
-            <ui-avatar
-              .src=${avatarUrl(String(row.uuid ?? row.id))}
-              .name=${String(row.displayName ?? '')}
-              size="28"
-            ></ui-avatar>
-            <span class="mono">${String(row.id)}</span>
-          </span>
-        `,
+        render: (row) =>
+          html`<span class="mono">${String(row.id)}</span>`,
       },
       { key: 'displayName', header: msg('Display name') },
       {

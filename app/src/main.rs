@@ -1,5 +1,4 @@
 mod auth;
-mod avatars;
 mod frontend;
 mod frontend_assets;
 mod kanidm_container;
@@ -26,8 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     let _frontend_handle = frontend::start(&settings.frontend, &manifest_dir)?;
     let (kanidm_settings, _kanidm_handle) = kanidm_container::start(&settings).await?;
-    let avatar_store = avatars::store_from_settings(&settings.avatars, &manifest_dir)?;
-    let state = auth::app_state_from_settings(&kanidm_settings, avatar_store)?;
+    let state = auth::app_state_from_settings(&kanidm_settings)?;
     let status_probe = status::probe_from_settings(&kanidm_settings)?;
 
     let listener = TcpListener::bind(&settings.server.address).await?;

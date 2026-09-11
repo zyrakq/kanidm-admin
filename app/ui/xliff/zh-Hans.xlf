@@ -2582,38 +2582,6 @@
   <source>Select language</source>
   <target>选择语言</target>
 </trans-unit>
-<trans-unit id="s17f5e242b25b3a6e">
-  <source>Avatar uploaded.</source>
-  <target>头像已上传。</target>
-</trans-unit>
-<trans-unit id="s2ced012679d781a0">
-  <source>Failed to upload the avatar.</source>
-  <target>上传头像失败。</target>
-</trans-unit>
-<trans-unit id="s09d12899cbbaa7b2">
-  <source>Avatar removed.</source>
-  <target>头像已删除。</target>
-</trans-unit>
-<trans-unit id="sc65578f56f2c906d">
-  <source>Failed to remove the avatar.</source>
-  <target>删除头像失败。</target>
-</trans-unit>
-<trans-unit id="s1967faf9ed8d3504">
-  <source>Avatar</source>
-  <target>头像</target>
-</trans-unit>
-<trans-unit id="se77f00ac0b8573b5">
-  <source>Shown in person lists and the site header.</source>
-  <target>显示在人员列表和站点页眉中。</target>
-</trans-unit>
-<trans-unit id="s6abff64e7ff7fde9">
-  <source>Avatar image</source>
-  <target>头像图片</target>
-</trans-unit>
-<trans-unit id="s324e2ced62ce31d8">
-  <source>Remove the avatar?</source>
-  <target>删除头像？</target>
-</trans-unit>
 </body>
 </file>
 </xliff>

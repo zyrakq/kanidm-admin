@@ -8,7 +8,6 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { notificationService } from '@/features/notifications';
 import { ApiError } from '@/shared/services/http-client';
-import { avatarUrl } from '@/shared/services/avatar-url';
 import '@/shared/components/admin-layout';
 import '@/shared/components/avatar';
 import '@/shared/components/ui-icon';
@@ -34,10 +33,6 @@ export class PersonDetailPage extends LitElement {
   @state() private loading = true;
   @state() private notFound = false;
   @state() private activeTab = 'overview';
-
-  /** Bumped on person-changed so the header avatar URL changes and
-   *  the browser refetches instead of serving its cached response. */
-  @state() private avatarVersion = 0;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -82,10 +77,7 @@ export class PersonDetailPage extends LitElement {
         return html`<person-overview-tab
           .id=${this.id}
           .person=${this.person}
-          @person-changed=${() => {
-            this.avatarVersion += 1;
-            void this.load();
-          }}
+          @person-changed=${() => void this.load()}
         ></person-overview-tab>`;
     }
   }
@@ -115,11 +107,7 @@ export class PersonDetailPage extends LitElement {
             ? html`<p class="muted">${msg('Person not found.')}</p>`
             : html`
                 <header class="person-head">
-                  <ui-avatar
-                    .src=${`${avatarUrl(this.person.uuid ?? this.person.id)}?v=${this.avatarVersion}`}
-                    .name=${this.person.displayName}
-                    size="48"
-                  ></ui-avatar>
+                  <ui-avatar name=${this.person.displayName} size="48"></ui-avatar>
                   <div>
                     <h1>${this.person.displayName}</h1>
                     <p class="muted mono">${this.person.id}</p>
