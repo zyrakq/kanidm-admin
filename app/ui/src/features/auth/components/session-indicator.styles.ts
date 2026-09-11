@@ -188,6 +188,10 @@ export const sessionIndicatorStyles = css`
   }
   .drawer-row-label {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .drawer-row-value {
     color: var(--theme-color-text-secondary);
@@ -198,6 +202,7 @@ export const sessionIndicatorStyles = css`
     border: none;
     font-size: 0.95rem;
     color: var(--theme-color-text-secondary);
+    flex-shrink: 0;
   }
   .drawer-row .countdown.warning {
     color: var(--theme-color-warning);
@@ -235,5 +240,11 @@ export const sessionIndicatorStyles = css`
   }
   .drawer-row.danger:hover {
     background: var(--theme-color-background);
+  }
+
+  @media (max-width: 480px) {
+    .drawer-row {
+      padding: 0.875rem 1rem;
+    }
   }
 `;
