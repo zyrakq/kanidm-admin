@@ -67,7 +67,7 @@ export class ThemeToggler extends LitElement {
           ? msg('Switch to light theme')
           : msg('Switch to dark theme')}
       >
-        ${!isDark ? this.renderMoonIcon() : this.renderSunIcon()}
+        ${isDark ? this.renderMoonIcon() : this.renderSunIcon()}
       </button>
     `;
   }
