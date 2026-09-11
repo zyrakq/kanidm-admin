@@ -55,7 +55,12 @@ async fn container_router() -> (Router, KanidmHandle, provision::DevCredentials)
         idm_admin_password: recover_password(container, provision::IDM_ADMIN_USERNAME).await,
     };
 
-    let state = auth::app_state_from_settings(&effective).expect("app state from effective");
+    // Same store wiring as main.rs: default [avatars] settings resolve
+    // to <manifest>/data/avatars (gitignored runtime dir).
+    let avatar_store =
+        crate::avatars::store_from_settings(&Default::default(), std::path::Path::new(env!("CARGO_MANIFEST_DIR")))
+            .expect("avatar store from defaults");
+    let state = auth::app_state_from_settings(&effective, avatar_store).expect("app state from effective");
     let router = auth::handlers::routes()
         .merge(proxy::handler::routes())
         .with_state(state);

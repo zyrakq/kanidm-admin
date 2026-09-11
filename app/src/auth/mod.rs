@@ -15,19 +15,25 @@ pub mod token;
 
 use std::sync::Arc;
 
+use crate::avatars::FsAvatarStore;
 use crate::proxy::forwarder::{Forwarder, ReqwestForwarder};
 use crate::settings::kanidm::KanidmSettings;
 
-/// Shared axum state: auth operations + the proxy forwarder.
+/// Shared axum state: auth operations, the proxy forwarder and the local avatar store.
 #[derive(Clone)]
 pub struct AppState {
     pub auth: Arc<dyn ops::KanidmAuthOps>,
     pub proxy: Arc<dyn Forwarder>,
+    pub avatars: Arc<dyn crate::avatars::AvatarStore>,
 }
 
 impl AppState {
-    pub fn new(auth: Arc<dyn ops::KanidmAuthOps>, proxy: Arc<dyn Forwarder>) -> Self {
-        Self { auth, proxy }
+    pub fn new(
+        auth: Arc<dyn ops::KanidmAuthOps>,
+        proxy: Arc<dyn Forwarder>,
+        avatars: Arc<dyn crate::avatars::AvatarStore>,
+    ) -> Self {
+        Self { auth, proxy, avatars }
     }
 }
 
@@ -35,6 +41,7 @@ impl AppState {
 /// in main so a broken Kanidm configuration fails fast at startup.
 pub fn app_state_from_settings(
     settings: &KanidmSettings,
+    avatars: FsAvatarStore,
 ) -> Result<AppState, Box<dyn std::error::Error + Send + Sync>> {
     let builder = ops::client_builder_from_settings(settings)
         .map_err(|error| format!("Kanidm client configuration error: {error:?}"))?;
@@ -43,5 +50,6 @@ pub fn app_state_from_settings(
     Ok(AppState::new(
         Arc::new(ops::KanidmClientAuthOps::new(builder)),
         Arc::new(forwarder),
+        Arc::new(avatars),
     ))
 }

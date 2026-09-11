@@ -290,6 +290,7 @@ mod tests {
         routes().with_state(AppState::new(
             Arc::new(mock),
             Arc::new(crate::proxy::forwarder::test_support::MockForwarder::default()),
+            Arc::new(crate::avatars::store::test_support::MemoryAvatarStore::default()),
         ))
     }
 
