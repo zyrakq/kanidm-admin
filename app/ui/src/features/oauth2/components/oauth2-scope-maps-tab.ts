@@ -12,6 +12,8 @@ import { notificationService } from '@/features/notifications';
 import { groupService, type GroupSummary } from '@/features/groups';
 import { oauth2Service } from '../services/oauth2.service';
 import type { Oauth2RsDetail, ScopeMap } from '../types/oauth2.types';
+import '@/shared/components/data-table';
+import type { TableColumn } from '@/shared/components/data-table';
 
 @customElement('oauth2-scope-maps-tab')
 @localized()
@@ -115,41 +117,41 @@ export class Oauth2ScopeMapsTab extends LitElement {
     }
   }
 
+  private mono(value: string) {
+    return html`<span
+      style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px; word-break: break-all;"
+      >${value}</span
+    >`;
+  }
+
   private renderMapTable(maps: ScopeMap[], sup: boolean) {
-    if (maps.length === 0) {
-      return html`<p class="muted">${msg('No entries.')}</p>`;
-    }
+    const columns: TableColumn[] = [
+      { key: 'group', header: msg('Group'), render: (row) => this.mono(String(row.group)) },
+      { key: 'scopes', header: msg('Scopes'), render: (row) => this.mono(String(row.scopes)) },
+      {
+        key: 'actions',
+        header: msg('Actions'),
+        render: (row) => html`
+          <button
+            class="remove-btn"
+            type="button"
+            ?disabled=${this.busy}
+            @click=${() => {
+              this.deleteTarget = { sup, group: String(row.group) };
+            }}
+          >
+            ${msg('Remove')}
+          </button>
+        `,
+      },
+    ];
     return html`
-      <table>
-        <thead>
-          <tr>
-            <th>${msg('Group')}</th>
-            <th>${msg('Scopes')}</th>
-            <th class="col-actions">${msg('Actions')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${maps.map(
-            (map) => html`
-              <tr>
-                <td class="mono">${map.group}</td>
-                <td class="mono">${map.scopes.join(' ')}</td>
-                <td class="col-actions">
-                  <button
-                    class="remove-btn"
-                    ?disabled=${this.busy}
-                    @click=${() => {
-                      this.deleteTarget = { sup, group: map.group };
-                    }}
-                  >
-                    ${msg('Remove')}
-                  </button>
-                </td>
-              </tr>
-            `
-          )}
-        </tbody>
-      </table>
+      <data-table
+        .columns=${columns}
+        .rows=${maps.map((map) => ({ group: map.group, scopes: map.scopes.join(' ') }))}
+        .emptyMessage=${msg('No entries.')}
+      ></data-table>
     `;
   }
 
@@ -276,32 +278,6 @@ export class Oauth2ScopeMapsTab extends LitElement {
       font-size: 16px;
       font-weight: 600;
       color: var(--theme-color-text-primary);
-    }
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 13px;
-      color: var(--theme-color-text-primary);
-      word-break: break-all;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 8px;
-    }
-    th,
-    td {
-      text-align: left;
-      padding: 10px 8px;
-      border-bottom: 1px solid var(--theme-color-border);
-      font-size: 14px;
-    }
-    th {
-      font-weight: 600;
-      color: var(--theme-color-text-secondary);
-    }
-    .col-actions {
-      width: 100px;
-      text-align: right;
     }
     .actions {
       display: flex;
