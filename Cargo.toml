@@ -25,7 +25,7 @@ base64 = "0.22"
 reqwest = { version = "0.13", default-features = false, features = ["rustls"] }
 kanidm_client = "1.11.1"
 kanidm_proto = "1.11.1"
-time = { version = "0.3", features = ["serde"] }
+time = { version = "0.3", features = ["serde", "formatting"] }
 tower = { version = "0.5", features = ["util"] }
 uuid = { version = "1", features = ["v4"] }
 
