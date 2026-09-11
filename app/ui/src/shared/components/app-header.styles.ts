@@ -7,6 +7,10 @@ export const appHeaderStyles = css`
   }
 
   header {
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    min-height: var(--header-height, auto);
     background: var(--theme-color-surface);
     border-bottom: 1px solid var(--theme-color-border);
     transition:
@@ -64,6 +68,30 @@ export const appHeaderStyles = css`
   @media (max-width: 540px) {
     .app-name {
       display: none;
+    }
+  }
+
+  .burger-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--theme-color-text-primary);
+    transition: background-color 0.15s ease;
+    flex-shrink: 0;
+  }
+  .burger-btn:hover {
+    background: var(--theme-color-background);
+  }
+  @media (max-width: 768px) {
+    .burger-btn {
+      display: flex;
     }
   }
 `;
