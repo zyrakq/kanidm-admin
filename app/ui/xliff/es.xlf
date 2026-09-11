@@ -2554,6 +2554,18 @@
   <source>Rows per page</source>
   <target>Filas por página</target>
 </trans-unit>
+<trans-unit id="sb07b1d863273d7ab">
+  <source>Switch to light theme</source>
+  <target>Cambiar al tema claro</target>
+</trans-unit>
+<trans-unit id="s6ce0fded45fae733">
+  <source>Switch to dark theme</source>
+  <target>Cambiar al tema oscuro</target>
+</trans-unit>
+<trans-unit id="s8af0c2a28e240b3b">
+  <source>Section menu</source>
+  <target>Menú de sección</target>
+</trans-unit>
 </body>
 </file>
 </xliff>
