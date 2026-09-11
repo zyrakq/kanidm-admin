@@ -1,5 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { msg } from '@lit/localize';
+import { localized } from '@/features/localization';
 import { themeService } from '../services/theme.service';
 import { themeTogglerStyles } from './theme-toggler.styles';
 import type { Theme } from '../types/theme.types';
@@ -18,6 +20,7 @@ import type { Theme } from '../types/theme.types';
  * ```
  */
 @customElement('theme-toggler')
+@localized()
 export class ThemeToggler extends LitElement {
   @state()
   private theme: Theme = 'light';
@@ -57,8 +60,12 @@ export class ThemeToggler extends LitElement {
         class="toggler"
         @click=${this.handleToggle}
         @keydown=${this.handleKeyDown}
-        aria-label=${isDark ? 'Switch to light theme' : 'Switch to dark theme'}
-        title=${isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+        aria-label=${isDark
+          ? msg('Switch to light theme')
+          : msg('Switch to dark theme')}
+        title=${isDark
+          ? msg('Switch to light theme')
+          : msg('Switch to dark theme')}
       >
         ${!isDark ? this.renderMoonIcon() : this.renderSunIcon()}
       </button>
