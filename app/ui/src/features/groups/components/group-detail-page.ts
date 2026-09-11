@@ -21,13 +21,6 @@ import type { GroupDetail } from '../types/group.types';
 import { groupService } from '../services/group.service';
 import { groupDetailPageStyles } from './group-detail-page.styles';
 
-const TABS: TabDef[] = [
-  { id: 'members', label: msg('Members') },
-  { id: 'settings', label: msg('Settings') },
-  { id: 'posix', label: msg('POSIX') },
-  { id: 'account-policy', label: msg('Account Policy') },
-];
-
 @customElement('group-detail-page')
 @localized()
 export class GroupDetailPage extends LitElement {
@@ -110,6 +103,16 @@ export class GroupDetailPage extends LitElement {
     }
   }
 
+  /** Built per render so labels re-evaluate msg() after locale switches. */
+  private get tabs(): TabDef[] {
+    return [
+      { id: 'members', label: msg('Members') },
+      { id: 'settings', label: msg('Settings') },
+      { id: 'posix', label: msg('POSIX') },
+      { id: 'account-policy', label: msg('Account Policy') },
+    ];
+  }
+
   render() {
     return html`
       <admin-layout>
@@ -135,7 +138,7 @@ export class GroupDetailPage extends LitElement {
                   </div>
                 </header>
                 <tab-bar
-                  .tabs=${TABS}
+                  .tabs=${this.tabs}
                   .active=${this.activeTab}
                   @tab-change=${this.handleTabChange}
                 ></tab-bar>
