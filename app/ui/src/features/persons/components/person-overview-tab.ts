@@ -14,6 +14,7 @@ import { notificationService } from '@/features/notifications';
 import { personService } from '../services/person.service';
 import type { PersonDetail } from '../types/person.types';
 import { personOverviewTabStyles } from './person-overview-tab.styles';
+import '@/shared/components/list-pager';
 
 /**
  * Kanidm datetime AVAs are RFC3339 strings (Value::new_datetime_s
@@ -52,6 +53,8 @@ export class PersonOverviewTab extends LitElement {
   @state() private addingGroup = false;
   @state() private removingGroup: string | null = null;
   @state() private groups: GroupSummary[] = [];
+  @state() private memberPage = 1;
+  @state() private memberPageSize = 10;
 
   // Edit form state (synced from `person` unless the user has edits).
   @state() private displayName = '';
@@ -350,26 +353,51 @@ export class PersonOverviewTab extends LitElement {
         <h2>${msg('Group membership')}</h2>
         ${person.memberOf.length === 0
           ? html`<p class="muted">${msg('Not a member of any group.')}</p>`
-          : html`
-              <ul class="group-list">
-                ${person.memberOf.map(
-                  (group) => html`
-                    <li>
-                      <span class="mono">${group}</span>
-                      <button
-                        class="remove-btn"
-                        ?disabled=${busy}
-                        @click=${() => this.removeGroup(group)}
-                      >
-                        ${this.removingGroup === group
-                          ? msg('Removing...')
-                          : msg('Remove')}
-                      </button>
-                    </li>
-                  `
-                )}
-              </ul>
-            `}
+          : (() => {
+              const total = person.memberOf.length;
+              const pageCount = Math.max(
+                1,
+                Math.ceil(total / this.memberPageSize)
+              );
+              const page = Math.min(this.memberPage, pageCount);
+              const pageGroups = person.memberOf.slice(
+                (page - 1) * this.memberPageSize,
+                page * this.memberPageSize
+              );
+              return html`
+                <ul class="group-list">
+                  ${pageGroups.map(
+                    (group) => html`
+                      <li>
+                        <span class="mono">${group}</span>
+                        <button
+                          class="remove-btn"
+                          ?disabled=${busy}
+                          @click=${() => this.removeGroup(group)}
+                        >
+                          ${this.removingGroup === group
+                            ? msg('Removing...')
+                            : msg('Remove')}
+                        </button>
+                      </li>
+                    `
+                  )}
+                </ul>
+                <list-pager
+                  .total=${total}
+                  .page=${page}
+                  .pageSize=${this.memberPageSize}
+                  @page-change=${(e: CustomEvent<{ page: number }>) =>
+                    (this.memberPage = e.detail.page)}
+                  @page-size-change=${(
+                    e: CustomEvent<{ pageSize: number }>
+                  ) => {
+                    this.memberPageSize = e.detail.pageSize;
+                    this.memberPage = 1;
+                  }}
+                ></list-pager>
+              `;
+            })()}
         <div class="add-group">
           <form-field
             class="group-field"
