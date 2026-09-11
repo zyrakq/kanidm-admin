@@ -45,10 +45,10 @@ export class AppHeader extends LitElement {
           <div class="left-cluster">
             <img src=${logo} alt="Kanidm Logo" class="logo" />
             <span class="app-name">${msg('Kanidm Admin')}</span>
-            <theme-toggler></theme-toggler>
           </div>
           <div class="spacer"></div>
           <div class="right-cluster">
+            <theme-toggler></theme-toggler>
             <locale-switcher></locale-switcher>
             <session-indicator></session-indicator>
           </div>
