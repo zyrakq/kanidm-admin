@@ -339,3 +339,47 @@ fn env_var_overrides_kanidm_container_image() {
         "APP_KANIDM_CONTAINER__IMAGE should override the default image"
     );
 }
+
+#[test]
+fn avatars_defaults_when_section_absent() {
+    let settings = settings_from_toml(BASE_TOML, "").expect("settings");
+    assert_eq!(settings.avatars.dir, "");
+    assert_eq!(
+        settings.avatars.resolve_dir(std::path::Path::new("/opt/app")),
+        std::path::PathBuf::from("/opt/app/data/avatars")
+    );
+}
+
+#[test]
+fn avatars_absolute_dir_used_as_is() {
+    let overlay = indoc! {r#"
+        [avatars]
+        dir = "/srv/avatars"
+    "#};
+    let settings = settings_from_toml(BASE_TOML, overlay).expect("settings");
+    assert_eq!(
+        settings.avatars.resolve_dir(std::path::Path::new("/opt/app")),
+        std::path::PathBuf::from("/srv/avatars")
+    );
+}
+
+#[test]
+fn avatars_empty_dir_uses_manifest_default() {
+    let overlay = indoc! {r#"
+        [avatars]
+        dir = ""
+    "#};
+    let settings = settings_from_toml(BASE_TOML, overlay).expect("settings");
+    assert_eq!(
+        settings.avatars.resolve_dir(std::path::Path::new("/opt/app")),
+        std::path::PathBuf::from("/opt/app/data/avatars")
+    );
+}
+
+#[test]
+fn avatars_dir_env_override() {
+    let env = HashMap::from([("APP_AVATARS__DIR".to_string(), "/env/avatars".to_string())]);
+    let settings =
+        settings_from_layers(BASE_TOML, "", Some(env)).expect("settings");
+    assert_eq!(settings.avatars.dir, "/env/avatars");
+}
