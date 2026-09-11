@@ -6,6 +6,7 @@ export { LocaleController, localized } from './controllers/locale.controller';
 
 // Components
 export { LocaleSwitcher } from './components/locale-switcher';
+export { LocaleBottomSheet } from './components/locale-bottom-sheet';
 
 // Types
 export type {
