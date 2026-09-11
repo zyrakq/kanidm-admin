@@ -98,6 +98,7 @@ export class ModalDialog extends LitElement {
       padding: 16px;
     }
     .card {
+      box-sizing: border-box;
       background: var(--theme-color-surface-elevated);
       border-radius: 8px;
       box-shadow: var(--theme-shadow-lg);
@@ -143,6 +144,14 @@ export class ModalDialog extends LitElement {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
+    }
+    @media (max-width: 640px) {
+      .overlay {
+        padding: 16px;
+      }
+      .card {
+        max-width: calc(100% - 32px);
+      }
     }
   `;
 }
