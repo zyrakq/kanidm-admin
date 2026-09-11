@@ -1,12 +1,15 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { msg, str } from '@lit/localize';
-import { localized } from '@/features/localization';
+import { localized, LocaleController, LOCALE_METADATA } from '@/features/localization';
 import { notificationService } from '@/features/notifications';
+import { ThemeController, themeService } from '@/features/theme';
+import { avatarUrl } from '@/shared/services/avatar-url';
 import { authService } from '../services/auth.service';
 import type { User } from '../types/auth.types';
 import '@/shared/components/avatar';
 import '@/shared/components/ui-icon';
+import '@/features/localization/components/locale-bottom-sheet';
 import { sessionIndicatorStyles } from './session-indicator.styles';
 
 /** Below this remaining time the countdown switches to warning styling. */
@@ -19,9 +22,14 @@ export class SessionIndicator extends LitElement {
   @state() private remainingMs: number | null = null;
   @state() private warning = false;
   @state() private menuOpen = false;
+  @state() private drawerOpen = false;
+  @state() private sheetOpen = false;
 
   private ticker: number | null = null;
   private warningNotified = false;
+  private theme = new ThemeController(this);
+  private localeCtrl = new LocaleController(this);
+  private mq = window.matchMedia('(max-width: 768px)');
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -29,6 +37,8 @@ export class SessionIndicator extends LitElement {
     // One-second tick; the display format decides the visible granularity
     // ("Xh Ym" above 1 h, "mm:ss" below).
     this.ticker = window.setInterval(() => this.tick(), 1000);
+    this.mq.addEventListener('change', this.handleBreakpointChange);
+    window.addEventListener('admin-drawer-open', this.handleAdminDrawerOpen);
   }
 
   disconnectedCallback(): void {
@@ -38,6 +48,10 @@ export class SessionIndicator extends LitElement {
       this.ticker = null;
     }
     document.removeEventListener('click', this.handleDocumentClick);
+    document.removeEventListener('keydown', this.handleDocumentKeyDown);
+    this.mq.removeEventListener('change', this.handleBreakpointChange);
+    window.removeEventListener('admin-drawer-open', this.handleAdminDrawerOpen);
+    document.body.style.overflow = '';
   }
 
   private remainingOf(expiresAt: number | null): number | null {
@@ -100,6 +114,68 @@ export class SessionIndicator extends LitElement {
     return this.user?.displayName || this.user?.username || '';
   }
 
+  // --- Drawer mode (mobile only; desktop dropdown stays) ---
+
+  private handleBreakpointChange = (e: MediaQueryListEvent): void => {
+    // Crossing to desktop: the drawer has no meaning there.
+    if (!e.matches && (this.drawerOpen || this.sheetOpen)) {
+      this.closeDrawer();
+    }
+  };
+
+  /** admin-layout opened its burger drawer: get out of the way. */
+  private handleAdminDrawerOpen = (): void => {
+    if (this.drawerOpen || this.sheetOpen) {
+      this.closeDrawer();
+    }
+  };
+
+  /** Mutual-close FIRST, scroll lock after (contract with
+   *  admin-layout: the closing handler clears body.overflow, this
+   *  opener re-locks it after the dispatch returns). */
+  private openDrawer(): void {
+    window.dispatchEvent(new CustomEvent('session-drawer-open'));
+    this.drawerOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  private closeDrawer(): void {
+    this.drawerOpen = false;
+    this.sheetOpen = false;
+    document.body.style.overflow = '';
+  }
+
+  private handleTriggerClick(): void {
+    if (this.mq.matches) {
+      if (this.drawerOpen) {
+        this.closeDrawer();
+      } else {
+        this.openDrawer();
+      }
+    } else {
+      this.menuOpen = !this.menuOpen;
+    }
+  }
+
+  private handleThemeToggle(): void {
+    void themeService.toggleTheme();
+  }
+
+  private toggleSheet(): void {
+    this.sheetOpen = !this.sheetOpen;
+  }
+
+  private handleDocumentKeyDown = (e: KeyboardEvent): void => {
+    if (e.key !== 'Escape') return;
+    // Sheet first, then drawer (velora order). The sheet has its own
+    // Escape listener that emits close; both converge on the same state.
+    if (this.sheetOpen) {
+      this.sheetOpen = false;
+    } else if (this.drawerOpen) {
+      this.closeDrawer();
+    }
+  };
+
   render() {
     if (!this.user) {
       return nothing;
@@ -120,15 +196,20 @@ export class SessionIndicator extends LitElement {
           class="avatar-btn"
           type="button"
           aria-haspopup="menu"
-          aria-expanded=${this.menuOpen ? 'true' : 'false'}
+          aria-expanded=${this.menuOpen || this.drawerOpen ? 'true' : 'false'}
           aria-label=${this.avatarName}
-          @click=${() => (this.menuOpen = !this.menuOpen)}
+          @click=${this.handleTriggerClick}
         >
-          <ui-avatar .name=${this.avatarName} size="32"></ui-avatar>
+          <ui-avatar
+            .src=${avatarUrl(this.user.id)}
+            .name=${this.avatarName}
+            size="32"
+          ></ui-avatar>
           <ui-icon name="chevron-down" size="16"></ui-icon>
           ${countdown}
         </button>
         ${this.menuOpen ? this.renderMenu() : nothing}
+        ${this.renderDrawer()}
       </div>
     `;
   }
@@ -165,6 +246,91 @@ export class SessionIndicator extends LitElement {
     `;
   }
 
+  private renderDrawer(): unknown {
+    const user = this.user;
+    if (!user) {
+      return nothing;
+    }
+    const isDark = this.theme.theme === 'dark';
+    const currentLocale = LOCALE_METADATA[this.localeCtrl.locale];
+
+    return html`
+      <div
+        class="drawer ${this.drawerOpen ? 'open' : ''}"
+        role="dialog"
+        aria-modal="true"
+        aria-label=${msg('Session menu')}
+      >
+        <div class="drawer-profile">
+          <ui-avatar
+            .src=${avatarUrl(user.id)}
+            .name=${this.avatarName}
+            size="56"
+          ></ui-avatar>
+          <span class="drawer-username"
+            >${user.displayName || user.username}</span
+          >
+          ${user.email
+            ? html`<span class="drawer-user-subtitle">${user.email}</span>`
+            : nothing}
+        </div>
+
+        <div class="drawer-row">
+          <ui-icon name="clock" size="20"></ui-icon>
+          <span class="drawer-row-label">${msg('Session')}</span>
+          ${this.remainingMs !== null
+            ? html`<span
+                class="countdown ${this.warning ? 'warning' : ''}"
+                >${this.formatRemaining(this.remainingMs)}</span
+              >`
+            : nothing}
+        </div>
+
+        <button
+          class="drawer-row"
+          type="button"
+          @click=${this.handleThemeToggle}
+          aria-label=${isDark
+            ? msg('Switch to light theme')
+            : msg('Switch to dark theme')}
+        >
+          <ui-icon name=${isDark ? 'sun' : 'moon'} size="20"></ui-icon>
+          <span class="drawer-row-label">${msg('Dark mode')}</span>
+          <div class="theme-track ${isDark ? 'active' : ''}" aria-hidden="true">
+            <div class="theme-thumb"></div>
+          </div>
+        </button>
+
+        <button
+          class="drawer-row"
+          type="button"
+          @click=${this.toggleSheet}
+          aria-label=${msg('Change language')}
+        >
+          <ui-icon name="globe" size="20"></ui-icon>
+          <span class="drawer-row-label">${msg('Language')}</span>
+          <span class="drawer-row-value">${currentLocale.flag}</span>
+          <ui-icon name="chevron-right" size="16"></ui-icon>
+        </button>
+
+        <button
+          class="drawer-row danger"
+          type="button"
+          @click=${() => void this.handleSignOut()}
+        >
+          <ui-icon name="log-out" size="20"></ui-icon>
+          <span class="drawer-row-label">${msg('Sign Out')}</span>
+        </button>
+      </div>
+
+      <locale-bottom-sheet
+        ?open=${this.sheetOpen}
+        @close=${() => (this.sheetOpen = false)}
+        @locale-selected=${() => (this.sheetOpen = false)}
+      ></locale-bottom-sheet>
+    `;
+  }
+
   private handleKeyDown(e: KeyboardEvent): void {
     if (e.key === 'Escape' && this.menuOpen) {
       this.menuOpen = false;
@@ -183,6 +349,13 @@ export class SessionIndicator extends LitElement {
         document.addEventListener('click', this.handleDocumentClick);
       } else {
         document.removeEventListener('click', this.handleDocumentClick);
+      }
+    }
+    if (changed.has('drawerOpen')) {
+      if (this.drawerOpen) {
+        document.addEventListener('keydown', this.handleDocumentKeyDown);
+      } else {
+        document.removeEventListener('keydown', this.handleDocumentKeyDown);
       }
     }
   }
