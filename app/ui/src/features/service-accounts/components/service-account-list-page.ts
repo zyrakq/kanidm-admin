@@ -183,11 +183,11 @@ export class ServiceAccountListPage extends LitElement {
           <form-field
             label=${msg('Entry managed by')}
             fieldId="service-account-create-managed-by"
-            type="select"
+            type="combobox"
             .value=${this.createEntryManagedBy}
             .options=${this.createGroups.map((group) => ({
               value: group.id,
-              label: group.displayName,
+              label: group.displayName ?? group.id,
             }))}
             @field-input=${(e: CustomEvent<{ value: string }>) =>
               (this.createEntryManagedBy = e.detail.value)}
