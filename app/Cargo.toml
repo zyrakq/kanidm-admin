@@ -26,5 +26,6 @@ testcontainers = { path = "../vendor/testcontainers-rs/testcontainers", features
 
 [dev-dependencies]
 indoc = "2"
+tempfile = "3"
 tower = { workspace = true }
 uuid = { workspace = true }
