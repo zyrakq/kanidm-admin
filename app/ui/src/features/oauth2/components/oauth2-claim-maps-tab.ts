@@ -136,7 +136,7 @@ export class Oauth2ClaimMapsTab extends LitElement {
     const maps = detail.claimMaps;
     const options = this.groups.map((group) => ({
       value: group.id,
-      label: group.displayName,
+      label: group.displayName ?? group.id,
     }));
     return html`
       <section class="card">
@@ -165,21 +165,19 @@ export class Oauth2ClaimMapsTab extends LitElement {
                         <td class="mono">${map.group}</td>
                         <td class="mono">${map.values.join(', ')}</td>
                         <td>
-                          <select
-                            class="join-select"
+                          <form-field
+                            style="--field-margin: 0"
+                            field-id=${'join-' + map.claim}
+                            type="select"
                             ?disabled=${this.busy}
-                            @change=${(e: Event) => {
-                              const join = (e.target as HTMLSelectElement)
-                                .value as Oauth2ClaimMapJoin;
-                              void this.setJoin(map.claim, join);
+                            .options=${JOIN_OPTIONS}
+                            @field-input=${(e: CustomEvent<{ value: string }>) => {
+                              void this.setJoin(
+                                map.claim,
+                                e.detail.value as Oauth2ClaimMapJoin
+                              );
                             }}
-                          >
-                            ${JOIN_OPTIONS.map(
-                              (option) => html`
-                                <option value=${option.value}>${option.label}</option>
-                              `
-                            )}
-                          </select>
+                          ></form-field>
                         </td>
                         <td class="col-actions">
                           <button
@@ -217,7 +215,7 @@ export class Oauth2ClaimMapsTab extends LitElement {
         <form-field
           field-id="claim-group"
           label=${msg('Group')}
-          type="select"
+          type="combobox"
           .value=${this.group}
           .options=${options}
           @field-input=${(e: CustomEvent<{ value: string }>) => {
@@ -319,20 +317,6 @@ export class Oauth2ClaimMapsTab extends LitElement {
     .col-actions {
       width: 100px;
       text-align: right;
-    }
-    .join-select {
-      padding: 5px 8px;
-      border: 1px solid var(--theme-color-border);
-      border-radius: 6px;
-      background: var(--theme-color-background);
-      color: var(--theme-color-text-primary);
-      font: inherit;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .join-select:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
     .actions {
       display: flex;
