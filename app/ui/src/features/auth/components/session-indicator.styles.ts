@@ -1,6 +1,12 @@
 import { css } from 'lit';
 
 export const sessionIndicatorStyles = css`
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   :host {
     display: block;
   }
@@ -137,6 +143,7 @@ export const sessionIndicatorStyles = css`
     visibility: hidden;
     transition: transform 0.3s ease, visibility 0s linear 0.3s;
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
   }
