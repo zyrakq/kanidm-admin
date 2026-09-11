@@ -4,7 +4,7 @@
 
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { unsafeStatic } from 'lit/static-html.js';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 
 export const ICON_NAMES = [
   'persons', 'groups', 'bot', 'key', 'grid', 'globe', 'settings', 'sync',
@@ -70,7 +70,6 @@ export class UiIcon extends LitElement {
     if (!this.name || !(this.name in ICONS)) {
       return nothing;
     }
-    const svg = unsafeStatic(ICONS[this.name]);
     return html`<svg
       xmlns="http://www.w3.org/2000/svg"
       width=${this.size}
@@ -83,7 +82,7 @@ export class UiIcon extends LitElement {
       stroke-linejoin="round"
       aria-hidden="true"
     >
-      ${svg}
+      ${unsafeSVG(ICONS[this.name] ?? '')}
     </svg>`;
   }
 }
