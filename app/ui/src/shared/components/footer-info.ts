@@ -87,33 +87,36 @@ export class FooterInfo extends LitElement {
   render() {
     return html`
       <footer>
-        <div class="left">
-          ${this.renderStatus()}
-        </div>
-        <div class="right">
-          <a
-            href="https://github.com/zyrakq/kanidm-admin"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            ${msg('GitHub')}
-          </a>
-          <span class="separator">•</span>
-          <a
-            href="https://kanidm.github.io/kanidm/stable/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            ${msg('Kanidm Docs')}
-          </a>
-          <span class="separator">•</span>
-          <a
-            href="https://github.com/kanidm/kanidm"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            ${msg('Kanidm GitHub')}
-          </a>
+        <div class="toolbar">
+          <div class="left">
+            ${this.renderStatus()}
+          </div>
+          <div class="spacer"></div>
+          <div class="right">
+            <a
+              href="https://github.com/zyrakq/kanidm-admin"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ${msg('GitHub')}
+            </a>
+            <span class="separator">•</span>
+            <a
+              href="https://kanidm.github.io/kanidm/stable/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ${msg('Kanidm Docs')}
+            </a>
+            <span class="separator">•</span>
+            <a
+              href="https://github.com/kanidm/kanidm"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ${msg('Kanidm GitHub')}
+            </a>
+          </div>
         </div>
       </footer>
     `;

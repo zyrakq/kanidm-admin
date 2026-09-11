@@ -7,15 +7,23 @@ export const footerInfoStyles = css`
   }
 
   footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
+    background: var(--theme-color-surface);
+    border-top: 1px solid var(--theme-color-border);
     color: var(--theme-color-text-secondary);
     font-size: 0.875rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    transition: color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 0 16px;
+    gap: 1rem;
+  }
+
+  .spacer {
+    flex: 1;
   }
 
   .left,
@@ -79,10 +87,16 @@ export const footerInfoStyles = css`
   }
 
   @media (max-width: 768px) {
-    footer {
+    .toolbar {
       flex-direction: column;
-      gap: 0.75rem;
-      padding: 1.5rem 1rem;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 16px;
+      min-height: unset;
+    }
+
+    .spacer {
+      display: none;
     }
 
     .left,
