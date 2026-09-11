@@ -3,8 +3,10 @@
 // reauth-modal) and an error message slot.
 
 import { LitElement, css, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
+import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
+import './ui-icon';
 
 @customElement('form-field')
 @localized()
@@ -28,6 +30,124 @@ export class FormField extends LitElement {
   /** Already-localized hint below the control. */
   @property() hint = '';
 
+  @state() private open = false;
+  @state() private activeIndex = -1;
+  @state() private filter = '';
+
+  private get listboxId(): string {
+    return (this.fieldId || 'combobox') + '-listbox';
+  }
+
+  private get selectedLabel(): string {
+    return this.options.find((o) => o.value === this.value)?.label ?? '';
+  }
+
+  private get filteredOptions() {
+    return this.options.filter((o) => o.label.toLowerCase().includes(this.filter.toLowerCase()));
+  }
+
+  private openCombobox(): void {
+    if (this.open) return;
+    this.filter = '';
+    this.activeIndex = -1;
+    this.open = true;
+    document.addEventListener('click', this.onDocClick);
+  }
+
+  private closeCombobox(): void {
+    this.open = false;
+    this.filter = '';
+    this.activeIndex = -1;
+    document.removeEventListener('click', this.onDocClick);
+  }
+
+  private toggleCombobox(): void {
+    if (this.open) {
+      this.closeCombobox();
+    } else {
+      this.openCombobox();
+    }
+  }
+
+  private onDocClick = (e: MouseEvent): void => {
+    if (!e.composedPath().includes(this)) this.closeCombobox();
+  };
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    document.removeEventListener('click', this.onDocClick);
+  }
+
+  private handleComboboxInput(e: Event): void {
+    this.filter = (e.target as HTMLInputElement).value;
+    this.activeIndex = -1;
+    if (!this.open) this.openCombobox();
+  }
+
+  private selectOption(index: number): void {
+    const opt = this.filteredOptions[index];
+    this.value = opt.value;
+    this.closeCombobox();
+    this.dispatchEvent(
+      new CustomEvent('field-input', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private handleComboboxKeyDown(e: KeyboardEvent): void {
+    if (e.key === 'ArrowDown') {
+      e.stopPropagation();
+      if (!this.open) {
+        this.openCombobox();
+      } else {
+        this.activeIndex = Math.min(this.activeIndex + 1, this.filteredOptions.length - 1);
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.stopPropagation();
+      this.activeIndex = Math.max(this.activeIndex - 1, 0);
+    } else if (e.key === 'Enter') {
+      e.stopPropagation();
+      if (this.open && this.activeIndex >= 0) {
+        e.preventDefault();
+        this.selectOption(this.activeIndex);
+      } else if (this.open) {
+        this.closeCombobox();
+      }
+    } else if (e.key === 'Escape') {
+      e.stopPropagation();
+      this.closeCombobox();
+    } else if (e.key === 'Tab') {
+      e.stopPropagation();
+      this.closeCombobox();
+    }
+  }
+
+  private renderListbox() {
+    const filtered = this.filteredOptions;
+    return html`
+      <div class="listbox" role="listbox" id=${this.listboxId}>
+        ${filtered.length === 0
+          ? html`<div class="listbox-empty">${msg('No results')}</div>`
+          : filtered.map(
+              (option, i) => html`
+                <div
+                  class=${'listbox-option' + (i === this.activeIndex ? ' active' : '')}
+                  role="option"
+                  id=${this.listboxId + '-opt-' + i}
+                  aria-selected=${option.value === this.value ? 'true' : 'false'}
+                  @click=${() => this.selectOption(i)}
+                >
+                  ${option.label}
+                </div>
+              `
+            )}
+      </div>
+    `;
+  }
+
   private handleInput(e: Event): void {
     const target = e.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
     this.value = target.value;
@@ -46,7 +166,40 @@ export class FormField extends LitElement {
       <label class="label" for=${this.fieldId}>${this.label}</label>
     `;
     let control;
-    if (this.type === 'select') {
+    if (this.type === 'combobox') {
+      control = html`
+        <div class="combobox">
+          <input
+            id=${this.fieldId}
+            class="input combobox-input"
+            role="combobox"
+            .value=${this.open ? this.filter : this.selectedLabel}
+            placeholder=${this.placeholder}
+            ?disabled=${this.disabled}
+            ?required=${this.required}
+            aria-expanded=${this.open}
+            aria-controls=${this.listboxId}
+            aria-activedescendant=${this.activeIndex >= 0 ? this.listboxId + '-opt-' + this.activeIndex : ''}
+            aria-autocomplete="list"
+            autocomplete="off"
+            @input=${this.handleComboboxInput}
+            @keydown=${this.handleComboboxKeyDown}
+            @click=${() => this.openCombobox()}
+          />
+          <button
+            class="chevron-btn"
+            type="button"
+            tabindex="-1"
+            aria-label=${msg('Toggle options')}
+            ?disabled=${this.disabled}
+            @click=${() => this.toggleCombobox()}
+          >
+            <ui-icon name=${this.open ? 'chevron-up' : 'chevron-down'} size="16"></ui-icon>
+          </button>
+          ${this.open ? this.renderListbox() : nothing}
+        </div>
+      `;
+    } else if (this.type === 'select') {
       control = html`
         <select
           id=${this.fieldId}
@@ -107,7 +260,8 @@ export class FormField extends LitElement {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      margin-bottom: 14px;
+      position: relative;
+      margin-bottom: var(--field-margin, 14px);
     }
     .label {
       font-size: 14px;
@@ -123,6 +277,7 @@ export class FormField extends LitElement {
       background: var(--theme-color-surface);
       transition: border-color 0.2s ease;
       width: 100%;
+      box-sizing: border-box;
     }
     .input:focus {
       outline: none;
@@ -141,6 +296,66 @@ export class FormField extends LitElement {
       margin: 0;
       font-size: 13px;
       color: var(--theme-color-error);
+    }
+    .input[type='number'] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+    .input[type='number']::-webkit-inner-spin-button,
+    .input[type='number']::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .combobox {
+      position: relative;
+    }
+    .combobox-input {
+      padding-right: 40px;
+    }
+    .chevron-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      color: var(--theme-color-text-muted);
+    }
+    .chevron-btn:hover {
+      color: var(--theme-color-text-primary);
+    }
+    .listbox {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: var(--theme-color-surface);
+      border: 1px solid var(--theme-color-border);
+      border-radius: 6px;
+      box-shadow: var(--theme-shadow-md);
+      max-height: 240px;
+      overflow-y: auto;
+      z-index: 900;
+    }
+    .listbox-option {
+      padding: 9px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--theme-color-text-primary);
+    }
+    .listbox-option:hover,
+    .listbox-option.active {
+      background: var(--theme-color-background);
+    }
+    .listbox-empty {
+      padding: 9px 12px;
+      font-size: 13px;
+      color: var(--theme-color-text-muted);
     }
   `;
 }
