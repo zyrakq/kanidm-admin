@@ -14,6 +14,8 @@ import { notificationService } from '@/features/notifications';
 import { personService } from '../services/person.service';
 import type { PersonDetail } from '../types/person.types';
 import { personOverviewTabStyles } from './person-overview-tab.styles';
+import { avatarUrl } from '@/shared/services/avatar-url';
+import '@/shared/components/confirm-dialog';
 import '@/shared/components/list-pager';
 
 /**
@@ -55,6 +57,12 @@ export class PersonOverviewTab extends LitElement {
   @state() private groups: GroupSummary[] = [];
   @state() private memberPage = 1;
   @state() private memberPageSize = 10;
+  @state() private avatarBusy = false;
+  @state() private avatarRemoveOpen = false;
+  @state() private avatarRemoving = false;
+  @state() private avatarMissing = false;
+  /** Cache-buster bumped after upload/remove to refresh the preview. */
+  @state() private avatarVersion = 0;
 
   // Edit form state (synced from `person` unless the user has edits).
   @state() private displayName = '';
@@ -119,6 +127,62 @@ export class PersonOverviewTab extends LitElement {
     this.dispatchEvent(
       new CustomEvent('person-changed', { bubbles: true, composed: true })
     );
+  }
+
+  /** Canonical avatar key: uuid when known (matches the session
+   *  indicator's self-avatar), else the route id. */
+  private get avatarKey(): string {
+    return this.person?.uuid ?? this.personId;
+  }
+
+  private get avatarPreviewUrl(): string {
+    return `${avatarUrl(this.avatarKey)}?v=${this.avatarVersion}`;
+  }
+
+  private async uploadAvatar(file: File): Promise<void> {
+    if (this.avatarBusy) return;
+    this.avatarBusy = true;
+    try {
+      await authService.withStepUp(() =>
+        personService.setImage(this.avatarKey, file)
+      );
+      this.avatarMissing = false;
+      this.avatarVersion += 1;
+      notificationService.success(msg('Avatar uploaded.'));
+      this.emitChanged();
+    } catch {
+      notificationService.error(msg('Failed to upload the avatar.'));
+    } finally {
+      this.avatarBusy = false;
+    }
+  }
+
+  private async removeAvatar(): Promise<void> {
+    if (this.avatarRemoving) return;
+    this.avatarRemoving = true;
+    try {
+      await authService.withStepUp(() =>
+        personService.removeImage(this.avatarKey)
+      );
+      this.avatarRemoveOpen = false;
+      this.avatarMissing = true;
+      this.avatarVersion += 1;
+      notificationService.success(msg('Avatar removed.'));
+      this.emitChanged();
+    } catch {
+      notificationService.error(msg('Failed to remove the avatar.'));
+    } finally {
+      this.avatarRemoving = false;
+    }
+  }
+
+  private handleAvatarFileChange(e: Event): void {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (file) {
+      void this.uploadAvatar(file);
+    }
   }
 
   /** Reload the person only when this tab owns the loading. */
@@ -267,6 +331,61 @@ export class PersonOverviewTab extends LitElement {
     } finally {
       this.removingGroup = null;
     }
+  }
+
+  private renderAvatarCard(): ReturnType<typeof html> {
+    return html`
+      <section class="card">
+        <h2>${msg('Avatar')}</h2>
+        <p class="muted">
+          ${msg('Shown in person lists and the site header.')}
+        </p>
+        <div class="avatar-preview">
+          ${this.avatarMissing
+            ? html`<div class="avatar-placeholder">${msg('No image')}</div>`
+            : html`<img
+                src=${this.avatarPreviewUrl}
+                alt=${msg('Avatar image')}
+                @error=${() => {
+                  this.avatarMissing = true;
+                }}
+              />`}
+        </div>
+        <div class="avatar-actions">
+          <label class="primary-btn file-label">
+            <input
+              type="file"
+              accept="image/*"
+              @change=${this.handleAvatarFileChange}
+            />
+            ${this.avatarBusy ? msg('Uploading...') : msg('Upload image')}
+          </label>
+          <button
+            class="danger-btn"
+            type="button"
+            ?disabled=${this.avatarMissing || this.avatarBusy}
+            @click=${() => {
+              this.avatarRemoveOpen = true;
+            }}
+          >
+            ${msg('Remove image...')}
+          </button>
+        </div>
+      </section>
+      ${this.avatarRemoveOpen
+        ? html`<confirm-dialog
+            open
+            danger
+            .busy=${this.avatarRemoving}
+            confirmLabel=${msg('Remove')}
+            message=${msg('Remove the avatar?')}
+            @confirm=${() => void this.removeAvatar()}
+            @cancel=${() => {
+              this.avatarRemoveOpen = false;
+            }}
+          ></confirm-dialog>`
+        : nothing}
+    `;
   }
 
   private renderProfile(): ReturnType<typeof html> {
@@ -431,15 +550,71 @@ export class PersonOverviewTab extends LitElement {
       </p>`;
     }
     return html`
+      ${this.renderAvatarCard()}
       ${this.renderProfile()} ${this.renderValidity()} ${this.renderGroups()}
     `;
   }
 
-  static styles = [personOverviewTabStyles, css`
-    form-field {
-      display: block;
-    }
-  `];
+  static styles = [
+    personOverviewTabStyles,
+    css`
+      form-field {
+        display: block;
+      }
+
+      .avatar-preview {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 160px;
+        height: 160px;
+        margin-bottom: 16px;
+        border: 1px dashed var(--theme-color-border);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--theme-color-background);
+      }
+      .avatar-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+      .avatar-placeholder {
+        font-size: 13px;
+        color: var(--theme-color-text-muted);
+      }
+      .avatar-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      .file-label input[type='file'] {
+        display: none;
+      }
+      .file-label {
+        display: inline-block;
+        text-align: center;
+      }
+      .danger-btn {
+        padding: 9px 16px;
+        border: none;
+        border-radius: 6px;
+        background: var(--theme-color-error);
+        color: var(--theme-color-surface);
+        font: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+      .danger-btn:hover:not(:disabled) {
+        filter: brightness(0.9);
+      }
+      .danger-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    `,
+  ];
 }
 
 declare global {
