@@ -9,6 +9,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
+import { groupService, type GroupSummary } from '@/features/groups';
 import { notificationService } from '@/features/notifications';
 import { personService } from '../services/person.service';
 import type { PersonDetail } from '../types/person.types';
@@ -50,6 +51,7 @@ export class PersonOverviewTab extends LitElement {
   @state() private savingValidity = false;
   @state() private addingGroup = false;
   @state() private removingGroup: string | null = null;
+  @state() private groups: GroupSummary[] = [];
 
   // Edit form state (synced from `person` unless the user has edits).
   @state() private displayName = '';
@@ -65,6 +67,10 @@ export class PersonOverviewTab extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+    groupService
+      .list()
+      .catch(() => [] as GroupSummary[])
+      .then((groups) => (this.groups = groups));
     if (!this.person && this.id) {
       this.selfLoaded = true;
       void this.load();
@@ -365,20 +371,19 @@ export class PersonOverviewTab extends LitElement {
               </ul>
             `}
         <div class="add-group">
-          <input
-            class="input"
-            placeholder=${msg('Group name or uuid')}
+          <form-field
+            class="group-field"
+            field-id="ov-new-group"
+            type="combobox"
+            placeholder=${msg('Select a group')}
             .value=${this.newGroup}
-            @input=${(e: Event) => {
-              this.newGroup = (e.target as HTMLInputElement).value;
-            }}
-            @keydown=${(e: KeyboardEvent) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                void this.addGroup();
-              }
-            }}
-          />
+            .options=${this.groups.map((group) => ({
+              value: group.id,
+              label: group.displayName ?? group.id,
+            }))}
+            @field-input=${(e: CustomEvent<{ value: string }>) =>
+              (this.newGroup = e.detail.value)}
+          ></form-field>
           <button
             class="primary-btn"
             ?disabled=${busy || this.newGroup.trim() === ''}

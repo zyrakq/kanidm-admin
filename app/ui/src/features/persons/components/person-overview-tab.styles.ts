@@ -111,20 +111,8 @@ export const personOverviewTabStyles = css`
     gap: 8px;
   }
 
-  .add-group .input {
+  .add-group form-field {
     flex: 1;
     min-width: 0;
-    padding: 9px 12px;
-    border: 1px solid var(--theme-color-border);
-    border-radius: 6px;
-    font: inherit;
-    color: var(--theme-color-text-primary);
-    background: var(--theme-color-surface);
-    transition: border-color 0.2s ease;
-  }
-
-  .add-group .input:focus {
-    outline: none;
-    border-color: var(--theme-color-primary);
   }
 `;
