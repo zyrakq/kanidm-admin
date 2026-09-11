@@ -9,6 +9,8 @@ import { attrFirst, attrList } from '@/shared/types/kanidm';
 /** Row model for the persons list. */
 export interface PersonSummary {
   id: string;
+  /** Entry uuid — canonical avatar key (stable across renames). */
+  uuid: string | null;
   displayName: string;
   mail: string | null;
 }
@@ -30,6 +32,7 @@ export interface PersonDetail {
 export function toPersonSummary(entry: KanidmEntry): PersonSummary {
   return {
     id: attrFirst(entry, 'name') ?? attrFirst(entry, 'uuid') ?? '',
+    uuid: attrFirst(entry, 'uuid') ?? null,
     displayName: attrFirst(entry, 'displayname') ?? '',
     mail: attrFirst(entry, 'mail') ?? null,
   };

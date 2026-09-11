@@ -50,4 +50,9 @@ export const personListPageStyles = css`
     font-family: var(--theme-font-mono, monospace);
     font-size: 13px;
   }
+  .name-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 `;
