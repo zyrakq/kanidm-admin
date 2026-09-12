@@ -18,10 +18,12 @@ use testcontainers::core::{CmdWaitFor, ExecCommand};
 use tower::ServiceExt;
 
 use crate::auth;
-use crate::kanidm_container::provision;
-use crate::kanidm_container::{KanidmHandle, start_container};
 use crate::proxy;
-use crate::settings::kanidm_container::KanidmContainerSettings;
+use crate::settings::testcontainer::TestcontainerSettings;
+use crate::testcontainer::{
+    parse_recover_account_password, start_containers, DevCredentials, TestcontainersHandle,
+    ADMIN_USERNAME, IDM_ADMIN_USERNAME,
+};
 
 /// Minimal valid 1x1 PNG (70 bytes) for the image upload roundtrip.
 const TINY_PNG: &[u8] = &[
@@ -36,23 +38,27 @@ const TINY_PNG: &[u8] = &[
 /// auth routes (login + profile) merged with the proxy catch-all, over
 /// the production AppState built from the container's effective
 /// settings (real TLS verification via the temp CA).
-async fn container_router() -> (Router, KanidmHandle, provision::DevCredentials) {
-    let settings = KanidmContainerSettings::default();
-    let (effective, handle) = start_container(&settings)
+async fn container_router() -> (Router, TestcontainersHandle, DevCredentials) {
+    // Only the kanidm container is needed here — the mail chain
+    // stays disabled (these tests do not exercise it).
+    let mut settings = TestcontainerSettings::default();
+    settings.kanidm.enabled = true;
+
+    let (effective, handle) = start_containers(&settings)
         .await
         .expect("container should start and provision");
 
     // recover-account issues a FRESH random password per call, so the
-    // passwords logged during start_container are already stale: both
-    // built-in accounts are re-recovered on the live container, exactly
-    // like the kanidm_container test does.
+    // passwords logged during start are already stale: both built-in
+    // accounts are re-recovered on the live container, exactly like
+    // the testcontainer module test does.
     let container = match &handle {
-        KanidmHandle::Container { container, .. } => container,
-        KanidmHandle::Disabled => panic!("container mode must return a Container handle"),
+        TestcontainersHandle::Containers { kanidm, .. } => &kanidm.container,
+        TestcontainersHandle::Disabled => panic!("container mode must return Containers"),
     };
-    let credentials = provision::DevCredentials {
-        admin_password: recover_password(container, provision::ADMIN_USERNAME).await,
-        idm_admin_password: recover_password(container, provision::IDM_ADMIN_USERNAME).await,
+    let credentials = DevCredentials {
+        admin_password: recover_password(container, ADMIN_USERNAME).await,
+        idm_admin_password: recover_password(container, IDM_ADMIN_USERNAME).await,
     };
 
     let state = auth::app_state_from_settings(&effective).expect("app state from effective");
@@ -132,9 +138,9 @@ async fn call_json(router: &Router, request: Request<Body>) -> (StatusCode, Valu
 }
 
 /// Recover one account's password on the live container (fresh random
-/// per call). recover_builtin_credentials/exec_stdout are pub(super)
-/// (kanidm_container-internal), so the exec is replicated here via the
-/// public testcontainers API and parsed with the pub
+/// per call). recover_builtin_credentials/exec_stdout are private to
+/// the testcontainer module, so the exec is replicated here via the
+/// public testcontainers API and parsed with the re-exported
 /// parse_recover_account_password helper.
 async fn recover_password(container: &ContainerAsync<GenericImage>, username: &str) -> String {
     let command = ["/sbin/kanidmd", "scripting", "recover-account", username];
@@ -146,7 +152,7 @@ async fn recover_password(container: &ContainerAsync<GenericImage>, username: &s
         .await
         .expect("recover-account exec");
     let stdout = exec.stdout_to_vec().await.expect("recover-account stdout");
-    provision::parse_recover_account_password(&stdout).expect("password in recover-account stdout")
+    parse_recover_account_password(&stdout).expect("password in recover-account stdout")
 }
 
 // ---------------------------------------------------------------------------
@@ -160,7 +166,7 @@ async fn recover_password(container: &ContainerAsync<GenericImage>, username: &s
 #[ignore = "requires a running Docker daemon"]
 async fn profile_idm_admin_includes_people_admins() {
     let (router, _handle, credentials) = container_router().await;
-    let cookie = login(&router, provision::IDM_ADMIN_USERNAME, &credentials.idm_admin_password).await;
+    let cookie = login(&router, IDM_ADMIN_USERNAME, &credentials.idm_admin_password).await;
 
     let (status, body) = call_json(
         &router,
@@ -186,7 +192,7 @@ async fn profile_idm_admin_includes_people_admins() {
 #[ignore = "requires a running Docker daemon"]
 async fn profile_admin_includes_domain_admins() {
     let (router, _handle, credentials) = container_router().await;
-    let cookie = login(&router, provision::ADMIN_USERNAME, &credentials.admin_password).await;
+    let cookie = login(&router, ADMIN_USERNAME, &credentials.admin_password).await;
 
     let (status, body) = call_json(
         &router,
@@ -213,7 +219,7 @@ async fn profile_admin_includes_domain_admins() {
 #[ignore = "requires a running Docker daemon"]
 async fn proxy_person_crud_roundtrip() {
     let (router, _handle, credentials) = container_router().await;
-    let cookie = login(&router, provision::IDM_ADMIN_USERNAME, &credentials.idm_admin_password).await;
+    let cookie = login(&router, IDM_ADMIN_USERNAME, &credentials.idm_admin_password).await;
 
     // POST /v1/person
     let create_body = serde_json::json!({
@@ -272,7 +278,7 @@ async fn proxy_person_crud_roundtrip() {
     // GET /v1/recycle_bin — contains it. Recycle-bin read rights belong
     // to idm_recycle_bin_admins (admin), not idm_admin, so this step
     // runs under the admin cookie.
-    let admin_cookie = login(&router, provision::ADMIN_USERNAME, &credentials.admin_password).await;
+    let admin_cookie = login(&router, ADMIN_USERNAME, &credentials.admin_password).await;
     let (status, body) = call_json(
         &router,
         request_with_cookie("GET", "/api/kanidm/v1/recycle_bin", &admin_cookie, Vec::new()),
@@ -310,7 +316,7 @@ async fn proxy_person_crud_roundtrip() {
 #[ignore = "requires a running Docker daemon"]
 async fn proxy_oauth2_image_roundtrip() {
     let (router, _handle, credentials) = container_router().await;
-    let cookie = login(&router, provision::IDM_ADMIN_USERNAME, &credentials.idm_admin_password).await;
+    let cookie = login(&router, IDM_ADMIN_USERNAME, &credentials.idm_admin_password).await;
 
     // POST /v1/oauth2/_basic — attr keys copied from the vendored
     // idm_oauth2_rs_basic_create.
@@ -408,7 +414,7 @@ async fn proxy_oauth2_image_roundtrip() {
 #[ignore = "requires a running Docker daemon"]
 async fn proxy_access_enforcement_maps_403() {
     let (router, _handle, credentials) = container_router().await;
-    let cookie = login(&router, provision::IDM_ADMIN_USERNAME, &credentials.idm_admin_password).await;
+    let cookie = login(&router, IDM_ADMIN_USERNAME, &credentials.idm_admin_password).await;
 
     // idm_admin can read the builtin admin account but must not modify
     // it (that right belongs to domain_admins/system admins only).
