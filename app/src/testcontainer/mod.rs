@@ -20,11 +20,16 @@
 // under logs/testcontainers/ (log_file.rs); the console carries
 // only app-level key events.
 
+mod kanidm;
 mod log_file;
 mod mail_certs;
 mod mailcrab;
+mod mail_sender;
 mod network;
 
+pub(crate) use kanidm::{
+    parse_recover_account_password, ADMIN_USERNAME, IDM_ADMIN_USERNAME,
+};
 pub(crate) use mailcrab::MailcrabContainer;
 pub(crate) use network::Mode;
 
