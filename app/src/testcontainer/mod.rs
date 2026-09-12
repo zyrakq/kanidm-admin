@@ -27,6 +27,10 @@ mod mailcrab;
 mod mail_sender;
 mod network;
 
+// Re-exports consumed only by the Docker-gated proxy integration
+// tests (cfg(test)); the gated test in this module uses the module
+// paths directly.
+#[cfg(test)]
 pub(crate) use kanidm::{
     parse_recover_account_password, ADMIN_USERNAME, IDM_ADMIN_USERNAME,
 };
@@ -41,6 +45,7 @@ use testcontainers::{ContainerAsync, GenericImage};
 use tracing::{info, warn};
 
 use crate::settings::kanidm::KanidmSettings;
+use crate::settings::loader::Settings;
 use crate::settings::testcontainer::TestcontainerSettings;
 
 /// Startup timeout for every dev container (image pull + first
@@ -137,6 +142,22 @@ impl Drop for TestcontainersHandle {
             delete_temp_ca(temp_ca);
         }
     }
+}
+
+/// Resolve the Kanidm settings the app connects with.
+///
+/// Container mode: run the dev containers, recover the built-in
+/// accounts, and return effective settings pointing at the
+/// containers (the [kanidm] section is ignored with a warning).
+/// Disabled mode: pass [kanidm] through unchanged.
+pub(crate) async fn start(
+    settings: &Settings,
+) -> Result<(KanidmSettings, TestcontainersHandle), Box<dyn std::error::Error + Send + Sync>> {
+    if !settings.testcontainer.kanidm.enabled {
+        return Ok((settings.kanidm.clone(), TestcontainersHandle::Disabled));
+    }
+    warn!("[kanidm] url/verify_ca/ca_path are ignored while the testcontainer is enabled");
+    start_containers(&settings.testcontainer).await
 }
 
 /// Run the full dev container chain and derive the effective

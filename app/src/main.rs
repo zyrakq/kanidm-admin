@@ -2,7 +2,6 @@ mod auth;
 mod branding;
 mod frontend;
 mod frontend_assets;
-mod kanidm_container;
 mod logging;
 mod mailcrab_proxy;
 mod preflight;
@@ -27,8 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
     let _frontend_handle = frontend::start(&settings.frontend, &manifest_dir)?;
-    let (kanidm_settings, _kanidm_handle) = kanidm_container::start(&settings).await?;
-    kanidm_settings.log_effective_config();
+    let (kanidm_settings, _testcontainers_handle) = testcontainer::start(&settings).await?;
     let state = auth::app_state_from_settings(&kanidm_settings)?;
     let status_probe = status::probe_from_settings(&kanidm_settings)?;
     let branding_store = branding::BrandingStore::new(
@@ -41,6 +39,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         routes::build(
             state,
             status_probe,
+            _testcontainers_handle.mailcrab_upstream(),
             branding::router(std::sync::Arc::new(branding_store)),
         ),
         &settings.frontend,
