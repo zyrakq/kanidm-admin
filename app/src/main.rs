@@ -10,6 +10,7 @@ mod proxy;
 mod routes;
 mod settings;
 mod status;
+mod testcontainer;
 
 use settings::loader::Settings;
 use std::path::PathBuf;

@@ -41,6 +41,7 @@ use testcontainers::{ContainerAsync, GenericImage};
 use tracing::{info, warn};
 
 use crate::settings::kanidm::KanidmSettings;
+use crate::settings::testcontainer::TestcontainerSettings;
 
 /// Startup timeout for every dev container (image pull + first
 /// readiness signal), mirroring the old subsystem.
@@ -138,6 +139,99 @@ impl Drop for TestcontainersHandle {
     }
 }
 
+/// Run the full dev container chain and derive the effective
+/// settings. Separate from `start` so the Docker-gated tests can
+/// run it without a full Settings layer.
+///
+/// Order matters: kanidm first (the sender provisions against
+/// it), mailcrab second (the sender smoke asserts its API already
+/// holds a message), the sender last.
+pub(crate) async fn start_containers(
+    tc: &TestcontainerSettings,
+) -> Result<(KanidmSettings, TestcontainersHandle), Box<dyn std::error::Error + Send + Sync>>
+{
+    tc.validate()?;
+
+    let mode = network::resolve_mode(&tc.mode)?;
+    network::ensure_network(&tc.network).await?;
+    if mode == Mode::InContainer {
+        network::self_attach(&tc.network).await?;
+    }
+
+    // The mail PKI is only needed when the mail chain runs.
+    let pki = if tc.mailcrab.enabled {
+        Some(mail_certs::generate()?)
+    } else {
+        None
+    };
+
+    let server = kanidm::run(&tc.kanidm.image, mode, &tc.network).await?;
+
+    // The temp CA file must outlive this function: main.rs builds
+    // the auth state from the returned settings AFTER start()
+    // returns, and the client builder parses the CA from the file
+    // at that point. The handle deletes it on drop (app
+    // shutdown).
+    let temp_ca = write_temp_ca(&server.ca_pem)?;
+    let effective =
+        kanidm::effective_settings(mode, server.host_port, &temp_ca.to_string_lossy());
+
+    kanidm::log_dev_credentials(&effective.url, &server.credentials);
+    kanidm::smoke_auth(&effective, &server.credentials.idm_admin_password).await?;
+
+    let dev = DevKanidm {
+        container: server.container,
+        ca_pem: server.ca_pem,
+        credentials: server.credentials,
+        effective: effective.clone(),
+    };
+
+    let mailcrab = if tc.mailcrab.enabled {
+        let pki = pki
+            .as_ref()
+            .expect("mailcrab enabled implies the mail PKI was generated");
+        Some(
+            mailcrab::run(&tc.mailcrab.image, mode, &tc.network, tc.mailcrab.ui_port, pki)
+                .await?,
+        )
+    } else {
+        None
+    };
+
+    let sender = if tc.kanidm_mail_sender.enabled {
+        let pki = pki
+            .as_ref()
+            .expect("sender enabled implies mailcrab enabled implies the mail PKI");
+        let upstream = mailcrab::upstream_base(mode, tc.mailcrab.ui_port);
+        Some(
+            mail_sender::run(
+                &tc.kanidm_mail_sender,
+                mode,
+                &tc.network,
+                &dev,
+                pki,
+                &upstream,
+            )
+            .await?,
+        )
+    } else {
+        None
+    };
+
+    info!(url = %effective.url, "dev testcontainers ready");
+    Ok((
+        effective,
+        TestcontainersHandle::Containers {
+            kanidm: dev,
+            sender,
+            mailcrab,
+            temp_ca,
+            mode,
+            ui_port: tc.mailcrab.ui_port,
+        },
+    ))
+}
+
 /// Write the container-generated CA to a temp file for
 /// `add_root_certificate_filepath`. The kanidm_client public API
 /// has no in-memory CA setter, so this brief file is the bridge:
@@ -222,5 +316,53 @@ mod tests {
     fn delete_temp_ca_does_not_panic_on_missing_file() {
         let path = std::env::temp_dir().join("kanidm-admin-dev-ca-does-not-exist.pem");
         delete_temp_ca(&path); // must not panic
+    }
+
+    /// Full flow against a real Docker daemon: all three
+    /// containers start, the sender's test mail is visible in the
+    /// mailcrab API, and the temp CA is cleaned up on drop.
+    /// Ignored by default (needs Docker); run explicitly with
+    /// `cargo test -- --ignored`.
+    #[tokio::test]
+    #[ignore = "requires a running Docker daemon"]
+    async fn three_containers_start_and_deliver_test_mail() {
+        let mut settings = TestcontainerSettings::default();
+        settings.kanidm.enabled = true;
+        settings.kanidm_mail_sender.enabled = true;
+        settings.mailcrab.enabled = true;
+
+        let (effective, handle) = start_containers(&settings)
+            .await
+            .expect("the container chain should start and provision");
+
+        // Real verification is the point: the effective settings
+        // carry the temp CA and verify_ca = true.
+        assert!(
+            effective.verify_ca,
+            "effective settings must verify the CA"
+        );
+
+        // The sender's startup smoke mail is already delivered.
+        let upstream = handle
+            .mailcrab_upstream()
+            .expect("mailcrab upstream with mailcrab enabled");
+        let response = reqwest::Client::new()
+            .get(format!("{upstream}/_/mailcrab/api/messages"))
+            .send()
+            .await
+            .expect("mailcrab API reachable");
+        let messages: serde_json::Value = response.json().await.expect("mailcrab API JSON");
+        let count = messages.as_array().map(|messages| messages.len()).unwrap_or(0);
+        assert!(count >= 1, "the sender test mail must be listed");
+
+        // Dropping the handle deletes the temp CA file (the
+        // containers themselves are removed by ContainerAsync's
+        // own Drop + watchdog).
+        let temp_ca = match &handle {
+            TestcontainersHandle::Containers { temp_ca, .. } => temp_ca.clone(),
+            TestcontainersHandle::Disabled => panic!("container mode must return Containers"),
+        };
+        drop(handle);
+        assert!(!temp_ca.exists(), "temp CA file deleted on drop");
     }
 }
