@@ -1,17 +1,21 @@
 // app/src/testcontainer/mail_certs.rs
 //
-// Throwaway PKI for the dev mail chain: a self-signed CA plus a
 // leaf certificate for mailcrab's SMTP TLS endpoint, generated
 // fresh per run with rcgen. The CA is mounted into the
 // kanidm-mail-sender container (trust anchor) and the leaf +
 // key into mailcrab (which serves them on its SMTP socket), so
 // the sender verifies mailcrab with real TLS — no host or
-// production certificate is ever touched.
+// production certificate is ever touched. The leaf name is
+// mode-aware: the sender connects to `localhost` in host mode
+// (loopback-published SMTP) and to the container DNS name
+// otherwise.
 
 use rcgen::{
     BasicConstraints, CertificateParams, CertifiedIssuer, DistinguishedName, DnType,
     ExtendedKeyUsagePurpose, IsCa, KeyPair, KeyUsagePurpose,
 };
+
+use super::Mode;
 
 /// Generated PKI material, PEM-encoded: the CA certificate (the
 /// sender's trust anchor), the mailcrab leaf certificate and its
@@ -25,12 +29,12 @@ pub(crate) struct MailPki {
 /// Generate the dev mail PKI: a throwaway CA and a mailcrab leaf
 /// certificate signed by it. Validity is left at rcgen's sane
 /// defaults (avoids a direct `time` dependency).
-pub(crate) fn generate() -> Result<MailPki, Box<dyn std::error::Error + Send + Sync>> {
+pub(crate) fn generate(mode: Mode) -> Result<MailPki, Box<dyn std::error::Error + Send + Sync>> {
     let ca_key = KeyPair::generate()?;
     let ca = CertifiedIssuer::self_signed(ca_params()?, &ca_key)?;
 
     let leaf_key = KeyPair::generate()?;
-    let leaf = leaf_params()?.signed_by(&leaf_key, &ca)?;
+    let leaf = leaf_params(mailcrab_name(mode))?.signed_by(&leaf_key, &ca)?;
 
     Ok(MailPki {
         ca_pem: ca.pem().into_bytes(),
@@ -52,15 +56,25 @@ fn ca_params() -> Result<CertificateParams, rcgen::Error> {
     Ok(params)
 }
 
-/// Leaf certificate parameters: CN and SAN `mailcrab` (the
-/// container DNS name the sender connects to), server-auth
-/// usage.
-fn leaf_params() -> Result<CertificateParams, rcgen::Error> {
-    let mut params = CertificateParams::new(vec!["mailcrab".to_string()])?;
+/// The mailcrab leaf certificate name (SAN and CN): `localhost`
+/// in host mode — the sender runs on the host network and relays
+/// into the loopback-published SMTP port — and the container DNS
+/// name in in-container mode.
+fn mailcrab_name(mode: Mode) -> &'static str {
+    match mode {
+        Mode::Host => "localhost",
+        Mode::InContainer => "mailcrab",
+    }
+}
+
+/// Leaf certificate parameters: CN and SAN `name` (the host the
+/// sender connects to), server-auth usage.
+fn leaf_params(name: &str) -> Result<CertificateParams, rcgen::Error> {
+    let mut params = CertificateParams::new(vec![name.to_string()])?;
     params.distinguished_name = DistinguishedName::new();
     params
         .distinguished_name
-        .push(DnType::CommonName, "mailcrab");
+        .push(DnType::CommonName, name);
     params.extended_key_usages = vec![ExtendedKeyUsagePurpose::ServerAuth];
     params.key_usages = vec![
         KeyUsagePurpose::DigitalSignature,
@@ -87,8 +101,14 @@ mod tests {
     }
 
     #[test]
-    fn generates_ca_and_leaf_with_mailcrab_san() {
-        let pki = generate().expect("PKI generation should succeed");
+    fn mailcrab_name_follows_the_mode() {
+        assert_eq!(mailcrab_name(Mode::Host), "localhost");
+        assert_eq!(mailcrab_name(Mode::InContainer), "mailcrab");
+    }
+
+    #[test]
+    fn host_mode_leaf_carries_localhost_san() {
+        let pki = generate(Mode::Host).expect("PKI generation should succeed");
 
         let ca = String::from_utf8(pki.ca_pem.clone()).expect("CA PEM is UTF-8");
         let cert = String::from_utf8(pki.cert_pem.clone()).expect("cert PEM is UTF-8");
@@ -115,13 +135,36 @@ mod tests {
             "CA certificate DER must contain the dev CA common name"
         );
 
-        // The leaf carries the mailcrab SAN (and CN) as DER string
-        // bytes — dependency-free structural check.
+        // The leaf carries the localhost SAN (and CN) as DER
+        // string bytes — and not the in-container DNS name.
+        let leaf_der = pem_body_der(&cert);
+        let san = b"localhost".as_slice();
+        assert!(
+            leaf_der.windows(san.len()).any(|w| w == san),
+            "leaf certificate DER must contain the localhost SAN"
+        );
+        let wrong = b"mailcrab".as_slice();
+        assert!(
+            !leaf_der.windows(wrong.len()).any(|w| w == wrong),
+            "leaf certificate DER must not contain the mailcrab DNS name"
+        );
+    }
+
+    #[test]
+    fn in_container_leaf_carries_mailcrab_san() {
+        let pki = generate(Mode::InContainer).expect("PKI generation should succeed");
+        let cert = String::from_utf8(pki.cert_pem.clone()).expect("cert PEM is UTF-8");
+
         let leaf_der = pem_body_der(&cert);
         let san = b"mailcrab".as_slice();
         assert!(
             leaf_der.windows(san.len()).any(|w| w == san),
             "leaf certificate DER must contain the mailcrab SAN"
+        );
+        let wrong = b"localhost".as_slice();
+        assert!(
+            !leaf_der.windows(wrong.len()).any(|w| w == wrong),
+            "leaf certificate DER must not contain the host-mode name"
         );
     }
 }

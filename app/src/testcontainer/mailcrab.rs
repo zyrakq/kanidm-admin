@@ -6,8 +6,12 @@
 // paths mailcrab's SMTP TLS endpoint serves (WORKDIR /app), so
 // the sender verifies it with real TLS. Readiness is app-side
 // (wait_ready): in-container mode publishes no port, so no
-// testcontainers http strategy could probe it.
+// testcontainers http strategy could probe it. Host mode
+// publishes the fixed UI port on 0.0.0.0 and the SMTP port
+// loopback-only (the sender on the host network relays via
+// localhost).
 
+use testcontainers::bollard::models::{HostConfig, PortBinding};
 use testcontainers::core::IntoContainerPort;
 use testcontainers::runners::AsyncRunner;
 use testcontainers::{ContainerAsync, ContainerRequest, CopyTargetOptions, GenericImage, ImageExt};
@@ -72,8 +76,32 @@ pub(crate) fn mailcrab_request(
         .with_startup_timeout(STARTUP_TIMEOUT);
 
     match mode {
-        Mode::Host => request.with_mapped_port(ui_port, MAILCRAB_HTTP_PORT.tcp()),
+        Mode::Host => request
+            .with_mapped_port(ui_port, MAILCRAB_HTTP_PORT.tcp())
+            .with_mapped_port(MAILCRAB_SMTP_PORT, MAILCRAB_SMTP_PORT.tcp())
+            .with_host_config_modifier(loopback_smtp()),
         Mode::InContainer => request.with_host_config_modifier(publish_nothing()),
+    }
+}
+
+/// Host-config modifier for mailcrab in host mode: rewrites the
+/// SMTP binding (the runner derives it from with_mapped_port
+/// with a wildcard host IP) to loopback-only — the sender runs
+/// on the host network and relays via localhost, and nothing
+/// else may reach the SMTP socket. The fixed UI binding keeps
+/// its wildcard IP (the one intentionally public port).
+fn loopback_smtp() -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
+    |config: &mut HostConfig| {
+        let mut bindings = config.port_bindings.take().unwrap_or_default();
+        bindings.insert(
+            format!("{MAILCRAB_SMTP_PORT}/tcp"),
+            Some(vec![PortBinding {
+                host_ip: Some("127.0.0.1".to_string()),
+                host_port: Some(MAILCRAB_SMTP_PORT.to_string()),
+            }]),
+        );
+        config.port_bindings = Some(bindings);
+        config.publish_all_ports = Some(false);
     }
 }
 
@@ -157,9 +185,10 @@ mod tests {
     use super::*;
     use crate::testcontainer::mail_certs;
     use std::collections::BTreeMap;
+    use testcontainers::bollard::models::PortMap;
 
-    fn test_pki() -> MailPki {
-        mail_certs::generate().expect("PKI generation should succeed")
+    fn test_pki(mode: Mode) -> MailPki {
+        mail_certs::generate(mode).expect("PKI generation should succeed")
     }
 
     #[test]
@@ -174,7 +203,7 @@ mod tests {
 
     #[test]
     fn request_sets_tls_prefix_ports_and_copies() {
-        let pki = test_pki();
+        let pki = test_pki(Mode::Host);
         let request = mailcrab_request(
             "marlonb/mailcrab:v1.9.0",
             Mode::Host,
@@ -215,17 +244,23 @@ mod tests {
         assert!(debug.contains("/app/cert.pem"));
         assert!(debug.contains("/app/key.pem"));
 
-        // Host mode maps the fixed UI port.
-        let ports = request.ports().expect("host mode maps the UI port");
+        // Host mode maps the fixed UI port and the SMTP port
+        // (the modifier then pins the SMTP binding to loopback).
+        let ports = request.ports().expect("host mode maps the UI and SMTP ports");
+        let debug = format!("{ports:?}");
         assert!(
-            format!("{ports:?}").contains("1080"),
+            debug.contains("1080"),
             "the mapped host port is the configured UI port: {ports:?}"
+        );
+        assert!(
+            debug.contains("1025"),
+            "the SMTP port is mapped for the loopback rewrite: {ports:?}"
         );
     }
 
     #[test]
     fn in_container_mode_publishes_nothing() {
-        let pki = test_pki();
+        let pki = test_pki(Mode::InContainer);
         let request = mailcrab_request(
             "marlonb/mailcrab:v1.9.0",
             Mode::InContainer,
@@ -237,5 +272,62 @@ mod tests {
             request.ports().is_none() && request.expose_ports().is_empty(),
             "in-container mode must not publish any port"
         );
+    }
+
+    #[test]
+    fn loopback_smtp_modifier_pins_smtp_to_loopback_only() {
+        // HostConfig as the runner builds it for host mode: both
+        // mapped ports carry wildcard host IPs.
+        let mut config = HostConfig {
+            port_bindings: Some(PortMap::from([
+                (
+                    "1080/tcp".to_string(),
+                    Some(vec![PortBinding {
+                        host_ip: None,
+                        host_port: Some("1080".to_string()),
+                    }]),
+                ),
+                (
+                    "1025/tcp".to_string(),
+                    Some(vec![PortBinding {
+                        host_ip: None,
+                        host_port: Some("1025".to_string()),
+                    }]),
+                ),
+            ])),
+            ..Default::default()
+        };
+
+        loopback_smtp()(&mut config);
+
+        let bindings = config.port_bindings.expect("bindings stay present");
+        let ui = bindings
+            .get("1080/tcp")
+            .and_then(|binding| binding.as_ref())
+            .and_then(|list| list.first());
+        assert_eq!(
+            ui.and_then(|binding| binding.host_ip.as_deref()),
+            None,
+            "the UI binding keeps its wildcard IP"
+        );
+        assert_eq!(
+            ui.and_then(|binding| binding.host_port.as_deref()),
+            Some("1080")
+        );
+
+        let smtp = bindings
+            .get("1025/tcp")
+            .and_then(|binding| binding.as_ref())
+            .and_then(|list| list.first());
+        assert_eq!(
+            smtp.and_then(|binding| binding.host_ip.as_deref()),
+            Some("127.0.0.1"),
+            "the SMTP binding is loopback-only"
+        );
+        assert_eq!(
+            smtp.and_then(|binding| binding.host_port.as_deref()),
+            Some("1025")
+        );
+        assert_eq!(config.publish_all_ports, Some(false));
     }
 }

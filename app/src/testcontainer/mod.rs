@@ -11,7 +11,8 @@
 // mode) attach the app's own container, generate the dev mail
 // PKI, run the kanidm cert-generate + server containers, recover
 // the built-in credentials, then mailcrab and the mail sender,
-// and prove the chain with smoke checks before serving. The
+// and prove the chain with smoke checks (kanidm auth, the
+// sender's test mail and its kanidm poll) before serving. The
 // generated kanidm CA is written to a temp file (the closest to
 // in-memory the public kanidm_client API allows:
 // add_root_certificate_filepath parses the file at call time),
@@ -56,6 +57,22 @@ pub(crate) const STARTUP_TIMEOUT: Duration = Duration::from_secs(120);
 /// Used to find and prune orphaned containers after a SIGKILL.
 pub(crate) const CONTAINER_LABEL_KEY: &str = "kanidm-admin.dev";
 pub(crate) const CONTAINER_LABEL_VALUE: &str = "true";
+
+/// Bounded scan for the sender kanidm-poll smoke: ~10 attempts
+/// × 1 s — two default poll intervals (the sender checks every
+/// 5 s when its config sets no schedule), so at least one poll
+/// tick is guaranteed to land in the window.
+const SENDER_POLL_ATTEMPTS: u32 = 10;
+const SENDER_POLL_DELAY: Duration = Duration::from_secs(1);
+
+/// Success marker for the sender kanidm-poll smoke: the sender's
+/// scheduler logs this on stderr on every poll tick.
+const SENDER_POLL_TICK: &str = "checking for mail";
+
+/// Failure marker for the sender kanidm-poll smoke: the sender
+/// logs this when the kanidm poll (bearer-token auth + SCIM
+/// query) fails.
+const SENDER_POLL_FAILURE: &str = "Unable to check for queued mail";
 
 /// Temp CA file name prefix; the full name is
 /// `kanidm-admin-dev-ca-{pid}-{nanos}.pem` in the system temp dir.
@@ -181,7 +198,7 @@ pub(crate) async fn start_containers(
 
     // The mail PKI is only needed when the mail chain runs.
     let pki = if tc.mailcrab.enabled {
-        Some(mail_certs::generate()?)
+        Some(mail_certs::generate(mode)?)
     } else {
         None
     };
@@ -224,17 +241,11 @@ pub(crate) async fn start_containers(
             .as_ref()
             .expect("sender enabled implies mailcrab enabled implies the mail PKI");
         let upstream = mailcrab::upstream_base(mode, tc.mailcrab.ui_port);
-        Some(
-            mail_sender::run(
-                &tc.kanidm_mail_sender,
-                mode,
-                &tc.network,
-                &dev,
-                pki,
-                &upstream,
-            )
-            .await?,
-        )
+        let container =
+            mail_sender::run(&tc.kanidm_mail_sender, mode, &tc.network, &dev, pki, &upstream)
+                .await?;
+        assert_sender_polling(&container).await?;
+        Some(container)
     } else {
         None
     };
@@ -251,6 +262,46 @@ pub(crate) async fn start_containers(
             ui_port: tc.mailcrab.ui_port,
         },
     ))
+}
+
+/// Sender kanidm-poll smoke: the `-t` test-mail smoke bypasses
+/// kanidm entirely (direct SMTP), so the sender's kanidm leg —
+/// bearer-token auth plus the SCIM ready-message poll — is
+/// otherwise unproven. Bounded scan of the sender's stderr
+/// requiring a poll tick with no poll failure; the container
+/// start has already waited for the readiness marker.
+async fn assert_sender_polling(
+    sender: &ContainerAsync<GenericImage>,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    for attempt in 0..SENDER_POLL_ATTEMPTS {
+        let stderr = sender
+            .stderr_to_vec()
+            .await
+            .map_err(|error| format!("failed to read the mail-sender stderr: {error}"))
+            .map(|bytes| String::from_utf8_lossy(&bytes).into_owned())?;
+        if poll_smoke_satisfied(&stderr) {
+            info!("mail-sender kanidm poll smoke succeeded");
+            return Ok(());
+        }
+        warn!(
+            "mail-sender poll smoke attempt {} not satisfied yet",
+            attempt + 1
+        );
+        tokio::time::sleep(SENDER_POLL_DELAY).await;
+    }
+    Err(format!(
+        "the mail-sender did not complete a kanidm mail poll within {} s: \
+         expected '{SENDER_POLL_TICK}' without '{SENDER_POLL_FAILURE}' in its stderr \
+         (container logs are captured under logs/testcontainers/kanidm-mail-sender/)",
+        SENDER_POLL_ATTEMPTS
+    )
+    .into())
+}
+
+/// Pure core of the sender poll smoke: satisfied iff the stderr
+/// shows a poll tick and no poll failure.
+fn poll_smoke_satisfied(stderr: &str) -> bool {
+    stderr.contains(SENDER_POLL_TICK) && !stderr.contains(SENDER_POLL_FAILURE)
 }
 
 /// Write the container-generated CA to a temp file for
@@ -337,6 +388,30 @@ mod tests {
     fn delete_temp_ca_does_not_panic_on_missing_file() {
         let path = std::env::temp_dir().join("kanidm-admin-dev-ca-does-not-exist.pem");
         delete_temp_ca(&path); // must not panic
+    }
+
+    #[test]
+    fn poll_smoke_requires_tick_without_failure() {
+        assert!(
+            poll_smoke_satisfied("checking for mail ..."),
+            "a poll tick satisfies the smoke"
+        );
+        assert!(
+            poll_smoke_satisfied("next mail check on ...\nchecking for mail ...\n"),
+            "a tick among other lines satisfies the smoke"
+        );
+        assert!(
+            !poll_smoke_satisfied("next mail check on ..."),
+            "the readiness line alone does not satisfy the smoke"
+        );
+        assert!(
+            !poll_smoke_satisfied("checking for mail ...\nUnable to check for queued mail\n"),
+            "a failed poll never satisfies the smoke"
+        );
+        assert!(
+            !poll_smoke_satisfied(""),
+            "empty stderr does not satisfy the smoke"
+        );
     }
 
     /// Full flow against a real Docker daemon: all three
