@@ -4,6 +4,7 @@ mod frontend;
 mod frontend_assets;
 mod kanidm_container;
 mod logging;
+mod mailcrab_proxy;
 mod preflight;
 mod proxy;
 mod routes;
