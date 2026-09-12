@@ -12,8 +12,12 @@
 // add_root_certificate_filepath parses the file at call time), the
 // effective settings point at the container with REAL verification,
 // and a smoke auth proves the chain end-to-end before serving.
+// Container output is captured into per-run files under
+// logs/kanidm-dev/ (log_file.rs); the console carries only
+// app-level key events.
 
 pub mod image;
+pub mod log_file;
 pub mod provision;
 
 use std::os::unix::fs::OpenOptionsExt;
@@ -57,6 +61,7 @@ pub enum KanidmHandle {
 impl Drop for KanidmHandle {
     fn drop(&mut self) {
         if let KanidmHandle::Container { temp_ca, .. } = self {
+            info!("dev Kanidm container stopping");
             remove_temp_ca(temp_ca);
         }
     }
