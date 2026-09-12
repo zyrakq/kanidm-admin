@@ -35,14 +35,18 @@ use crate::status::{self, KanidmStatusProbe};
 ///   POST /api/auth/reauth   — privilege step-up (refreshes cookie)
 ///   GET  /api/auth/profile  — signed-in user plus their Kanidm groups
 ///   ANY  /api/kanidm/{*path} — authenticated proxy to the Kanidm server
+///   GET  /_/mailcrab        — 301 to /_/mailcrab/ (mailcrab testcontainer only)
+///   GET  /_/mailcrab/ws     — mailcrab WebSocket bridge (mailcrab testcontainer only)
+///   ANY  /_/mailcrab/{*path} — mailcrab dev UI forward (mailcrab testcontainer only)
 ///   GET/PUT/DELETE /api/branding[/{slot}] — branding manifest/upload/remove
 ///   GET  /branding/{slot}   — serve an uploaded branding file
 pub fn build(
     state: AppState,
     status_probe: Arc<dyn KanidmStatusProbe>,
+    mailcrab_upstream: Option<String>,
     branding_routes: Router,
 ) -> Router {
-    Router::new()
+    let router = Router::new()
         .route("/api/health", get(health_check))
         .route("/api/hello", get(hello_handler))
         .route(
@@ -51,12 +55,21 @@ pub fn build(
         )
         .merge(auth_routes())
         .merge(crate::proxy::bulk::routes())
-        .merge(crate::proxy::handler::routes())
-        .with_state(state)
-        // The branding router carries its own state (BrandingState), so it
-        // is a stateless `Router<()>`; merge it only after `with_state`
-        // has turned the main router stateless too (axum 0.8 semantics).
-        .merge(branding_routes)
+        .merge(crate::proxy::handler::routes());
+
+    // The mailcrab dev proxy exists only while the mailcrab
+    // testcontainer is enabled; the conditional stays here so
+    // main.rs remains a plain sequence of calls.
+    let router = match mailcrab_upstream {
+        Some(upstream) => router.merge(crate::mailcrab_proxy::routes(upstream)),
+        None => router,
+    };
+
+    router.with_state(state)
+    // The branding router carries its own state (BrandingState), so it
+    // is a stateless `Router<()>`; merge it only after `with_state`
+    // has turned the main router stateless too (axum 0.8 semantics).
+    .merge(branding_routes)
 }
 
 /// Attach the SPA fallback service chosen by `frontend.serve_from`.
