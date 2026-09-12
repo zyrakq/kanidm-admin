@@ -9,9 +9,22 @@ public_dir = ""
 [kanidm]
 url = "https://localhost:8443"
 
-[kanidm_container]
+[testcontainer]
+mode = "auto"
+network = "kanidm-admin-dev"
+
+[testcontainer.kanidm]
 enabled = false
 image = "kanidm/server:1.11.2"
+
+[testcontainer.kanidm-mail-sender]
+enabled = false
+image = "kanidm/tools:1.11.2"
+
+[testcontainer.mailcrab]
+enabled = false
+image = "marlonb/mailcrab:v1.9.0"
+ui_port = 1080
 
 [branding]
 dir = ""
