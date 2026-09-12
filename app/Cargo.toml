@@ -23,6 +23,9 @@ reqwest = { workspace = true }
 kanidm_proto = { workspace = true }
 time = { workspace = true }
 testcontainers = { workspace = true }
+rcgen = { workspace = true }
+tokio-tungstenite = { workspace = true }
+futures-util = { workspace = true }
 
 [dev-dependencies]
 http-body-util = "0.1"
