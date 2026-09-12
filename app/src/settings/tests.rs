@@ -48,6 +48,23 @@ const BASE_TOML: &str = indoc! {r#"
 
     [kanidm]
     url = "https://kanidm.example.com"
+
+    [testcontainer]
+    mode = "auto"
+    network = "kanidm-admin-dev"
+
+    [testcontainer.kanidm]
+    enabled = false
+    image = "kanidm/server:1.11.1"
+
+    [testcontainer.kanidm_mail_sender]
+    enabled = false
+    image = "kanidm/tools:1.11.1"
+
+    [testcontainer.mailcrab]
+    enabled = false
+    image = "marlonb/mailcrab:v1.9.0"
+    ui_port = 1080
 "#};
 
 const DEV_TOML: &str = indoc! {r#"
@@ -55,7 +72,13 @@ const DEV_TOML: &str = indoc! {r#"
     serve_from = "disk"
     watch = true
 
-    [kanidm_container]
+    [testcontainer.kanidm]
+    enabled = true
+
+    [testcontainer.kanidm_mail_sender]
+    enabled = true
+
+    [testcontainer.mailcrab]
     enabled = true
 "#};
 
@@ -283,61 +306,116 @@ fn missing_kanidm_section_is_rejected() {
 }
 
 #[test]
-fn kanidm_container_defaults_when_section_absent() {
+fn testcontainer_base_defaults_are_correct() {
     let s = settings_from_toml(BASE_TOML, "").expect("should deserialize");
-    assert!(
-        !s.kanidm_container.enabled,
-        "container must default to disabled when the section is absent"
+    assert_eq!(s.testcontainer.mode, "auto");
+    assert_eq!(s.testcontainer.network, "kanidm-admin-dev");
+    assert!(!s.testcontainer.kanidm.enabled);
+    assert_eq!(s.testcontainer.kanidm.image, "kanidm/server:1.11.2");
+    assert!(!s.testcontainer.kanidm_mail_sender.enabled);
+    assert_eq!(
+        s.testcontainer.kanidm_mail_sender.image,
+        "kanidm/tools:1.11.2"
     );
-    assert_eq!(s.kanidm_container.image, "kanidm/server:1.11.2");
-    assert_eq!(s.kanidm_container.effective_image(), "kanidm/server:1.11.2");
+    assert!(!s.testcontainer.mailcrab.enabled);
+    assert_eq!(s.testcontainer.mailcrab.image, "marlonb/mailcrab:v1.9.0");
+    assert_eq!(s.testcontainer.mailcrab.ui_port, 1080);
 }
 
 #[test]
-fn dev_overlay_enables_kanidm_container() {
+fn dev_overlay_enables_the_mail_chain() {
     let s = settings_from_toml(BASE_TOML, DEV_TOML).expect("should deserialize");
     assert!(
-        s.kanidm_container.enabled,
-        "development overlay should enable the container"
+        s.testcontainer.kanidm.enabled,
+        "development overlay enables the kanidm container"
     );
+    assert!(
+        s.testcontainer.kanidm_mail_sender.enabled,
+        "development overlay enables the mail sender"
+    );
+    assert!(
+        s.testcontainer.mailcrab.enabled,
+        "development overlay enables mailcrab"
+    );
+    // Non-overridden fields keep the base values.
+    assert_eq!(s.testcontainer.mailcrab.ui_port, 1080);
+    assert_eq!(s.testcontainer.kanidm.image, "kanidm/server:1.11.1");
 }
 
 #[test]
-fn kanidm_container_image_overlay_parses() {
-    let overlay = indoc! {r#"
-        [kanidm_container]
-        enabled = true
-        image = "kanidm/server:1.12.0"
+fn absent_testcontainer_section_yields_defaults() {
+    // BASE_TOML minus every [testcontainer] table: the serde
+    // default on the Settings field fills real defaults.
+    let base = indoc! {r#"
+        [server]
+        address = "0.0.0.0:4000"
+
+        [frontend]
+        serve_from = "disk"
+        watch = false
+        public_dir = ""
+
+        [kanidm]
+        url = "https://kanidm.example.com"
     "#};
-    let s = settings_from_toml(BASE_TOML, overlay).expect("should deserialize");
-    assert_eq!(s.kanidm_container.image, "kanidm/server:1.12.0");
-    assert_eq!(s.kanidm_container.effective_image(), "kanidm/server:1.12.0");
+    let s = settings_from_toml(base, "").expect("should deserialize");
+    assert!(!s.testcontainer.kanidm.enabled);
+    assert_eq!(s.testcontainer.mode, "auto");
+    assert_eq!(s.testcontainer.network, "kanidm-admin-dev");
+    assert_eq!(s.testcontainer.mailcrab.ui_port, 1080);
 }
 
 #[test]
-fn env_var_disables_kanidm_container() {
+fn env_var_disables_kanidm_testcontainer() {
     let env = HashMap::from([(
-        "APP_KANIDM_CONTAINER__ENABLED".to_string(),
+        "APP_TESTCONTAINER__KANIDM__ENABLED".to_string(),
         "false".to_string(),
     )]);
     let s = settings_from_layers(BASE_TOML, DEV_TOML, Some(env)).expect("should deserialize");
     assert!(
-        !s.kanidm_container.enabled,
-        "APP_KANIDM_CONTAINER__ENABLED=false should override the development overlay"
+        !s.testcontainer.kanidm.enabled,
+        "APP_TESTCONTAINER__KANIDM__ENABLED=false should override the development overlay"
     );
 }
 
 #[test]
-fn env_var_overrides_kanidm_container_image() {
+fn env_var_enables_sender_through_snake_alias() {
+    // Config env keys are snake_case; the kebab-renamed TOML key
+    // resolves through its snake_case serde alias.
     let env = HashMap::from([(
-        "APP_KANIDM_CONTAINER__IMAGE".to_string(),
-        "kanidm/server:1.10.5".to_string(),
+        "APP_TESTCONTAINER__KANIDM_MAIL_SENDER__ENABLED".to_string(),
+        "true".to_string(),
+    )]);
+    let s = settings_from_layers(BASE_TOML, "", Some(env)).expect("should deserialize");
+    assert!(
+        s.testcontainer.kanidm_mail_sender.enabled,
+        "APP_TESTCONTAINER__KANIDM_MAIL_SENDER__ENABLED should reach the kebab-renamed field"
+    );
+}
+
+#[test]
+fn env_var_overrides_mailcrab_ui_port() {
+    let env = HashMap::from([(
+        "APP_TESTCONTAINER__MAILCRAB__UI_PORT".to_string(),
+        "1081".to_string(),
     )]);
     let s = settings_from_layers(BASE_TOML, DEV_TOML, Some(env)).expect("should deserialize");
     assert_eq!(
-        s.kanidm_container.effective_image(),
-        "kanidm/server:1.10.5",
-        "APP_KANIDM_CONTAINER__IMAGE should override the default image"
+        s.testcontainer.mailcrab.ui_port, 1081,
+        "APP_TESTCONTAINER__MAILCRAB__UI_PORT should override the base value"
+    );
+}
+
+#[test]
+fn env_var_overrides_mode() {
+    let env = HashMap::from([(
+        "APP_TESTCONTAINER__MODE".to_string(),
+        "host".to_string(),
+    )]);
+    let s = settings_from_layers(BASE_TOML, DEV_TOML, Some(env)).expect("should deserialize");
+    assert_eq!(
+        s.testcontainer.mode, "host",
+        "APP_TESTCONTAINER__MODE should override the base value"
     );
 }
 
