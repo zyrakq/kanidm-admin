@@ -4,22 +4,21 @@ use serde::Deserialize;
 use super::branding::BrandingSettings;
 use super::frontend::FrontendSettings;
 use super::kanidm::KanidmSettings;
-use super::kanidm_container::KanidmContainerSettings;
 use super::server::ServerSettings;
+use super::testcontainer::TestcontainerSettings;
 
 #[derive(Debug, Deserialize)]
 pub struct Settings {
     pub server: ServerSettings,
     pub frontend: FrontendSettings,
     pub kanidm: KanidmSettings,
-    /// Optional: ephemeral dev Kanidm container. An absent section
-    /// means defaults (disabled); see settings/kanidm_container.rs.
-    #[serde(default)]
-    pub kanidm_container: KanidmContainerSettings,
-    /// Optional: UI-uploaded branding overrides (logos/favicons). An
-    /// absent section means defaults; see settings/branding.rs.
+    /// Optional: ephemeral dev containers (kanidm + the mail
+    /// chain). An absent section means defaults (disabled); see
+    /// settings/testcontainer.rs.
     #[serde(default)]
     pub branding: BrandingSettings,
+    #[serde(default)]
+    pub testcontainer: TestcontainerSettings,
 }
 
 impl Settings {
