@@ -16,6 +16,7 @@ use tracing::warn;
 use super::kanidm::{split_image_tag, IDM_ADMIN_USERNAME};
 use super::log_file::{file_consumer, LogSubfolder};
 use super::mail_certs::MailPki;
+use super::mailcrab::MAILCRAB_SMTP_PORT;
 use super::{DevKanidm, Mode, CONTAINER_LABEL_KEY, CONTAINER_LABEL_VALUE, STARTUP_TIMEOUT};
 use crate::settings::kanidm::KanidmSettings;
 use crate::settings::testcontainer::MailSenderContainerSettings;
@@ -59,7 +60,8 @@ connect_timeout = 10
 
 /// Mail sender config TOML (exact content from the design). The
 /// `schedule` key is omitted on purpose: kanidm-mail-sender
-/// defaults to checking every 5 s when no schedule is set.
+/// defaults to checking every 5 s when no schedule is set. The
+/// relay port is single-sourced from the mailcrab SMTP constant.
 fn mail_sender_toml(token: &str, instance_url: &str) -> String {
     format!(
         "token = \"{token}\"
@@ -67,7 +69,7 @@ instance_display_name = \"Kanidm Admin (dev)\"
 instance_url = \"{instance_url}\"
 mail_from_address = \"noreply@localhost\"
 mail_reply_to_address = \"noreply@localhost\"
-mail_relay = \"smtps://mailcrab:1025\"
+mail_relay = \"smtps://mailcrab:{MAILCRAB_SMTP_PORT}\"
 mail_username = \"mailcrab\"
 mail_password = \"mailcrab\"
 mail_connect_timeout_seconds = 15
@@ -121,7 +123,6 @@ async fn provision(
 /// tools image has no EXPOSE, there is nothing to publish.
 fn sender_request(
     image: &str,
-    mode: Mode,
     network: &str,
     client_toml: String,
     mail_toml: String,
@@ -175,7 +176,6 @@ pub(crate) async fn run(
     let mail_toml = mail_sender_toml(&token, &dev.effective.url);
     let container = sender_request(
         &settings.image,
-        mode,
         network,
         client_toml,
         mail_toml,
@@ -201,7 +201,7 @@ pub(crate) async fn run(
     // 4. One-shot test mail through the sender binary.
     container
         .exec(
-            ExecCommand::new([...SENDER_CMD, "-t", "test@example.com"])
+            ExecCommand::new(SENDER_CMD.iter().copied().chain(["-t", "test@example.com"]))
                 .with_cmd_ready_condition(CmdWaitFor::exit_code(0)),
         )
         .await
@@ -320,7 +320,6 @@ mod tests {
     fn sender_request_mounts_configs_and_cas_with_modes() {
         let request = sender_request(
             "kanidm/tools:1.11.1",
-            Mode::Host,
             "kanidm-admin-dev",
             client_config_toml(Mode::Host),
             mail_sender_toml("tok", "https://localhost:55001"),

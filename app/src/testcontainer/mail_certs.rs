@@ -27,7 +27,7 @@ pub(crate) struct MailPki {
 /// defaults (avoids a direct `time` dependency).
 pub(crate) fn generate() -> Result<MailPki, Box<dyn std::error::Error + Send + Sync>> {
     let ca_key = KeyPair::generate()?;
-    let ca = CertifiedIssuer::self_signed(ca_params(), &ca_key)?;
+    let ca = CertifiedIssuer::self_signed(ca_params()?, &ca_key)?;
 
     let leaf_key = KeyPair::generate()?;
     let leaf = leaf_params()?.signed_by(&leaf_key, &ca)?;
