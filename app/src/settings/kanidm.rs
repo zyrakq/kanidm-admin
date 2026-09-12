@@ -7,7 +7,7 @@
 use serde::Deserialize;
 use tracing::info;
 
-// Clone: kanidm_container::start returns an owned copy of these
+// Clone: testcontainer::start returns an owned copy of these
 // settings in the disabled (non-container) path.
 #[derive(Debug, Clone, Deserialize)]
 pub struct KanidmSettings {
