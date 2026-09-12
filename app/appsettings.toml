@@ -17,7 +17,7 @@ network = "kanidm-admin-dev"
 enabled = false
 image = "kanidm/server:1.11.2"
 
-[testcontainer.kanidm-mail-sender]
+[testcontainer.kanidm_mail_sender]
 enabled = false
 image = "kanidm/tools:1.11.2"
 

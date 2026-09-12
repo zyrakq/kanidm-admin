@@ -41,11 +41,13 @@ pub struct TestcontainerSettings {
     /// Kanidm server container settings.
     #[serde(default)]
     pub kanidm: KanidmContainerSettings,
-    /// kanidm-mail-sender container settings. The TOML key is the
-    /// kebab-case container/DNS name; the snake_case alias keeps
-    /// config-crate env overrides working (env keys are
-    /// snake_case).
-    #[serde(default, rename = "kanidm-mail-sender", alias = "kanidm_mail_sender")]
+    /// kanidm-mail-sender container settings. The canonical key is
+    /// snake_case, matching the config crate's env keys so env
+    /// overrides merge cleanly with the TOML layers; the kebab
+    /// form is accepted as a serde alias for hand-written TOML.
+    /// (A rename + alias pair would make serde reject any config
+    /// carrying both key shapes as a duplicate field.)
+    #[serde(default, alias = "kanidm-mail-sender")]
     pub kanidm_mail_sender: MailSenderContainerSettings,
     /// Mailcrab container settings.
     #[serde(default)]
@@ -234,23 +236,23 @@ mod tests {
     }
 
     #[test]
-    fn kebab_sender_key_parses() {
+    fn kebab_sender_alias_parses() {
         let toml = indoc! {r#"
             [kanidm-mail-sender]
             enabled = true
         "#};
-        let s = from_toml(toml).expect("kebab key deserializes");
+        let s = from_toml(toml).expect("kebab alias deserializes");
         assert!(s.kanidm_mail_sender.enabled);
         assert_eq!(s.kanidm_mail_sender.image, "kanidm/tools:1.11.1");
     }
 
     #[test]
-    fn snake_case_sender_alias_parses() {
+    fn snake_sender_key_parses() {
         let toml = indoc! {r#"
             [kanidm_mail_sender]
             enabled = true
         "#};
-        let s = from_toml(toml).expect("snake_case alias deserializes");
+        let s = from_toml(toml).expect("snake_case key deserializes");
         assert!(s.kanidm_mail_sender.enabled);
     }
 

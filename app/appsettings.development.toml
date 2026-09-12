@@ -5,7 +5,7 @@ watch = true
 [testcontainer.kanidm]
 enabled = true
 
-[testcontainer.kanidm-mail-sender]
+[testcontainer.kanidm_mail_sender]
 enabled = true
 
 [testcontainer.mailcrab]
