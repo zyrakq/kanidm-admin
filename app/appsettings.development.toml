@@ -2,5 +2,11 @@
 serve_from = "disk"
 watch = true
 
-[kanidm_container]
+[testcontainer.kanidm]
+enabled = true
+
+[testcontainer.kanidm-mail-sender]
+enabled = true
+
+[testcontainer.mailcrab]
 enabled = true
