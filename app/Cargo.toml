@@ -22,7 +22,7 @@ kanidm_client = { workspace = true }
 reqwest = { workspace = true }
 kanidm_proto = { workspace = true }
 time = { workspace = true }
-testcontainers = { path = "../vendor/testcontainers-rs/testcontainers", features = ["watchdog"] }
+testcontainers = { workspace = true }
 
 [dev-dependencies]
 indoc = "2"

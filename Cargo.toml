@@ -28,6 +28,7 @@ kanidm_proto = "1.11.1"
 time = { version = "0.3", features = ["serde", "formatting"] }
 tower = { version = "0.5", features = ["util"] }
 uuid = { version = "1", features = ["v4"] }
+testcontainers = { version = "0.28", features = ["watchdog"] }
 
 # bisync was yanked from crates.io (all versions, 2026-08-24). It is a
 # build-time-only transitive dependency (kanidm_build_profiles -> gix ->
