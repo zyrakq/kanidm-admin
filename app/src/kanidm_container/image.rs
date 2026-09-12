@@ -3,17 +3,19 @@
 // Container side of the dev Kanidm: run the two-container flow on the
 // official kanidm/server image — a one-shot cert-generate container
 // whose TLS material is extracted as bytes, then a server container
-// seeded with those bytes in memory. Mirrors container logs into
-// tracing and runs commands inside the running container.
+// seeded with those bytes in memory. Captures container logs into
+// per-run files (log_file.rs) and runs commands inside the running
+// container.
 
 use std::time::Duration;
 
-use testcontainers::core::logs::LogFrame;
 use testcontainers::core::wait::ExitWaitStrategy;
 use testcontainers::core::{CmdWaitFor, ExecCommand, IntoContainerPort, WaitFor};
 use testcontainers::runners::AsyncRunner;
 use testcontainers::{ContainerAsync, ContainerRequest, GenericImage, ImageExt};
-use tracing::warn;
+use tracing::{info, warn};
+
+use super::log_file::{file_consumer, LogSubfolder};
 
 /// Kanidm HTTPS port inside the container.
 pub const KANIDM_HTTPS_PORT: u16 = 8443;
@@ -40,7 +42,8 @@ const CERT_GENERATE_CMD: [&str; 2] = ["/sbin/kanidmd", "cert-generate"];
 /// Env-only config shared by both containers. When /data/server.toml
 /// is absent and no -c is given, kanidmd builds its config purely
 /// from KANIDM_* env vars and prints a WARNING to stderr — expected
-/// and harmless (mirrored into tracing; does not affect the stdout
+/// and harmless (captured into the run log file; does not affect the
+/// stdout
 /// readiness wait). The DB path is shared because kanidmd validates
 /// the full config for every subcommand — cert-generate exits 1
 /// without it (verified against kanidm/server:1.11.1).
@@ -95,7 +98,6 @@ pub fn cert_generate_request(image: &str) -> ContainerRequest<GenericImage> {
         .with_env_var(KANIDM_TLS_CHAIN.0, KANIDM_TLS_CHAIN.1)
         .with_env_var(KANIDM_TLS_KEY.0, KANIDM_TLS_KEY.1)
         .with_env_var(KANIDM_DB_PATH.0, KANIDM_DB_PATH.1)
-        .with_log_consumer(mirror_logs)
         .with_startup_timeout(STARTUP_TIMEOUT)
 }
 
@@ -118,7 +120,6 @@ pub fn server_request(
         .with_copy_to(CHAIN_PEM_PATH, material.chain_pem.clone())
         .with_copy_to(KEY_PEM_PATH, material.key_pem.clone())
         .with_label(CONTAINER_LABEL_KEY, CONTAINER_LABEL_VALUE)
-        .with_log_consumer(mirror_logs)
         .with_startup_timeout(STARTUP_TIMEOUT)
 }
 
@@ -132,8 +133,10 @@ pub async fn run_server(
     image: &str,
 ) -> Result<ServerContainer, Box<dyn std::error::Error + Send + Sync>> {
     let material = generate_certificates(image).await?;
+    info!("dev Kanidm certificates generated");
 
     let container = server_request(image, &material)
+        .with_log_consumer(file_consumer(LogSubfolder::Server))
         .start()
         .await
         .map_err(|error| {
@@ -160,6 +163,7 @@ async fn generate_certificates(
     image: &str,
 ) -> Result<CertMaterial, Box<dyn std::error::Error + Send + Sync>> {
     let container = cert_generate_request(image)
+        .with_log_consumer(file_consumer(LogSubfolder::Cert))
         .start()
         .await
         .map_err(|error| {
@@ -221,16 +225,6 @@ pub fn split_image_tag(image: &str) -> (String, String) {
     match image.rsplit_once(':') {
         Some((name, tag)) if !tag.contains('/') => (name.to_string(), tag.to_string()),
         _ => (image.to_string(), "latest".to_string()),
-    }
-}
-
-/// Mirror container logs into tracing under the `kanidm` target so
-/// container-side failures surface next to app logs.
-fn mirror_logs(frame: &LogFrame) {
-    let text = String::from_utf8_lossy(frame.bytes());
-    match frame {
-        LogFrame::StdOut(_) => tracing::info!(target: "kanidm", "{text}"),
-        LogFrame::StdErr(_) => tracing::warn!(target: "kanidm", "{text}"),
     }
 }
 
