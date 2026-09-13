@@ -25,6 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     let _frontend_handle = frontend::start(&settings.frontend, &manifest_dir)?;
     let (kanidm_settings, _kanidm_handle) = kanidm_container::start(&settings).await?;
+    kanidm_settings.log_effective_config();
     let state = auth::app_state_from_settings(&kanidm_settings)?;
     let status_probe = status::probe_from_settings(&kanidm_settings)?;
 
