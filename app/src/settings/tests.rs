@@ -1,3 +1,4 @@
+use super::kanidm::KanidmSettings;
 use super::loader::Settings;
 use config::{Config, ConfigError, Environment, FileFormat};
 use indoc::indoc;
@@ -338,4 +339,61 @@ fn env_var_overrides_kanidm_container_image() {
         "kanidm/server:1.10.5",
         "APP_KANIDM_CONTAINER__IMAGE should override the default image"
     );
+}
+
+// --- Kanidm effective-config logging ------------------------------------
+
+/// Build a KanidmSettings directly for the display-variant tests: the
+/// formatting logic is a pure function of the struct, so no TOML
+/// round-trip is needed.
+fn kanidm_settings(ca_path: Option<&str>, verify_ca: bool) -> KanidmSettings {
+    KanidmSettings {
+        url: "https://kanidm.example.com".to_string(),
+        ca_path: ca_path.map(str::to_string),
+        verify_ca,
+    }
+}
+
+#[test]
+fn kanidm_ca_path_display_none_renders_not_set() {
+    let s = kanidm_settings(None, true);
+    assert_eq!(
+        s.ca_path_display(),
+        "not set",
+        "ca_path None means unset (system trust store) and must render as 'not set'"
+    );
+}
+
+#[test]
+fn kanidm_ca_path_display_empty_renders_not_set() {
+    let s = kanidm_settings(Some(""), true);
+    assert_eq!(
+        s.ca_path_display(),
+        "not set",
+        "empty ca_path string is treated as unset and must render as 'not set'"
+    );
+}
+
+#[test]
+fn kanidm_ca_path_display_set_renders_verbatim() {
+    let s = kanidm_settings(Some("/etc/kanidm/ca.pem"), true);
+    assert_eq!(
+        s.ca_path_display(),
+        "/etc/kanidm/ca.pem",
+        "a set ca_path must render verbatim"
+    );
+}
+
+#[test]
+fn kanidm_log_effective_config_accepts_all_variants() {
+    // log_effective_config is infallible (a tracing no-op without a
+    // subscriber); this runs the full ca_path x verify_ca matrix
+    // through the method so a panic (e.g. an unwrap on None) or a
+    // field-type regression surfaces here. Covers verify_ca true/false,
+    // which renders as a plain bool with no formatting of its own.
+    for ca_path in [None, Some(""), Some("/etc/kanidm/ca.pem")] {
+        for verify_ca in [true, false] {
+            kanidm_settings(ca_path, verify_ca).log_effective_config();
+        }
+    }
 }
