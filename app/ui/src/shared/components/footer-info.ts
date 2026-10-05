@@ -66,6 +66,21 @@ export class FooterInfo extends LitElement {
             ${msg('Kanidm unavailable')}
           </span>
         `;
+      case 'version_warning':
+        return html`
+          <span
+            class="status"
+            data-state="version_warning"
+            title=${msg(
+              str`Client ${this.status.clientVersion ?? '—'} / Server ${
+                this.status.serverVersion ?? '—'
+              } / Supported range ${this.status.supportedRange ?? '—'}`
+            )}
+          >
+            <span class="status-dot"></span>
+            ${msg('Untested version')}
+          </span>
+        `;
       case 'version_conflict':
         return html`
           <span
@@ -74,11 +89,11 @@ export class FooterInfo extends LitElement {
             title=${msg(
               str`Client ${this.status.clientVersion ?? '—'} / Server ${
                 this.status.serverVersion ?? '—'
-              }`
+              } / Supported range ${this.status.supportedRange ?? '—'}`
             )}
           >
             <span class="status-dot"></span>
-            ${msg('Version conflict')}
+            ${msg('Incompatible version')}
           </span>
         `;
     }

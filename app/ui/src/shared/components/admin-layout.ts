@@ -8,6 +8,7 @@ import { localized } from '@/features/localization';
 import '@/shared/components/app-header';
 import '@/shared/components/sidebar-nav';
 import '@/shared/components/footer-info';
+import '@/shared/components/version-banner';
 
 @customElement('admin-layout')
 @localized()
@@ -83,6 +84,7 @@ export class AdminLayout extends LitElement {
             <sidebar-nav @nav-click=${this.handleNavClick}></sidebar-nav>
           </aside>
           <main class="content">
+            <version-banner></version-banner>
             <slot></slot>
           </main>
         </div>

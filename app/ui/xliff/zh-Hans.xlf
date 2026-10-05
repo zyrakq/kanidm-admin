@@ -154,14 +154,6 @@
   <source>Kanidm unavailable</source>
   <target>Kanidm 不可用</target>
 </trans-unit>
-<trans-unit id="se0d04c05c5fec71a">
-  <source>Client <ph id="0">${this.status.clientVersion ?? '—'}</ph> / Server <ph id="1">${this.status.serverVersion ?? '—'}</ph></source>
-  <target>客户端 <ph id="0">${this.status.clientVersion ?? '—'}</ph> / 服务器 <ph id="1">${this.status.serverVersion ?? '—'}</ph></target>
-</trans-unit>
-<trans-unit id="s8dda7bda0932ae5f">
-  <source>Version conflict</source>
-  <target>版本冲突</target>
-</trans-unit>
 <trans-unit id="s91b085374c46aa29">
   <source>Persons</source>
   <target>人员</target>
@@ -2708,6 +2700,34 @@
 <trans-unit id="s9ea1038d8fcb8fd9">
   <source>Failed to update the two-factor policy</source>
   <target>无法更新双因素认证策略</target>
+</trans-unit>
+<trans-unit id="s32707b5f52bf8b6e">
+  <source>Client <ph id="0">${this.status.clientVersion ?? '—'}</ph> / Server <ph id="1">${this.status.serverVersion ?? '—'}</ph> / Supported range <ph id="2">${this.status.supportedRange ?? '—'}</ph></source>
+  <target>客户端 <ph id="0">${this.status.clientVersion ?? '—'}</ph> / 服务器 <ph id="1">${this.status.serverVersion ?? '—'}</ph> / 支持的范围 <ph id="2">${this.status.supportedRange ?? '—'}</ph></target>
+</trans-unit>
+<trans-unit id="sb040848a3916d81b">
+  <source>Untested version</source>
+  <target>未测试的版本</target>
+</trans-unit>
+<trans-unit id="s295e048b68b257dc">
+  <source>Incompatible version</source>
+  <target>不兼容的版本</target>
+</trans-unit>
+<trans-unit id="sf7eb68ba95a4e0a6">
+  <source>Incompatible Kanidm version</source>
+  <target>Kanidm 版本不兼容</target>
+</trans-unit>
+<trans-unit id="s60f7047ea9833993">
+  <source>Untested Kanidm version</source>
+  <target>未测试的 Kanidm 版本</target>
+</trans-unit>
+<trans-unit id="sed9b650fb081abd1">
+  <source>This panel targets Kanidm <ph id="0">${s.clientVersion ?? '—'}</ph>, but the server reports <ph id="1">${s.serverVersion ?? '—'}</ph>. Some features may be broken.</source>
+  <target>此面板面向 Kanidm <ph id="0">${s.clientVersion ?? '—'}</ph>，但服务器报告为 <ph id="1">${s.serverVersion ?? '—'}</ph>。部分功能可能无法使用。</target>
+</trans-unit>
+<trans-unit id="s295aaf895fc4b36a">
+  <source>This panel was tested with Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — the server reports <ph id="1">${s.serverVersion ?? '—'}</ph>. Some features may not work.</source>
+  <target>此面板已使用 Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> 测试 — 服务器报告为 <ph id="1">${s.serverVersion ?? '—'}</ph>。部分功能可能无法使用。</target>
 </trans-unit>
 </body>
 </file>

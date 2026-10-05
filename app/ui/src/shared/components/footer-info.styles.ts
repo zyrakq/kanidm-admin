@@ -63,12 +63,20 @@ export const footerInfoStyles = css`
     background: var(--theme-color-error);
   }
 
-  .status[data-state='version_conflict'] {
+  .status[data-state='version_warning'] {
     color: var(--theme-color-warning);
   }
 
-  .status[data-state='version_conflict'] .status-dot {
+  .status[data-state='version_warning'] .status-dot {
     background: var(--theme-color-warning);
+  }
+
+  .status[data-state='version_conflict'] {
+    color: var(--theme-color-error);
+  }
+
+  .status[data-state='version_conflict'] .status-dot {
+    background: var(--theme-color-error);
   }
 
   .separator {

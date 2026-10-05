@@ -1,13 +1,16 @@
 // app/src/status.rs
 //
 // GET /api/status — Kanidm server version and reachability for the
-// footer. The backend is the only party allowed to talk to Kanidm (the
-// proxy architecture keeps TLS/CA config in [kanidm] settings), so this
-// module pings the server with a raw HTTP request, reads the
-// `X-KANIDM-VERSION` response header (the same mechanism kanidm_client's
-// expect_version uses), compares it with the compile-time client version and returns a
-// ready-to-render state. Always answers 200 JSON — the payload carries
-// the outcome, including `unreachable`.
+// footer and the version banner. The backend is the only party allowed
+// to talk to Kanidm (the proxy architecture keeps TLS/CA config in
+// [kanidm] settings), so this module pings the server with a raw HTTP
+// request, reads the `X-KANIDM-VERSION` response header (the same
+// mechanism kanidm_client's expect_version uses), compares it with the
+// compile-time client version and resolves a version state: `alive`
+// inside the advertised compatibility band, otherwise a non-blocking
+// `version_warning` (same major, drifted minor) or `version_conflict`
+// (different major). Always answers 200 JSON — the payload carries the
+// outcome, including `unreachable`.
 //
 // The response also carries `kanidmUrl` — the effective Kanidm base URL
 // as resolved at startup (container mode rewrites the configured value).
@@ -50,7 +53,7 @@ pub fn client_version() -> &'static str {
 }
 
 // ---------------------------------------------------------------------------
-// Version parsing and the conflict rule (pure functions, unit-tested)
+// Version parsing and the compatibility rule (pure functions, unit-tested)
 // ---------------------------------------------------------------------------
 
 /// Parsed `major.minor.patch` version — the X-KANIDM-VERSION format.
@@ -77,14 +80,46 @@ pub fn parse_version(value: &str) -> Option<Version> {
     Some(Version { major, minor, patch })
 }
 
-/// Conflict rule: the client is NEWER by major, or the SAME major and
-/// older by minor/patch. A newer server (including a newer major) is
-/// fine — servers stay backward compatible with older clients.
-pub fn version_conflict(client: &Version, server: &Version) -> bool {
+/// Half-width of the advertised compatibility band, in Kanidm minor
+/// versions, around the compile-time kanidm_client version. A build
+/// pinned to kanidm_client 1.11 therefore treats server minors 1.10–1.12
+/// as the tested range. Bump the pinned client in Cargo.toml, verify the
+/// app against the server versions it claims to cover, and only then
+/// widen this span.
+const SUPPORTED_MINOR_SPAN: u64 = 1;
+
+/// Compatibility decision between the pinned client version and the
+/// live server, expressed as states instead of a boolean conflict:
+///
+/// - same major, minor within `SUPPORTED_MINOR_SPAN` of the client →
+///   `Alive` — the advertised, tested band. Patch differences are
+///   irrelevant.
+/// - same major, minor outside the band → `VersionWarning`: the server
+///   drifted past the tested range, but Kanidm's v1 JSON API is stable
+///   across minors, so the app keeps working. A banner-worth warning,
+///   never a block.
+/// - different major → `VersionConflict`: the API contract can break
+///   across majors and the pinned client cannot know what changed.
+pub fn version_state(client: &Version, server: &Version) -> StatusState {
     if client.major != server.major {
-        return client.major > server.major;
+        return StatusState::VersionConflict;
     }
-    (client.minor, client.patch) < (server.minor, server.patch)
+    let minor_diff = (client.minor as i64 - server.minor as i64).unsigned_abs();
+    if minor_diff <= SUPPORTED_MINOR_SPAN {
+        StatusState::Alive
+    } else {
+        StatusState::VersionWarning
+    }
+}
+
+/// The advertised band as a human-readable string, e.g. "1.10 – 1.12"
+/// for a pinned client on 1.11.x. Rendered by the UI's version banner
+/// so operators can see which server range this build claims to cover.
+/// Clamped at minor 0 when the pinned client sits on the first minor.
+pub fn supported_range(client: &Version) -> String {
+    let min_minor = client.minor.saturating_sub(SUPPORTED_MINOR_SPAN);
+    let max_minor = client.minor + SUPPORTED_MINOR_SPAN;
+    format!("{}.{} – {}.{}", client.major, min_minor, client.major, max_minor)
 }
 
 // ---------------------------------------------------------------------------
@@ -96,6 +131,9 @@ pub fn version_conflict(client: &Version, server: &Version) -> bool {
 pub enum StatusState {
     Alive,
     Unreachable,
+    /// Server version drifted past the advertised band — informative
+    /// banner, never a block.
+    VersionWarning,
     VersionConflict,
 }
 
@@ -105,6 +143,10 @@ pub struct StatusResponse {
     pub state: StatusState,
     pub server_version: Option<String>,
     pub client_version: String,
+    /// Advertised compatibility range around the pinned client version
+    /// (e.g. "1.10 – 1.12"); present whenever both the server and the
+    /// client versions are known, i.e. the comparison actually happened.
+    pub supported_range: Option<String>,
     /// Effective Kanidm base URL, e.g. `https://idm.example.com:8443`.
     /// Always present: the [kanidm] url section is required, and
     /// container mode has already substituted the URL by the time the
@@ -242,35 +284,34 @@ fn compute_response(
             state: StatusState::Unreachable,
             server_version: None,
             client_version,
+            supported_range: None,
             kanidm_url,
         };
     }
 
     let Some(server) = outcome.server_version else {
         // Alive but version unknown (absent or malformed X-KANIDM-VERSION):
-        // no conflict check is possible.
+        // no comparison is possible.
         return StatusResponse {
             state: StatusState::Alive,
             server_version: None,
             client_version,
+            supported_range: None,
             kanidm_url,
         };
     };
 
     // An unknown client version (env var missing AND fallback malformed)
-    // also disables the comparison rather than guessing a conflict.
-    let conflict = parse_version(&client_version)
-        .map(|client| version_conflict(&client, &server))
-        .unwrap_or(false);
+    // also disables the comparison rather than guessing a mismatch.
+    let parsed_client = parse_version(&client_version);
+    let state =
+        parsed_client.map(|client| version_state(&client, &server)).unwrap_or(StatusState::Alive);
 
     StatusResponse {
-        state: if conflict {
-            StatusState::VersionConflict
-        } else {
-            StatusState::Alive
-        },
+        state,
         server_version: Some(format!("{}.{}.{}", server.major, server.minor, server.patch)),
         client_version,
+        supported_range: parsed_client.map(|client| supported_range(&client)),
         kanidm_url,
     }
 }
@@ -292,8 +333,8 @@ mod build_script;
 mod tests {
     use super::build_script::extract_kanidm_client_version;
     use super::{
-        client_version, compute_response, parse_version, status_handler, version_conflict,
-        KanidmStatusProbe, ProbeOutcome, StatusState, Version,
+        client_version, compute_response, parse_version, status_handler, supported_range,
+        version_state, KanidmStatusProbe, ProbeOutcome, StatusState, Version,
     };
     use async_trait::async_trait;
     use axum::body::{to_bytes, Body};
@@ -329,26 +370,41 @@ mod tests {
         }
     }
 
-    // -- version_conflict: the design table ---------------------------------
+    // -- version_state: the design table ------------------------------------
 
+    /// The advertised band: same major and minor within ±1 of the pinned
+    /// client — patch differences are irrelevant. Outside the band is a
+    /// warning; a different major is a conflict in both directions.
     #[test]
-    fn conflict_rule_matches_the_design_table() {
+    fn version_state_matches_the_design_table() {
         let v = |major, minor, patch| Version { major, minor, patch };
 
-        // client 1.11.1 vs server 1.11.0 — client newer by patch: ok
-        assert!(!version_conflict(&v(1, 11, 1), &v(1, 11, 0)));
-        // client 1.11.1 vs server 1.11.2 — client older by patch: conflict
-        assert!(version_conflict(&v(1, 11, 1), &v(1, 11, 2)));
-        // client 1.11.1 vs server 1.12.0 — client older by minor: conflict
-        assert!(version_conflict(&v(1, 11, 1), &v(1, 12, 0)));
-        // client 2.0.0 vs server 1.11.1 — client newer by major: conflict
-        assert!(version_conflict(&v(2, 0, 0), &v(1, 11, 1)));
-        // client 1.11.1 vs server 2.0.0 — server newer by major: ok
-        assert!(!version_conflict(&v(1, 11, 1), &v(2, 0, 0)));
-        // identical versions: ok
-        assert!(!version_conflict(&v(1, 11, 1), &v(1, 11, 1)));
-        // client newer by minor within the same major: ok
-        assert!(!version_conflict(&v(1, 12, 0), &v(1, 11, 9)));
+        // identical versions: alive
+        assert_eq!(version_state(&v(1, 11, 1), &v(1, 11, 1)), StatusState::Alive);
+        // same major, different patch: alive in both directions
+        assert_eq!(version_state(&v(1, 11, 1), &v(1, 11, 0)), StatusState::Alive);
+        assert_eq!(version_state(&v(1, 11, 1), &v(1, 11, 2)), StatusState::Alive);
+        // same major, ±1 minor: alive in both directions
+        assert_eq!(version_state(&v(1, 11, 1), &v(1, 10, 9)), StatusState::Alive);
+        assert_eq!(version_state(&v(1, 11, 1), &v(1, 12, 0)), StatusState::Alive);
+        // same major, beyond the band: warning
+        assert_eq!(version_state(&v(1, 11, 1), &v(1, 9, 9)), StatusState::VersionWarning);
+        assert_eq!(version_state(&v(1, 11, 1), &v(1, 13, 0)), StatusState::VersionWarning);
+        // different major: conflict, regardless of direction
+        assert_eq!(version_state(&v(2, 0, 0), &v(1, 11, 1)), StatusState::VersionConflict);
+        assert_eq!(version_state(&v(1, 11, 1), &v(2, 0, 0)), StatusState::VersionConflict);
+    }
+
+    // -- supported_range ----------------------------------------------------
+
+    #[test]
+    fn supported_range_spans_one_minor_each_way() {
+        let v = |major, minor, patch| Version { major, minor, patch };
+
+        assert_eq!(supported_range(&v(1, 11, 1)), "1.10 – 1.12");
+        // clamped at minor 0 when the pinned client sits on the first one
+        assert_eq!(supported_range(&v(1, 0, 0)), "1.0 – 1.1");
+        assert_eq!(supported_range(&v(2, 3, 0)), "2.2 – 2.4");
     }
 
     // -- compute_response ---------------------------------------------------
@@ -378,16 +434,17 @@ mod tests {
     }
 
     #[test]
-    fn compute_response_alive_without_header_skips_conflict_check() {
+    fn compute_response_alive_without_header_skips_version_check() {
         let response =
             compute_response("1.11.1", outcome(true, None), TEST_KANIDM_URL);
         assert_eq!(response.state, StatusState::Alive);
         assert_eq!(response.server_version, None);
+        assert_eq!(response.supported_range, None);
         assert_eq!(response.kanidm_url, TEST_KANIDM_URL);
     }
 
     #[test]
-    fn compute_response_alive_when_client_newer_or_equal() {
+    fn compute_response_alive_when_server_inside_band() {
         let response = compute_response(
             "1.11.1",
             outcome(true, Some("1.11.0")),
@@ -395,39 +452,52 @@ mod tests {
         );
         assert_eq!(response.state, StatusState::Alive);
         assert_eq!(response.server_version.as_deref(), Some("1.11.0"));
+        assert_eq!(response.supported_range.as_deref(), Some("1.10 – 1.12"));
     }
 
     #[test]
-    fn compute_response_conflict_when_client_older_by_patch() {
+    fn compute_response_alive_when_server_one_minor_ahead() {
         let response = compute_response(
             "1.11.1",
-            outcome(true, Some("1.11.2")),
+            outcome(true, Some("1.12.0")),
             TEST_KANIDM_URL,
         );
-        assert_eq!(response.state, StatusState::VersionConflict);
-        assert_eq!(response.server_version.as_deref(), Some("1.11.2"));
-        assert_eq!(response.client_version, "1.11.1");
+        assert_eq!(response.state, StatusState::Alive);
     }
 
     #[test]
-    fn compute_response_conflict_when_client_newer_by_major() {
+    fn compute_response_warning_when_server_beyond_band() {
+        let response = compute_response(
+            "1.11.1",
+            outcome(true, Some("1.13.0")),
+            TEST_KANIDM_URL,
+        );
+        assert_eq!(response.state, StatusState::VersionWarning);
+        assert_eq!(response.server_version.as_deref(), Some("1.13.0"));
+        assert_eq!(response.client_version, "1.11.1");
+        assert_eq!(response.supported_range.as_deref(), Some("1.10 – 1.12"));
+    }
+
+    #[test]
+    fn compute_response_conflict_when_major_differs() {
         let response = compute_response(
             "2.0.0",
             outcome(true, Some("1.11.1")),
             TEST_KANIDM_URL,
         );
         assert_eq!(response.state, StatusState::VersionConflict);
+        // the band is reported even on conflict so the UI can show it
+        assert_eq!(response.supported_range.as_deref(), Some("2.0 – 2.1"));
     }
 
     #[test]
-    fn compute_response_ok_when_server_newer_by_major() {
+    fn compute_response_conflict_when_server_major_differs() {
         let response = compute_response(
             "1.11.1",
             outcome(true, Some("2.0.0")),
             TEST_KANIDM_URL,
         );
-        assert_eq!(response.state, StatusState::Alive);
-        assert_eq!(response.server_version.as_deref(), Some("2.0.0"));
+        assert_eq!(response.state, StatusState::VersionConflict);
     }
 
     #[test]
@@ -439,6 +509,8 @@ mod tests {
         );
         assert_eq!(response.state, StatusState::Alive);
         assert_eq!(response.client_version, "unknown");
+        // client version unparseable: no comparison, no advertised range
+        assert_eq!(response.supported_range, None);
     }
 
     // -- handler wiring (mock probe, no live Kanidm) ------------------------
@@ -488,11 +560,23 @@ mod tests {
 
     #[tokio::test]
     async fn handler_returns_alive_with_camel_case_fields() {
-        // Server 9999.0.0 is newer by major than any 1.x client, so this
-        // stays `alive` regardless of the compiled-in client version.
-        let body = get_status(outcome(true, Some("9999.0.0"))).await;
+        // A server exactly on the pinned client version is alive; the
+        // expected server string is derived at runtime because
+        // KANIDM_CLIENT_VERSION is compiled in and can change with
+        // dependency bumps.
+        let client = parse_version(client_version()).expect("client version parses");
+        let server = format!("{}.{}.{}", client.major, client.minor, client.patch);
+        let expected_range = format!(
+            "{}.{} – {}.{}",
+            client.major,
+            client.minor.saturating_sub(1),
+            client.major,
+            client.minor + 1
+        );
+        let body = get_status(outcome(true, Some(&server))).await;
         assert_eq!(body["state"], json!("alive"));
-        assert_eq!(body["serverVersion"], json!("9999.0.0"));
+        assert_eq!(body["serverVersion"], json!(server));
+        assert_eq!(body["supportedRange"], json!(expected_range));
         assert_eq!(body["kanidmUrl"], json!(TEST_KANIDM_URL));
         assert!(
             body["clientVersion"].as_str().is_some_and(|v| !v.is_empty()),
@@ -505,14 +589,35 @@ mod tests {
         let body = get_status(outcome(false, None)).await;
         assert_eq!(body["state"], json!("unreachable"));
         assert_eq!(body["serverVersion"], json!(null));
+        assert_eq!(body["supportedRange"], json!(null));
     }
 
     #[tokio::test]
     async fn handler_returns_conflict_for_ancient_server() {
-        // Server 0.0.0 is older by major than any 1.x client, so this is
-        // a conflict regardless of the compiled-in client version.
+        // Server 0.0.0 has a different major than any realistic modern
+        // client, so this is a conflict regardless of the compiled-in
+        // client version.
         let body = get_status(outcome(true, Some("0.0.0"))).await;
         assert_eq!(body["state"], json!("version_conflict"));
+    }
+
+    #[tokio::test]
+    async fn handler_returns_warning_beyond_band() {
+        // Two minors ahead of the pinned client: same major, outside the
+        // advertised band — a warning, not a conflict. Derived at runtime
+        // for independence from the compiled-in client version.
+        let client = parse_version(client_version()).expect("client version parses");
+        let server = format!("{}.{}.0", client.major, client.minor + 2);
+        let expected_range = format!(
+            "{}.{} – {}.{}",
+            client.major,
+            client.minor.saturating_sub(1),
+            client.major,
+            client.minor + 1
+        );
+        let body = get_status(outcome(true, Some(&server))).await;
+        assert_eq!(body["state"], json!("version_warning"));
+        assert_eq!(body["supportedRange"], json!(expected_range));
     }
 
     // -- compile-time client version pipeline --------------------------------

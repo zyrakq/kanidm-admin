@@ -49,7 +49,8 @@ kanidm-admin/
 │       │   └── shared/            # Reusable UI components
 │       │       └── components/
 │       │           ├── app-header.ts
-│       │           └── footer-info.ts
+│       │           ├── footer-info.ts
+│       │           └── version-banner.ts
 │       ├── xliff/           # Translation source files (ru, es, zh-Hans)
 │       ├── vite.config.ts
 │       ├── tsconfig.json
@@ -94,6 +95,7 @@ in dedicated modules:
 | `preflight.rs` | CLI dependency checks (currently: `bun`) |
 | `logging.rs` | Tracing filter + `pretty_env_logger` init |
 | `routes.rs` | Custom API handlers, disk/embedded SPA fallbacks, fallback chooser |
+| `status.rs` | `GET /api/status` — Kanidm reachability + version-state resolution for footer/banner |
 
 `main.rs` sequence:
 
@@ -153,7 +155,26 @@ Each feature is self-contained under `src/features/<name>/` with this structure:
 ### Shared Components
 
 - **`<app-header>`** — logo, app name, `<theme-toggler>`, `<locale-switcher>`; hides app name at ≤540px
-- **`<footer-info>`** — status dot, version `v0.0.0`, external links (GitHub, Kanidm docs)
+- **`<footer-info>`** — polls `GET /api/status` every 30s and renders a status dot: green `Kanidm vX.Y.Z`, red `Kanidm unavailable`, amber `Untested version` (same major outside the advertised band), red `Incompatible version` (major mismatch); tooltips carry client/server/supported-range
+- **`<version-banner>`** — dismissable compatibility banner mounted above admin content: amber for `version_warning`, red for `version_conflict`, hidden otherwise; dismissal lives in sessionStorage keyed `state:serverVersion`, so new drift shows again
+
+### Kanidm Compatibility Model
+
+kanidm-admin releases its own versions independently of the Kanidm server
+releases; compatibility is expressed as a **declared band** around the
+pinned `kanidm_client` version (from workspace `Cargo.toml`, compiled in
+via `build.rs`), not as matching release numbers:
+
+| Server vs pinned client | State | UI behavior |
+|---|---|---|
+| same major, minor within ±1 (`SUPPORTED_MINOR_SPAN`) | `alive` | green dot, app normal |
+| same major, minor outside the band | `version_warning` | amber banner + footer.dot, non-blocking |
+| different major | `version_conflict` | red banner + footer dot, non-blocking |
+| no/malformed `X-KANIDM-VERSION` header | `alive` | version comparison skipped |
+
+Bump the pinned `kanidm_client` in `Cargo.toml`, verify the app against
+the server versions the band claims to cover, and only then widen
+`SUPPORTED_MINOR_SPAN` (`app/src/status.rs`).
 
 ## Data Flow
 
@@ -169,6 +190,19 @@ User visits /
 Real Kanidm OIDC integration (login redirect, callback handling, session
 refresh) is deferred to a follow-up design. `vendor/kanidm` is the reference
 for that work's API contracts.
+
+### Status Update Bus
+
+```
+<footer-info> polls GET /api/status every 30s
+  → kanidmStatusService.fetchStatus() updates lastKnown
+    → window: 'kanidm-status-changed' (KanidmStatus payload)
+      → <version-banner> re-renders (amber/red or hidden)
+
+banner ✕ click
+  → sessionStorage['kanidm-admin.version-banner-dismissed'] = '<state>:<serverVersion>'
+  → hidden until state or server version changes
+```
 
 ### Notification Event Bus
 

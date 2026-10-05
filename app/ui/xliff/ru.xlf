@@ -154,14 +154,6 @@
   <source>Kanidm unavailable</source>
   <target>Kanidm недоступен</target>
 </trans-unit>
-<trans-unit id="se0d04c05c5fec71a">
-  <source>Client <ph id="0">${this.status.clientVersion ?? '—'}</ph> / Server <ph id="1">${this.status.serverVersion ?? '—'}</ph></source>
-  <target>Клиент <ph id="0">${this.status.clientVersion ?? '—'}</ph> / Сервер <ph id="1">${this.status.serverVersion ?? '—'}</ph></target>
-</trans-unit>
-<trans-unit id="s8dda7bda0932ae5f">
-  <source>Version conflict</source>
-  <target>Конфликт версий</target>
-</trans-unit>
 <trans-unit id="s91b085374c46aa29">
   <source>Persons</source>
   <target>Персоны</target>
@@ -2708,6 +2700,34 @@
 <trans-unit id="s9ea1038d8fcb8fd9">
   <source>Failed to update the two-factor policy</source>
   <target>Не удалось обновить политику двухфакторной аутентификации</target>
+</trans-unit>
+<trans-unit id="s32707b5f52bf8b6e">
+  <source>Client <ph id="0">${this.status.clientVersion ?? '—'}</ph> / Server <ph id="1">${this.status.serverVersion ?? '—'}</ph> / Supported range <ph id="2">${this.status.supportedRange ?? '—'}</ph></source>
+  <target>Клиент <ph id="0">${this.status.clientVersion ?? '—'}</ph> / Сервер <ph id="1">${this.status.serverVersion ?? '—'}</ph> / Поддерживаемый диапазон <ph id="2">${this.status.supportedRange ?? '—'}</ph></target>
+</trans-unit>
+<trans-unit id="sb040848a3916d81b">
+  <source>Untested version</source>
+  <target>Непротестированная версия</target>
+</trans-unit>
+<trans-unit id="s295e048b68b257dc">
+  <source>Incompatible version</source>
+  <target>Несовместимая версия</target>
+</trans-unit>
+<trans-unit id="sf7eb68ba95a4e0a6">
+  <source>Incompatible Kanidm version</source>
+  <target>Несовместимая версия Kanidm</target>
+</trans-unit>
+<trans-unit id="s60f7047ea9833993">
+  <source>Untested Kanidm version</source>
+  <target>Непротестированная версия Kanidm</target>
+</trans-unit>
+<trans-unit id="sed9b650fb081abd1">
+  <source>This panel targets Kanidm <ph id="0">${s.clientVersion ?? '—'}</ph>, but the server reports <ph id="1">${s.serverVersion ?? '—'}</ph>. Some features may be broken.</source>
+  <target>Эта панель рассчитана на Kanidm <ph id="0">${s.clientVersion ?? '—'}</ph>, но на сервере установлен <ph id="1">${s.serverVersion ?? '—'}</ph>. Часть функций может не работать.</target>
+</trans-unit>
+<trans-unit id="s295aaf895fc4b36a">
+  <source>This panel was tested with Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — the server reports <ph id="1">${s.serverVersion ?? '—'}</ph>. Some features may not work.</source>
+  <target>Эта панель протестирована с Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — на сервере установлен <ph id="1">${s.serverVersion ?? '—'}</ph>. Часть функций может не работать.</target>
 </trans-unit>
 </body>
 </file>
