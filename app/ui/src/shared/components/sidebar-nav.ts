@@ -1,6 +1,6 @@
 // Section sidebar: sections filtered by the user's groups (access map),
 // icons, active state from the current location. Re-renders on
-// 'auth-state-changed' (D7).
+// 'auth-state-changed' (D7) and 'route-changed' (SPA navigation).
 
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -21,13 +21,13 @@ export class SidebarNav extends LitElement {
     super.connectedCallback();
     this.refresh();
     window.addEventListener('auth-state-changed', this.handleAuthChange);
-    window.addEventListener('popstate', this.handleNavigation);
+    window.addEventListener('route-changed', this.handleNavigation);
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
     window.removeEventListener('auth-state-changed', this.handleAuthChange);
-    window.removeEventListener('popstate', this.handleNavigation);
+    window.removeEventListener('route-changed', this.handleNavigation);
   }
 
   private handleAuthChange = (): void => {
@@ -43,11 +43,13 @@ export class SidebarNav extends LitElement {
     this.activePath = window.location.pathname;
   }
 
-  private navigate(href: string): void {
+  private navigate(): void {
     this.dispatchEvent(
       new CustomEvent('nav-click', { bubbles: true, composed: true })
     );
-    window.location.assign(href);
+    // Let the Router's global anchor-click interceptor handle it: no
+    // preventDefault and no window.location.assign (that would do a full
+    // page reload). Clicking the same section is a no-op (href unchanged).
   }
 
   render() {
@@ -61,9 +63,8 @@ export class SidebarNav extends LitElement {
             <a
               class="item ${this.activePath.startsWith(section.href) ? 'active' : ''}"
               href=${section.href}
-              @click=${(e: Event) => {
-                e.preventDefault();
-                this.navigate(section.href);
+              @click=${() => {
+                this.navigate();
               }}
             >
               <ui-icon name=${section.icon as IconName} size="18"></ui-icon>

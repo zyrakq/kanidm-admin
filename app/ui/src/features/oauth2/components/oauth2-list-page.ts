@@ -9,6 +9,7 @@ import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { ApiError } from '@/shared/services/http-client';
+import { navigate } from '@/shared/services/router.service';
 import '@/shared/components/admin-layout';
 import '@/shared/components/data-table';
 import '@/shared/components/modal-dialog';
@@ -163,7 +164,7 @@ export class Oauth2ListPage extends LitElement {
           .searchable=${true}
           .emptyMessage=${msg('No OAuth2 clients found.')}
           @row-click=${(e: CustomEvent<{ row: Oauth2RsSummary }>) =>
-            window.location.assign(
+            navigate(
               `/admin/oauth2/${encodeURIComponent(e.detail.row.id)}`
             )}
         ></data-table>

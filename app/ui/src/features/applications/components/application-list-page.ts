@@ -213,12 +213,6 @@ export class ApplicationListPage extends LitElement {
                   <a
                     class="linked-group"
                     href="/admin/groups/${encodeURIComponent(group)}"
-                    @click=${(e: MouseEvent) => {
-                      e.preventDefault();
-                      window.location.assign(
-                        `/admin/groups/${encodeURIComponent(group)}`
-                      );
-                    }}
                     >${group}</a
                   >
                 `

@@ -9,6 +9,7 @@ import { authService } from '@/features/auth';
 import { groupService, type GroupSummary } from '@/features/groups';
 import { notificationService } from '@/features/notifications';
 import { ApiError } from '@/shared/services/http-client';
+import { navigate } from '@/shared/services/router.service';
 import '@/shared/components/admin-layout';
 import '@/shared/components/data-table';
 import '@/shared/components/modal-dialog';
@@ -153,7 +154,7 @@ export class ServiceAccountListPage extends LitElement {
           .searchable=${true}
           .emptyMessage=${msg('No service accounts found.')}
           @row-click=${(e: CustomEvent<{ row: ServiceAccountSummary }>) =>
-            window.location.assign(
+            navigate(
               `/admin/service-accounts/${encodeURIComponent(e.detail.row.id)}`
             )}
         ></data-table>

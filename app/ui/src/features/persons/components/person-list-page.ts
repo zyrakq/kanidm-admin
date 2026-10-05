@@ -8,6 +8,7 @@ import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { ApiError } from '@/shared/services/http-client';
+import { navigate } from '@/shared/services/router.service';
 import '@/shared/components/admin-layout';
 import '@/shared/components/data-table';
 import '@/shared/components/modal-dialog';
@@ -134,7 +135,7 @@ export class PersonListPage extends LitElement {
           .searchable=${true}
           .emptyMessage=${msg('No persons found.')}
           @row-click=${(e: CustomEvent<{ row: PersonSummary }>) =>
-            window.location.assign(
+            navigate(
               `/admin/persons/${encodeURIComponent(e.detail.row.id)}`
             )}
         ></data-table>

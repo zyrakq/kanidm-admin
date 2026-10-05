@@ -10,6 +10,7 @@ import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { ApiError } from '@/shared/services/http-client';
+import { navigate } from '@/shared/services/router.service';
 import '@/shared/components/admin-layout';
 import '@/shared/components/data-table';
 import '@/shared/components/modal-dialog';
@@ -112,7 +113,7 @@ export class SyncListPage extends LitElement {
           .searchable=${true}
           .emptyMessage=${msg('No sync accounts found.')}
           @row-click=${(e: CustomEvent<{ row: SyncAccountSummary }>) =>
-            window.location.assign(
+            navigate(
               `/admin/sync/${encodeURIComponent(e.detail.row.id)}`
             )}
         ></data-table>

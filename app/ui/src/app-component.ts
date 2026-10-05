@@ -4,6 +4,7 @@ import { Router } from '@lit-labs/router';
 import { authService } from '@/features/auth';
 import { localizationService } from '@/features/localization';
 import { canAccess, firstVisiblePath, type SectionId } from '@/shared/access/section-access';
+import { registerRouter } from '@/shared/services/router.service';
 import '@/features/theme/services/favicon.service';
 
 // Route targets. Section features register their pages here as they are
@@ -35,6 +36,7 @@ export class AppComponent extends LitElement {
   constructor() {
     super();
     localizationService.init();
+    registerRouter(this._router);
   }
 
   private _router = new Router(this, [
@@ -186,6 +188,8 @@ export class AppComponent extends LitElement {
   }
 
   render() {
+    // App	controller is re-rendered on every navigation, so this is a good point to announce the current path to route-aware components (e.g. sidebar active state).
+    window.dispatchEvent(new CustomEvent('route-changed'));
     return html`${this._router.outlet()}`;
   }
 

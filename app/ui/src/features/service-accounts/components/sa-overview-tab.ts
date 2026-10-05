@@ -11,6 +11,7 @@ import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { apiFetch } from '@/shared/services/http-client';
+import { navigate } from '@/shared/services/router.service';
 import { serviceAccountService } from '../services/service-account.service';
 import type { ServiceAccountDetail } from '../types/service-account.types';
 import { saOverviewTabStyles } from './sa-overview-tab.styles';
@@ -225,7 +226,7 @@ export class SaOverviewTab extends LitElement {
       notificationService.success(msg('Converted to person.'));
       this.confirmOpen = false;
       // The service account no longer exists; land on the new person.
-      window.location.assign(
+      navigate(
         `/admin/persons/${encodeURIComponent(this.saId)}`
       );
     } catch {
