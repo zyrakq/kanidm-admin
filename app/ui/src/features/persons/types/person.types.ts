@@ -102,3 +102,63 @@ export interface UnixUserTokenView {
   shell?: string | null;
   uuid: string;
 }
+
+/**
+ * Request actions for the credential-update session (vendor CURequest,
+ * an externally-tagged serde enum with `rename_all = "lowercase"`):
+ * unit variants serialize as bare lowercase strings ("primaryremove"),
+ * single-arg variants as single-key objects ({"totpremove": "label"}).
+ */
+export type CredentialUpdateRequest =
+  | 'primaryremove'
+  | 'cancelmfareg'
+  | { totpremove: string };
+
+/**
+ * CredentialDetail inside a CUStatus (vendor CredentialDetail).
+ */
+export interface CredentialDetail {
+  uuid: string;
+  type_: CredentialDetailType;
+}
+
+/** Native state hint (CUCredState, PascalCase enum). */
+export type CUCredState =
+  | 'Modifiable'
+  | 'DeleteOnly'
+  | 'AccessDeny'
+  | 'PolicyDeny';
+
+/**
+ * MFA registration state (CURegState, externally-tagged PascalCase enum
+ * with no rename attr). Payload variants are typed loosely — the UI
+ * never needs their contents, only that registration is/ isn't in
+ * progress.
+ */
+export type CURegState =
+  | 'None'
+  | 'TotpTryAgain'
+  | 'TotpInvalidSha1'
+  | { TotpCheck: unknown }
+  | { TotpNameTryAgain: string }
+  | { BackupCodes: string[] }
+  | { Passkey: unknown }
+  | { AttestedPasskey: unknown };
+
+/**
+ * CUStatus view (vendor CUStatus from a credential-update session:
+ * begin/status/action all return it; snake_case fields, PascalCase
+ * enums). Only the fields the UI consumes are typed; the rest of the
+ * wire object (passkeys, unixcred, sshkeys, …) is ignored.
+ */
+export interface CredentialUpdateStatusView {
+  spn: string;
+  displayname: string;
+  mfaregstate: CURegState;
+  can_commit: boolean;
+  /** CURegWarning unit variants, PascalCase strings. */
+  warnings: string[];
+  dirty: boolean;
+  primary: CredentialDetail | null;
+  primary_state: CUCredState;
+}

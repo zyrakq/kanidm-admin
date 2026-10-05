@@ -2618,6 +2618,30 @@
   <source>Copy QR image</source>
   <target>复制二维码图片</target>
 </trans-unit>
+<trans-unit id="s37ca9ed9bb8de972">
+  <source>Kanidm refused the change.</source>
+  <target>Kanidm 拒绝了该更改。</target>
+</trans-unit>
+<trans-unit id="scd0ce0c640c6c1d3">
+  <source>Failed to disable MFA.</source>
+  <target>禁用 MFA 失败。</target>
+</trans-unit>
+<trans-unit id="sfc8f91cabdfbe69d">
+  <source>Disable MFA</source>
+  <target>禁用 MFA</target>
+</trans-unit>
+<trans-unit id="s89cc8587dfdf0e5a">
+  <source>Account policy requires MFA, so two-factor authentication cannot be disabled.</source>
+  <target>账户策略要求 MFA，因此无法禁用。</target>
+</trans-unit>
+<trans-unit id="se1f5e70fc3b0cd37">
+  <source>Two-factor authentication disabled.</source>
+  <target>双因素认证已禁用。</target>
+</trans-unit>
+<trans-unit id="sbcdf44f9fa77e9ac">
+  <source>Two-factor authentication codes (<ph id="0">${this.mfaConfirm.join(', ')}</ph>) will be removed; the password stays in place.</source>
+  <target>将删除双因素认证码（<ph id="0">${this.mfaConfirm.join(', ')}</ph>）；密码保持不变。</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

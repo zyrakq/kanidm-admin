@@ -7,6 +7,8 @@ import { ApiError, apiFetch } from '@/shared/services/http-client';
 import { entryBody, type KanidmEntry } from '@/shared/types/kanidm';
 import type {
   CredentialStatusView,
+  CredentialUpdateRequest,
+  CredentialUpdateStatusView,
   PersonDetail,
   PersonSummary,
   SessionItem,
@@ -107,6 +109,64 @@ class PersonService {
     return apiFetch<CredentialStatusView>(
       `${BASE}/person/${encodeURIComponent(id)}/_credential/_status`
     );
+  }
+
+  /**
+   * Begin an admin credential-update session (vendor
+   * idm_account_credential_update_begin): GET
+   * /v1/person/{id}/_credential/_update -> (CUSessionToken, CUStatus),
+   * serialized as a 2-element JSON array.
+   */
+  async credentialUpdateBegin(
+    id: string
+  ): Promise<{ token: string; status: CredentialUpdateStatusView }> {
+    const [sessionToken, status] = await apiFetch<
+      [{ token: string }, CredentialUpdateStatusView]
+    >(`${BASE}/person/${encodeURIComponent(id)}/_credential/_update`);
+    return { token: sessionToken.token, status };
+  }
+
+  /**
+   * Refresh the session status (vendor
+   * idm_account_credential_update_status: POST /v1/credential/_status
+   * with the session token).
+   */
+  async credentialUpdateStatus(
+    token: string
+  ): Promise<CredentialUpdateStatusView> {
+    return apiFetch<CredentialUpdateStatusView>(
+      `${BASE}/credential/_status`,
+      { method: 'POST', body: JSON.stringify({ token }) }
+    );
+  }
+
+  /**
+   * Perform one credential-update action (vendor idm_account_credential_update_*
+   * helpers): POST /v1/credential/_update with [CURequest, CUSessionToken]
+   * -> CUStatus. Non-2xx surfaces Kanidm's OperationError via the proxy
+   * envelope.
+   */
+  async credentialUpdateAction(
+    token: string,
+    request: CredentialUpdateRequest
+  ): Promise<CredentialUpdateStatusView> {
+    return apiFetch<CredentialUpdateStatusView>(
+      `${BASE}/credential/_update`,
+      { method: 'POST', body: JSON.stringify([request, { token }]) }
+    );
+  }
+
+  /**
+   * Commit the session (vendor idm_account_credential_update_commit:
+   * POST /v1/credential/_commit with the session token). Upstream
+   * refuses the commit when can_commit is false (e.g. account policy
+   * still requires MFA).
+   */
+  async credentialUpdateCommit(token: string): Promise<void> {
+    await apiFetch<void>(`${BASE}/credential/_commit`, {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
   }
 
   /**

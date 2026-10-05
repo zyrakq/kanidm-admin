@@ -56,6 +56,20 @@ export const personCredentialsTabStyles = css`
     border-color: var(--theme-color-text-secondary);
   }
 
+  .btn-small {
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+  }
+
+  .btn-danger {
+    background: var(--theme-color-error);
+    color: var(--theme-color-background);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    filter: brightness(0.9);
+  }
+
   .intent-panel {
     display: flex;
     flex-direction: column;
