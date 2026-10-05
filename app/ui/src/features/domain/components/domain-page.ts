@@ -36,16 +36,6 @@ export class DomainPage extends LitElement {
   // Behaviour form state.
   @state() private maxQueryableAttrs = '';
 
-  // Account-policy minimum credential type on idm_all_persons
-  // ('any' | 'mfa' | 'passkey' | 'attested_passkey'); null = unset/
-  // unreadable, the row stays disabled.
-  @state() private credentialMinimum:
-    | 'any'
-    | 'mfa'
-    | 'passkey'
-    | 'attested_passkey'
-    | null = null;
-
   // Image state.
   @state() private imageFailed = false;
   @state() private imageBusy = false;
@@ -74,14 +64,6 @@ export class DomainPage extends LitElement {
       this.toastError(error, msg('Failed to load domain settings'));
     } finally {
       this.loading = false;
-    }
-    // Separate fetch: a failure here only disables the policy row,
-    // never the whole page.
-    try {
-      this.credentialMinimum =
-        await domainService.getCredentialTypeMinimum();
-    } catch {
-      this.credentialMinimum = null;
     }
   }
 
@@ -363,30 +345,6 @@ export class DomainPage extends LitElement {
             ${this.busy ? msg('Saving...') : msg('Save')}
           </button>
         </div>
-      </section>
-
-      <section class="card">
-        <h2>${msg('Account policy')}</h2>
-        ${this.renderToggleRow(
-          msg('Mandatory two-factor authentication'),
-          msg(
-            'Applies to all persons. While enabled, password-only credentials cannot be saved: MFA (TOTP or passkey) is required. Turning it off allows password-only logins.'
-          ),
-          this.credentialMinimum !== null &&
-            this.credentialMinimum !== 'any',
-          () => {
-            const current =
-              this.credentialMinimum !== null &&
-              this.credentialMinimum !== 'any';
-            void this.run(
-              () =>
-                domainService.setCredentialTypeMinimum(current ? 'any' : 'mfa'),
-              msg('Setting updated.'),
-              msg('Failed to update the two-factor policy')
-            );
-          },
-          this.busy || this.credentialMinimum === null
-        )}
       </section>
 
       <section class="card">

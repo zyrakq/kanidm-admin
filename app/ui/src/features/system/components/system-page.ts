@@ -17,6 +17,7 @@ import '@/shared/components/confirm-dialog';
 import '@/shared/components/form-field';
 import type { TableColumn } from '@/shared/components/data-table';
 import { systemService } from '../services/system.service';
+import { domainService } from '@/features/domain';
 import { systemPageStyles } from './system-page.styles';
 
 /** Which list a pending remove targets. */
@@ -34,6 +35,17 @@ export class SystemPage extends LitElement {
   @state() private deniedNamesBusy = false;
   @state() private removeTarget: { kind: ListKind; value: string } | null = null;
   @state() private removeBusy = false;
+
+  // Account-policy minimum credential type on idm_all_persons
+  // ('any' | 'mfa' | 'passkey' | 'attested_passkey'); null = unset/
+  // unreadable, the row stays disabled.
+  @state() private credentialMinimum:
+    | 'any'
+    | 'mfa'
+    | 'passkey'
+    | 'attested_passkey'
+    | null = null;
+  @state() private credentialBusy = false;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -53,6 +65,14 @@ export class SystemPage extends LitElement {
       this.toastError(error, msg('Failed to load system settings'));
     } finally {
       this.loading = false;
+    }
+    // Separate fetch: a failure here only disables the policy row,
+    // never the whole page.
+    try {
+      this.credentialMinimum =
+        await domainService.getCredentialTypeMinimum();
+    } catch {
+      this.credentialMinimum = null;
     }
   }
 
@@ -140,6 +160,21 @@ export class SystemPage extends LitElement {
     return values.map((value) => ({ value }));
   }
 
+  private async saveCredentialPolicy(next: boolean): Promise<void> {
+    this.credentialBusy = true;
+    try {
+      await authService.withStepUp(() =>
+        domainService.setCredentialTypeMinimum(next ? 'mfa' : 'any')
+      );
+      notificationService.success(msg('Setting updated.'));
+    } catch (error) {
+      this.toastError(error, msg('Failed to update the two-factor policy'));
+    } finally {
+      this.credentialBusy = false;
+      await this.load();
+    }
+  }
+
   private renderAddForm(kind: ListKind): unknown {
     const isBadlist = kind === 'badlist';
     const busy = isBadlist ? this.badlistBusy : this.deniedNamesBusy;
@@ -199,6 +234,33 @@ export class SystemPage extends LitElement {
         </div>
 
         <section class="card">
+          <h2>${msg('Account policy')}</h2>
+          <div class="toggle-row">
+            <div class="toggle-text">
+              <span class="toggle-label">${msg('Mandatory two-factor authentication')}</span>
+              <span class="muted">
+                ${msg(
+                  'Applies to all persons. While enabled, password-only credentials cannot be saved: MFA (TOTP or passkey) is required. Turning it off allows password-only logins.'
+                )}
+              </span>
+            </div>
+            <label class="switch">
+              <input
+                type="checkbox"
+                .checked=${this.credentialMinimum !== null &&
+                this.credentialMinimum !== 'any'}
+                ?disabled=${this.credentialBusy || this.credentialMinimum === null}
+                @change=${(e: Event) =>
+                  void this.saveCredentialPolicy(
+                    (e.target as HTMLInputElement).checked
+                  )}
+              />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
           <h2>${msg('Password badlist')}</h2>
           <p class="description">
             ${msg(
@@ -234,7 +296,6 @@ export class SystemPage extends LitElement {
       </admin-layout>
     `;
   }
-
   static styles = systemPageStyles;
 }
 
