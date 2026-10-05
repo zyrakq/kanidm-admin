@@ -110,9 +110,9 @@ pub(super) fn log_dev_credentials(url: &str, credentials: &DevCredentials) {
     info!(
         url = %url,
         admin = ADMIN_USERNAME,
-        admin_password = %credentials.admin_password,
+        admin_password = %format!("'{}'", credentials.admin_password),
         idm_admin = IDM_ADMIN_USERNAME,
-        idm_admin_password = %credentials.idm_admin_password,
+        idm_admin_password = %format!("'{}'", credentials.idm_admin_password),
         "dev Kanidm credentials — log in with either account"
     );
 }
