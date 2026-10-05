@@ -4,14 +4,17 @@
 
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { msg } from '@lit/localize';
+import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
+import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { ApiError } from '@/shared/services/http-client';
+import { navigate } from '@/shared/services/router.service';
 import '@/shared/components/admin-layout';
 import '@/shared/components/avatar';
 import '@/shared/components/ui-icon';
 import '@/shared/components/tab-bar';
+import '@/shared/components/confirm-dialog';
 import type { TabDef } from '@/shared/components/tab-bar';
 import './person-overview-tab';
 import './person-credentials-tab';
@@ -33,6 +36,8 @@ export class PersonDetailPage extends LitElement {
   @state() private loading = true;
   @state() private notFound = false;
   @state() private activeTab = 'overview';
+  @state() private deleteOpen = false;
+  @state() private deleteBusy = false;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -59,6 +64,26 @@ export class PersonDetailPage extends LitElement {
 
   private handleTabChange(e: CustomEvent<{ id: string }>): void {
     this.activeTab = e.detail.id;
+  }
+
+  private async submitDelete(): Promise<void> {
+    if (!this.person) {
+      return;
+    }
+    this.deleteBusy = true;
+    try {
+      const id = this.person.id;
+      await authService.withStepUp(() => personService.remove(id));
+      notificationService.success(msg(str`Deleted person ${id}`));
+      this.deleteOpen = false;
+      navigate('/admin/persons');
+    } catch (error) {
+      notificationService.error(
+        error instanceof ApiError ? error.message : msg('Failed to delete person')
+      );
+    } finally {
+      this.deleteBusy = false;
+    }
   }
 
   private renderTab(): ReturnType<typeof html> {
@@ -115,6 +140,15 @@ export class PersonDetailPage extends LitElement {
                       ? html`<p class="muted mono">${this.person.uuid}</p>`
                       : nothing}
                   </div>
+                  <button
+                    class="btn-delete"
+                    type="button"
+                    ?disabled=${this.deleteBusy}
+                    @click=${() => (this.deleteOpen = true)}
+                  >
+                    <ui-icon name="trash" size="16"></ui-icon>
+                    ${msg('Delete')}
+                  </button>
                 </header>
                 <tab-bar
                   .tabs=${this.tabs}
@@ -123,6 +157,21 @@ export class PersonDetailPage extends LitElement {
                 ></tab-bar>
                 <section class="tab-content">${this.renderTab()}</section>
               `}
+        ${this.deleteOpen && this.person
+          ? html`
+              <confirm-dialog
+                .open=${true}
+                .busy=${this.deleteBusy}
+                .danger=${true}
+                .message=${msg(
+                  str`Delete person "${this.person.displayName}" (${this.person.id})? The entry can be revived from the recycle bin.`
+                )}
+                .confirmLabel=${msg('Delete')}
+                @cancel=${() => (this.deleteOpen = false)}
+                @confirm=${() => void this.submitDelete()}
+              ></confirm-dialog>
+            `
+          : nothing}
       </admin-layout>
     `;
   }

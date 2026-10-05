@@ -5,13 +5,16 @@
 
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { msg } from '@lit/localize';
+import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
+import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { ApiError } from '@/shared/services/http-client';
+import { navigate } from '@/shared/services/router.service';
 import '@/shared/components/admin-layout';
 import '@/shared/components/ui-icon';
 import '@/shared/components/tab-bar';
+import '@/shared/components/confirm-dialog';
 import type { TabDef } from '@/shared/components/tab-bar';
 import './oauth2-settings-tab';
 import './oauth2-origins-tab';
@@ -33,6 +36,8 @@ export class Oauth2DetailPage extends LitElement {
   @state() private loading = true;
   @state() private notFound = false;
   @state() private activeTab = 'settings';
+  @state() private deleteOpen = false;
+  @state() private deleteBusy = false;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -59,6 +64,28 @@ export class Oauth2DetailPage extends LitElement {
 
   private handleTabChange(e: CustomEvent<{ id: string }>): void {
     this.activeTab = e.detail.id;
+  }
+
+  private async submitDelete(): Promise<void> {
+    if (!this.detail) {
+      return;
+    }
+    this.deleteBusy = true;
+    try {
+      const id = this.detail.id;
+      await authService.withStepUp(() => oauth2Service.remove(id));
+      notificationService.success(msg(str`Deleted OAuth2 client ${id}`));
+      this.deleteOpen = false;
+      navigate('/admin/oauth2');
+    } catch (error) {
+      notificationService.error(
+        error instanceof ApiError
+          ? error.message
+          : msg('Failed to delete OAuth2 client')
+      );
+    } finally {
+      this.deleteBusy = false;
+    }
   }
 
   private renderTab(): ReturnType<typeof html> {
@@ -114,6 +141,15 @@ export class Oauth2DetailPage extends LitElement {
                       ? html`<p class="muted mono">${this.detail.uuid}</p>`
                       : nothing}
                   </div>
+                  <button
+                    class="btn-delete"
+                    type="button"
+                    ?disabled=${this.deleteBusy}
+                    @click=${() => (this.deleteOpen = true)}
+                  >
+                    <ui-icon name="trash" size="16"></ui-icon>
+                    ${msg('Delete')}
+                  </button>
                 </header>
                 <tab-bar
                   .tabs=${this.tabs}
@@ -122,6 +158,21 @@ export class Oauth2DetailPage extends LitElement {
                 ></tab-bar>
                 <section class="tab-content">${this.renderTab()}</section>
               `}
+        ${this.deleteOpen && this.detail
+          ? html`
+              <confirm-dialog
+                .open=${true}
+                .busy=${this.deleteBusy}
+                .danger=${true}
+                .message=${msg(
+                  str`Delete OAuth2 client "${this.detail.displayName}" (${this.detail.id})? The entry can be revived from the recycle bin.`
+                )}
+                .confirmLabel=${msg('Delete')}
+                @cancel=${() => (this.deleteOpen = false)}
+                @confirm=${() => void this.submitDelete()}
+              ></confirm-dialog>
+            `
+          : nothing}
       </admin-layout>
     `;
   }

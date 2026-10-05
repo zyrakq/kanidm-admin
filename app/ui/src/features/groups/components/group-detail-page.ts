@@ -5,13 +5,16 @@
 
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { msg } from '@lit/localize';
+import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
+import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { ApiError } from '@/shared/services/http-client';
+import { navigate } from '@/shared/services/router.service';
 import '@/shared/components/admin-layout';
 import '@/shared/components/ui-icon';
 import '@/shared/components/tab-bar';
+import '@/shared/components/confirm-dialog';
 import type { TabDef } from '@/shared/components/tab-bar';
 import './group-members-tab';
 import './group-settings-tab';
@@ -31,6 +34,8 @@ export class GroupDetailPage extends LitElement {
   @state() private loading = true;
   @state() private notFound = false;
   @state() private activeTab = 'members';
+  @state() private deleteOpen = false;
+  @state() private deleteBusy = false;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -57,6 +62,26 @@ export class GroupDetailPage extends LitElement {
 
   private handleTabChange(e: CustomEvent<{ id: string }>): void {
     this.activeTab = e.detail.id;
+  }
+
+  private async submitDelete(): Promise<void> {
+    if (!this.group) {
+      return;
+    }
+    this.deleteBusy = true;
+    try {
+      const id = this.group.id;
+      await authService.withStepUp(() => groupService.remove(id));
+      notificationService.success(msg(str`Deleted group ${id}`));
+      this.deleteOpen = false;
+      navigate('/admin/groups');
+    } catch (error) {
+      notificationService.error(
+        error instanceof ApiError ? error.message : msg('Failed to delete group')
+      );
+    } finally {
+      this.deleteBusy = false;
+    }
   }
 
   /** Any tab mutation: reload the detail. */
@@ -136,6 +161,15 @@ export class GroupDetailPage extends LitElement {
                       ? html`<p class="muted mono">${this.group.uuid}</p>`
                       : nothing}
                   </div>
+                  <button
+                    class="btn-delete"
+                    type="button"
+                    ?disabled=${this.deleteBusy}
+                    @click=${() => (this.deleteOpen = true)}
+                  >
+                    <ui-icon name="trash" size="16"></ui-icon>
+                    ${msg('Delete')}
+                  </button>
                 </header>
                 <tab-bar
                   .tabs=${this.tabs}
@@ -144,6 +178,21 @@ export class GroupDetailPage extends LitElement {
                 ></tab-bar>
                 <section class="tab-content">${this.renderTab()}</section>
               `}
+        ${this.deleteOpen && this.group
+          ? html`
+              <confirm-dialog
+                .open=${true}
+                .busy=${this.deleteBusy}
+                .danger=${true}
+                .message=${msg(
+                  str`Delete group "${this.group.displayName ?? this.group.id}" (${this.group.id})? The entry can be revived from the recycle bin.`
+                )}
+                .confirmLabel=${msg('Delete')}
+                @cancel=${() => (this.deleteOpen = false)}
+                @confirm=${() => void this.submitDelete()}
+              ></confirm-dialog>
+            `
+          : nothing}
       </admin-layout>
     `;
   }

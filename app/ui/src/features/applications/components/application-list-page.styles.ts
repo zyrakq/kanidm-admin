@@ -103,4 +103,24 @@ export const applicationListPageStyles = css`
     font-size: 13px;
     margin: 0;
   }
+  .btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--theme-color-border);
+    border-radius: 6px;
+    background: var(--theme-color-surface);
+    color: var(--theme-color-text-secondary);
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .btn-delete:hover {
+    color: var(--theme-color-error);
+    border-color: var(--theme-color-error);
+    background: var(--theme-color-background);
+  }
 `;

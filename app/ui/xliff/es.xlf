@@ -1574,10 +1574,6 @@
   <source>My Client</source>
   <target>Mi cliente</target>
 </trans-unit>
-<trans-unit id="s6d80e49125d501cb">
-  <source>Delete OAuth2 client "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? This cannot be undone.</source>
-  <target>¿Eliminar el cliente OAuth2 "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? Esto no se puede deshacer.</target>
-</trans-unit>
 <trans-unit id="sa959e07d83fe9f6e">
   <source>Failed to load origins.</source>
   <target>Error al cargar los orígenes.</target>
@@ -2174,10 +2170,6 @@
   <source>My Application</source>
   <target>Mi aplicación</target>
 </trans-unit>
-<trans-unit id="s1db7317ebdd37e07">
-  <source>Delete application "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.name}</ph>)? This cannot be undone.</source>
-  <target>¿Eliminar la aplicación "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.name}</ph>)? Esto no se puede deshacer.</target>
-</trans-unit>
 <trans-unit id="sf1e9d421f35b51e5">
   <source>Application</source>
   <target>Aplicación</target>
@@ -2642,6 +2634,69 @@
   <source>Two-factor authentication codes (<ph id="0">${this.mfaConfirm.join(', ')}</ph>) will be removed; the password stays in place.</source>
   <target>Se eliminarán los códigos de autenticación en dos pasos (<ph id="0">${this.mfaConfirm.join(', ')}</ph>); la contraseña permanecerá intacta.</target>
 </trans-unit>
+<trans-unit id="s93cb4f5d8722c766">
+  <source>Delete <ph id="0">${this.bulkTargets.length}</ph> selected groups? The entries can be revived from the recycle bin.</source>
+  <target>¿Eliminar los grupos seleccionados (<ph id="0">${this.bulkTargets.length}</ph>)? Las entradas se pueden restaurar desde la papelera.</target>
+</trans-unit>
+<trans-unit id="s3353d041f74e2de0">
+  <source>Deleted <ph id="0">${response.deleted}</ph> entries</source>
+  <target>Se eliminaron <ph id="0">${deleted}</ph> entradas</target>
+</trans-unit>
+<trans-unit id="s6c3ee5e3348560fc">
+  <source>Deleted <ph id="0">${response.deleted}</ph> of <ph id="1">${targets.length}</ph>. Failed: <ph id="2">${failures.join(', ')}</ph></source>
+  <target>Se eliminaron <ph id="0">${deleted}</ph> de <ph id="1">${targets.length}</ph>. Con errores: <ph id="2">${failures.join(', ')}</ph></target>
+</trans-unit>
+<trans-unit id="s337311661b729992">
+  <source>Delete <ph id="0">${this.bulkTargets.length}</ph> selected persons? The entries can be revived from the recycle bin.</source>
+  <target>¿Eliminar las personas seleccionadas (<ph id="0">${this.bulkTargets.length}</ph>)? Las entradas se pueden restaurar desde la papelera.</target>
+</trans-unit>
+<trans-unit id="s69d6d9dfed8fa993">
+  <source>Delete <ph id="0">${this.bulkTargets.length}</ph> selected service accounts? The entries can be revived from the recycle bin.</source>
+  <target>¿Eliminar las cuentas de servicio seleccionadas (<ph id="0">${this.bulkTargets.length}</ph>)? Las entradas se pueden restaurar desde la papelera.</target>
+</trans-unit>
+<trans-unit id="s58bfb494feb8eb02">
+  <source><ph id="0">${this.selected.size}</ph> selected</source>
+  <target><ph id="0">${this.selected.size}</ph> seleccionados</target>
+</trans-unit>
+<trans-unit id="s38c7b3d048d88c07">
+  <source>Delete selected</source>
+  <target>Eliminar selección</target>
+</trans-unit>
+<trans-unit id="sd0b6082239185272">
+  <source>Select all</source>
+  <target>Seleccionar todo</target>
+</trans-unit>
+<trans-unit id="s01924e0434d0960b">
+  <source>Select <ph id="0">${this.rowId(row)}</ph></source>
+  <target>Seleccionar <ph id="0">${this.rowId(row)}</ph></target>
+</trans-unit>
+<trans-unit id="sc5be23213b5d37a2">
+  <source>Delete application "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.name}</ph>)? The entry can be revived from the recycle bin.</source>
+      <target>Delete application "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.name}</ph>)? La entrada se puede restaurar desde la papelera.</target></trans-unit>
+<trans-unit id="sf779f030b41df735">
+  <source>Delete <ph id="0">${this.bulkTargets.length}</ph> selected applications? The entries can be revived from the recycle bin.</source>
+      <target>Delete <ph id="0">${this.bulkTargets.length}</ph> selected applications? Las entradas se pueden restaurar desde la papelera.</target></trans-unit>
+<trans-unit id="sade59b872e2127ee">
+  <source>Delete OAuth2 client "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? The entry can be revived from the recycle bin.</source>
+      <target>Delete OAuth2 client "<ph id="0">${this.deleteTarget.displayName}</ph>" (<ph id="1">${this.deleteTarget.id}</ph>)? La entrada se puede restaurar desde la papelera.</target></trans-unit>
+<trans-unit id="sefb82fb27c301899">
+  <source>Delete <ph id="0">${this.bulkTargets.length}</ph> selected OAuth2 clients? The entries can be revived from the recycle bin.</source>
+      <target>Delete <ph id="0">${this.bulkTargets.length}</ph> selected OAuth2 clients? Las entradas se pueden restaurar desde la papelera.</target></trans-unit>
+<trans-unit id="scf939321e4ae6a9a">
+  <source>Access denied</source>
+      <target>Acceso denegado</target></trans-unit>
+<trans-unit id="s7bc5934a36ebbb50">
+  <source>The entry is in use and cannot be deleted</source>
+      <target>La entrada está en uso y no se puede eliminar</target></trans-unit>
+<trans-unit id="s0a11c2ffb8309d1a">
+  <source>Not found</source>
+      <target>No encontrado</target></trans-unit>
+<trans-unit id="sa81ac90c8a1b2b82">
+  <source>The entry is protected and cannot be deleted</source>
+      <target>La entrada está protegida y no se puede eliminar</target></trans-unit>
+<trans-unit id="se50bb7aee2221dff">
+  <source>Delete failed</source>
+      <target>Error al eliminar</target></trans-unit>
 </body>
 </file>
 </xliff>

@@ -5,14 +5,17 @@
 
 import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { msg } from '@lit/localize';
+import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
+import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { ApiError } from '@/shared/services/http-client';
+import { navigate } from '@/shared/services/router.service';
 import '@/shared/components/admin-layout';
 import '@/shared/components/avatar';
 import '@/shared/components/ui-icon';
 import '@/shared/components/tab-bar';
+import '@/shared/components/confirm-dialog';
 import type { TabDef } from '@/shared/components/tab-bar';
 import './sa-overview-tab';
 import './sa-credentials-tab';
@@ -35,6 +38,8 @@ export class ServiceAccountDetailPage extends LitElement {
   @state() private loading = true;
   @state() private notFound = false;
   @state() private activeTab = 'overview';
+  @state() private deleteOpen = false;
+  @state() private deleteBusy = false;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -63,6 +68,28 @@ export class ServiceAccountDetailPage extends LitElement {
 
   private handleTabChange(e: CustomEvent<{ id: string }>): void {
     this.activeTab = e.detail.id;
+  }
+
+  private async submitDelete(): Promise<void> {
+    if (!this.sa) {
+      return;
+    }
+    this.deleteBusy = true;
+    try {
+      const id = this.sa.id;
+      await authService.withStepUp(() => serviceAccountService.remove(id));
+      notificationService.success(msg(str`Deleted service account ${id}`));
+      this.deleteOpen = false;
+      navigate('/admin/service-accounts');
+    } catch (error) {
+      notificationService.error(
+        error instanceof ApiError
+          ? error.message
+          : msg('Failed to delete service account')
+      );
+    } finally {
+      this.deleteBusy = false;
+    }
   }
 
   private renderTab(): ReturnType<typeof html> {
@@ -126,6 +153,15 @@ export class ServiceAccountDetailPage extends LitElement {
                       ? html`<p class="muted mono">${this.sa.uuid}</p>`
                       : nothing}
                   </div>
+                  <button
+                    class="btn-delete"
+                    type="button"
+                    ?disabled=${this.deleteBusy}
+                    @click=${() => (this.deleteOpen = true)}
+                  >
+                    <ui-icon name="trash" size="16"></ui-icon>
+                    ${msg('Delete')}
+                  </button>
                 </header>
                 <tab-bar
                   .tabs=${this.tabs}
@@ -134,6 +170,21 @@ export class ServiceAccountDetailPage extends LitElement {
                 ></tab-bar>
                 <section class="tab-content">${this.renderTab()}</section>
               `}
+        ${this.deleteOpen && this.sa
+          ? html`
+              <confirm-dialog
+                .open=${true}
+                .busy=${this.deleteBusy}
+                .danger=${true}
+                .message=${msg(
+                  str`Delete service account "${this.sa.displayName}" (${this.sa.id})? The entry can be revived from the recycle bin.`
+                )}
+                .confirmLabel=${msg('Delete')}
+                @cancel=${() => (this.deleteOpen = false)}
+                @confirm=${() => void this.submitDelete()}
+              ></confirm-dialog>
+            `
+          : nothing}
       </admin-layout>
     `;
   }

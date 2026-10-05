@@ -146,6 +146,9 @@ pub(crate) mod test_support {
         pub last_request: Mutex<Option<ForwardRequest>>,
         /// Response to return; None -> transport error.
         pub response: Mutex<Option<Result<ForwardResponse, ForwardTransportError>>>,
+        /// Scripted responses, consumed one per call (bulk fan-out
+        /// tests). Overrides `response`; when empty, `response` is used.
+        pub queue: Mutex<std::collections::VecDeque<ForwardResponse>>,
         pub call_count: Mutex<usize>,
     }
 
@@ -153,6 +156,13 @@ pub(crate) mod test_support {
         pub fn with_response(response: ForwardResponse) -> Self {
             Self {
                 response: Mutex::new(Some(Ok(response))),
+                ..Default::default()
+            }
+        }
+
+        pub fn with_responses(responses: Vec<ForwardResponse>) -> Self {
+            Self {
+                queue: Mutex::new(responses.into_iter().collect()),
                 ..Default::default()
             }
         }
@@ -183,6 +193,9 @@ pub(crate) mod test_support {
         ) -> Result<ForwardResponse, ForwardTransportError> {
             *self.call_count.lock().expect("call count lock") += 1;
             *self.last_request.lock().expect("last request lock") = Some(request);
+            if let Some(scripted) = self.queue.lock().expect("response queue lock").pop_front() {
+                return Ok(scripted);
+            }
             self.response
                 .lock()
                 .expect("response lock")

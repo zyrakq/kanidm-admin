@@ -7,6 +7,10 @@ import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
+import {
+  bulkDelete,
+  friendlyDeleteFailure,
+} from '@/shared/services/bulk-delete';
 import { ApiError } from '@/shared/services/http-client';
 import { navigate } from '@/shared/services/router.service';
 import '@/shared/components/admin-layout';
@@ -31,6 +35,8 @@ export class PersonListPage extends LitElement {
   @state() private createDisplayName = '';
   @state() private deleteTarget: PersonSummary | null = null;
   @state() private deleteBusy = false;
+  @state() private bulkTargets: PersonSummary[] | null = null;
+  @state() private bulkBusy = false;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -99,6 +105,37 @@ export class PersonListPage extends LitElement {
     }
   }
 
+  private async submitBulkDelete(): Promise<void> {
+    const targets = this.bulkTargets ?? [];
+    if (targets.length === 0) {
+      return;
+    }
+    this.bulkBusy = true;
+    try {
+      const response = await authService.withStepUp(() =>
+        bulkDelete('person', targets.map((target) => target.id))
+      );
+      const failures = response.results
+        .filter((result) => !result.ok)
+        .map((result) => `${result.id}: ${friendlyDeleteFailure(result)}`);
+      if (failures.length === 0) {
+        notificationService.success(msg(str`Deleted ${response.deleted} entries`));
+      } else {
+        notificationService.error(
+          msg(
+            str`Deleted ${response.deleted} of ${targets.length}. Failed: ${failures.join(', ')}`
+          )
+        );
+      }
+      this.bulkTargets = null;
+      await this.load();
+    } catch (error) {
+      this.toastError(error, msg('Failed to delete person'));
+    } finally {
+      this.bulkBusy = false;
+    }
+  }
+
   private get columns(): TableColumn[] {
     return [
       {
@@ -113,6 +150,27 @@ export class PersonListPage extends LitElement {
         header: msg('Mail'),
         render: (row) =>
           row.mail ? html`<span class="mono">${String(row.mail)}</span>` : '—',
+      },
+      {
+        key: 'actions',
+        header: '',
+        render: (raw) => {
+          const row = raw as unknown as PersonSummary;
+          return html`
+            <button
+              class="btn-delete"
+              type="button"
+              title=${msg('Delete')}
+              aria-label=${msg('Delete')}
+              @click=${(e: MouseEvent) => {
+                e.stopPropagation();
+                this.deleteTarget = row;
+              }}
+            >
+              <ui-icon name="trash" size="16"></ui-icon>
+            </button>
+          `;
+        },
       },
     ];
   }
@@ -133,11 +191,14 @@ export class PersonListPage extends LitElement {
           .rows=${this.persons}
           .loading=${this.loading}
           .searchable=${true}
+          .selectable=${true}
           .emptyMessage=${msg('No persons found.')}
           @row-click=${(e: CustomEvent<{ row: PersonSummary }>) =>
             navigate(
               `/admin/persons/${encodeURIComponent(e.detail.row.id)}`
             )}
+          @bulk-delete=${(e: CustomEvent<{ rows: PersonSummary[] }>) =>
+            (this.bulkTargets = e.detail.rows)}
         ></data-table>
 
         <modal-dialog
@@ -194,6 +255,22 @@ export class PersonListPage extends LitElement {
                 .confirmLabel=${msg('Delete')}
                 @cancel=${() => (this.deleteTarget = null)}
                 @confirm=${() => void this.submitDelete()}
+              ></confirm-dialog>
+            `
+          : nothing}
+
+        ${this.bulkTargets
+          ? html`
+              <confirm-dialog
+                .open=${true}
+                .busy=${this.bulkBusy}
+                .danger=${true}
+                .message=${msg(
+                  str`Delete ${this.bulkTargets.length} selected persons? The entries can be revived from the recycle bin.`
+                )}
+                .confirmLabel=${msg('Delete')}
+                @cancel=${() => (this.bulkTargets = null)}
+                @confirm=${() => void this.submitBulkDelete()}
               ></confirm-dialog>
             `
           : nothing}

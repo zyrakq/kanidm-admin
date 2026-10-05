@@ -12,6 +12,10 @@ import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
+import {
+  bulkDelete,
+  friendlyDeleteFailure,
+} from '@/shared/services/bulk-delete';
 import { groupService, type GroupSummary } from '@/features/groups';
 import { ApiError } from '@/shared/services/http-client';
 import '@/shared/components/admin-layout';
@@ -41,6 +45,8 @@ export class ApplicationListPage extends LitElement {
   @state() private createLinkedGroup = '';
   @state() private deleteTarget: ApplicationSummary | null = null;
   @state() private deleteBusy = false;
+  @state() private bulkTargets: ApplicationSummary[] | null = null;
+  @state() private bulkBusy = false;
   @state() private detail: ApplicationDetail | null = null;
   @state() private detailLoading = false;
 
@@ -135,6 +141,37 @@ export class ApplicationListPage extends LitElement {
     }
   }
 
+  private async submitBulkDelete(): Promise<void> {
+    const targets = this.bulkTargets ?? [];
+    if (targets.length === 0) {
+      return;
+    }
+    this.bulkBusy = true;
+    try {
+      const response = await authService.withStepUp(() =>
+        bulkDelete('application', targets.map((target) => target.name))
+      );
+      const failures = response.results
+        .filter((result) => !result.ok)
+        .map((result) => `${result.id}: ${friendlyDeleteFailure(result)}`);
+      if (failures.length === 0) {
+        notificationService.success(msg(str`Deleted ${response.deleted} entries`));
+      } else {
+        notificationService.error(
+          msg(
+            str`Deleted ${response.deleted} of ${targets.length}. Failed: ${failures.join(', ')}`
+          )
+        );
+      }
+      this.bulkTargets = null;
+      await this.load();
+    } catch (error) {
+      this.toastError(error, msg('Failed to delete application'));
+    } finally {
+      this.bulkBusy = false;
+    }
+  }
+
   private async openDetail(app: ApplicationSummary): Promise<void> {
     this.detail = null;
     this.detailLoading = true;
@@ -175,14 +212,16 @@ export class ApplicationListPage extends LitElement {
           const row = raw as unknown as ApplicationSummary;
           return html`
             <button
-              class="btn-secondary btn-delete"
+              class="btn-delete"
               type="button"
+              title=${msg('Delete')}
+              aria-label=${msg('Delete')}
               @click=${(e: MouseEvent) => {
                 e.stopPropagation();
                 this.deleteTarget = row;
               }}
             >
-              ${msg('Delete')}
+              <ui-icon name="trash" size="16"></ui-icon>
             </button>
           `;
         },
@@ -273,9 +312,12 @@ export class ApplicationListPage extends LitElement {
           .rows=${this.applications}
           .loading=${this.loading}
           .searchable=${true}
+          .selectable=${true}
           .emptyMessage=${msg('No applications found.')}
           @row-click=${(e: CustomEvent<{ row: ApplicationSummary }>) =>
             void this.openDetail(e.detail.row)}
+          @bulk-delete=${(e: CustomEvent<{ rows: ApplicationSummary[] }>) =>
+            (this.bulkTargets = e.detail.rows)}
         ></data-table>
 
         <modal-dialog
@@ -336,11 +378,27 @@ export class ApplicationListPage extends LitElement {
                 .busy=${this.deleteBusy}
                 .danger=${true}
                 .message=${msg(
-                  str`Delete application "${this.deleteTarget.displayName}" (${this.deleteTarget.name})? This cannot be undone.`
+                  str`Delete application "${this.deleteTarget.displayName}" (${this.deleteTarget.name})? The entry can be revived from the recycle bin.`
                 )}
                 .confirmLabel=${msg('Delete')}
                 @cancel=${() => (this.deleteTarget = null)}
                 @confirm=${() => void this.submitDelete()}
+              ></confirm-dialog>
+            `
+          : nothing}
+
+        ${this.bulkTargets
+          ? html`
+              <confirm-dialog
+                .open=${true}
+                .busy=${this.bulkBusy}
+                .danger=${true}
+                .message=${msg(
+                  str`Delete ${this.bulkTargets.length} selected applications? The entries can be revived from the recycle bin.`
+                )}
+                .confirmLabel=${msg('Delete')}
+                @cancel=${() => (this.bulkTargets = null)}
+                @confirm=${() => void this.submitBulkDelete()}
               ></confirm-dialog>
             `
           : nothing}

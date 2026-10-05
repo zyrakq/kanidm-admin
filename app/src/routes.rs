@@ -44,6 +44,7 @@ pub fn build(state: AppState, status_probe: Arc<dyn KanidmStatusProbe>) -> Route
             get(status::status_handler).with_state(status_probe),
         )
         .merge(auth_routes())
+        .merge(crate::proxy::bulk::routes())
         .merge(crate::proxy::handler::routes())
         .with_state(state)
 }

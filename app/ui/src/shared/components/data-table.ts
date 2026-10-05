@@ -1,11 +1,13 @@
 // Generic data table: column config, loading/empty states, row click,
-// optional client-side search (kanidm lists are unpaginated full lists).
+// optional client-side search (kanidm lists are unpaginated full lists),
+// optional row selection with a bulk-delete bar (kanidm has no bulk
+// endpoint, so deletion itself is a sequential loop in the caller).
 
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { msg } from '@lit/localize';
+import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
-import type { TemplateResult } from 'lit';
+import type { PropertyValues, TemplateResult } from 'lit';
 import './ui-icon';
 import './list-pager';
 
@@ -30,14 +32,88 @@ export class DataTable extends LitElement {
   @property({ type: Boolean }) searchable = false;
   /** Already-localized search placeholder. */
   @property() searchPlaceholder = '';
+  /** Show the row-selection column and the bulk-delete bar. */
+  @property({ type: Boolean }) selectable = false;
 
   @state() private searchTerm = '';
   @state() private page = 1;
   @state() private pageSize = 10;
+  /** Ids (row.id) of selected rows; survives search and paging. */
+  @state() private selected = new Set<string>();
 
   private handleSearch(e: Event): void {
     this.searchTerm = (e.target as HTMLInputElement).value.toLowerCase();
     this.page = 1;
+  }
+
+  private rowId(row: Record<string, unknown>): string {
+    return String(row['id'] ?? '');
+  }
+
+  /** Filtered rows plus the current page slice of them. */
+  private paginate(): {
+    filtered: Record<string, unknown>[];
+    pageRows: Record<string, unknown>[];
+    safePage: number;
+  } {
+    const filtered = this.visibleRows();
+    const pageCount = Math.max(1, Math.ceil(filtered.length / this.pageSize));
+    const safePage = Math.min(this.page, pageCount);
+    const pageRows = filtered.slice(
+      (safePage - 1) * this.pageSize,
+      safePage * this.pageSize
+    );
+    return { filtered, pageRows, safePage };
+  }
+
+  private toggleRowSelection(
+    row: Record<string, unknown>,
+    checked: boolean
+  ): void {
+    const next = new Set(this.selected);
+    const id = this.rowId(row);
+    if (checked) {
+      next.add(id);
+    } else {
+      next.delete(id);
+    }
+    this.selected = next;
+  }
+
+  /** Select/deselect every row of the current page (Gmail-style). */
+  private togglePageSelection(
+    checked: boolean,
+    pageRows: Record<string, unknown>[]
+  ): void {
+    const next = new Set(this.selected);
+    for (const row of pageRows) {
+      const id = this.rowId(row);
+      if (checked) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+    }
+    this.selected = next;
+  }
+
+  private clearSelection(): void {
+    this.selected = new Set();
+  }
+
+  /** Rows currently selected, in this.rows order. */
+  private selectedRows(): Record<string, unknown>[] {
+    return this.rows.filter((row) => this.selected.has(this.rowId(row)));
+  }
+
+  private handleBulkDelete(): void {
+    this.dispatchEvent(
+      new CustomEvent('bulk-delete', {
+        detail: { rows: this.selectedRows() },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   private visibleRows(): Record<string, unknown>[] {
@@ -64,14 +140,38 @@ export class DataTable extends LitElement {
     return column.render ? column.render(row) : String(row[column.key] ?? '');
   }
 
-  render() {
-    const filtered = this.visibleRows();
-    const pageCount = Math.max(1, Math.ceil(filtered.length / this.pageSize));
-    const safePage = Math.min(this.page, pageCount);
-    const pageRows = filtered.slice(
-      (safePage - 1) * this.pageSize,
-      safePage * this.pageSize
+  protected updated(changed: PropertyValues): void {
+    super.updated(changed);
+    // Prune the selection to rows that still exist — after a reload
+    // following deletions the deleted ids vanish, while failed ones
+    // stay selected for a retry.
+    if (changed.has('rows')) {
+      const ids = new Set(this.rows.map((row) => this.rowId(row)));
+      const pruned = new Set([...this.selected].filter((id) => ids.has(id)));
+      if (pruned.size !== this.selected.size) {
+        this.selected = pruned;
+      }
+    }
+    // Lit can't bind the indeterminate state declaratively.
+    const selectAll = this.renderRoot.querySelector<HTMLInputElement>(
+      '.select-all'
     );
+    if (selectAll) {
+      const pageRows = this.paginate().pageRows;
+      const selectedCount = pageRows.filter((row) =>
+        this.selected.has(this.rowId(row))
+      ).length;
+      selectAll.indeterminate =
+        selectedCount > 0 && selectedCount < pageRows.length;
+    }
+  }
+
+  render() {
+    const { filtered, pageRows, safePage } = this.paginate();
+    const colCount = this.columns.length + (this.selectable ? 1 : 0);
+    const allPageSelected =
+      pageRows.length > 0 &&
+      pageRows.every((row) => this.selected.has(this.rowId(row)));
     return html`
       ${this.searchable
         ? html`
@@ -87,10 +187,50 @@ export class DataTable extends LitElement {
             </div>
           `
         : nothing}
+      ${this.selectable && this.selected.size > 0
+        ? html`
+            <div class="selection-bar" role="toolbar">
+              <span class="selection-count">
+                ${msg(str`${this.selected.size} selected`)}
+              </span>
+              <button
+                class="bar-btn"
+                type="button"
+                @click=${() => this.clearSelection()}
+              >
+                ${msg('Clear')}
+              </button>
+              <button
+                class="bar-btn bar-btn-danger"
+                type="button"
+                @click=${() => this.handleBulkDelete()}
+              >
+                <ui-icon name="trash" size="14"></ui-icon>
+                ${msg('Delete selected')}
+              </button>
+            </div>
+          `
+        : nothing}
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
+              ${this.selectable
+                ? html`<th class="col-select">
+                    <input
+                      type="checkbox"
+                      class="select-all"
+                      .checked=${allPageSelected}
+                      ?disabled=${this.loading || pageRows.length === 0}
+                      aria-label=${msg('Select all')}
+                      @change=${(e: Event) =>
+                        this.togglePageSelection(
+                          (e.target as HTMLInputElement).checked,
+                          pageRows
+                        )}
+                    />
+                  </th>`
+                : nothing}
               ${this.columns.map(
                 (column) => html`<th scope="col">${column.header}</th>`
               )}
@@ -99,17 +239,34 @@ export class DataTable extends LitElement {
           <tbody>
             ${this.loading
               ? html`<tr class="state-row">
-                  <td colspan=${this.columns.length}>${msg('Loading...')}</td>
+                  <td colspan=${colCount}>${msg('Loading...')}</td>
                 </tr>`
               : filtered.length === 0
                 ? html`<tr class="state-row">
-                    <td colspan=${this.columns.length}>
+                    <td colspan=${colCount}>
                       ${this.emptyMessage || msg('No entries found.')}
                     </td>
                   </tr>`
                 : pageRows.map(
                     (row) => html`
                       <tr class="data-row" @click=${() => this.handleRowClick(row)}>
+                        ${this.selectable
+                          ? html`<td
+                              class="col-select"
+                              @click=${(e: Event) => e.stopPropagation()}
+                            >
+                              <input
+                                type="checkbox"
+                                .checked=${this.selected.has(this.rowId(row))}
+                                aria-label=${msg(str`Select ${this.rowId(row)}`)}
+                                @change=${(e: Event) =>
+                                  this.toggleRowSelection(
+                                    row,
+                                    (e.target as HTMLInputElement).checked
+                                  )}
+                              />
+                            </td>`
+                          : nothing}
                         ${this.columns.map(
                           (column) => html`<td>${this.renderCell(row, column)}</td>`
                         )}
@@ -195,6 +352,55 @@ export class DataTable extends LitElement {
       color: var(--theme-color-text-muted);
       padding: 24px 14px;
       cursor: default;
+    }
+    .col-select {
+      width: 36px;
+      text-align: center;
+    }
+    .col-select input {
+      cursor: pointer;
+      accent-color: var(--theme-color-primary);
+    }
+    .selection-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border: 1px solid var(--theme-color-border);
+      border-radius: 6px;
+      background: var(--theme-color-surface);
+      margin-bottom: 12px;
+    }
+    .selection-count {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--theme-color-text-primary);
+    }
+    .bar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font: inherit;
+      font-size: 14px;
+      background: transparent;
+      color: var(--theme-color-text-secondary);
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .bar-btn:hover {
+      background: var(--theme-color-background);
+      color: var(--theme-color-text-primary);
+    }
+    .bar-btn-danger {
+      color: var(--theme-color-error);
+      font-weight: 500;
+    }
+    .bar-btn-danger:hover {
+      background: var(--theme-color-error);
+      color: #ffffff;
     }
   `;
 }
