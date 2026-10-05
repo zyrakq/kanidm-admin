@@ -23,8 +23,8 @@ mime_guess = "2"
 async-trait = "0.1"
 base64 = "0.22"
 reqwest = { version = "0.13", default-features = false, features = ["rustls"] }
-kanidm_client = "1.11.1"
-kanidm_proto = "1.11.1"
+kanidm_client = "1.11.2"
+kanidm_proto = "1.11.2"
 time = { version = "0.3", features = ["serde", "formatting"] }
 tower = { version = "0.5", features = ["util"] }
 uuid = { version = "1", features = ["v4"] }
@@ -32,8 +32,9 @@ testcontainers = { version = "0.28", features = ["watchdog"] }
 
 # bisync was yanked from crates.io (all versions, 2026-08-24). It is a
 # build-time-only transitive dependency (kanidm_build_profiles -> gix ->
-# gix-protocol -> bisync) required by kanidm 1.11.1. Patch both crates to
-# the pinned upstream git revision until kanidm ships a bisync-free release.
+# gix-protocol -> bisync); required by kanidm 1.11.x (verified for
+# 1.11.2). Patch both crates to the pinned upstream git revision until
+# kanidm ships a bisync-free release.
 [patch.crates-io]
 bisync = { git = "https://github.com/JM4ier/bisync", rev = "be3a0a6255a0af592e66be8614a149151f67fdf5" }
 bisync_macros = { git = "https://github.com/JM4ier/bisync", rev = "be3a0a6255a0af592e66be8614a149151f67fdf5" }

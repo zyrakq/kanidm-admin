@@ -289,8 +289,8 @@ fn kanidm_container_defaults_when_section_absent() {
         !s.kanidm_container.enabled,
         "container must default to disabled when the section is absent"
     );
-    assert_eq!(s.kanidm_container.image, "kanidm/server:1.11.1");
-    assert_eq!(s.kanidm_container.effective_image(), "kanidm/server:1.11.1");
+    assert_eq!(s.kanidm_container.image, "kanidm/server:1.11.2");
+    assert_eq!(s.kanidm_container.effective_image(), "kanidm/server:1.11.2");
 }
 
 #[test]

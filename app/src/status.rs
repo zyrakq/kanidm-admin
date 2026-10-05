@@ -35,14 +35,14 @@ use crate::settings::kanidm::KanidmSettings;
 const PING_TIMEOUT_SECS: u64 = 3;
 
 /// `X-KANIDM-VERSION` header that Kanidm's version middleware sets on
-/// every response, carrying its server version (e.g. `1.11.1`). Header
+/// every response, carrying its server version (e.g. `1.11.2`). Header
 /// names are case-insensitive; reqwest stores them lowercase.
 const KVERSION_HEADER: &str = "x-kanidm-version";
 
 /// Fallback for the compile-time client version when build.rs could not
 /// extract it from Cargo.lock. Keep in sync with the kanidm_client
 /// version in the workspace Cargo.toml.
-const FALLBACK_CLIENT_VERSION: &str = "1.11.1";
+const FALLBACK_CLIENT_VERSION: &str = "1.11.2";
 
 /// Compile-time kanidm_client version (from Cargo.lock via build.rs).
 pub fn client_version() -> &'static str {

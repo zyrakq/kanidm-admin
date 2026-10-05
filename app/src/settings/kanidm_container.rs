@@ -11,8 +11,8 @@
 use serde::Deserialize;
 
 /// Default image, pinned to the kanidm_client version the workspace
-/// uses (1.11.1).
-const DEFAULT_IMAGE: &str = "kanidm/server:1.11.1";
+/// uses (1.11.2).
+const DEFAULT_IMAGE: &str = "kanidm/server:1.11.2";
 
 #[derive(Debug, Deserialize)]
 #[serde(default)]
@@ -20,7 +20,7 @@ pub struct KanidmContainerSettings {
     /// Start the ephemeral dev Kanidm container at startup.
     pub enabled: bool,
     /// Official kanidm/server image to run (e.g.
-    /// `kanidm/server:1.11.1`). Empty string falls back to the pinned
+    /// `kanidm/server:1.11.2`). Empty string falls back to the pinned
     /// default.
     pub image: String,
 }
