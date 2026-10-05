@@ -196,7 +196,7 @@ export class Oauth2ListPage extends LitElement {
                 this.deleteTarget = row;
               }}
             >
-              <ui-icon name="trash" size="16"></ui-icon>
+              <ui-icon name="trash" size="18"></ui-icon>
             </button>
           `;
         },

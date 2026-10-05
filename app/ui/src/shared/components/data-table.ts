@@ -80,13 +80,10 @@ export class DataTable extends LitElement {
     this.selected = next;
   }
 
-  /** Select/deselect every row of the current page (Gmail-style). */
-  private togglePageSelection(
-    checked: boolean,
-    pageRows: Record<string, unknown>[]
-  ): void {
+  /** Select/deselect every filtered row (across all pages). */
+  private toggleAllSelection(checked: boolean): void {
     const next = new Set(this.selected);
-    for (const row of pageRows) {
+    for (const row of this.visibleRows()) {
       const id = this.rowId(row);
       if (checked) {
         next.add(id);
@@ -95,10 +92,6 @@ export class DataTable extends LitElement {
       }
     }
     this.selected = next;
-  }
-
-  private clearSelection(): void {
-    this.selected = new Set();
   }
 
   /** Rows currently selected, in this.rows order. */
@@ -157,21 +150,22 @@ export class DataTable extends LitElement {
       '.select-all'
     );
     if (selectAll) {
-      const pageRows = this.paginate().pageRows;
-      const selectedCount = pageRows.filter((row) =>
+      const filtered = this.visibleRows();
+      const selectedCount = filtered.filter((row) =>
         this.selected.has(this.rowId(row))
       ).length;
-      selectAll.indeterminate =
-        selectedCount > 0 && selectedCount < pageRows.length;
+      selectAll.checked =
+        filtered.length > 0 && selectedCount === filtered.length;
+      selectAll.indeterminate = selectedCount > 0 && !selectAll.checked;
     }
   }
 
   render() {
     const { filtered, pageRows, safePage } = this.paginate();
     const colCount = this.columns.length + (this.selectable ? 1 : 0);
-    const allPageSelected =
-      pageRows.length > 0 &&
-      pageRows.every((row) => this.selected.has(this.rowId(row)));
+    const allFilteredSelected =
+      filtered.length > 0 &&
+      filtered.every((row) => this.selected.has(this.rowId(row)));
     return html`
       ${this.searchable
         ? html`
@@ -187,22 +181,16 @@ export class DataTable extends LitElement {
             </div>
           `
         : nothing}
-      ${this.selectable && this.selected.size > 0
+      ${this.selectable
         ? html`
             <div class="selection-bar" role="toolbar">
               <span class="selection-count">
                 ${msg(str`${this.selected.size} selected`)}
               </span>
               <button
-                class="bar-btn"
-                type="button"
-                @click=${() => this.clearSelection()}
-              >
-                ${msg('Clear')}
-              </button>
-              <button
                 class="bar-btn bar-btn-danger"
                 type="button"
+                ?disabled=${this.selected.size === 0}
                 @click=${() => this.handleBulkDelete()}
               >
                 <ui-icon name="trash" size="14"></ui-icon>
@@ -220,13 +208,12 @@ export class DataTable extends LitElement {
                     <input
                       type="checkbox"
                       class="select-all"
-                      .checked=${allPageSelected}
-                      ?disabled=${this.loading || pageRows.length === 0}
+                      .checked=${allFilteredSelected}
+                      ?disabled=${this.loading || filtered.length === 0}
                       aria-label=${msg('Select all')}
                       @change=${(e: Event) =>
-                        this.togglePageSelection(
-                          (e.target as HTMLInputElement).checked,
-                          pageRows
+                        this.toggleAllSelection(
+                          (e.target as HTMLInputElement).checked
                         )}
                     />
                   </th>`
@@ -361,6 +348,32 @@ export class DataTable extends LitElement {
       cursor: pointer;
       accent-color: var(--theme-color-primary);
     }
+    /* Column renderers run inside THIS shadow root, so any class used by
+       list-page render functions must be styled here — the page's own
+       adoptedStyleSheets cannot cross the shadow boundary. */
+    .btn-delete {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      border-radius: 6px;
+      background: none;
+      color: var(--theme-color-error);
+      cursor: pointer;
+      vertical-align: middle;
+      transition: color 0.15s ease, background-color 0.15s ease;
+    }
+    .btn-delete:hover {
+      background: var(--theme-color-error);
+      color: #ffffff;
+    }
+    .mono {
+      font-family: var(--theme-font-mono, monospace);
+      font-size: 13px;
+    }
     .selection-bar {
       display: flex;
       align-items: center;
@@ -390,15 +403,19 @@ export class DataTable extends LitElement {
       cursor: pointer;
       transition: background-color 0.15s ease, color 0.15s ease;
     }
-    .bar-btn:hover {
+    .bar-btn:hover:not(:disabled) {
       background: var(--theme-color-background);
       color: var(--theme-color-text-primary);
+    }
+    .bar-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
     }
     .bar-btn-danger {
       color: var(--theme-color-error);
       font-weight: 500;
     }
-    .bar-btn-danger:hover {
+    .bar-btn-danger:hover:not(:disabled) {
       background: var(--theme-color-error);
       color: #ffffff;
     }
