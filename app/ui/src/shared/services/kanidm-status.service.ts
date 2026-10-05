@@ -14,18 +14,22 @@ export interface KanidmStatus {
   state: KanidmStatusState;
   serverVersion: string | null;
   clientVersion: string | null;
+  /** Effective Kanidm base URL (resolved backend-side, container mode aware). */
+  kanidmUrl: string | null;
 }
 
 interface StatusResponse {
   state: KanidmStatusState;
   serverVersion: string | null;
   clientVersion: string;
+  kanidmUrl: string;
 }
 
 const UNREACHABLE: KanidmStatus = {
   state: 'unreachable',
   serverVersion: null,
   clientVersion: null,
+  kanidmUrl: null,
 };
 
 class KanidmStatusService {
@@ -64,6 +68,7 @@ class KanidmStatusService {
         state: response.state,
         serverVersion: response.serverVersion ?? null,
         clientVersion: response.clientVersion ?? null,
+        kanidmUrl: response.kanidmUrl ?? null,
       };
     } catch {
       status = { ...UNREACHABLE };

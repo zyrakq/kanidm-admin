@@ -15,6 +15,7 @@
     "@lit/localize": "^0.12.2",
     "@lit/localize-tools": "^0.8.1",
     "lit": "^3.3.1",
+    "qrcode-generator": "^2.0.4",
     "urlpattern-polyfill": "^10.1.0"
   },
   "devDependencies": {

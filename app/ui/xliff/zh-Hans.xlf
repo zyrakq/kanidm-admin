@@ -2582,6 +2582,42 @@
   <source>Select language</source>
   <target>选择语言</target>
 </trans-unit>
+<trans-unit id="safdb211ae5c278c4">
+  <source>Reset code copied to clipboard.</source>
+  <target>重置代码已复制到剪贴板。</target>
+</trans-unit>
+<trans-unit id="s95b1ac44c8953a35">
+  <source>Reset code</source>
+  <target>重置代码</target>
+</trans-unit>
+<trans-unit id="sc7cae0914551bb10">
+  <source>Reset link</source>
+  <target>重置链接</target>
+</trans-unit>
+<trans-unit id="s4f013b4c82c08809">
+  <source>Copy code</source>
+  <target>复制代码</target>
+</trans-unit>
+<trans-unit id="s19172ed3838854fc">
+  <source>Copy link</source>
+  <target>复制链接</target>
+</trans-unit>
+<trans-unit id="s198eb4f161373c15">
+  <source>Hide QR code</source>
+  <target>隐藏二维码</target>
+</trans-unit>
+<trans-unit id="s750f312e6ef461e4">
+  <source>Show QR code</source>
+  <target>显示二维码</target>
+</trans-unit>
+<trans-unit id="sc26cb9574bdc036c">
+  <source>QR code with the credential reset link</source>
+  <target>包含凭据重置链接的二维码</target>
+</trans-unit>
+<trans-unit id="s2f96c13ece2cac42">
+  <source>Copy QR image</source>
+  <target>复制二维码图片</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

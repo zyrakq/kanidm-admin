@@ -4,7 +4,9 @@ import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { notificationService } from '@/features/notifications';
 import { authService } from '@/features/auth';
+import { kanidmStatusService } from '@/shared/services/kanidm-status.service';
 import { personService } from '../services/person.service';
+import { buildResetUrl, qrDataUrl, qrPngBlob } from '../utils/reset-link';
 import type { CredentialDetailType } from '../types/person.types';
 import { personCredentialsTabStyles } from './person-credentials-tab.styles';
 
@@ -41,6 +43,8 @@ export class PersonCredentialsTab extends LitElement {
     type_: CredentialDetailType;
   }> = [];
   @state() private intentToken: string | null = null;
+  @state() private kanidmUrl: string | null = null;
+  @state() private qrOpen = false;
   @state() private emailModalOpen = false;
   @state() private emailValue = '';
   @state() private submitting = false;
@@ -72,6 +76,10 @@ export class PersonCredentialsTab extends LitElement {
         personService.credentialUpdateIntent(this.id, DEFAULT_INTENT_TTL)
       );
       this.intentToken = token;
+      this.qrOpen = false;
+      // The effective Kanidm base URL is only known backend-side; a
+      // failed lookup just hides the link/QR options (token still shown).
+      void this.loadKanidmUrl();
       notificationService.success(msg('Credential reset link created.'));
     } catch (error) {
       notificationService.error(msg('Failed to create credential reset link.'));
@@ -80,12 +88,58 @@ export class PersonCredentialsTab extends LitElement {
     }
   }
 
+  private async loadKanidmUrl(): Promise<void> {
+    const status = await kanidmStatusService.fetchStatus();
+    this.kanidmUrl = status.kanidmUrl;
+  }
+
+  /** Full reset link, or null while the base URL is unknown. */
+  private get resetUrl(): string | null {
+    if (!this.intentToken || !this.kanidmUrl) {
+      return null;
+    }
+    return buildResetUrl(this.kanidmUrl, this.intentToken);
+  }
+
   private async handleCopyToken(): Promise<void> {
     if (!this.intentToken) {
       return;
     }
     try {
       await navigator.clipboard.writeText(this.intentToken);
+      notificationService.success(msg('Reset code copied to clipboard.'));
+    } catch {
+      notificationService.error(msg('Failed to copy to clipboard.'));
+    }
+  }
+
+  private async handleCopyLink(): Promise<void> {
+    const url = this.resetUrl;
+    if (!url) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      notificationService.success(msg('Reset link copied to clipboard.'));
+    } catch {
+      notificationService.error(msg('Failed to copy to clipboard.'));
+    }
+  }
+
+  private toggleQr(): void {
+    this.qrOpen = !this.qrOpen;
+  }
+
+  private async handleCopyQrImage(): Promise<void> {
+    const url = this.resetUrl;
+    if (!url) {
+      return;
+    }
+    try {
+      const blob = await qrPngBlob(url);
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob }),
+      ]);
       notificationService.success(msg('Reset link copied to clipboard.'));
     } catch {
       notificationService.error(msg('Failed to copy to clipboard.'));
@@ -110,15 +164,9 @@ export class PersonCredentialsTab extends LitElement {
     this.submitting = true;
     try {
       await authService.withStepUp(() =>
-        personService.sendCredentialIntent(
-          this.id,
-          DEFAULT_INTENT_TTL,
-          email
-        )
+        personService.sendCredentialIntent(this.id, DEFAULT_INTENT_TTL, email)
       );
-      notificationService.success(
-        msg(str`Reset link sent to ${email}.`)
-      );
+      notificationService.success(msg(str`Reset link sent to ${email}.`));
       this.closeEmailModal();
     } catch (error) {
       notificationService.error(msg('Failed to send reset link.'));
@@ -127,10 +175,7 @@ export class PersonCredentialsTab extends LitElement {
     }
   }
 
-  private renderCredRow(cred: {
-    uuid: string;
-    type_: CredentialDetailType;
-  }) {
+  private renderCredRow(cred: { uuid: string; type_: CredentialDetailType }) {
     return html`
       <li class="cred-row">
         <span class="cred-type">${credentialTypeLabel(cred.type_)}</span>
@@ -143,15 +188,56 @@ export class PersonCredentialsTab extends LitElement {
     if (!this.intentToken) {
       return nothing;
     }
+    const url = this.resetUrl;
     return html`
       <div class="intent-panel">
         <div class="intent-label">${msg('Credential reset link')}</div>
-        <code class="intent-token">${this.intentToken}</code>
-        <button
-          class="btn btn-secondary"
-          @click=${this.handleCopyToken}
-        >
-          ${msg('Copy')}
+        <div class="intent-field">
+          <span class="intent-field-label">${msg('Reset code')}</span>
+          <code class="intent-token">${this.intentToken}</code>
+        </div>
+        ${url
+          ? html`
+              <div class="intent-field">
+                <span class="intent-field-label">${msg('Reset link')}</span>
+                <code class="intent-token">${url}</code>
+              </div>
+            `
+          : nothing}
+        <div class="intent-actions">
+          <button class="btn btn-secondary" @click=${this.handleCopyToken}>
+            ${msg('Copy code')}
+          </button>
+          ${url
+            ? html`
+                <button class="btn btn-secondary" @click=${this.handleCopyLink}>
+                  ${msg('Copy link')}
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  aria-expanded=${this.qrOpen ? 'true' : 'false'}
+                  @click=${this.toggleQr}
+                >
+                  ${this.qrOpen ? msg('Hide QR code') : msg('Show QR code')}
+                </button>
+              `
+            : nothing}
+        </div>
+        ${this.qrOpen && url ? this.renderQr(url) : nothing}
+      </div>
+    `;
+  }
+
+  private renderQr(url: string) {
+    return html`
+      <div class="qr-block">
+        <img
+          class="qr-image"
+          src=${qrDataUrl(url)}
+          alt=${msg('QR code with the credential reset link')}
+        />
+        <button class="btn btn-secondary" @click=${this.handleCopyQrImage}>
+          ${msg('Copy QR image')}
         </button>
       </div>
     `;
@@ -162,10 +248,7 @@ export class PersonCredentialsTab extends LitElement {
       return nothing;
     }
     return html`
-      <div
-        class="modal-backdrop"
-        @click=${this.closeEmailModal}
-      >
+      <div class="modal-backdrop" @click=${this.closeEmailModal}>
         <div
           class="modal"
           role="dialog"
@@ -181,9 +264,8 @@ export class PersonCredentialsTab extends LitElement {
                 type="email"
                 required
                 .value=${this.emailValue}
-                @input=${(
-                  event: Event & { target: HTMLInputElement }
-                ) => (this.emailValue = event.target.value)}
+                @input=${(event: Event & { target: HTMLInputElement }) =>
+                  (this.emailValue = event.target.value)}
               />
             </label>
             <div class="modal-actions">
@@ -233,7 +315,6 @@ export class PersonCredentialsTab extends LitElement {
         </div>
 
         ${this.renderIntentPanel()}
-
         ${this.creds.length === 0
           ? html`<p class="muted">${msg('No credentials enrolled.')}</p>`
           : html`

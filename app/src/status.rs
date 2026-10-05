@@ -9,6 +9,12 @@
 // ready-to-render state. Always answers 200 JSON — the payload carries
 // the outcome, including `unreachable`.
 //
+// The response also carries `kanidmUrl` — the effective Kanidm base URL
+// as resolved at startup (container mode rewrites the configured value).
+// The UI needs it to build credential-reset links: the proxy does not
+// forward generic /ui/* pages, so those links must point at the Kanidm
+// server origin directly.
+//
 // /api/health stays a plain "OK" liveness probe and is not touched.
 
 use std::sync::Arc;
@@ -99,6 +105,11 @@ pub struct StatusResponse {
     pub state: StatusState,
     pub server_version: Option<String>,
     pub client_version: String,
+    /// Effective Kanidm base URL, e.g. `https://idm.example.com:8443`.
+    /// Always present: the [kanidm] url section is required, and
+    /// container mode has already substituted the URL by the time the
+    /// probe is built.
+    pub kanidm_url: String,
 }
 
 // ---------------------------------------------------------------------------
@@ -119,6 +130,11 @@ pub struct ProbeOutcome {
 #[async_trait]
 pub trait KanidmStatusProbe: Send + Sync {
     async fn probe(&self) -> ProbeOutcome;
+
+    /// Effective Kanidm base URL (after any container-mode rewrite) the
+    /// probe connects to; exposed via the status response so the SPA can
+    /// build links to Kanidm pages (e.g. credential reset).
+    fn kanidm_url(&self) -> &str;
 }
 
 /// Production probe: unauthenticated GET to the Kanidm URL root.
@@ -179,6 +195,10 @@ impl KanidmStatusProbe for KanidmHttpProbe {
             Err(_) => ProbeOutcome::default(),
         }
     }
+
+    fn kanidm_url(&self) -> &str {
+        &self.url
+    }
 }
 
 /// Build the production probe from the [kanidm] settings; called once in
@@ -197,20 +217,32 @@ pub fn probe_from_settings(
 pub async fn status_handler(
     State(probe): State<Arc<dyn KanidmStatusProbe>>,
 ) -> Json<StatusResponse> {
-    Json(compute_response(client_version(), probe.probe().await))
+    Json(
+        compute_response(
+            client_version(),
+            probe.probe().await,
+            probe.kanidm_url(),
+        )
+    )
 }
 
 /// Pure decision logic, kept out of the handler so the full design table
 /// is unit-testable with arbitrary client versions (the compiled-in env
 /// version cannot be controlled from tests).
-fn compute_response(client_version: &str, outcome: ProbeOutcome) -> StatusResponse {
+fn compute_response(
+    client_version: &str,
+    outcome: ProbeOutcome,
+    kanidm_url: &str,
+) -> StatusResponse {
     let client_version = client_version.to_string();
+    let kanidm_url = kanidm_url.to_string();
 
     if !outcome.reachable {
         return StatusResponse {
             state: StatusState::Unreachable,
             server_version: None,
             client_version,
+            kanidm_url,
         };
     }
 
@@ -221,6 +253,7 @@ fn compute_response(client_version: &str, outcome: ProbeOutcome) -> StatusRespon
             state: StatusState::Alive,
             server_version: None,
             client_version,
+            kanidm_url,
         };
     };
 
@@ -238,6 +271,7 @@ fn compute_response(client_version: &str, outcome: ProbeOutcome) -> StatusRespon
         },
         server_version: Some(format!("{}.{}.{}", server.major, server.minor, server.patch)),
         client_version,
+        kanidm_url,
     }
 }
 
@@ -319,6 +353,10 @@ mod tests {
 
     // -- compute_response ---------------------------------------------------
 
+    /// Fixed URL for pure-function tests — compute_response must copy it
+    /// verbatim into the response.
+    const TEST_KANIDM_URL: &str = "https://kanidm.test:8443";
+
     fn outcome(reachable: bool, server: Option<&str>) -> ProbeOutcome {
         ProbeOutcome {
             reachable,
@@ -328,29 +366,44 @@ mod tests {
 
     #[test]
     fn compute_response_unreachable() {
-        let response = compute_response("1.11.1", outcome(false, Some("1.11.1")));
+        let response = compute_response(
+            "1.11.1",
+            outcome(false, Some("1.11.1")),
+            TEST_KANIDM_URL,
+        );
         assert_eq!(response.state, StatusState::Unreachable);
         assert_eq!(response.server_version, None);
         assert_eq!(response.client_version, "1.11.1");
+        assert_eq!(response.kanidm_url, TEST_KANIDM_URL);
     }
 
     #[test]
     fn compute_response_alive_without_header_skips_conflict_check() {
-        let response = compute_response("1.11.1", outcome(true, None));
+        let response =
+            compute_response("1.11.1", outcome(true, None), TEST_KANIDM_URL);
         assert_eq!(response.state, StatusState::Alive);
         assert_eq!(response.server_version, None);
+        assert_eq!(response.kanidm_url, TEST_KANIDM_URL);
     }
 
     #[test]
     fn compute_response_alive_when_client_newer_or_equal() {
-        let response = compute_response("1.11.1", outcome(true, Some("1.11.0")));
+        let response = compute_response(
+            "1.11.1",
+            outcome(true, Some("1.11.0")),
+            TEST_KANIDM_URL,
+        );
         assert_eq!(response.state, StatusState::Alive);
         assert_eq!(response.server_version.as_deref(), Some("1.11.0"));
     }
 
     #[test]
     fn compute_response_conflict_when_client_older_by_patch() {
-        let response = compute_response("1.11.1", outcome(true, Some("1.11.2")));
+        let response = compute_response(
+            "1.11.1",
+            outcome(true, Some("1.11.2")),
+            TEST_KANIDM_URL,
+        );
         assert_eq!(response.state, StatusState::VersionConflict);
         assert_eq!(response.server_version.as_deref(), Some("1.11.2"));
         assert_eq!(response.client_version, "1.11.1");
@@ -358,39 +411,61 @@ mod tests {
 
     #[test]
     fn compute_response_conflict_when_client_newer_by_major() {
-        let response = compute_response("2.0.0", outcome(true, Some("1.11.1")));
+        let response = compute_response(
+            "2.0.0",
+            outcome(true, Some("1.11.1")),
+            TEST_KANIDM_URL,
+        );
         assert_eq!(response.state, StatusState::VersionConflict);
     }
 
     #[test]
     fn compute_response_ok_when_server_newer_by_major() {
-        let response = compute_response("1.11.1", outcome(true, Some("2.0.0")));
+        let response = compute_response(
+            "1.11.1",
+            outcome(true, Some("2.0.0")),
+            TEST_KANIDM_URL,
+        );
         assert_eq!(response.state, StatusState::Alive);
         assert_eq!(response.server_version.as_deref(), Some("2.0.0"));
     }
 
     #[test]
     fn compute_response_unknown_client_version_disables_comparison() {
-        let response = compute_response("unknown", outcome(true, Some("1.11.2")));
+        let response = compute_response(
+            "unknown",
+            outcome(true, Some("1.11.2")),
+            TEST_KANIDM_URL,
+        );
         assert_eq!(response.state, StatusState::Alive);
         assert_eq!(response.client_version, "unknown");
     }
 
     // -- handler wiring (mock probe, no live Kanidm) ------------------------
 
-    struct MockProbe(ProbeOutcome);
+    struct MockProbe {
+        outcome: ProbeOutcome,
+        url: String,
+    }
 
     #[async_trait]
     impl KanidmStatusProbe for MockProbe {
         async fn probe(&self) -> ProbeOutcome {
-            self.0
+            self.outcome
+        }
+
+        fn kanidm_url(&self) -> &str {
+            &self.url
         }
     }
 
     fn router_with(outcome: ProbeOutcome) -> Router {
         Router::new().route(
             "/api/status",
-            get(status_handler).with_state(Arc::new(MockProbe(outcome))),
+            get(status_handler).with_state(Arc::new(MockProbe {
+                outcome,
+                url: TEST_KANIDM_URL.to_string(),
+            })),
         )
     }
 
@@ -418,6 +493,7 @@ mod tests {
         let body = get_status(outcome(true, Some("9999.0.0"))).await;
         assert_eq!(body["state"], json!("alive"));
         assert_eq!(body["serverVersion"], json!("9999.0.0"));
+        assert_eq!(body["kanidmUrl"], json!(TEST_KANIDM_URL));
         assert!(
             body["clientVersion"].as_str().is_some_and(|v| !v.is_empty()),
             "clientVersion must be a non-empty string: {body}"

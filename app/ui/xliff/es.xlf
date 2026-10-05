@@ -2582,6 +2582,42 @@
   <source>Select language</source>
   <target>Seleccionar idioma</target>
 </trans-unit>
+<trans-unit id="safdb211ae5c278c4">
+  <source>Reset code copied to clipboard.</source>
+  <target>Código de restablecimiento copiado al portapapeles.</target>
+</trans-unit>
+<trans-unit id="s95b1ac44c8953a35">
+  <source>Reset code</source>
+  <target>Código de restablecimiento</target>
+</trans-unit>
+<trans-unit id="sc7cae0914551bb10">
+  <source>Reset link</source>
+  <target>Enlace de restablecimiento</target>
+</trans-unit>
+<trans-unit id="s4f013b4c82c08809">
+  <source>Copy code</source>
+  <target>Copiar código</target>
+</trans-unit>
+<trans-unit id="s19172ed3838854fc">
+  <source>Copy link</source>
+  <target>Copiar enlace</target>
+</trans-unit>
+<trans-unit id="s198eb4f161373c15">
+  <source>Hide QR code</source>
+  <target>Ocultar código QR</target>
+</trans-unit>
+<trans-unit id="s750f312e6ef461e4">
+  <source>Show QR code</source>
+  <target>Mostrar código QR</target>
+</trans-unit>
+<trans-unit id="sc26cb9574bdc036c">
+  <source>QR code with the credential reset link</source>
+  <target>Código QR con el enlace de restablecimiento de credenciales</target>
+</trans-unit>
+<trans-unit id="s2f96c13ece2cac42">
+  <source>Copy QR image</source>
+  <target>Copiar imagen del QR</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

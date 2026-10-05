@@ -73,6 +73,18 @@ export const personCredentialsTabStyles = css`
     color: var(--theme-color-text-secondary);
   }
 
+  .intent-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .intent-field-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--theme-color-text-muted);
+  }
+
   .intent-token {
     font-size: 0.8125rem;
     color: var(--theme-color-text-primary);
@@ -82,8 +94,35 @@ export const personCredentialsTabStyles = css`
     border-radius: 6px;
   }
 
+  .intent-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
   .intent-panel .btn {
     align-self: flex-start;
+  }
+
+  .qr-block {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    align-self: flex-start;
+    padding: 0.75rem;
+    background: var(--theme-color-background);
+    border: 1px solid var(--theme-color-border);
+    border-radius: 6px;
+  }
+
+  /* QR codes must stay black-on-white for scanners to read them, so the
+     backdrop is fixed and intentionally not themed. */
+  .qr-image {
+    display: block;
+    width: 10rem;
+    height: 10rem;
+    background: #ffffff;
+    border-radius: 4px;
   }
 
   .cred-list {

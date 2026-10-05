@@ -2582,6 +2582,42 @@
   <source>Select language</source>
   <target>Выбрать язык</target>
 </trans-unit>
+<trans-unit id="safdb211ae5c278c4">
+  <source>Reset code copied to clipboard.</source>
+  <target>Код сброса скопирован в буфер обмена.</target>
+</trans-unit>
+<trans-unit id="s95b1ac44c8953a35">
+  <source>Reset code</source>
+  <target>Код сброса</target>
+</trans-unit>
+<trans-unit id="sc7cae0914551bb10">
+  <source>Reset link</source>
+  <target>Ссылка для сброса</target>
+</trans-unit>
+<trans-unit id="s4f013b4c82c08809">
+  <source>Copy code</source>
+  <target>Копировать код</target>
+</trans-unit>
+<trans-unit id="s19172ed3838854fc">
+  <source>Copy link</source>
+  <target>Копировать ссылку</target>
+</trans-unit>
+<trans-unit id="s198eb4f161373c15">
+  <source>Hide QR code</source>
+  <target>Скрыть QR-код</target>
+</trans-unit>
+<trans-unit id="s750f312e6ef461e4">
+  <source>Show QR code</source>
+  <target>Показать QR-код</target>
+</trans-unit>
+<trans-unit id="sc26cb9574bdc036c">
+  <source>QR code with the credential reset link</source>
+  <target>QR-код со ссылкой для сброса учётных данных</target>
+</trans-unit>
+<trans-unit id="s2f96c13ece2cac42">
+  <source>Copy QR image</source>
+  <target>Копировать QR-изображение</target>
+</trans-unit>
 </body>
 </file>
 </xliff>
