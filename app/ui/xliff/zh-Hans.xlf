@@ -2697,6 +2697,18 @@
 <trans-unit id="se50bb7aee2221dff">
   <source>Delete failed</source>
       <target>删除失败</target></trans-unit>
+<trans-unit id="s0813a0996a8629be">
+  <source>Mandatory two-factor authentication</source>
+  <target>强制双因素认证</target>
+</trans-unit>
+<trans-unit id="s24e18d887a171fb3">
+  <source>Applies to all persons. While enabled, password-only credentials cannot be saved: MFA (TOTP or passkey) is required. Turning it off allows password-only logins.</source>
+  <target>适用于所有 persons。启用期间无法保存仅密码的凭据：必须使用 MFA（TOTP 或 passkey）。关闭后允许仅凭密码登录。</target>
+</trans-unit>
+<trans-unit id="s9ea1038d8fcb8fd9">
+  <source>Failed to update the two-factor policy</source>
+  <target>无法更新双因素认证策略</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

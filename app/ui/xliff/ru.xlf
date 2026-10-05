@@ -2697,6 +2697,18 @@
 <trans-unit id="se50bb7aee2221dff">
   <source>Delete failed</source>
       <target>Не удалось удалить</target></trans-unit>
+<trans-unit id="s0813a0996a8629be">
+  <source>Mandatory two-factor authentication</source>
+  <target>Обязательная двухфакторная аутентификация</target>
+</trans-unit>
+<trans-unit id="s24e18d887a171fb3">
+  <source>Applies to all persons. While enabled, password-only credentials cannot be saved: MFA (TOTP or passkey) is required. Turning it off allows password-only logins.</source>
+  <target>Действует на все учётные записи persons. Пока включено, сохранить доступ только по паролю нельзя — потребуется MFA (TOTP или passkey). При выключении разрешён вход по одному паролю.</target>
+</trans-unit>
+<trans-unit id="s9ea1038d8fcb8fd9">
+  <source>Failed to update the two-factor policy</source>
+  <target>Не удалось обновить политику двухфакторной аутентификации</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

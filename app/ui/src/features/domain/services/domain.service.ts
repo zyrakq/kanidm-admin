@@ -92,6 +92,46 @@ class DomainService {
   }
 
   /**
+   * The account-policy minimum credential type enforced on all persons
+   * (vendor idm_all_persons credential_type_minimum). Read from the
+   * group entry; null = attr unset = policy 'any' (server default).
+   */
+  async getCredentialTypeMinimum(): Promise<
+    'any' | 'mfa' | 'passkey' | 'attested_passkey' | null
+  > {
+    const entries = await apiFetch<KanidmEntry[]>(
+      `${BASE}/group/idm_all_persons`
+    );
+    const value = entries[0]?.attrs['credential_type_minimum']?.[0];
+    if (
+      value === 'any' ||
+      value === 'mfa' ||
+      value === 'passkey' ||
+      value === 'attested_passkey'
+    ) {
+      return value;
+    }
+    return null;
+  }
+
+  /**
+   * Set the minimum credential type on idm_all_persons (vendor
+   * group_account_policy_credential_type_minimum_set: PUT
+   * /v1/group/{id}/_attr/credential_type_minimum).
+   */
+  async setCredentialTypeMinimum(
+    value: 'any' | 'mfa' | 'passkey' | 'attested_passkey'
+  ): Promise<void> {
+    await apiFetch<void>(
+      `${BASE}/group/idm_all_persons/_attr/credential_type_minimum`,
+      {
+        method: 'PUT',
+        body: JSON.stringify([value]),
+      }
+    );
+  }
+
+  /**
    * Upload the domain image (vendor idm_domain_update_image: POST
    * /v1/domain/_image multipart with a part named "image"). The FormData
    * keeps the browser-generated multipart boundary (http-client never
