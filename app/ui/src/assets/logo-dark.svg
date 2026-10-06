@@ -1,96 +1,33 @@
-<svg width="140" height="140" viewBox="30 30 140 140" xmlns="http://www.w3.org/2000/svg">
-    <style>
-        .body {
-            fill: #10B981;
-        }
-
-        .shell {
-            fill: #059669;
-        }
-
-        .dark {
-            fill: #047857;
-        }
-    </style>
-
-    <!-- SHELL -->
-    <path d="M 60,95 
-           C 60,85 70,80 100,80 
-           C 130,80 140,85 140,95
-           L 145,110
-           C 145,125 130,135 100,135
-           C 70,135 55,125 55,110
-           Z" class="body" stroke="#047857" stroke-width="2" />
-
-    <!-- Shell texture -->
-    <ellipse cx="100" cy="100" rx="35" ry="22" fill="none" stroke="#047857" stroke-width="1.5" opacity="0.3" />
-    <path d="M 75,100 Q 100,95 125,100" fill="none" stroke="#047857" stroke-width="1.5" opacity="0.3" />
-    <path d="M 70,110 Q 100,105 130,110" fill="none" stroke="#047857" stroke-width="1.5" opacity="0.3" />
-
-    <!-- LEGS -->
-    <g class="shell">
-        <path d="M 75,100 Q 60,100 50,110 L 45,125" fill="none" stroke="#059669" stroke-width="4"
-            stroke-linecap="round" />
-        <path d="M 70,108 Q 55,112 48,118 L 44,132" fill="none" stroke="#059669" stroke-width="4"
-            stroke-linecap="round" />
-        <path d="M 68,115 Q 55,122 50,128 L 48,140" fill="none" stroke="#059669" stroke-width="4"
-            stroke-linecap="round" />
-        <path d="M 70,122 Q 60,130 55,135 L 54,145" fill="none" stroke="#059669" stroke-width="4"
-            stroke-linecap="round" />
-
-        <path d="M 125,100 Q 140,100 150,110 L 155,125" fill="none" stroke="#059669" stroke-width="4"
-            stroke-linecap="round" />
-        <path d="M 130,108 Q 145,112 152,118 L 156,132" fill="none" stroke="#059669" stroke-width="4"
-            stroke-linecap="round" />
-        <path d="M 132,115 Q 145,122 150,128 L 152,140" fill="none" stroke="#059669" stroke-width="4"
-            stroke-linecap="round" />
-        <path d="M 130,122 Q 140,130 145,135 L 146,145" fill="none" stroke="#059669" stroke-width="4"
-            stroke-linecap="round" />
+<svg width="140" height="140" viewBox="6 3 126 126" xmlns="http://www.w3.org/2000/svg">
+  <title>Kanidm Admin</title>
+  <defs>
+    <filter id="sticker" x="-10%" y="-10%" width="120%" height="120%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="1.3" result="d"/>
+      <feFlood flood-color="#ffffff"/>
+      <feComposite in2="d" operator="in" result="o"/>
+      <feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#sticker)"><g transform="matrix(0.91407203,0,0,0.91407203,-34.121105,-24.362694)">
+    <path d="m 62.537712,110.23377 c -3.36297,8.12708 5.78522,15.61876 5.82446,15.73981 -1.67096,-4.90156 -3.43697,-8.85836 -0.189,-12.28424" style="fill:#803300;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round" /> 
+    <path style="fill:#803300;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round" d="m 138.4423,109.69923 c 3.36297,8.12708 -5.78522,15.61876 -5.82446,15.7398 1.67096,-4.90155 3.43697,-8.85835 0.189,-12.28423" /> 
+    <path d="m 100.24698,67.21217 c -1.308628,-0.01556 -2.560878,2.352773 -4.890668,6.986654 -7.05187,-7.755768 -7.41258,-7.849666 -9.84229,2.649966 -0.11364,0.04758 -0.22709,0.0959 -0.34055,0.144695 -8.88231,-5.324406 -9.34124,-5.366051 -8.66717,5.041551 -0.21569,0.159933 -0.43121,0.322088 -0.64596,0.486794 -9.102,-3.605578 -9.49555,-3.378386 -7.19232,6.611477 -0.10784,0.11671 -0.21599,0.23284 -0.3235,0.35089 -9.27685,-2.506375 -9.53641,-2.129764 -6.07663,7.65845 -0.14847,0.21295 -0.29578,0.42957 -0.44338,0.64544 -10.45618,-1.11775 -10.67098,-0.91353 -5.35523,8.828413 -0.026,0.0482 -0.0526,0.0943 -0.0786,0.14263 -4.28381,2.04782 -5.70197,4.54381 -7.73183,7.89409 -0.15756,6.64457 6.9544,12.37105 17.18035,18.87895 -3.51325,-6.5113 -9.00735,-9.81207 -10.0614,-17.88832 1.54367,-2.90538 4.16877,-3.90901 6.42286,-5.21622 24.61995,14.36815 50.615808,14.53471 76.550928,-0.55035 2.26015,1.31503 4.90084,2.31509 6.45076,5.23224 -1.05405,8.07624 -6.54866,11.3765 -10.06191,17.8878 10.22594,-6.5079 17.33842,-12.23387 17.18086,-18.87844 -1.97354,-3.25733 -3.37677,-5.706 -7.38973,-7.72149 5.01291,-9.218263 4.53571,-9.305023 -5.98567,-8.177293 -0.0891,-0.1152 -0.17795,-0.23186 -0.26717,-0.34623 3.63467,-10.261532 3.40665,-10.529692 -6.39186,-7.87136 2.47993,-10.705895 2.14854,-10.749554 -7.77938,-6.803718 0.74781,-11.285018 0.47993,-11.261581 -8.88835,-5.642548 -2.49815,-10.818768 -2.79293,-10.786576 -9.94048,-2.924887 -2.68846,-4.933638 -4.10296,-7.403383 -5.43173,-7.419184 z" style="fill:#ff6600;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round" /> 
+    <g transform="translate(-2.3193819,-7.5517449)" style="display:inline"> <path style="fill:#d45500;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter" d="m 98.808992,121.55238 c -0.682767,-0.0559 4.468828,10.17565 8.051908,0.17277 0.24133,-0.67372 -3.69223,2.90976 -8.051908,-0.17277 z" /> <g> <path style="fill:#000000;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 93.212672,111.5632 c -5.131386,10.99206 5.618332,14.73472 4.412511,4.11951 -0.319289,-3.2881 -2.328089,-7.17448 -4.412511,-4.11951 z" /> <path style="fill:#ffffff;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="m 95.394393,112.41429 c -1.183441,1.51896 -0.08172,3.83605 -0.09872,3.98526 1.674403,1.64132 1.61267,-4.77034 0.09872,-3.98526 z" /> </g> <g> <path d="m 109.6169,111.5632 c -5.13141,10.99206 5.61836,14.73472 4.41254,4.11951 -0.31929,-3.2881 -2.3281,-7.17448 -4.41254,-4.11951 z" style="fill:#000000;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /> <path d="m 111.79864,112.41429 c -1.18345,1.51896 -0.0817,3.83605 -0.0987,3.98526 1.67441,1.64132 1.61267,-4.77034 0.0987,-3.98526 z" style="fill:#ffffff;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /> </g> </g> 
+    <path d="m 75.334492,106.8255 c -0.51041,0.004 -0.85068,0.0544 -0.79478,0.0889 0,0 -9.13406,11.93611 0.31006,18.65881 a 9.7471106,8.2770874 37.793943 0 0 1.43712,9.42372 9.7471106,8.2770874 37.793943 0 0 10.56473,3.9672 l -3.56412,-8.60569 9.19685,0.73536 a 9.7471106,8.2770874 37.793943 0 0 -7.02645,-8.91057 9.7471106,8.2770874 37.793943 0 0 -7.00784,0.009 c -1.86231,-1.36401 -4.6287,-4.92596 -0.0408,-12.47521 1.51807,-2.49795 -1.54349,-2.90314 -3.07475,-2.89129 z" style="fill:#ff6600;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:round" /> 
+    <g transform="translate(130.49 72.36) rotate(-29.2)">
+      <rect x="0" y="0" width="31.3" height="43.9" rx="2.6" fill="#ffffff" stroke="#000" stroke-width="1" stroke-linejoin="round"/>
+      <rect x="11.6" y="2.2" width="8.1" height="2.2" rx="1.1" fill="#2a3455" stroke="#000" stroke-width=".5"/>
+      <rect x="1.8" y="7" width="27.7" height="7.5" fill="#ff6600" stroke="#000" stroke-width=".5"/>
+      <text x="15.65" y="12.6" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="4.6" fill="#fff" stroke="#000" stroke-width=".25" paint-order="stroke">KANIDM</text>
+      <rect x="9.4" y="17.2" width="12.5" height="12.5" rx="1" fill="#2a3455" stroke="#000" stroke-width=".5"/>
+      <circle cx="15.65" cy="21.9" r="2.6" fill="#cccccc"/>
+      <path d="M10.6 29.7c.3-3.6 2.4-5 5.05-5s4.75 1.4 5.05 5z" fill="#cccccc"/>
+      <rect x="6" y="31.6" width="19.3" height="1.3" rx=".65" fill="#b1b3b8"/>
+      <rect x="8.5" y="34" width="14.3" height="1.3" rx=".65" fill="#b1b3b8"/>
+      <rect x="3.6" y="37.4" width="24.1" height="4.4" rx="1" fill="#FFD700" stroke="#000" stroke-width=".6"/>
+      <text x="15.65" y="40.8" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="3.4" fill="#2a3455" letter-spacing=".3">ADMIN</text>
     </g>
-
-    <!-- CLAWS -->
-    <g>
-        <ellipse cx="72" cy="90" rx="8" ry="10" class="shell" transform="rotate(-20 72 90)" />
-        <g transform="translate(55, 75)">
-            <ellipse cx="0" cy="0" rx="13" ry="11" class="shell" />
-            <path d="M -9,-5 Q -16,-9 -19,-6 L -15,-3 Z" class="dark" />
-            <path d="M -9,5 Q -16,9 -19,6 L -15,3 Z" class="dark" />
-        </g>
-
-        <ellipse cx="128" cy="90" rx="8" ry="10" class="shell" transform="rotate(20 128 90)" />
-        <g transform="translate(145, 75)">
-            <ellipse cx="0" cy="0" rx="13" ry="11" class="shell" />
-            <path d="M 9,-5 Q 16,-9 19,-6 L 15,-3 Z" class="dark" />
-            <path d="M 9,5 Q 16,9 19,6 L 15,3 Z" class="dark" />
-        </g>
-    </g>
-
-    <!-- EYES ON STALKS -->
-    <g>
-        <line x1="85" y1="85" x2="82" y2="68" stroke="#059669" stroke-width="4" stroke-linecap="round" />
-        <circle cx="82" cy="63" r="9" fill="white" stroke="#059669" stroke-width="2.5" />
-        <circle cx="84" cy="63" r="6" fill="#2D3748" />
-        <circle cx="86" cy="61" r="3" fill="white" />
-
-        <line x1="115" y1="85" x2="118" y2="68" stroke="#059669" stroke-width="4" stroke-linecap="round" />
-        <circle cx="118" cy="63" r="9" fill="white" stroke="#059669" stroke-width="2.5" />
-        <circle cx="120" cy="63" r="6" fill="#2D3748" />
-        <circle cx="122" cy="61" r="3" fill="white" />
-    </g>
-
-    <!-- MOUTH -->
-    <path d="M 90,118 Q 100,125 110,118" fill="none" stroke="#047857" stroke-width="3" stroke-linecap="round" />
-
-    <!-- PASSPORT -->
-    <g>
-        <rect x="82" y="96" width="36" height="26" rx="2.5" fill="white" stroke="#059669" stroke-width="3" />
-        <rect x="86" y="100" width="12" height="16" rx="1.5" class="shell" />
-        <line x1="101" y1="102" x2="113" y2="102" stroke="#059669" stroke-width="2" stroke-linecap="round" />
-        <line x1="101" y1="107" x2="113" y2="107" stroke="#059669" stroke-width="2" stroke-linecap="round" />
-        <line x1="101" y1="112" x2="110" y2="112" stroke="#059669" stroke-width="2" stroke-linecap="round" />
-
-        <rect x="86" y="117" width="28" height="4" rx="1" fill="#FFD700" />
-        <text x="90" y="120" font-family="Arial, sans-serif" font-size="4" fill="#2D3748"
-            font-weight="bold">ADMIN</text>
-    </g>
+    <path d="m 145.61485,98.730679 c 3.50932,-3.1137 4.19635,-7.01138 3.17635,-11.38324 l -7.3914,3.83317 z" style="fill:#ffffff;stroke:#000;stroke-width:1;stroke-linejoin:round" />
+    <path d="m 136.84733,83.996879 c -2.18137,1.42401 -3.84498,3.66555 -4.59874,6.19631 -0.99138,3.35068 -0.25622,6.742 1.91889,8.85192 -3.57942,9.769591 -10.05414,6.555411 -10.19096,6.426891 -1.10017,-0.85629 -5.17794,3.63047 0.53268,5.22929 8.92019,2.49747 12.77572,-5.47478 14.1562,-9.67038 2.45132,0.18756 5.02004,-0.78148 7.05239,-2.660471 3.06875,-2.84546 4.34444,-7.22212 3.15795,-10.83433 l -8.31186,4.20365 0.005,-1.29218 z" style="fill:#ff6600;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:round" /> 
+  </g></g>
 </svg>
