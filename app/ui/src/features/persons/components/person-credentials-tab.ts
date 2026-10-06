@@ -5,6 +5,14 @@ import { localized } from '@/features/localization';
 import { notificationService } from '@/features/notifications';
 import { authService } from '@/features/auth';
 import '@/shared/components/confirm-dialog';
+import '@/shared/components/modal-dialog';
+import '@/shared/components/form-field';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-copy-field';
+import '@/shared/components/ui-qr';
+import '@/shared/components/ui-empty-state';
+import '@/shared/components/ui-skeleton';
 import { kanidmStatusService } from '@/shared/services/kanidm-status.service';
 import { personService } from '../services/person.service';
 import { buildResetUrl, qrDataUrl, qrPngBlob } from '../utils/reset-link';
@@ -106,31 +114,6 @@ export class PersonCredentialsTab extends LitElement {
       return null;
     }
     return buildResetUrl(this.kanidmUrl, this.intentToken);
-  }
-
-  private async handleCopyToken(): Promise<void> {
-    if (!this.intentToken) {
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(this.intentToken);
-      notificationService.success(msg('Reset code copied to clipboard.'));
-    } catch {
-      notificationService.error(msg('Failed to copy to clipboard.'));
-    }
-  }
-
-  private async handleCopyLink(): Promise<void> {
-    const url = this.resetUrl;
-    if (!url) {
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(url);
-      notificationService.success(msg('Reset link copied to clipboard.'));
-    } catch {
-      notificationService.error(msg('Failed to copy to clipboard.'));
-    }
   }
 
   private toggleQr(): void {
@@ -279,22 +262,40 @@ export class PersonCredentialsTab extends LitElement {
   private renderCredRow(cred: { uuid: string; type_: CredentialDetailType }) {
     const hasTotp = this.totpLabelsOf(cred.type_).length > 0;
     return html`
-      <li class="cred-row">
-        <span class="cred-type">${credentialTypeLabel(cred.type_)}</span>
-        <span class="cred-uuid" title=${cred.uuid}>${cred.uuid}</span>
-        ${hasTotp
-          ? html`
-              <button
-                type="button"
-                class="btn btn-small btn-danger"
-                @click=${() => this.openMfaConfirm(cred)}
-              >
-                ${msg('Disable MFA')}
-              </button>
-            `
-          : nothing}
+      <li>
+        <ui-card interactive>
+          <div class="cred-row">
+            <div class="cred-main">
+              <span class="cred-type">${credentialTypeLabel(cred.type_)}</span>
+              <span class="cred-uuid" title=${cred.uuid}>${cred.uuid}</span>
+            </div>
+            ${hasTotp
+              ? html`
+                  <ui-button
+                    size="sm"
+                    variant="danger"
+                    @click=${() => this.openMfaConfirm(cred)}
+                  >
+                    ${msg('Disable MFA')}
+                  </ui-button>
+                `
+              : nothing}
+          </div>
+        </ui-card>
       </li>
     `;
+  }
+
+  private notifyCopied(): void {
+    notificationService.success(msg('Reset code copied to clipboard.'));
+  }
+
+  private notifyCopyFailed(): void {
+    notificationService.error(msg('Failed to copy to clipboard.'));
+  }
+
+  private notifyLinkCopied(): void {
+    notificationService.success(msg('Reset link copied to clipboard.'));
   }
 
   private renderIntentPanel() {
@@ -303,133 +304,119 @@ export class PersonCredentialsTab extends LitElement {
     }
     const url = this.resetUrl;
     return html`
-      <div class="intent-panel">
-        <div class="intent-label">${msg('Credential reset link')}</div>
-        <div class="intent-field">
-          <span class="intent-field-label">${msg('Reset code')}</span>
-          <code class="intent-token">${this.intentToken}</code>
-        </div>
-        ${url
-          ? html`
-              <div class="intent-field">
-                <span class="intent-field-label">${msg('Reset link')}</span>
-                <code class="intent-token">${url}</code>
-              </div>
-            `
-          : nothing}
-        <div class="intent-actions">
-          <button class="btn btn-secondary" @click=${this.handleCopyToken}>
-            ${msg('Copy code')}
-          </button>
+      <ui-card class="intent-card">
+        <div class="intent-body">
+          <h4 class="intent-title">${msg('Credential reset link')}</h4>
+          <ui-copy-field
+            label=${msg('Reset code')}
+            copy-label=${msg('Copy code')}
+            .value=${this.intentToken}
+            @copied=${this.notifyCopied}
+            @copy-failed=${this.notifyCopyFailed}
+          ></ui-copy-field>
           ${url
             ? html`
-                <button class="btn btn-secondary" @click=${this.handleCopyLink}>
-                  ${msg('Copy link')}
-                </button>
-                <button
-                  class="btn btn-secondary"
-                  aria-expanded=${this.qrOpen ? 'true' : 'false'}
-                  @click=${this.toggleQr}
-                >
-                  ${this.qrOpen ? msg('Hide QR code') : msg('Show QR code')}
-                </button>
+                <ui-copy-field
+                  label=${msg('Reset link')}
+                  copy-label=${msg('Copy link')}
+                  .value=${url}
+                  @copied=${this.notifyLinkCopied}
+                  @copy-failed=${this.notifyCopyFailed}
+                ></ui-copy-field>
+                <div class="intent-actions">
+                  <ui-button
+                    icon=${this.qrOpen ? 'chevron-up' : 'chevron-down'}
+                    aria-expanded=${this.qrOpen ? 'true' : 'false'}
+                    @click=${this.toggleQr}
+                  >
+                    ${this.qrOpen ? msg('Hide QR code') : msg('Show QR code')}
+                  </ui-button>
+                </div>
+                <ui-qr
+                  ?open=${this.qrOpen}
+                  .src=${qrDataUrl(url)}
+                  alt=${msg('QR code with the credential reset link')}
+                  copy-label=${msg('Copy QR image')}
+                  @copy=${this.handleCopyQrImage}
+                ></ui-qr>
               `
             : nothing}
         </div>
-        ${this.qrOpen && url ? this.renderQr(url) : nothing}
-      </div>
-    `;
-  }
-
-  private renderQr(url: string) {
-    return html`
-      <div class="qr-block">
-        <img
-          class="qr-image"
-          src=${qrDataUrl(url)}
-          alt=${msg('QR code with the credential reset link')}
-        />
-        <button class="btn btn-secondary" @click=${this.handleCopyQrImage}>
-          ${msg('Copy QR image')}
-        </button>
-      </div>
+      </ui-card>
     `;
   }
 
   private renderEmailModal() {
-    if (!this.emailModalOpen) {
-      return nothing;
-    }
     return html`
-      <div class="modal-backdrop" @click=${this.closeEmailModal}>
-        <div
-          class="modal"
-          role="dialog"
-          aria-modal="true"
-          aria-label=${msg('Email reset link')}
-          @click=${(event: Event) => event.stopPropagation()}
-        >
-          <h3 class="modal-title">${msg('Email reset link')}</h3>
-          <form @submit=${this.handleSendEmail}>
-            <label class="field">
-              <span class="field-label">${msg('Email address')}</span>
-              <input
-                type="email"
-                required
-                .value=${this.emailValue}
-                @input=${(event: Event & { target: HTMLInputElement }) =>
-                  (this.emailValue = event.target.value)}
-              />
-            </label>
-            <div class="modal-actions">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                @click=${this.closeEmailModal}
-              >
-                ${msg('Cancel')}
-              </button>
-              <button
-                type="submit"
-                class="btn btn-primary"
-                ?disabled=${this.submitting}
-              >
-                ${msg('Send')}
-              </button>
-            </div>
-          </form>
+      <modal-dialog
+        heading=${msg('Email reset link')}
+        .open=${this.emailModalOpen}
+        .busy=${this.submitting}
+        @modal-close=${this.closeEmailModal}
+      >
+        <form id="email-form" @submit=${this.handleSendEmail}>
+          <form-field
+            label=${msg('Email address')}
+            fieldId="reset-email"
+            type="email"
+            required
+            .value=${this.emailValue}
+            @field-input=${(event: CustomEvent<{ value: string }>) =>
+              (this.emailValue = event.detail.value)}
+            @keydown=${(event: KeyboardEvent) => {
+              if (event.key === 'Enter') void this.handleSendEmail(event);
+            }}
+          ></form-field>
+        </form>
+        <div slot="footer">
+          <ui-button ?disabled=${this.submitting} @click=${this.closeEmailModal}>
+            ${msg('Cancel')}
+          </ui-button>
+          <ui-button
+            variant="primary"
+            ?loading=${this.submitting}
+            ?disabled=${!this.emailValue.trim()}
+            @click=${this.handleSendEmail}
+          >
+            ${msg('Send')}
+          </ui-button>
         </div>
-      </div>
+      </modal-dialog>
     `;
   }
 
   render() {
     if (this.loading) {
-      return html`<p class="muted">${msg('Loading credentials…')}</p>`;
+      return html`
+        <div class="loading" role="status" aria-label=${msg('Loading credentials…')}>
+          <ui-skeleton height="40px"></ui-skeleton>
+          <ui-skeleton height="56px" .lines=${2}></ui-skeleton>
+        </div>
+      `;
     }
 
     return html`
       <section class="credentials">
         <div class="actions">
-          <button
-            class="btn btn-primary"
-            ?disabled=${this.submitting}
+          <ui-button
+            variant="primary"
+            ?loading=${this.submitting}
             @click=${this.handleCreateIntent}
           >
             ${msg('Create credential reset link')}
-          </button>
-          <button
-            class="btn btn-secondary"
+          </ui-button>
+          <ui-button
+            icon="mail"
             ?disabled=${this.submitting}
             @click=${this.openEmailModal}
           >
             ${msg('Email reset link')}
-          </button>
+          </ui-button>
         </div>
 
         ${this.renderIntentPanel()}
         ${this.creds.length === 0
-          ? html`<p class="muted">${msg('No credentials enrolled.')}</p>`
+          ? html`<ui-empty-state icon="key">${msg('No credentials enrolled.')}</ui-empty-state>`
           : html`
               <ul class="cred-list">
                 ${this.creds.map((cred) => this.renderCredRow(cred))}

@@ -10,6 +10,8 @@ import { localized } from '@/features/localization';
 import type { PropertyValues, TemplateResult } from 'lit';
 import './ui-icon';
 import './list-pager';
+import './ui-button';
+import './ui-skeleton';
 
 export interface TableColumn {
   /** Key used for search matching and default cell rendering. */
@@ -187,15 +189,15 @@ export class DataTable extends LitElement {
               <span class="selection-count">
                 ${msg(str`${this.selected.size} selected`)}
               </span>
-              <button
-                class="bar-btn bar-btn-danger"
-                type="button"
+              <ui-button
+                variant="danger-ghost"
+                size="sm"
+                icon="trash"
                 ?disabled=${this.selected.size === 0}
                 @click=${() => this.handleBulkDelete()}
               >
-                <ui-icon name="trash" size="14"></ui-icon>
                 ${msg('Delete selected')}
-              </button>
+              </ui-button>
             </div>
           `
         : nothing}
@@ -225,9 +227,13 @@ export class DataTable extends LitElement {
           </thead>
           <tbody>
             ${this.loading
-              ? html`<tr class="state-row">
-                  <td colspan=${colCount}>${msg('Loading...')}</td>
-                </tr>`
+              ? [0, 1, 2].map(
+                  () => html`<tr class="skeleton-row">
+                    <td colspan=${colCount}>
+                      <ui-skeleton height="16px"></ui-skeleton>
+                    </td>
+                  </tr>`
+                )
               : filtered.length === 0
                 ? html`<tr class="state-row">
                     <td colspan=${colCount}>
@@ -287,9 +293,22 @@ export class DataTable extends LitElement {
       gap: 8px;
       padding: 8px 12px;
       border: 1px solid var(--theme-color-border);
-      border-radius: 6px;
+      border-radius: var(--theme-radius-md);
+      background: var(--theme-color-surface-sunken);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
       margin-bottom: 12px;
       color: var(--theme-color-text-muted);
+      transition:
+        border-color var(--theme-duration-fast) var(--theme-ease),
+        box-shadow var(--theme-duration-fast) var(--theme-ease);
+    }
+    .search:hover {
+      border-color: var(--theme-color-border-strong);
+    }
+    .search:focus-within {
+      border-color: var(--theme-color-primary);
+      box-shadow: var(--theme-focus-ring);
+      color: var(--theme-color-text-secondary);
     }
     .search input {
       box-sizing: border-box;
@@ -303,8 +322,9 @@ export class DataTable extends LitElement {
     .table-wrap {
       overflow-x: auto;
       border: 1px solid var(--theme-color-border);
-      border-radius: 8px;
+      border-radius: var(--theme-radius-lg);
       background: var(--theme-color-surface);
+      box-shadow: var(--theme-elevation-1), var(--theme-highlight);
     }
     table {
       width: 100%;
@@ -314,13 +334,17 @@ export class DataTable extends LitElement {
     th {
       text-align: left;
       padding: 10px 14px;
+      font-size: 12px;
       font-weight: 600;
-      color: var(--theme-color-text-secondary);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--theme-color-text-muted);
+      background: var(--theme-color-surface-sunken);
       border-bottom: 1px solid var(--theme-color-border);
       white-space: nowrap;
     }
     td {
-      padding: 10px 14px;
+      padding: 12px 14px;
       color: var(--theme-color-text-primary);
       border-bottom: 1px solid var(--theme-color-border);
     }
@@ -329,16 +353,19 @@ export class DataTable extends LitElement {
     }
     .data-row {
       cursor: pointer;
-      transition: background-color 0.15s ease;
+      transition: background-color var(--theme-duration-fast) var(--theme-ease);
     }
     .data-row:hover {
-      background: var(--theme-color-background);
+      background: var(--theme-color-surface-hover);
     }
     .state-row td {
       text-align: center;
       color: var(--theme-color-text-muted);
-      padding: 24px 14px;
+      padding: 28px 14px;
       cursor: default;
+    }
+    .skeleton-row td {
+      padding: 14px;
     }
     .col-select {
       width: 36px;
@@ -359,16 +386,21 @@ export class DataTable extends LitElement {
       height: 28px;
       padding: 0;
       border: none;
-      border-radius: 6px;
+      border-radius: var(--theme-radius-sm);
       background: none;
       color: var(--theme-color-error);
       cursor: pointer;
       vertical-align: middle;
-      transition: color 0.15s ease, background-color 0.15s ease;
+      transition:
+        color var(--theme-duration-fast) var(--theme-ease),
+        background-color var(--theme-duration-fast) var(--theme-ease);
     }
     .btn-delete:hover {
-      background: var(--theme-color-error);
-      color: #ffffff;
+      background: var(--theme-color-error-soft);
+    }
+    .btn-delete:focus-visible {
+      outline: none;
+      box-shadow: var(--theme-focus-ring);
     }
     .mono {
       font-family: var(--theme-font-mono, monospace);
@@ -380,44 +412,15 @@ export class DataTable extends LitElement {
       gap: 12px;
       padding: 8px 12px;
       border: 1px solid var(--theme-color-border);
-      border-radius: 6px;
+      border-radius: var(--theme-radius-md);
       background: var(--theme-color-surface);
+      box-shadow: var(--theme-elevation-1), var(--theme-highlight);
       margin-bottom: 12px;
     }
     .selection-count {
       font-size: 14px;
       font-weight: 500;
       color: var(--theme-color-text-primary);
-    }
-    .bar-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border: none;
-      border-radius: 6px;
-      padding: 4px 8px;
-      font: inherit;
-      font-size: 14px;
-      background: transparent;
-      color: var(--theme-color-text-secondary);
-      cursor: pointer;
-      transition: background-color 0.15s ease, color 0.15s ease;
-    }
-    .bar-btn:hover:not(:disabled) {
-      background: var(--theme-color-background);
-      color: var(--theme-color-text-primary);
-    }
-    .bar-btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-    .bar-btn-danger {
-      color: var(--theme-color-error);
-      font-weight: 500;
-    }
-    .bar-btn-danger:hover:not(:disabled) {
-      background: var(--theme-color-error);
-      color: #ffffff;
     }
   `;
 }

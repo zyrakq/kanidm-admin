@@ -15,7 +15,10 @@ import '@/shared/components/modal-dialog';
 import '@/shared/components/confirm-dialog';
 import '@/shared/components/form-field';
 import '@/shared/components/tab-bar';
-import '@/shared/components/ui-icon';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-badge';
+import '@/shared/components/ui-skeleton';
 import type { TableColumn } from '@/shared/components/data-table';
 import type { MessageDetail, MessageSummary } from '../types/message.types';
 import { messageService } from '../services/message.service';
@@ -134,8 +137,8 @@ export class MessagesPage extends LitElement {
         header: msg('Sent'),
         render: (row) =>
           row.sentAt
-            ? html`<span class="badge sent">${msg('Sent')}</span>`
-            : html`<span class="badge">${msg('Pending')}</span>`,
+            ? html`<ui-badge variant="success">${msg('Sent')}</ui-badge>`
+            : html`<ui-badge>${msg('Pending')}</ui-badge>`,
       },
       { key: 'mailDestination', header: msg('Mail destination') },
     ];
@@ -143,7 +146,7 @@ export class MessagesPage extends LitElement {
 
   private renderDetail(): unknown {
     if (this.detailLoading) {
-      return html`<p>${msg('Loading...')}</p>`;
+      return html`<ui-skeleton height="20px" .lines=${4}></ui-skeleton>`;
     }
     if (!this.detail) {
       return nothing;
@@ -206,25 +209,26 @@ export class MessagesPage extends LitElement {
           @tab-change=${this.handleTabChange}
         ></tab-bar>
 
-        <div class="send-test-card">
-          <form-field
-            label=${msg('Person name')}
-            fieldId="message-send-test-person"
-            .value=${this.sendTestPerson}
-            placeholder="william"
-            @field-input=${(e: CustomEvent<{ value: string }>) =>
-              (this.sendTestPerson = e.detail.value)}
-          ></form-field>
-          <button
-            class="btn-primary"
-            type="button"
-            ?disabled=${this.sendTestBusy}
-            @click=${() => void this.submitSendTest()}
-          >
-            <ui-icon name="send" size="16"></ui-icon>
-            ${this.sendTestBusy ? msg('Working...') : msg('Send')}
-          </button>
-        </div>
+        <ui-card class="send-test-card">
+          <div class="send-test-row">
+            <form-field
+              label=${msg('Person name')}
+              fieldId="message-send-test-person"
+              .value=${this.sendTestPerson}
+              placeholder="william"
+              @field-input=${(e: CustomEvent<{ value: string }>) =>
+                (this.sendTestPerson = e.detail.value)}
+            ></form-field>
+            <ui-button
+              variant="primary"
+              ?loading=${this.sendTestBusy}
+              @click=${() => void this.submitSendTest()}
+              icon="send"
+            >
+              ${msg('Send')}
+            </ui-button>
+          </div>
+        </ui-card>
 
         <data-table
           .columns=${this.columns}
@@ -247,22 +251,19 @@ export class MessagesPage extends LitElement {
         >
           ${this.renderDetail()}
           <div slot="footer">
-            <button
-              class="btn-secondary"
-              type="button"
+            <ui-button
               ?disabled=${this.markSentBusy}
               @click=${() => (this.detail = null)}
             >
               ${msg('Close')}
-            </button>
-            <button
-              class="btn-primary"
-              type="button"
+            </ui-button>
+            <ui-button
+              variant="primary"
               ?disabled=${this.markSentBusy || !this.detail}
               @click=${() => (this.confirmOpen = true)}
             >
               ${msg('Mark sent')}
-            </button>
+            </ui-button>
           </div>
         </modal-dialog>
 

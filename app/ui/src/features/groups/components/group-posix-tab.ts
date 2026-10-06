@@ -9,6 +9,10 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-skeleton';
+import '@/shared/components/form-field';
 import { groupService } from '../services/group.service';
 import type { GroupDetail } from '../types/group.types';
 
@@ -97,26 +101,26 @@ export class GroupPosixTab extends LitElement {
     if (!detail.isPosix) {
       return html`
         <p class="muted">${msg('This group is not POSIX-enabled.')}</p>
-        <section class="card">
-          <h2>${msg('Enable POSIX')}</h2>
+        <ui-card>
+          <h2 slot="header">${msg('Enable POSIX')}</h2>
           ${this.renderGidField()}
           <div class="actions">
-            <button
-              class="primary-btn"
-              ?disabled=${this.saving}
+            <ui-button
+              variant="primary"
+              ?loading=${this.saving}
               @click=${() => void this.savePosix()}
             >
               ${this.saving ? msg('Enabling...') : msg('Enable POSIX')}
-            </button>
+            </ui-button>
           </div>
-        </section>
+        </ui-card>
       `;
     }
     return html`
-      <section class="card">
-        <h2>${msg('POSIX details')}</h2>
+      <ui-card>
+        <h2 slot="header">${msg('POSIX details')}</h2>
         ${this.tokenLoading
-          ? html`<p class="muted">${msg('Loading POSIX details...')}</p>`
+          ? html`<ui-skeleton lines="3"></ui-skeleton>`
           : this.token
             ? html`
                 <dl class="token">
@@ -141,15 +145,15 @@ export class GroupPosixTab extends LitElement {
             : nothing}
         ${this.renderGidField()}
         <div class="actions">
-          <button
-            class="primary-btn"
-            ?disabled=${this.saving}
+          <ui-button
+            variant="primary"
+            ?loading=${this.saving}
             @click=${() => void this.savePosix()}
           >
             ${this.saving ? msg('Saving...') : msg('Save GID number')}
-          </button>
+          </ui-button>
         </div>
-      </section>
+      </ui-card>
     `;
   }
 
@@ -162,16 +166,11 @@ export class GroupPosixTab extends LitElement {
       font-size: 14px;
       color: var(--theme-color-text-muted);
     }
-    .card {
-      background: var(--theme-color-surface);
-      border: 1px solid var(--theme-color-border);
-      border-radius: 8px;
-      padding: 20px;
+    ui-card {
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
-    .card h2 {
-      margin: 0 0 16px;
+    h2 {
+      margin: 0;
       font-size: 16px;
       font-weight: 600;
       color: var(--theme-color-text-primary);
@@ -204,27 +203,6 @@ export class GroupPosixTab extends LitElement {
     .actions {
       display: flex;
       justify-content: flex-end;
-    }
-    .primary-btn {
-      padding: 9px 16px;
-      border: none;
-      border-radius: 6px;
-      background: var(--theme-color-primary);
-      color: var(--theme-color-surface);
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    .primary-btn:hover:not(:disabled) {
-      background: var(--theme-color-primary-hover);
-    }
-    .primary-btn:active:not(:disabled) {
-      background: var(--theme-color-primary-active);
-    }
-    .primary-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
   `;
 }

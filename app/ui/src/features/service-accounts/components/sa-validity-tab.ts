@@ -9,6 +9,10 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
+import '@/shared/components/form-field';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-skeleton';
 import { serviceAccountService } from '../services/service-account.service';
 import type { ServiceAccountDetail } from '../types/service-account.types';
 
@@ -144,14 +148,12 @@ export class SaValidityTab extends LitElement {
 
   render() {
     if (!this.sa) {
-      return html`<p class="muted">
-        ${this.loading
-          ? msg('Loading...')
-          : msg('Service account not available.')}
-      </p>`;
+      return this.loading
+        ? html`<ui-skeleton height="56px" .lines=${2}></ui-skeleton>`
+        : html`<p class="muted">${msg('Service account not available.')}</p>`;
     }
     return html`
-      <section class="card">
+      <ui-card class="card">
         <h2>${msg('Account validity')}</h2>
         <form-field
           type="datetime-local"
@@ -176,15 +178,15 @@ export class SaValidityTab extends LitElement {
           }}
         ></form-field>
         <div class="actions">
-          <button
-            class="primary-btn"
-            ?disabled=${this.saving}
+          <ui-button
+            variant="primary"
+            ?loading=${this.saving}
             @click=${this.applyValidity}
           >
-            ${this.saving ? msg('Applying...') : msg('Apply')}
-          </button>
+            ${msg('Apply')}
+          </ui-button>
         </div>
-      </section>
+      </ui-card>
     `;
   }
 
@@ -193,12 +195,7 @@ export class SaValidityTab extends LitElement {
       display: block;
     }
     .card {
-      background: var(--theme-color-surface);
-      border: 1px solid var(--theme-color-border);
-      border-radius: 8px;
-      padding: 20px;
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
     .card h2 {
       margin: 0 0 16px;
@@ -214,27 +211,6 @@ export class SaValidityTab extends LitElement {
     .actions {
       display: flex;
       justify-content: flex-end;
-    }
-    .primary-btn {
-      padding: 9px 16px;
-      border: none;
-      border-radius: 6px;
-      background: var(--theme-color-primary);
-      color: var(--theme-color-surface);
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    .primary-btn:hover:not(:disabled) {
-      background: var(--theme-color-primary-hover);
-    }
-    .primary-btn:active:not(:disabled) {
-      background: var(--theme-color-primary-active);
-    }
-    .primary-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
     form-field {
       display: block;

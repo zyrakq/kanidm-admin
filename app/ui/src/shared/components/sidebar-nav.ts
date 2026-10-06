@@ -88,21 +88,29 @@ export class SidebarNav extends LitElement {
       align-items: center;
       gap: 10px;
       padding: 9px 12px;
-      border-radius: 6px;
+      border-radius: var(--theme-radius-md);
       color: var(--theme-color-text-secondary);
       text-decoration: none;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      transition: background-color 0.2s ease, color 0.2s ease;
+      transition:
+        background-color var(--theme-duration-fast) var(--theme-ease),
+        color var(--theme-duration-fast) var(--theme-ease),
+        box-shadow var(--theme-duration-fast) var(--theme-ease);
     }
     .item:hover {
-      background: var(--theme-color-background);
+      background: var(--theme-color-surface-hover);
       color: var(--theme-color-text-primary);
     }
+    .item:focus-visible {
+      outline: none;
+      box-shadow: var(--theme-focus-ring);
+    }
     .item.active {
-      background: var(--theme-color-background);
+      background: var(--theme-color-primary-soft);
       color: var(--theme-color-primary);
+      box-shadow: var(--theme-highlight);
     }
     @media (max-width: 768px) {
       nav {

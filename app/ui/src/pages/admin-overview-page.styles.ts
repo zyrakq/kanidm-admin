@@ -15,14 +15,7 @@ export const adminOverviewPageStyles = css`
     gap: 16px;
     margin-bottom: 28px;
   }
-  .card {
-    background: var(--theme-color-surface);
-    border: 1px solid var(--theme-color-border);
-    border-radius: 8px;
-    box-shadow: var(--theme-shadow-md);
-    padding: 18px;
-  }
-  .card h2 {
+  ui-card h2 {
     margin: 0 0 10px;
     font-size: 14px;
     font-weight: 600;
@@ -52,12 +45,12 @@ export const adminOverviewPageStyles = css`
     gap: 8px;
     padding: 10px 14px;
     border: 1px solid var(--theme-color-border);
-    border-radius: 6px;
-    background: var(--theme-color-surface);
+    border-radius: var(--theme-radius-md);
+    background: var(--theme-color-surface-raised);
     color: var(--theme-color-text-primary);
     text-decoration: none;
     font-weight: 500;
-    transition: border-color 0.2s ease;
+    transition: border-color var(--theme-duration) var(--theme-ease);
   }
   .link:hover {
     border-color: var(--theme-color-primary);

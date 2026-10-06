@@ -271,17 +271,29 @@ export class FormField extends LitElement {
     .input {
       padding: 9px 12px;
       border: 1px solid var(--theme-color-border);
-      border-radius: 6px;
+      border-radius: var(--theme-radius-md);
       font: inherit;
       color: var(--theme-color-text-primary);
-      background: var(--theme-color-surface);
-      transition: border-color 0.2s ease;
+      background: var(--theme-color-surface-sunken);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+      transition:
+        border-color var(--theme-duration) var(--theme-ease),
+        box-shadow var(--theme-duration) var(--theme-ease),
+        background-color var(--theme-duration) var(--theme-ease);
       width: 100%;
       box-sizing: border-box;
+    }
+    .input::placeholder {
+      color: var(--theme-color-text-muted);
+    }
+    .input:hover:not(:disabled):not(:focus) {
+      border-color: var(--theme-color-border-strong);
     }
     .input:focus {
       outline: none;
       border-color: var(--theme-color-primary);
+      background: var(--theme-color-surface);
+      box-shadow: var(--theme-focus-ring);
     }
     .input:disabled {
       opacity: 0.6;
@@ -334,23 +346,36 @@ export class FormField extends LitElement {
       top: calc(100% + 4px);
       left: 0;
       right: 0;
-      background: var(--theme-color-surface);
+      background: var(--theme-color-surface-elevated);
       border: 1px solid var(--theme-color-border);
-      border-radius: 6px;
-      box-shadow: var(--theme-shadow-md);
+      border-radius: var(--theme-radius-md);
+      box-shadow: var(--theme-elevation-3), var(--theme-highlight);
       max-height: 240px;
       overflow-y: auto;
+      padding: 4px;
       z-index: 900;
+      animation: listbox-in var(--theme-duration) var(--theme-ease);
+    }
+    @keyframes listbox-in {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
     }
     .listbox-option {
-      padding: 9px 12px;
+      padding: 8px 10px;
       font-size: 14px;
       cursor: pointer;
+      border-radius: var(--theme-radius-sm);
       color: var(--theme-color-text-primary);
     }
     .listbox-option:hover,
     .listbox-option.active {
-      background: var(--theme-color-background);
+      background: var(--theme-color-surface-hover);
+    }
+    .listbox-option[aria-selected='true'] {
+      color: var(--theme-color-primary);
+      background: var(--theme-color-primary-soft);
     }
     .listbox-empty {
       padding: 9px 12px;

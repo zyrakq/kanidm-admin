@@ -3,6 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '../services/auth.service';
+import '@/shared/components/ui-button';
 import { reauthModalStyles } from './reauth-modal.styles';
 
 // Global step-up modal. The auth service opens it via the
@@ -126,20 +127,16 @@ export class ReauthModal extends LitElement {
                   </p>`
                 : nothing}
               <div class="actions">
-                <button
-                  class="btn btn-secondary"
-                  type="button"
-                  @click=${this.handleCancel}
-                >
+                <ui-button @click=${this.handleCancel}>
                   ${msg('Cancel')}
-                </button>
-                <button
-                  class="btn btn-primary"
+                </ui-button>
+                <ui-button
+                  variant="primary"
                   type="submit"
                   ?disabled=${!this.password}
                 >
                   ${msg('Confirm')}
-                </button>
+                </ui-button>
               </div>
             </form>
           </div>

@@ -13,6 +13,12 @@ export const serviceAccountDetailPageStyles = css`
     font-weight: 500;
     color: var(--theme-color-text-secondary);
     text-decoration: none;
+    border-radius: var(--theme-radius-sm);
+    transition: color var(--theme-duration-fast) var(--theme-ease);
+  }
+  .back:focus-visible {
+    outline: none;
+    box-shadow: var(--theme-focus-ring);
   }
   .back:hover {
     color: var(--theme-color-text-primary);
@@ -24,28 +30,7 @@ export const serviceAccountDetailPageStyles = css`
     margin-bottom: 16px;
   }
   .btn-delete {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
     margin-left: auto;
-    border: 1px solid var(--theme-color-border);
-    border-radius: 6px;
-    padding: 8px 14px;
-    font-size: 14px;
-    font-weight: 500;
-    background: var(--theme-color-surface);
-    color: var(--theme-color-error);
-    cursor: pointer;
-    transition: color 0.15s ease, border-color 0.15s ease,
-      background-color 0.15s ease;
-  }
-  .btn-delete:hover:not(:disabled) {
-    border-color: var(--theme-color-error);
-    background: var(--theme-color-background);
-  }
-  .btn-delete:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
   h1 {
     margin: 0;

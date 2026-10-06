@@ -7,6 +7,11 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import '@/shared/components/data-table';
+import '@/shared/components/confirm-dialog';
+import '@/shared/components/form-field';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-skeleton';
 import type { TableColumn } from '@/shared/components/data-table';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
@@ -163,16 +168,16 @@ export class Oauth2ClaimMapsTab extends LitElement {
         key: 'actions',
         header: msg('Actions'),
         render: (row) => html`
-          <button
-            class="remove-btn"
-            type="button"
+          <ui-button
+            variant="danger-ghost"
+            size="sm"
             ?disabled=${this.busy}
             @click=${() => {
               this.deleteTarget = row.raw as ClaimMap;
             }}
           >
             ${msg('Remove')}
-          </button>
+          </ui-button>
         `,
       },
     ];
@@ -192,7 +197,7 @@ export class Oauth2ClaimMapsTab extends LitElement {
 
   render() {
     if (this.loading) {
-      return html`<p class="muted">${msg('Loading...')}</p>`;
+      return html`<ui-skeleton lines="3"></ui-skeleton>`;
     }
     const detail = this.detail;
     if (!detail) {
@@ -204,7 +209,7 @@ export class Oauth2ClaimMapsTab extends LitElement {
       label: group.displayName ?? group.id,
     }));
     return html`
-      <section class="card">
+      <ui-card class="card">
         <h2>${msg('Claim maps')}</h2>
         <p class="muted">
           ${msg('Custom claims added to tokens based on group membership.')}
@@ -215,8 +220,8 @@ export class Oauth2ClaimMapsTab extends LitElement {
             'The join strategy applies per claim: csv/ssv join values into one string, array emits a JSON array.'
           )}
         </p>
-      </section>
-      <section class="card">
+      </ui-card>
+      <ui-card class="card">
         <h2>${msg('Add claim map')}</h2>
         <form-field
           field-id="claim-name"
@@ -246,18 +251,18 @@ export class Oauth2ClaimMapsTab extends LitElement {
           }}
         ></form-field>
         <div class="actions">
-          <button
-            class="primary-btn"
+          <ui-button
+            variant="primary"
             ?disabled=${this.claim.trim() === '' ||
             this.group.trim() === '' ||
-            this.parseValues(this.values).length === 0 ||
-            this.busy}
+            this.parseValues(this.values).length === 0}
+            ?loading=${this.busy}
             @click=${() => void this.addClaimMap()}
           >
-            ${this.busy ? msg('Saving...') : msg('Add claim map')}
-          </button>
+            ${msg('Add claim map')}
+          </ui-button>
         </div>
-      </section>
+      </ui-card>
       ${this.deleteTarget !== null
         ? html`<confirm-dialog
             open
@@ -293,12 +298,7 @@ export class Oauth2ClaimMapsTab extends LitElement {
       font-size: 13px;
     }
     .card {
-      background: var(--theme-color-surface);
-      border: 1px solid var(--theme-color-border);
-      border-radius: 8px;
-      padding: 20px;
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
     .card h2 {
       margin: 0 0 16px;
@@ -309,43 +309,6 @@ export class Oauth2ClaimMapsTab extends LitElement {
     .actions {
       display: flex;
       justify-content: flex-end;
-    }
-    .primary-btn {
-      padding: 9px 16px;
-      border: none;
-      border-radius: 6px;
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      background: var(--theme-color-primary);
-      color: var(--theme-color-surface);
-      transition: background-color 0.2s ease;
-    }
-    .primary-btn:hover:not(:disabled) {
-      background: var(--theme-color-primary-hover);
-    }
-    .primary-btn:active:not(:disabled) {
-      background: var(--theme-color-primary-active);
-    }
-    .remove-btn {
-      padding: 5px 12px;
-      background: transparent;
-      border: 1px solid var(--theme-color-error);
-      border-radius: 6px;
-      color: var(--theme-color-error);
-      font: inherit;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-    .remove-btn:hover:not(:disabled) {
-      background: var(--theme-color-error);
-      color: var(--theme-color-surface);
-    }
-    .primary-btn:disabled,
-    .remove-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
   `;
 }

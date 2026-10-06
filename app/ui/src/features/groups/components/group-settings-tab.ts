@@ -10,6 +10,9 @@ import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import '@/shared/components/confirm-dialog';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-button';
+import '@/shared/components/form-field';
 import { groupService } from '../services/group.service';
 import type { GroupDetail } from '../types/group.types';
 
@@ -124,10 +127,10 @@ export class GroupSettingsTab extends LitElement {
       return html`<p class="muted">${msg('Group not available.')}</p>`;
     }
     return html`
-      <section class="card">
-        <h2>${msg('Settings')}</h2>
+      <ui-card>
+        <h2 slot="header">${msg('Settings')}</h2>
         <form-field
-          field-id="grp-displayname"
+          fieldId="grp-displayname"
           label=${msg('Display name')}
           .value=${this.displayName}
           @field-input=${(e: CustomEvent<{ value: string }>) => {
@@ -136,7 +139,7 @@ export class GroupSettingsTab extends LitElement {
           }}
         ></form-field>
         <form-field
-          field-id="grp-description"
+          fieldId="grp-description"
           label=${msg('Description')}
           .value=${this.description}
           hint=${msg('Leave empty to remove the description.')}
@@ -146,7 +149,7 @@ export class GroupSettingsTab extends LitElement {
           }}
         ></form-field>
         <form-field
-          field-id="grp-mail"
+          fieldId="grp-mail"
           label=${msg('Mail addresses')}
           .value=${this.mail}
           hint=${msg('Comma-separated list of mail addresses.')}
@@ -156,23 +159,23 @@ export class GroupSettingsTab extends LitElement {
           }}
         ></form-field>
         <div class="actions">
-          <button
-            class="primary-btn"
-            ?disabled=${this.saving}
+          <ui-button
+            variant="primary"
+            ?loading=${this.saving}
             @click=${this.saveSettings}
           >
             ${this.saving ? msg('Saving...') : msg('Save')}
-          </button>
+          </ui-button>
         </div>
-      </section>
-      <section class="card">
-        <h2>${msg('Rename group')}</h2>
+      </ui-card>
+      <ui-card>
+        <h2 slot="header">${msg('Rename group')}</h2>
         <p class="muted">
           ${msg('Current name')}:
           <span class="mono">${detail.id}</span>
         </p>
         <form-field
-          field-id="grp-new-name"
+          fieldId="grp-new-name"
           label=${msg('New name')}
           .value=${this.newName}
           @field-input=${(e: CustomEvent<{ value: string }>) => {
@@ -180,8 +183,8 @@ export class GroupSettingsTab extends LitElement {
           }}
         ></form-field>
         <div class="actions">
-          <button
-            class="danger-btn"
+          <ui-button
+            variant="danger"
             ?disabled=${this.newName.trim() === '' ||
             this.newName.trim() === detail.id}
             @click=${() => {
@@ -189,9 +192,9 @@ export class GroupSettingsTab extends LitElement {
             }}
           >
             ${msg('Rename...')}
-          </button>
+          </ui-button>
         </div>
-      </section>
+      </ui-card>
       ${this.renameOpen
         ? html`<confirm-dialog
             open
@@ -222,16 +225,11 @@ export class GroupSettingsTab extends LitElement {
       font-size: 14px;
       color: var(--theme-color-text-muted);
     }
-    .card {
-      background: var(--theme-color-surface);
-      border: 1px solid var(--theme-color-border);
-      border-radius: 8px;
-      padding: 20px;
+    ui-card {
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
-    .card h2 {
-      margin: 0 0 16px;
+    h2 {
+      margin: 0;
       font-size: 16px;
       font-weight: 600;
       color: var(--theme-color-text-primary);
@@ -245,38 +243,6 @@ export class GroupSettingsTab extends LitElement {
     .actions {
       display: flex;
       justify-content: flex-end;
-    }
-    .primary-btn,
-    .danger-btn {
-      padding: 9px 16px;
-      border: none;
-      border-radius: 6px;
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    .primary-btn {
-      background: var(--theme-color-primary);
-      color: var(--theme-color-surface);
-    }
-    .primary-btn:hover:not(:disabled) {
-      background: var(--theme-color-primary-hover);
-    }
-    .primary-btn:active:not(:disabled) {
-      background: var(--theme-color-primary-active);
-    }
-    .danger-btn {
-      background: var(--theme-color-error);
-      color: var(--theme-color-surface);
-    }
-    .danger-btn:hover:not(:disabled) {
-      filter: brightness(0.9);
-    }
-    .primary-btn:disabled,
-    .danger-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
   `;
 }

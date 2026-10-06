@@ -9,6 +9,7 @@ import { ApiError } from '@/shared/services/http-client';
 import type { User } from '../types/auth.types';
 import logoLight from '@/assets/logo-light.svg';
 import logoDark from '@/assets/logo-dark.svg';
+import '@/shared/components/ui-button';
 import { loginFormStyles } from './login-form.styles';
 
 @customElement('login-form')
@@ -107,8 +108,9 @@ export class LoginForm extends LitElement {
                     >
                   </div>
                   <div class="actions">
-                    <button
-                      class="btn btn-primary"
+                    <ui-button
+                      variant="primary"
+                      block
                       @click=${() => {
                         const target = firstVisiblePath(
                           authService.getGroups()
@@ -117,7 +119,7 @@ export class LoginForm extends LitElement {
                       }}
                     >
                       ${msg('Go to Dashboard')}
-                    </button>
+                    </ui-button>
                   </div>
                 `
               : html`
@@ -157,13 +159,15 @@ export class LoginForm extends LitElement {
                         ? html`<p class="error" role="alert">${this.error}</p>`
                         : nothing
                     }
-                    <button
-                      class="btn btn-primary"
+                    <button type="submit" hidden></button>
+                    <ui-button
+                      variant="primary"
                       type="submit"
-                      ?disabled=${this.loading}
+                      block
+                      ?loading=${this.loading}
                     >
                       ${this.loading ? msg('Signing in...') : msg('Sign In')}
-                    </button>
+                    </ui-button>
                   </form>
                 `
           }

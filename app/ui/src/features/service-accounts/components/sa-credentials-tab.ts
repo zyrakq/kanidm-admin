@@ -10,6 +10,11 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { notificationService } from '@/features/notifications';
 import { authService } from '@/features/auth';
+import '@/shared/components/modal-dialog';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-empty-state';
+import '@/shared/components/ui-skeleton';
 import { serviceAccountService } from '../services/service-account.service';
 import type { CredentialDetailType } from '../types/service-account.types';
 import { saCredentialsTabStyles } from './sa-credentials-tab.styles';
@@ -103,9 +108,13 @@ export class SaCredentialsTab extends LitElement {
     type_: CredentialDetailType;
   }) {
     return html`
-      <li class="cred-row">
-        <span class="cred-type">${credentialTypeLabel(cred.type_)}</span>
-        <span class="cred-uuid" title=${cred.uuid}>${cred.uuid}</span>
+      <li>
+        <ui-card interactive>
+          <div class="cred-row">
+            <span class="cred-type">${credentialTypeLabel(cred.type_)}</span>
+            <span class="cred-uuid" title=${cred.uuid}>${cred.uuid}</span>
+          </div>
+        </ui-card>
       </li>
     `;
   }
@@ -115,64 +124,51 @@ export class SaCredentialsTab extends LitElement {
       return nothing;
     }
     return html`
-      <div
-        class="modal-backdrop"
-        @click=${this.closeGeneratedModal}
+      <modal-dialog
+        heading=${msg('Generated password')}
+        .open=${true}
+        @modal-close=${this.closeGeneratedModal}
       >
-        <div
-          class="modal"
-          role="dialog"
-          aria-modal="true"
-          aria-label=${msg('Generated password')}
-          @click=${(event: Event) => event.stopPropagation()}
-        >
-          <h3 class="modal-title">${msg('Generated password')}</h3>
-          <p class="warning">
-            ${msg(
-              'This password will not be shown again. Copy it now and share it securely.'
-            )}
-          </p>
-          <code class="generated">${this.generatedPassword}</code>
-          <div class="modal-actions">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click=${this.handleCopy}
-            >
-              ${msg('Copy')}
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click=${this.closeGeneratedModal}
-            >
-              ${msg('Done')}
-            </button>
-          </div>
+        <p class="warning">
+          ${msg(
+            'This password will not be shown again. Copy it now and share it securely.'
+          )}
+        </p>
+        <code class="generated">${this.generatedPassword}</code>
+        <div slot="footer">
+          <ui-button @click=${this.handleCopy}>${msg('Copy')}</ui-button>
+          <ui-button variant="primary" @click=${this.closeGeneratedModal}>
+            ${msg('Done')}
+          </ui-button>
         </div>
-      </div>
+      </modal-dialog>
     `;
   }
 
   render() {
     if (this.loading) {
-      return html`<p class="muted">${msg('Loading credentials…')}</p>`;
+      return html`
+        <div class="loading" role="status" aria-label=${msg('Loading credentials…')}>
+          <ui-skeleton height="40px"></ui-skeleton>
+          <ui-skeleton height="56px" .lines=${2}></ui-skeleton>
+        </div>
+      `;
     }
 
     return html`
       <section class="credentials">
         <div class="actions">
-          <button
-            class="btn btn-primary"
-            ?disabled=${this.generating}
+          <ui-button
+            variant="primary"
+            ?loading=${this.generating}
             @click=${this.handleGenerate}
           >
-            ${this.generating ? msg('Generating...') : msg('Generate password')}
-          </button>
+            ${msg('Generate password')}
+          </ui-button>
         </div>
 
         ${this.creds.length === 0
-          ? html`<p class="muted">${msg('No credentials enrolled.')}</p>`
+          ? html`<ui-empty-state icon="key">${msg('No credentials enrolled.')}</ui-empty-state>`
           : html`
               <ul class="cred-list">
                 ${this.creds.map((cred) => this.renderCredRow(cred))}

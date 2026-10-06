@@ -15,6 +15,8 @@ import { personService } from '../services/person.service';
 import type { PersonDetail } from '../types/person.types';
 import { personOverviewTabStyles } from './person-overview-tab.styles';
 import '@/shared/components/list-pager';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
 
 /**
  * Kanidm datetime AVAs are RFC3339 strings (Value::new_datetime_s
@@ -271,7 +273,7 @@ export class PersonOverviewTab extends LitElement {
 
   private renderProfile(): ReturnType<typeof html> {
     return html`
-      <section class="card">
+      <ui-card><section>
         <h2>${msg('Profile')}</h2>
         <form-field
           field-id="ov-displayname"
@@ -297,21 +299,21 @@ export class PersonOverviewTab extends LitElement {
             this.setField('mail', e.detail.value)}
         ></form-field>
         <div class="actions">
-          <button
-            class="primary-btn"
-            ?disabled=${this.saving}
+          <ui-button
+            variant="primary"
+            ?loading=${this.saving}
             @click=${this.saveProfile}
           >
             ${this.saving ? msg('Saving...') : msg('Save')}
-          </button>
+          </ui-button>
         </div>
-      </section>
+      </section></ui-card>
     `;
   }
 
   private renderValidity(): ReturnType<typeof html> {
     return html`
-      <section class="card">
+      <ui-card><section>
         <h2>${msg('Account validity')}</h2>
         <form-field
           type="datetime-local"
@@ -332,15 +334,15 @@ export class PersonOverviewTab extends LitElement {
             this.setField('expire', e.detail.value)}
         ></form-field>
         <div class="actions">
-          <button
-            class="primary-btn"
-            ?disabled=${this.savingValidity}
+          <ui-button
+            variant="primary"
+            ?loading=${this.savingValidity}
             @click=${this.applyValidity}
           >
             ${this.savingValidity ? msg('Applying...') : msg('Apply')}
-          </button>
+          </ui-button>
         </div>
-      </section>
+      </section></ui-card>
     `;
   }
 
@@ -349,7 +351,7 @@ export class PersonOverviewTab extends LitElement {
     if (!person) return nothing;
     const busy = this.addingGroup || this.removingGroup !== null;
     return html`
-      <section class="card">
+      <ui-card><section>
         <h2>${msg('Group membership')}</h2>
         ${person.memberOf.length === 0
           ? html`<p class="muted">${msg('Not a member of any group.')}</p>`
@@ -370,15 +372,17 @@ export class PersonOverviewTab extends LitElement {
                     (group) => html`
                       <li>
                         <span class="mono">${group}</span>
-                        <button
-                          class="remove-btn"
+                        <ui-button
+                          size="sm"
+                          variant="danger-ghost"
                           ?disabled=${busy}
+                          ?loading=${this.removingGroup === group}
                           @click=${() => this.removeGroup(group)}
                         >
                           ${this.removingGroup === group
                             ? msg('Removing...')
                             : msg('Remove')}
-                        </button>
+                        </ui-button>
                       </li>
                     `
                   )}
@@ -412,15 +416,17 @@ export class PersonOverviewTab extends LitElement {
             @field-input=${(e: CustomEvent<{ value: string }>) =>
               (this.newGroup = e.detail.value)}
           ></form-field>
-          <button
-            class="primary-btn"
+          <ui-button
+            variant="primary"
+            icon="plus"
             ?disabled=${busy || this.newGroup.trim() === ''}
+            ?loading=${this.addingGroup}
             @click=${this.addGroup}
           >
             ${this.addingGroup ? msg('Adding...') : msg('Add')}
-          </button>
+          </ui-button>
         </div>
-      </section>
+      </section></ui-card>
     `;
   }
 

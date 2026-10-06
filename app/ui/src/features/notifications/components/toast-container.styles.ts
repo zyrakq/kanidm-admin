@@ -20,25 +20,23 @@ export const toastContainerStyles = css`
   .queue-badge {
     flex: 1;
     padding: 0.75rem 1rem;
-    background: #ff6b35;
-    color: white;
-    border-radius: 8px;
+    background: var(--theme-color-primary);
+    color: var(--theme-color-on-primary);
+    border-radius: var(--theme-radius-lg);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--theme-elevation-2), var(--theme-highlight);
   }
 
   .queue-badge:hover {
-    background: #e85d2a;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    background: var(--theme-color-primary-hover);
+    transform: translateY(-1px);
   }
 
   .queue-badge:active {
     transform: translateY(0);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   }
 
   .queue-actions {
@@ -55,29 +53,27 @@ export const toastContainerStyles = css`
     align-items: center;
     gap: 0.25rem;
     padding: 0.75rem 1rem;
-    background: white;
-    color: #6b7280;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    background: var(--theme-color-surface-elevated);
+    color: var(--theme-color-text-secondary);
+    border: 1px solid var(--theme-color-border);
+    border-radius: var(--theme-radius-lg);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--theme-elevation-2), var(--theme-highlight);
     white-space: nowrap;
   }
 
   .clear-all-button:hover {
-    background: #fef2f2;
-    color: #ef4444;
-    border-color: #fee2e2;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    background: var(--theme-color-error-soft);
+    color: var(--theme-color-error);
+    border-color: var(--theme-color-error);
+    transform: translateY(-1px);
   }
 
   .clear-all-button:active {
     transform: translateY(0);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   }
 
   .clear-all-button span {

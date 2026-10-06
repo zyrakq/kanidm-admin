@@ -12,6 +12,7 @@ import { kanidmStatusService } from '@/shared/services/kanidm-status.service';
 import type { KanidmEntry } from '@/shared/types/kanidm';
 import '@/shared/components/admin-layout';
 import '@/shared/components/ui-icon';
+import '@/shared/components/ui-card';
 import { adminOverviewPageStyles } from './admin-overview-page.styles';
 
 @customElement('admin-overview-page')
@@ -63,7 +64,7 @@ export class AdminOverviewPage extends LitElement {
         <h1 class="page-title">${msg('Administration')}</h1>
 
         <div class="cards">
-          <section class="card">
+          <ui-card>
             <h2>${msg('Session')}</h2>
             <p class="big">${user?.displayName || user?.username || ''}</p>
             <p class="muted">${user?.username || ''}</p>
@@ -72,9 +73,9 @@ export class AdminOverviewPage extends LitElement {
                 ? msg('Elevated access active')
                 : msg('Elevated access requires re-authentication')}
             </p>
-          </section>
+          </ui-card>
 
-          <section class="card">
+          <ui-card>
             <h2>${msg('Server')}</h2>
             <p class="big">
               ${this.status === 'alive'
@@ -83,13 +84,13 @@ export class AdminOverviewPage extends LitElement {
                   ? msg('Kanidm is unreachable')
                   : msg('Checking server...')}
             </p>
-          </section>
+          </ui-card>
 
-          <section class="card">
+          <ui-card>
             <h2>${msg('Quick stats')}</h2>
             <p class="muted">${msg('Persons')}: ${this.personCount ?? '—'}</p>
             <p class="muted">${msg('Groups')}: ${this.groupCount ?? '—'}</p>
-          </section>
+          </ui-card>
         </div>
 
         <h2>${msg('Sections')}</h2>

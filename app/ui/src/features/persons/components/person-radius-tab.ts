@@ -2,6 +2,11 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-icon';
+import '@/shared/components/ui-empty-state';
+import '@/shared/components/ui-skeleton';
 import { personService } from '../services/person.service';
 import { authService } from '@/features/auth/services/auth.service';
 import { notificationService } from '@/features/notifications';
@@ -102,25 +107,24 @@ export class PersonRadiusTab extends LitElement {
   }
 
   private renderLoading() {
-    return html`<p class="muted">${msg('Loading…')}</p>`;
+    return html`<ui-skeleton height="48px"></ui-skeleton>`;
   }
 
   private renderEmpty() {
     return html`
       <div class="section">
         <h3 class="section-title">${msg('RADIUS')}</h3>
-        <div class="card">
-          <p class="muted">${msg('No RADIUS secret is set for this account.')}</p>
-          <div class="actions">
-            <button
-              class="primary"
-              ?disabled=${this.busy}
-              @click=${this.regenerate}
-            >
-              ${msg('Generate secret')}
-            </button>
-          </div>
-        </div>
+        <ui-empty-state icon="key">
+          ${msg('No RADIUS secret is set for this account.')}
+          <ui-button
+            slot="action"
+            variant="primary"
+            ?loading=${this.busy}
+            @click=${this.regenerate}
+          >
+            ${msg('Generate secret')}
+          </ui-button>
+        </ui-empty-state>
       </div>
     `;
   }
@@ -131,49 +135,54 @@ export class PersonRadiusTab extends LitElement {
     return html`
       <div class="section">
         <h3 class="section-title">${msg('RADIUS')}</h3>
-        <div class="card">
-          ${this.newSecret
-            ? html`<p class="muted">
-                ${msg(
-                  'New secret generated — copy it now, it will not be shown again.'
-                )}
-              </p>`
-            : nothing}
-          <div class="secret-row">
-            <span class="secret">
-              ${this.revealed || this.newSecret ? display : masked}
-            </span>
+        <ui-card>
+          <div class="card-body">
             ${this.newSecret
-              ? nothing
-              : html`<button class="secondary" @click=${this.toggleReveal}>
-                  ${this.revealed ? msg('Hide') : msg('Reveal')}
-                </button>`}
-            <button class="secondary" @click=${this.copySecret}>
-              ${msg('Copy')}
-            </button>
-          </div>
-          <div class="actions">
-            <button
-              class="primary"
-              ?disabled=${this.busy}
-              @click=${this.regenerate}
-            >
-              ${msg('Regenerate secret')}
-            </button>
-            <button
-              class="danger"
-              ?disabled=${this.busy}
-              @click=${this.deleteSecret}
-            >
-              ${msg('Delete secret')}
-            </button>
-            ${this.newSecret
-              ? html`<button class="secondary" @click=${this.dismissNewSecret}>
-                  ${msg('Done')}
-                </button>`
+              ? html`<p class="notice">
+                  <ui-icon name="warning" size="16"></ui-icon>
+                  ${msg(
+                    'New secret generated — copy it now, it will not be shown again.'
+                  )}
+                </p>`
               : nothing}
+            <div class="secret-row">
+              <span class="secret">
+                ${this.revealed || this.newSecret ? display : masked}
+              </span>
+              ${this.newSecret
+                ? nothing
+                : html`<ui-button @click=${this.toggleReveal}>
+                    ${this.revealed ? msg('Hide') : msg('Reveal')}
+                  </ui-button>`}
+              <ui-button icon="copy" @click=${this.copySecret}>
+                ${msg('Copy')}
+              </ui-button>
+            </div>
+            <div class="actions">
+              <ui-button
+                variant="primary"
+                icon="refresh"
+                ?disabled=${this.busy}
+                @click=${this.regenerate}
+              >
+                ${msg('Regenerate secret')}
+              </ui-button>
+              <ui-button
+                variant="danger-ghost"
+                icon="trash"
+                ?disabled=${this.busy}
+                @click=${this.deleteSecret}
+              >
+                ${msg('Delete secret')}
+              </ui-button>
+              ${this.newSecret
+                ? html`<ui-button @click=${this.dismissNewSecret}>
+                    ${msg('Done')}
+                  </ui-button>`
+                : nothing}
+            </div>
           </div>
-        </div>
+        </ui-card>
       </div>
     `;
   }

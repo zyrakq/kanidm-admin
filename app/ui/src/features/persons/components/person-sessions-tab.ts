@@ -8,6 +8,7 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
+import '@/shared/components/ui-button';
 import { personService } from '../services/person.service';
 import type { SessionItem } from '../types/person.types';
 
@@ -114,16 +115,18 @@ export class PersonSessionsTab extends LitElement {
             key: 'actions',
             header: '',
             render: (row: Record<string, unknown>) => html`
-              <button
-                class="revoke-btn"
+              <ui-button
+                size="sm"
+                variant="danger-ghost"
                 ?disabled=${this.revokingId !== null}
+                ?loading=${this.revokingId === row.session_id}
                 @click=${() =>
                   this.revoke(row as unknown as SessionItem)}
               >
                 ${this.revokingId === row.session_id
                   ? msg('Revoking...')
                   : msg('Revoke')}
-              </button>
+              </ui-button>
             `,
           },
         ]}
@@ -137,25 +140,6 @@ export class PersonSessionsTab extends LitElement {
   static styles = css`
     :host {
       display: block;
-    }
-    .revoke-btn {
-      padding: 4px 12px;
-      border: 1px solid var(--theme-color-error);
-      border-radius: 6px;
-      background: transparent;
-      color: var(--theme-color-error);
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease, color 0.2s ease;
-    }
-    .revoke-btn:hover:not(:disabled) {
-      background: var(--theme-color-error);
-      color: var(--theme-color-surface);
-    }
-    .revoke-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
   `;
 }

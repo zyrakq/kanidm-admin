@@ -7,6 +7,8 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import '@/shared/components/admin-layout';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-button';
 import { noAccessPageStyles } from './no-access-page.styles';
 
 @customElement('no-access-page')
@@ -28,21 +30,21 @@ export class NoAccessPage extends LitElement {
       <admin-layout>
         <h1 class="page-title">${msg('Administration')}</h1>
 
-        <section class="card">
+        <ui-card>
           <h2>${msg('No admin access')}</h2>
           <p class="muted">
             ${msg(
               'Your account is not a member of any administration group. Ask your Kanidm administrator for access.'
             )}
           </p>
-          <button
-            class="btn"
-            ?disabled=${this.signingOut}
+          <ui-button
+            variant="primary"
+            ?loading=${this.signingOut}
             @click=${this.handleSignOut}
           >
             ${this.signingOut ? msg('Signing out...') : msg('Sign Out')}
-          </button>
-        </section>
+          </ui-button>
+        </ui-card>
       </admin-layout>
     `;
   }

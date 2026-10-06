@@ -10,6 +10,8 @@ import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import '@/shared/components/confirm-dialog';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
 import { oauth2Service } from '../services/oauth2.service';
 import type { Oauth2RsDetail } from '../types/oauth2.types';
 
@@ -213,7 +215,7 @@ export class Oauth2SettingsTab extends LitElement {
       ${detail.isPublic
         ? nothing
         : html`
-            <section class="card">
+            <ui-card><section>
               <h2>${msg('Basic secret')}</h2>
               <p class="muted">
                 ${msg(
@@ -224,33 +226,37 @@ export class Oauth2SettingsTab extends LitElement {
                 ? html`
                     <div class="secret-row">
                       <code class="mono">${this.secret}</code>
-                      <button class="secondary-btn" @click=${() => void this.copySecret()}>
+                      <ui-button
+                        variant="secondary"
+                        size="sm"
+                        @click=${() => void this.copySecret()}
+                      >
                         ${this.copied ? msg('Copied!') : msg('Copy')}
-                      </button>
+                      </ui-button>
                     </div>
                   `
                 : html`
                     <div class="actions">
-                      <button
-                        class="secondary-btn"
-                        ?disabled=${this.secretLoading}
+                      <ui-button
+                        variant="secondary"
+                        ?loading=${this.secretLoading}
                         @click=${() => void this.showSecret()}
                       >
-                        ${this.secretLoading ? msg('Loading...') : msg('Show secret')}
-                      </button>
-                      <button
-                        class="danger-btn"
+                        ${msg('Show secret')}
+                      </ui-button>
+                      <ui-button
+                        variant="danger"
                         @click=${() => {
                           this.resetOpen = true;
                         }}
                       >
                         ${msg('Reset secret...')}
-                      </button>
+                      </ui-button>
                     </div>
                   `}
-            </section>
+            </section></ui-card>
           `}
-      <section class="card">
+      <ui-card><section>
         <h2>${msg('General')}</h2>
         <form-field
           field-id="set-displayname"
@@ -272,16 +278,16 @@ export class Oauth2SettingsTab extends LitElement {
           }}
         ></form-field>
         <div class="actions">
-          <button
-            class="primary-btn"
-            ?disabled=${this.saving}
+          <ui-button
+            variant="primary"
+            ?loading=${this.saving}
             @click=${() => void this.saveBasics()}
           >
-            ${this.saving ? msg('Saving...') : msg('Save')}
-          </button>
+            ${msg('Save')}
+          </ui-button>
         </div>
-      </section>
-      <section class="card">
+      </section></ui-card>
+      <ui-card><section>
         <h2>${msg('Tokens')}</h2>
         <form-field
           field-id="set-expiry"
@@ -295,8 +301,8 @@ export class Oauth2SettingsTab extends LitElement {
           }}
         ></form-field>
         <div class="actions">
-          <button
-            class="secondary-btn"
+          <ui-button
+            variant="secondary"
             ?disabled=${this.busy}
             @click=${() => {
               this.expiryInput = '';
@@ -305,17 +311,17 @@ export class Oauth2SettingsTab extends LitElement {
             }}
           >
             ${msg('Clear')}
-          </button>
-          <button
-            class="primary-btn"
-            ?disabled=${this.busy}
+          </ui-button>
+          <ui-button
+            variant="primary"
+            ?loading=${this.busy}
             @click=${() => void this.saveExpiry()}
           >
-            ${this.busy ? msg('Saving...') : msg('Save')}
-          </button>
+            ${msg('Save')}
+          </ui-button>
         </div>
-      </section>
-      <section class="card">
+      </section></ui-card>
+      <ui-card><section>
         <h2>${msg('Security')}</h2>
         ${this.renderToggleRow(
           msg('Strict redirect URI validation'),
@@ -426,7 +432,7 @@ export class Oauth2SettingsTab extends LitElement {
           },
           this.busy
         )}
-      </section>
+      </section></ui-card>
       ${this.resetOpen
         ? html`<confirm-dialog
             open
@@ -499,15 +505,11 @@ export class Oauth2SettingsTab extends LitElement {
       font-size: 14px;
       color: var(--theme-color-text-muted);
     }
-    .card {
-      background: var(--theme-color-surface);
-      border: 1px solid var(--theme-color-border);
-      border-radius: 8px;
-      padding: 20px;
+    ui-card {
+      display: block;
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
-    .card h2 {
+    section h2 {
       margin: 0 0 16px;
       font-size: 16px;
       font-weight: 600;
@@ -598,48 +600,6 @@ export class Oauth2SettingsTab extends LitElement {
       transform: translateX(18px);
     }
     .switch input:disabled + .slider {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .primary-btn,
-    .secondary-btn,
-    .danger-btn {
-      padding: 9px 16px;
-      border: none;
-      border-radius: 6px;
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    .primary-btn {
-      background: var(--theme-color-primary);
-      color: var(--theme-color-surface);
-    }
-    .primary-btn:hover:not(:disabled) {
-      background: var(--theme-color-primary-hover);
-    }
-    .primary-btn:active:not(:disabled) {
-      background: var(--theme-color-primary-active);
-    }
-    .secondary-btn {
-      background: transparent;
-      color: var(--theme-color-text-primary);
-      border: 1px solid var(--theme-color-border);
-    }
-    .secondary-btn:hover:not(:disabled) {
-      background: var(--theme-color-background);
-    }
-    .danger-btn {
-      background: var(--theme-color-error);
-      color: var(--theme-color-surface);
-    }
-    .danger-btn:hover:not(:disabled) {
-      filter: brightness(0.9);
-    }
-    .primary-btn:disabled,
-    .secondary-btn:disabled,
-    .danger-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }

@@ -81,7 +81,7 @@ export const localeSwitcherStyles = css`
 
   .locale-item.active {
     background: var(--theme-color-primary);
-    color: #ffffff;
+    color: var(--theme-color-on-primary);
   }
 
   .locale-item .flag {

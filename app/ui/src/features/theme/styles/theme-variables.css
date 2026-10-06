@@ -20,8 +20,8 @@
 
   /* Text colors */
   --theme-color-text-primary: #1f2937;
-  --theme-color-text-secondary: #6b7280;
-  --theme-color-text-muted: #9ca3af;
+  --theme-color-text-secondary: #4b5563;
+  --theme-color-text-muted: #6b7280;
 
   /* Border colors */
   --theme-color-border: #e5e7eb;
@@ -39,7 +39,45 @@
 
   /* Elevated surface for modals and toasts */
   --theme-color-surface-elevated: #ffffff;
+
+  /* Radii */
+  --theme-radius-sm: 6px;
+  --theme-radius-md: 8px;
+  --theme-radius-lg: 12px;
+  --theme-radius-xl: 16px;
+
+  /* Surfaces */
+  --theme-color-surface-raised: #ffffff;
+  --theme-color-surface-sunken: #f3f4f6;
+  --theme-color-surface-hover: #f3f4f6;
+  --theme-color-border-strong: #d1d5db;
+  --theme-color-on-primary: #1a0f0a;
+
+  /* Elevation (soft, layered) */
+  --theme-elevation-1: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+  --theme-elevation-2: 0 2px 4px rgba(16, 24, 40, 0.05), 0 6px 14px rgba(16, 24, 40, 0.08);
+  --theme-elevation-3: 0 4px 8px rgba(16, 24, 40, 0.06), 0 16px 36px rgba(16, 24, 40, 0.14);
+  --theme-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  /* Focus + accent glow */
+  --theme-focus-ring: 0 0 0 3px rgba(255, 107, 53, 0.28);
+  --theme-primary-glow: 0 1px 2px rgba(217, 78, 31, 0.35), 0 4px 12px rgba(255, 107, 53, 0.28);
+  --theme-color-primary-soft: rgba(255, 107, 53, 0.1);
+  --theme-color-error-soft: rgba(239, 68, 68, 0.1);
+  --theme-color-success-soft: rgba(16, 185, 129, 0.12);
+  --theme-color-warning-soft: rgba(245, 158, 11, 0.14);
+  --theme-color-info-soft: rgba(59, 130, 246, 0.12);
+
+  /* Overlay */
+  --theme-overlay-bg: rgba(15, 23, 42, 0.45);
+  --theme-overlay-blur: 4px;
+
+  /* Motion */
+  --theme-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --theme-duration-fast: 0.12s;
+  --theme-duration: 0.2s;
 }
+
 
 /* ========== Dark Theme ========== */
 :root[theme="dark"] {
@@ -58,7 +96,7 @@
   /* Text colors */
   --theme-color-text-primary: #ececec;
   --theme-color-text-secondary: #a1a1a6;
-  --theme-color-text-muted: #6e6e73;
+  --theme-color-text-muted: #8a8a90;
 
   /* Border colors */
   --theme-color-border: #333335;
@@ -73,4 +111,33 @@
   --theme-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --theme-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.4);
   --theme-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.5);
+
+  --theme-color-surface-raised: #232324;
+  --theme-color-surface-sunken: #101011;
+  --theme-color-surface-hover: #262627;
+  --theme-color-border-strong: #4a4a4d;
+  --theme-color-on-primary: #1a0f0a;
+
+  --theme-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --theme-elevation-2: 0 2px 4px rgba(0, 0, 0, 0.35), 0 8px 18px rgba(0, 0, 0, 0.4);
+  --theme-elevation-3: 0 4px 8px rgba(0, 0, 0, 0.4), 0 20px 44px rgba(0, 0, 0, 0.6);
+  --theme-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  --theme-focus-ring: 0 0 0 3px rgba(255, 122, 69, 0.35);
+  --theme-primary-glow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(255, 122, 69, 0.28);
+  --theme-color-primary-soft: rgba(255, 122, 69, 0.14);
+  --theme-color-error-soft: rgba(248, 113, 113, 0.14);
+  --theme-color-success-soft: rgba(52, 211, 153, 0.14);
+  --theme-color-warning-soft: rgba(251, 191, 36, 0.14);
+  --theme-color-info-soft: rgba(96, 165, 250, 0.14);
+
+  --theme-overlay-bg: rgba(0, 0, 0, 0.6);
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --theme-duration-fast: 0s;
+    --theme-duration: 0s;
+  }
 }

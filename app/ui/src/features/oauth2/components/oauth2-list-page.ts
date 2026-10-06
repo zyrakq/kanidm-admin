@@ -20,6 +20,8 @@ import '@/shared/components/modal-dialog';
 import '@/shared/components/confirm-dialog';
 import '@/shared/components/form-field';
 import '@/shared/components/ui-icon';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-badge';
 import type { TableColumn } from '@/shared/components/data-table';
 import type { Oauth2RsSummary } from '../types/oauth2.types';
 import { oauth2Service } from '../services/oauth2.service';
@@ -177,8 +179,8 @@ export class Oauth2ListPage extends LitElement {
         header: msg('Type'),
         render: (row) =>
           row.isPublic
-            ? html`<span class="badge badge-public">${msg('Public')}</span>`
-            : html`<span class="badge">${msg('Confidential')}</span>`,
+            ? html`<ui-badge variant="info">${msg('Public')}</ui-badge>`
+            : html`<ui-badge>${msg('Confidential')}</ui-badge>`,
       },
       {
         key: 'actions',
@@ -209,10 +211,9 @@ export class Oauth2ListPage extends LitElement {
       <admin-layout>
         <div class="page-head">
           <h1>${msg('OAuth2 Clients')}</h1>
-          <button class="btn-primary" type="button" @click=${this.openCreate}>
-            <ui-icon name="plus" size="16"></ui-icon>
+          <ui-button variant="primary" icon="plus" @click=${this.openCreate}>
             ${msg('Create OAuth2 client')}
-          </button>
+          </ui-button>
         </div>
 
         <data-table
@@ -271,22 +272,19 @@ export class Oauth2ListPage extends LitElement {
               (this.createOrigin = e.detail.value)}
           ></form-field>
           <div slot="footer">
-            <button
-              class="btn-secondary"
-              type="button"
+            <ui-button
               ?disabled=${this.createBusy}
               @click=${() => (this.createOpen = false)}
             >
               ${msg('Cancel')}
-            </button>
-            <button
-              class="btn-primary"
-              type="button"
-              ?disabled=${this.createBusy}
+            </ui-button>
+            <ui-button
+              variant="primary"
+              ?loading=${this.createBusy}
               @click=${() => void this.submitCreate()}
             >
-              ${this.createBusy ? msg('Working...') : msg('Create')}
-            </button>
+              ${msg('Create')}
+            </ui-button>
           </div>
         </modal-dialog>
 

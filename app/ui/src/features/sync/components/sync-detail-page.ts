@@ -17,6 +17,10 @@ import '@/shared/components/admin-layout';
 import '@/shared/components/confirm-dialog';
 import '@/shared/components/form-field';
 import '@/shared/components/ui-icon';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-empty-state';
+import '@/shared/components/ui-skeleton';
 import type { SyncAccountDetail } from '../types/sync-account.types';
 import { syncAccountService } from '../services/sync-account.service';
 import { syncDetailPageStyles } from './sync-detail-page.styles';
@@ -258,7 +262,7 @@ export class SyncDetailPage extends LitElement {
   private renderPortalCard() {
     const hasPortal = (this.detail?.credentialPortal ?? null) !== null;
     return html`
-      <section class="card">
+      <ui-card>
         <h2>${msg('Credential Portal')}</h2>
         <p class="hint">
           ${msg(
@@ -278,30 +282,27 @@ export class SyncDetailPage extends LitElement {
             @field-input=${(e: CustomEvent<{ value: string }>) =>
               (this.portalInput = e.detail.value)}
           ></form-field>
-          <button
-            class="btn-primary"
-            type="button"
+          <ui-button
+            variant="primary"
             ?disabled=${this.portalBusy || !this.portalInput.trim()}
             @click=${() => void this.savePortal(this.portalInput.trim())}
           >
             ${msg('Save')}
-          </button>
-          <button
-            class="btn-secondary"
-            type="button"
+          </ui-button>
+          <ui-button
             ?disabled=${this.portalBusy || !hasPortal}
             @click=${() => void this.savePortal(null)}
           >
             ${msg('Clear')}
-          </button>
+          </ui-button>
         </div>
-      </section>
+      </ui-card>
     `;
   }
 
   private renderYieldCard() {
     return html`
-      <section class="card">
+      <ui-card>
         <h2>${msg('Yield Attributes')}</h2>
         <p class="hint">
           ${msg(
@@ -316,22 +317,21 @@ export class SyncDetailPage extends LitElement {
             (this.yieldInput = e.detail.value)}
         ></form-field>
         <div class="row">
-          <button
-            class="btn-primary"
-            type="button"
-            ?disabled=${this.yieldBusy}
+          <ui-button
+            variant="primary"
+            ?loading=${this.yieldBusy}
             @click=${() => void this.saveYield()}
           >
-            ${this.yieldBusy ? msg('Working...') : msg('Save')}
-          </button>
+            ${msg('Save')}
+          </ui-button>
         </div>
-      </section>
+      </ui-card>
     `;
   }
 
   private renderTokenCard() {
     return html`
-      <section class="card">
+      <ui-card>
         <h2>${msg('Sync Token')}</h2>
         <p class="hint">
           ${msg(
@@ -347,22 +347,20 @@ export class SyncDetailPage extends LitElement {
             @field-input=${(e: CustomEvent<{ value: string }>) =>
               (this.tokenLabel = e.detail.value)}
           ></form-field>
-          <button
-            class="btn-primary"
-            type="button"
-            ?disabled=${this.tokenBusy}
+          <ui-button
+            variant="primary"
+            ?loading=${this.tokenBusy}
             @click=${() => void this.generateToken()}
           >
-            ${this.tokenBusy ? msg('Working...') : msg('Generate token')}
-          </button>
-          <button
-            class="btn-danger"
-            type="button"
+            ${msg('Generate token')}
+          </ui-button>
+          <ui-button
+            variant="danger"
             ?disabled=${this.destroyTokenBusy}
             @click=${() => (this.confirmKind = 'destroy-token')}
           >
             ${msg('Destroy token')}
-          </button>
+          </ui-button>
         </div>
         ${this.revealedToken
           ? html`
@@ -374,25 +372,20 @@ export class SyncDetailPage extends LitElement {
                 </p>
                 <div class="token-value">
                   <code>${this.revealedToken}</code>
-                  <button
-                    class="btn-secondary"
-                    type="button"
-                    @click=${() => void this.copyToken()}
-                  >
-                    <ui-icon name="key" size="14"></ui-icon>
+                  <ui-button @click=${() => void this.copyToken()} icon="key">
                     ${msg('Copy')}
-                  </button>
+                  </ui-button>
                 </div>
               </div>
             `
           : nothing}
-      </section>
+      </ui-card>
     `;
   }
 
   private renderMaintenanceCard() {
     return html`
-      <section class="card">
+      <ui-card>
         <h2>${msg('Maintenance')}</h2>
         <p class="hint">
           ${msg(
@@ -400,30 +393,26 @@ export class SyncDetailPage extends LitElement {
           )}
         </p>
         <div class="danger-zone">
-          <button
-            class="btn-secondary"
-            type="button"
-            ?disabled=${this.refreshBusy}
+          <ui-button
+            ?loading=${this.refreshBusy}
             @click=${() => void this.forceRefresh()}
           >
-            ${this.refreshBusy ? msg('Working...') : msg('Force refresh')}
-          </button>
-          <button
-            class="btn-danger"
-            type="button"
+            ${msg('Force refresh')}
+          </ui-button>
+          <ui-button
+            variant="danger"
             @click=${() => (this.confirmKind = 'finalise')}
           >
             ${msg('Finalise')}
-          </button>
-          <button
-            class="btn-danger"
-            type="button"
+          </ui-button>
+          <ui-button
+            variant="danger"
             @click=${() => (this.confirmKind = 'terminate')}
           >
             ${msg('Terminate')}
-          </button>
+          </ui-button>
         </div>
-      </section>
+      </ui-card>
     `;
   }
 
@@ -435,9 +424,11 @@ export class SyncDetailPage extends LitElement {
           ${msg('All sync accounts')}
         </a>
         ${this.loading
-          ? html`<p class="muted">${msg('Loading...')}</p>`
+          ? html`<ui-skeleton height="48px" .lines=${3}></ui-skeleton>`
           : this.notFound || !this.detail
-            ? html`<p class="muted">${msg('Sync account not found.')}</p>`
+            ? html`<ui-empty-state icon="sync">
+                ${msg('Sync account not found.')}
+              </ui-empty-state>`
             : html`
                 <header class="account-head">
                   <h1>${this.detail.id}</h1>

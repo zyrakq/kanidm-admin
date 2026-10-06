@@ -14,6 +14,10 @@ import '@/shared/components/admin-layout';
 import '@/shared/components/confirm-dialog';
 import '@/shared/components/form-field';
 import '@/shared/components/ui-icon';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-empty-state';
+import '@/shared/components/ui-skeleton';
 import type { DomainInfo } from '../types/domain.types';
 import { domainService } from '../services/domain.service';
 import { domainPageStyles } from './domain-page.styles';
@@ -214,17 +218,19 @@ export class DomainPage extends LitElement {
           <h1>${msg('Domain')}</h1>
         </div>
         ${this.loading
-          ? html`<p class="muted">${msg('Loading...')}</p>`
+          ? html`<ui-skeleton height="48px" .lines=${3}></ui-skeleton>`
           : this.info
             ? this.renderCards(this.info)
-            : html`<p class="muted">${msg('Domain not available.')}</p>`}
+            : html`<ui-empty-state icon="globe">
+                ${msg('Domain not available.')}
+              </ui-empty-state>`}
       </admin-layout>
     `;
   }
 
   private renderCards(info: DomainInfo) {
     return html`
-      <section class="card">
+      <ui-card>
         <h2>${msg('Info')}</h2>
         <dl class="info-grid">
           <dt>${msg('Domain name')}</dt>
@@ -234,9 +240,9 @@ export class DomainPage extends LitElement {
           <dt>${msg('LDAP base DN')}</dt>
           <dd class="mono">${info.ldapBasedn ?? '—'}</dd>
         </dl>
-      </section>
+      </ui-card>
 
-      <section class="card">
+      <ui-card>
         <h2>${msg('Identity')}</h2>
         <form-field
           field-id="domain-display-name"
@@ -267,17 +273,17 @@ export class DomainPage extends LitElement {
           }}
         ></form-field>
         <div class="actions">
-          <button
-            class="primary-btn"
-            ?disabled=${this.busy}
+          <ui-button
+            variant="primary"
+            ?loading=${this.busy}
             @click=${() => this.confirmBasedn()}
           >
-            ${this.busy ? msg('Saving...') : msg('Save')}
-          </button>
+            ${msg('Save')}
+          </ui-button>
         </div>
-      </section>
+      </ui-card>
 
-      <section class="card">
+      <ui-card>
         <h2>${msg('Behaviour')}</h2>
         ${this.renderToggleRow(
           msg('Easter eggs'),
@@ -337,17 +343,17 @@ export class DomainPage extends LitElement {
           }}
         ></form-field>
         <div class="actions">
-          <button
-            class="primary-btn"
-            ?disabled=${this.busy}
+          <ui-button
+            variant="primary"
+            ?loading=${this.busy}
             @click=${() => void this.saveMaxQueryableAttrs()}
           >
-            ${this.busy ? msg('Saving...') : msg('Save')}
-          </button>
+            ${msg('Save')}
+          </ui-button>
         </div>
-      </section>
+      </ui-card>
 
-      <section class="card">
+      <ui-card>
         <h2>${msg('Image')}</h2>
         <div class="image-row">
           ${this.imageFailed
@@ -366,25 +372,32 @@ export class DomainPage extends LitElement {
           </div>
         </div>
         <div class="actions">
-          <label class="secondary-btn image-upload">
-            <input
-              type="file"
-              accept="image/png,image/jpeg,image/gif,image/svg+xml,image/webp"
-              hidden
-              ?disabled=${this.imageBusy}
-              @change=${(e: Event) => void this.uploadImage(e)}
-            />
-            ${this.imageBusy ? msg('Working...') : msg('Upload image...')}
-          </label>
-          <button
-            class="danger-btn"
+          <input
+            id="domain-image-input"
+            type="file"
+            accept="image/png,image/jpeg,image/gif,image/svg+xml,image/webp"
+            hidden
+            ?disabled=${this.imageBusy}
+            @change=${(e: Event) => void this.uploadImage(e)}
+          />
+          <ui-button
+            ?loading=${this.imageBusy}
+            @click=${() =>
+              this.renderRoot
+                .querySelector<HTMLInputElement>('#domain-image-input')
+                ?.click()}
+          >
+            ${msg('Upload image...')}
+          </ui-button>
+          <ui-button
+            variant="danger"
             ?disabled=${this.imageBusy}
             @click=${() => (this.imageRemoveOpen = true)}
           >
             ${msg('Remove image...')}
-          </button>
+          </ui-button>
         </div>
-      </section>
+      </ui-card>
 
       ${this.basednConfirmOpen
         ? html`<confirm-dialog

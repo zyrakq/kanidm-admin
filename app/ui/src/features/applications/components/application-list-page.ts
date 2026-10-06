@@ -24,6 +24,7 @@ import '@/shared/components/modal-dialog';
 import '@/shared/components/confirm-dialog';
 import '@/shared/components/form-field';
 import '@/shared/components/ui-icon';
+import '@/shared/components/ui-button';
 import type { TableColumn } from '@/shared/components/data-table';
 import type {
   ApplicationDetail,
@@ -284,13 +285,9 @@ export class ApplicationListPage extends LitElement {
             : html`<p class="empty">${msg('No additional attributes.')}</p>`}
         </div>
         <div slot="footer">
-          <button
-            class="btn-secondary"
-            type="button"
-            @click=${() => (this.detail = null)}
-          >
+          <ui-button @click=${() => (this.detail = null)}>
             ${msg('Close')}
-          </button>
+          </ui-button>
         </div>
       </modal-dialog>
     `;
@@ -301,10 +298,12 @@ export class ApplicationListPage extends LitElement {
       <admin-layout>
         <div class="page-head">
           <h1>${msg('Applications')}</h1>
-          <button class="btn-primary" type="button" @click=${() =>
-            void this.openCreate()}>
+          <ui-button
+            variant="primary"
+            @click=${() => void this.openCreate()}
+          >
             ${msg('Create application')}
-          </button>
+          </ui-button>
         </div>
 
         <data-table
@@ -352,22 +351,19 @@ export class ApplicationListPage extends LitElement {
               (this.createLinkedGroup = e.detail.value)}
           ></form-field>
           <div slot="footer">
-            <button
-              class="btn-secondary"
-              type="button"
+            <ui-button
               ?disabled=${this.createBusy}
               @click=${() => (this.createOpen = false)}
             >
               ${msg('Cancel')}
-            </button>
-            <button
-              class="btn-primary"
-              type="button"
-              ?disabled=${this.createBusy}
+            </ui-button>
+            <ui-button
+              variant="primary"
+              ?loading=${this.createBusy}
               @click=${() => void this.submitCreate()}
             >
-              ${this.createBusy ? msg('Working...') : msg('Create')}
-            </button>
+              ${msg('Create')}
+            </ui-button>
           </div>
         </modal-dialog>
 

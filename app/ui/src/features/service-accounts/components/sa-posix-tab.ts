@@ -13,6 +13,7 @@ import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { ApiError } from '@/shared/services/http-client';
+import '@/shared/components/ui-button';
 import { serviceAccountService } from '../services/service-account.service';
 import type { UnixUserTokenView } from '../types/service-account.types';
 
@@ -121,13 +122,13 @@ export class SaPosixTab extends LitElement {
           this.shell = e.detail.value;
         }}
       ></form-field>
-      <button
-        class="primary-btn"
-        ?disabled=${this.saving}
+      <ui-button
+        variant="primary"
+        ?loading=${this.saving}
         @click=${() => void this.savePosix()}
       >
-        ${this.saving ? msg('Saving...') : msg('Save POSIX attributes')}
-      </button>
+        ${msg('Save POSIX attributes')}
+      </ui-button>
     `;
   }
 
@@ -144,13 +145,13 @@ export class SaPosixTab extends LitElement {
             this.password = e.detail.value;
           }}
         ></form-field>
-        <button
-          class="primary-btn"
-          ?disabled=${this.settingPassword}
+        <ui-button
+          variant="primary"
+          ?loading=${this.settingPassword}
           @click=${() => void this.setPassword()}
         >
-          ${this.settingPassword ? msg('Setting...') : msg('Set POSIX password')}
-        </button>
+          ${msg('Set POSIX password')}
+        </ui-button>
       </section>
     `;
   }
@@ -199,27 +200,6 @@ export class SaPosixTab extends LitElement {
       margin: 0 0 12px;
       font-size: 14px;
       color: var(--theme-color-text-muted);
-    }
-    .primary-btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      background: var(--theme-color-primary);
-      color: var(--theme-color-surface);
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    .primary-btn:hover:not(:disabled) {
-      background: var(--theme-color-primary-hover);
-    }
-    .primary-btn:active:not(:disabled) {
-      background: var(--theme-color-primary-active);
-    }
-    .primary-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
   `;
 }

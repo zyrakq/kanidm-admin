@@ -13,6 +13,11 @@ import { groupService, type GroupSummary } from '@/features/groups';
 import { oauth2Service } from '../services/oauth2.service';
 import type { Oauth2RsDetail, ScopeMap } from '../types/oauth2.types';
 import '@/shared/components/data-table';
+import '@/shared/components/confirm-dialog';
+import '@/shared/components/form-field';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-skeleton';
 import type { TableColumn } from '@/shared/components/data-table';
 
 @customElement('oauth2-scope-maps-tab')
@@ -133,16 +138,16 @@ export class Oauth2ScopeMapsTab extends LitElement {
         key: 'actions',
         header: msg('Actions'),
         render: (row) => html`
-          <button
-            class="remove-btn"
-            type="button"
+          <ui-button
+            variant="danger-ghost"
+            size="sm"
             ?disabled=${this.busy}
             @click=${() => {
               this.deleteTarget = { sup, group: String(row.group) };
             }}
           >
             ${msg('Remove')}
-          </button>
+          </ui-button>
         `,
       },
     ];
@@ -191,50 +196,50 @@ export class Oauth2ScopeMapsTab extends LitElement {
         }}
       ></form-field>
       <div class="actions">
-        <button
-          class="primary-btn"
+        <ui-button
+          variant="primary"
           ?disabled=${group.trim() === '' ||
-          this.parseScopes(scopes).length === 0 ||
-          this.busy}
+          this.parseScopes(scopes).length === 0}
+          ?loading=${this.busy}
           @click=${() => void this.addMap(sup)}
         >
-          ${this.busy ? msg('Saving...') : msg('Add')}
-        </button>
+          ${msg('Add')}
+        </ui-button>
       </div>
     `;
   }
 
   render() {
     if (this.loading) {
-      return html`<p class="muted">${msg('Loading...')}</p>`;
+      return html`<ui-skeleton lines="3"></ui-skeleton>`;
     }
     const detail = this.detail;
     if (!detail) {
       return html`<p class="muted">${msg('Client not available.')}</p>`;
     }
     return html`
-      <section class="card">
+      <ui-card class="card">
         <h2>${msg('Scope maps')}</h2>
         <p class="muted">
           ${msg('Scopes granted to members of a group.')}
         </p>
         ${this.renderMapTable(detail.scopeMaps, false)}
-      </section>
-      <section class="card">
+      </ui-card>
+      <ui-card class="card">
         <h2>${msg('Add scope map')}</h2>
         ${this.renderAddForm(false)}
-      </section>
-      <section class="card">
+      </ui-card>
+      <ui-card class="card">
         <h2>${msg('Supplemental scope maps')}</h2>
         <p class="muted">
           ${msg('Scopes granted to all users, regardless of group membership.')}
         </p>
         ${this.renderMapTable(detail.supScopeMaps, true)}
-      </section>
-      <section class="card">
+      </ui-card>
+      <ui-card class="card">
         <h2>${msg('Add supplemental scope map')}</h2>
         ${this.renderAddForm(true)}
-      </section>
+      </ui-card>
       ${this.deleteTarget !== null
         ? html`<confirm-dialog
             open
@@ -266,12 +271,7 @@ export class Oauth2ScopeMapsTab extends LitElement {
       color: var(--theme-color-text-muted);
     }
     .card {
-      background: var(--theme-color-surface);
-      border: 1px solid var(--theme-color-border);
-      border-radius: 8px;
-      padding: 20px;
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
     .card h2 {
       margin: 0 0 16px;
@@ -282,43 +282,6 @@ export class Oauth2ScopeMapsTab extends LitElement {
     .actions {
       display: flex;
       justify-content: flex-end;
-    }
-    .primary-btn {
-      padding: 9px 16px;
-      border: none;
-      border-radius: 6px;
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      background: var(--theme-color-primary);
-      color: var(--theme-color-surface);
-      transition: background-color 0.2s ease;
-    }
-    .primary-btn:hover:not(:disabled) {
-      background: var(--theme-color-primary-hover);
-    }
-    .primary-btn:active:not(:disabled) {
-      background: var(--theme-color-primary-active);
-    }
-    .remove-btn {
-      padding: 5px 12px;
-      background: transparent;
-      border: 1px solid var(--theme-color-error);
-      border-radius: 6px;
-      color: var(--theme-color-error);
-      font: inherit;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-    .remove-btn:hover:not(:disabled) {
-      background: var(--theme-color-error);
-      color: var(--theme-color-surface);
-    }
-    .primary-btn:disabled,
-    .remove-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
   `;
 }

@@ -287,9 +287,28 @@ try {
   ```css
   transition: background-color 0.2s ease, color 0.2s ease;
   ```
-- Buttons: orange background (`var(--theme-color-primary)`), no shadows, `border-radius: 6px`, `font-weight: 500`
-- Cards: surface background, minimal shadow (`var(--theme-shadow-md)`), `border-radius: 8px`
+- Style is restrained: soft shadows (`--theme-elevation-1/2/3`), subtle top highlight (`--theme-highlight`), short animations (`--theme-duration`, `--theme-ease`)
+- Radii via `--theme-radius-sm/md/lg/xl`; focus via `--theme-focus-ring`
 - No gradients on backgrounds, no 3D effects
+
+### Shared `ui-*` Components
+
+Never re-implement buttons, cards, badges, empty/loading states or modals locally — use `shared/components/`:
+
+| Component | Use |
+|-----------|-----|
+| `ui-button` | All buttons. `variant`: primary/secondary/danger/ghost/danger-ghost; `size`: sm/md; `loading`, `block`, `icon`; `type="submit"` is form-associated |
+| `ui-card` | Surfaces. `interactive`, `sunken`, `flush`; slots `header`/default/`footer` |
+| `ui-badge` | Status chips. `variant`: neutral/primary/success/error/warning/info |
+| `ui-empty-state` | Empty lists (`icon`, `heading`, `action` slot) |
+| `ui-skeleton` | Loading placeholders (`width`, `height`, `lines`) |
+| `ui-copy-field`, `ui-qr` | Copyable value, collapsible QR code |
+| `modal-dialog`, `confirm-dialog` | Dialogs; actions go in `<div slot="footer">` |
+| `form-field` | All inputs, selects and textareas |
+
+- Shared components receive already-localized strings via props; they don't define their own `msg()` strings
+- Button text goes in the default slot; `label` is only the aria-label
+- Exception: row `.btn-delete` buttons rendered inside `data-table` column renderers are styled by `data-table`
 
 ## TypeScript
 

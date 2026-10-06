@@ -13,6 +13,8 @@ import { ApiError } from '@/shared/services/http-client';
 import { navigate } from '@/shared/services/router.service';
 import '@/shared/components/admin-layout';
 import '@/shared/components/ui-icon';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-skeleton';
 import '@/shared/components/tab-bar';
 import '@/shared/components/confirm-dialog';
 import type { TabDef } from '@/shared/components/tab-bar';
@@ -146,7 +148,7 @@ export class GroupDetailPage extends LitElement {
           ${msg('All groups')}
         </a>
         ${this.loading
-          ? html`<p class="muted">${msg('Loading...')}</p>`
+          ? html`<ui-skeleton lines="3"></ui-skeleton>`
           : this.notFound || !this.group
             ? html`<p class="muted">${msg('Group not found.')}</p>`
             : html`
@@ -161,15 +163,15 @@ export class GroupDetailPage extends LitElement {
                       ? html`<p class="muted mono">${this.group.uuid}</p>`
                       : nothing}
                   </div>
-                  <button
+                  <ui-button
                     class="btn-delete"
-                    type="button"
+                    variant="danger-ghost"
+                    icon="trash"
                     ?disabled=${this.deleteBusy}
                     @click=${() => (this.deleteOpen = true)}
                   >
-                    <ui-icon name="trash" size="16"></ui-icon>
                     ${msg('Delete')}
-                  </button>
+                  </ui-button>
                 </header>
                 <tab-bar
                   .tabs=${this.tabs}

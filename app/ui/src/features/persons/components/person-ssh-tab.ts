@@ -13,6 +13,11 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-empty-state';
+import '@/shared/components/ui-skeleton';
+import '@/shared/components/form-field';
 import { personService } from '../services/person.service';
 import { personSshTabStyles } from './person-ssh-tab.styles';
 
@@ -64,12 +69,12 @@ export class PersonSshTab extends LitElement {
     }
   }
 
-  private handleTagInput(e: Event): void {
-    this.tag = (e.target as HTMLInputElement).value;
+  private handleTagInput(e: CustomEvent<{ value: string }>): void {
+    this.tag = e.detail.value;
   }
 
-  private handlePubkeyInput(e: Event): void {
-    this.pubkey = (e.target as HTMLTextAreaElement).value;
+  private handlePubkeyInput(e: CustomEvent<{ value: string }>): void {
+    this.pubkey = e.detail.value;
   }
 
   private async handleAdd(e: Event): Promise<void> {
@@ -124,7 +129,7 @@ export class PersonSshTab extends LitElement {
     return html`
       <h2 class="section-title">${msg('SSH Public Keys')}</h2>
       ${this.loading
-        ? html`<p class="muted">${msg('Loading...')}</p>`
+        ? html`<ui-skeleton height="56px" .lines=${2}></ui-skeleton>`
         : this.loadError
           ? html`<p class="error" role="alert">${this.loadError}</p>`
           : this.renderKeyList()}
@@ -134,26 +139,34 @@ export class PersonSshTab extends LitElement {
 
   private renderKeyList() {
     if (this.keys.length === 0) {
-      return html`<p class="muted">${msg('No SSH keys registered.')}</p>`;
+      return html`<ui-empty-state class="empty" icon="terminal">
+        ${msg('No SSH keys registered.')}
+      </ui-empty-state>`;
     }
     return html`
       <ul class="key-list">
         ${this.keys.map(
           (item) => html`
-            <li class="key-item">
-              <div class="key-body">
-                ${item.tag
-                  ? html`<p class="key-tag">${item.tag}</p>`
-                  : nothing}
-                <p class="key-value">${item.key}</p>
-              </div>
-              <button
-                class="btn btn-danger"
-                ?disabled=${this.busy || !item.tag}
-                @click=${() => this.handleRemove(item)}
-              >
-                ${msg('Remove')}
-              </button>
+            <li>
+              <ui-card interactive>
+                <div class="key-item">
+                  <div class="key-body">
+                    ${item.tag
+                      ? html`<p class="key-tag">${item.tag}</p>`
+                      : nothing}
+                    <p class="key-value">${item.key}</p>
+                  </div>
+                  <ui-button
+                    variant="danger-ghost"
+                    size="sm"
+                    icon="trash"
+                    ?disabled=${this.busy || !item.tag}
+                    @click=${() => this.handleRemove(item)}
+                  >
+                    ${msg('Remove')}
+                  </ui-button>
+                </div>
+              </ui-card>
             </li>
           `
         )}
@@ -163,40 +176,36 @@ export class PersonSshTab extends LitElement {
 
   private renderAddForm() {
     return html`
-      <form class="add-form" @submit=${this.handleAdd}>
-        <div class="field">
-          <label class="label" for="ssh-tag">${msg('Tag')}</label>
-          <input
-            id="ssh-tag"
-            class="input"
-            type="text"
+      <ui-card>
+        <form class="add-form" @submit=${this.handleAdd}>
+          <form-field
+            fieldId="ssh-tag"
+            label=${msg('Tag')}
             .value=${this.tag}
-            @input=${this.handleTagInput}
             ?disabled=${this.busy}
             required
-          />
-        </div>
-        <div class="field">
-          <label class="label" for="ssh-pubkey">${msg('Public key')}</label>
-          <textarea
-            id="ssh-pubkey"
-            class="textarea"
+            @field-input=${this.handleTagInput}
+          ></form-field>
+          <form-field
+            fieldId="ssh-pubkey"
+            type="textarea"
+            label=${msg('Public key')}
             .value=${this.pubkey}
-            @input=${this.handlePubkeyInput}
             ?disabled=${this.busy}
             placeholder="ssh-ed25519 AAAA..."
             required
-          ></textarea>
-        </div>
-        ${this.formError
-          ? html`<p class="error" role="alert">${this.formError}</p>`
-          : nothing}
-        <div class="form-actions">
-          <button class="btn btn-primary" type="submit" ?disabled=${this.busy}>
-            ${msg('Add Key')}
-          </button>
-        </div>
-      </form>
+            @field-input=${this.handlePubkeyInput}
+          ></form-field>
+          ${this.formError
+            ? html`<p class="error" role="alert">${this.formError}</p>`
+            : nothing}
+          <div class="form-actions">
+            <ui-button type="submit" variant="primary" icon="plus" ?loading=${this.busy}>
+              ${msg('Add Key')}
+            </ui-button>
+          </div>
+        </form>
+      </ui-card>
     `;
   }
 }

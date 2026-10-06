@@ -7,6 +7,10 @@ import { LitElement, css, html, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-empty-state';
+import '@/shared/components/form-field';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { groupService } from '../services/group.service';
@@ -98,37 +102,42 @@ export class GroupMembersTab extends LitElement {
     }
     const busy = this.removing !== null || this.adding || this.setting;
     return html`
-      <section class="card">
-        <h2>${msg('Members')}</h2>
+      <ui-card>
+        <h2 slot="header">${msg('Members')}</h2>
         ${detail.members.length === 0
-          ? html`<p class="muted">${msg('This group has no members.')}</p>`
+          ? html`<ui-empty-state class="empty" icon="groups">
+              ${msg('This group has no members.')}
+            </ui-empty-state>`
           : html`
               <ul class="member-list">
                 ${detail.members.map(
                   (member) => html`
                     <li>
                       <span class="mono">${member}</span>
-                      <button
-                        class="remove-btn"
+                      <ui-button
+                        variant="danger-ghost"
+                        size="sm"
                         ?disabled=${busy}
+                        ?loading=${this.removing === member}
                         @click=${() => this.removeMember(member)}
                       >
                         ${this.removing === member
                           ? msg('Removing...')
                           : msg('Remove')}
-                      </button>
+                      </ui-button>
                     </li>
                   `
                 )}
               </ul>
             `}
         <div class="add-member">
-          <input
-            class="input"
+          <form-field
+            class="add-input"
+            fieldId="group-add-member"
             placeholder=${msg('Person or service account name')}
             .value=${this.newMember}
-            @input=${(e: Event) => {
-              this.newMember = (e.target as HTMLInputElement).value;
+            @field-input=${(e: CustomEvent<{ value: string }>) => {
+              this.newMember = e.detail.value;
             }}
             @keydown=${(e: KeyboardEvent) => {
               if (e.key === 'Enter') {
@@ -136,17 +145,18 @@ export class GroupMembersTab extends LitElement {
                 void this.addMember();
               }
             }}
-          />
-          <button
-            class="primary-btn"
+          ></form-field>
+          <ui-button
+            variant="primary"
             ?disabled=${busy || this.newMember.trim() === ''}
+            ?loading=${this.adding}
             @click=${this.addMember}
           >
             ${this.adding ? msg('Adding...') : msg('Add member')}
-          </button>
+          </ui-button>
         </div>
-      </section>
-      <section class="card">
+      </ui-card>
+      <ui-card>
         <details class="advanced">
           <summary>${msg('Advanced: replace all members')}</summary>
           <p class="muted">
@@ -154,25 +164,28 @@ export class GroupMembersTab extends LitElement {
               'One member name per line. Saving replaces the entire member list.'
             )}
           </p>
-          <textarea
-            class="input members-textarea"
-            rows="6"
+          <form-field
+            class="members-textarea"
+            fieldId="group-members-text"
+            type="textarea"
+            .rows=${6}
             .value=${this.membersText}
-            @input=${(e: Event) => {
-              this.membersText = (e.target as HTMLTextAreaElement).value;
+            @field-input=${(e: CustomEvent<{ value: string }>) => {
+              this.membersText = e.detail.value;
             }}
-          ></textarea>
+          ></form-field>
           <div class="actions">
-            <button
-              class="primary-btn"
+            <ui-button
+              variant="primary"
               ?disabled=${busy}
+              ?loading=${this.setting}
               @click=${this.setMembers}
             >
               ${this.setting ? msg('Saving...') : msg('Set members')}
-            </button>
+            </ui-button>
           </div>
         </details>
-      </section>
+      </ui-card>
     `;
   }
 
@@ -185,19 +198,17 @@ export class GroupMembersTab extends LitElement {
       font-size: 14px;
       color: var(--theme-color-text-muted);
     }
-    .card {
-      background: var(--theme-color-surface);
-      border: 1px solid var(--theme-color-border);
-      border-radius: 8px;
-      padding: 20px;
+    ui-card {
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
-    .card h2 {
-      margin: 0 0 16px;
+    h2 {
+      margin: 0;
       font-size: 16px;
       font-weight: 600;
       color: var(--theme-color-text-primary);
+    }
+    .empty {
+      margin-bottom: 16px;
     }
     .member-list {
       list-style: none;
@@ -214,7 +225,7 @@ export class GroupMembersTab extends LitElement {
       gap: 12px;
       padding: 8px 12px;
       border: 1px solid var(--theme-color-border);
-      border-radius: 6px;
+      border-radius: var(--theme-radius-md);
     }
     .mono {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -222,52 +233,19 @@ export class GroupMembersTab extends LitElement {
       color: var(--theme-color-text-primary);
       word-break: break-all;
     }
-    .remove-btn {
-      flex-shrink: 0;
-      padding: 4px 12px;
-      border: 1px solid var(--theme-color-error);
-      border-radius: 6px;
-      background: transparent;
-      color: var(--theme-color-error);
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease, color 0.2s ease;
-    }
-    .remove-btn:hover:not(:disabled) {
-      background: var(--theme-color-error);
-      color: var(--theme-color-surface);
-    }
-    .remove-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
     .add-member {
       display: flex;
+      align-items: flex-start;
       gap: 8px;
     }
-    .input {
+    .add-input {
       flex: 1;
       min-width: 0;
-      padding: 9px 12px;
-      border: 1px solid var(--theme-color-border);
-      border-radius: 6px;
-      font: inherit;
-      color: var(--theme-color-text-primary);
-      background: var(--theme-color-surface);
-      transition: border-color 0.2s ease;
-    }
-    .input:focus {
-      outline: none;
-      border-color: var(--theme-color-primary);
+      --field-margin: 0;
     }
     .members-textarea {
       display: block;
-      width: 100%;
-      box-sizing: border-box;
-      resize: vertical;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 13px;
+      --field-margin: 0;
     }
     .advanced summary {
       margin-bottom: 12px;
@@ -280,27 +258,6 @@ export class GroupMembersTab extends LitElement {
       display: flex;
       justify-content: flex-end;
       margin-top: 12px;
-    }
-    .primary-btn {
-      padding: 9px 16px;
-      border: none;
-      border-radius: 6px;
-      background: var(--theme-color-primary);
-      color: var(--theme-color-surface);
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    .primary-btn:hover:not(:disabled) {
-      background: var(--theme-color-primary-hover);
-    }
-    .primary-btn:active:not(:disabled) {
-      background: var(--theme-color-primary-active);
-    }
-    .primary-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
   `;
 }

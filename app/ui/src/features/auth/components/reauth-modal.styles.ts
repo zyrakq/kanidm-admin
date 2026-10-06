@@ -11,7 +11,8 @@ export const reauthModalStyles = css`
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--theme-overlay-bg);
+    backdrop-filter: blur(var(--theme-overlay-blur));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -31,8 +32,9 @@ export const reauthModalStyles = css`
 
   .modal-card {
     background: var(--theme-color-surface-elevated);
-    border-radius: 8px;
-    box-shadow: var(--theme-shadow-lg);
+    border: 1px solid var(--theme-color-border);
+    border-radius: var(--theme-radius-xl);
+    box-shadow: var(--theme-elevation-3), var(--theme-highlight);
     max-width: 420px;
     width: 100%;
     display: flex;
@@ -105,8 +107,8 @@ export const reauthModalStyles = css`
     padding: 0.625rem 0.875rem;
     font-size: 0.9375rem;
     border: 1px solid var(--theme-color-border);
-    border-radius: 6px;
-    background: var(--theme-color-background);
+    border-radius: var(--theme-radius-md);
+    background: var(--theme-color-surface-sunken);
     color: var(--theme-color-text-primary);
     font-family: inherit;
     transition:
@@ -117,6 +119,7 @@ export const reauthModalStyles = css`
   .input:focus {
     outline: none;
     border-color: var(--theme-color-primary);
+    box-shadow: var(--theme-focus-ring);
   }
 
   .error {
@@ -130,48 +133,5 @@ export const reauthModalStyles = css`
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
-  }
-
-  .btn {
-    padding: 0.5rem 1.25rem;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background-color 0.2s ease;
-  }
-
-  .btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .btn-primary {
-    background: var(--theme-color-primary);
-    color: white;
-  }
-
-  .btn-primary:hover:not(:disabled) {
-    background: var(--theme-color-primary-hover);
-  }
-
-  .btn-primary:active:not(:disabled) {
-    background: var(--theme-color-primary-active);
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--theme-color-text-secondary);
-    border: 1px solid var(--theme-color-border);
-    transition:
-      color 0.2s ease,
-      border-color 0.2s ease;
-  }
-
-  .btn-secondary:hover {
-    color: var(--theme-color-text-primary);
-    border-color: var(--theme-color-text-secondary);
   }
 `;

@@ -9,6 +9,11 @@ import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import '@/shared/components/confirm-dialog';
+import '@/shared/components/form-field';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-empty-state';
+import '@/shared/components/ui-skeleton';
 import { oauth2Service } from '../services/oauth2.service';
 import type { Oauth2RsDetail } from '../types/oauth2.types';
 
@@ -75,17 +80,19 @@ export class Oauth2OriginsTab extends LitElement {
 
   render() {
     if (this.loading) {
-      return html`<p class="muted">${msg('Loading...')}</p>`;
+      return html`<ui-skeleton lines="3"></ui-skeleton>`;
     }
     const origins = this.detail?.origins ?? [];
     return html`
-      <section class="card">
+      <ui-card class="card">
         <h2>${msg('Redirect origins')}</h2>
         <p class="muted">
           ${msg('Origins the client may redirect to after authentication.')}
         </p>
         ${origins.length === 0
-          ? html`<p class="muted">${msg('No origins configured.')}</p>`
+          ? html`<ui-empty-state icon="globe">
+              ${msg('No origins configured.')}
+            </ui-empty-state>`
           : html`
               <table>
                 <thead>
@@ -100,15 +107,16 @@ export class Oauth2OriginsTab extends LitElement {
                       <tr>
                         <td class="mono">${origin}</td>
                         <td class="col-actions">
-                          <button
-                            class="remove-btn"
+                          <ui-button
+                            variant="danger-ghost"
+                            size="sm"
                             ?disabled=${this.busy}
                             @click=${() => {
                               this.removeTarget = origin;
                             }}
                           >
                             ${msg('Remove')}
-                          </button>
+                          </ui-button>
                         </td>
                       </tr>
                     `
@@ -116,8 +124,8 @@ export class Oauth2OriginsTab extends LitElement {
                 </tbody>
               </table>
             `}
-      </section>
-      <section class="card">
+      </ui-card>
+      <ui-card class="card">
         <h2>${msg('Add origin')}</h2>
         <form-field
           field-id="org-origin"
@@ -129,15 +137,16 @@ export class Oauth2OriginsTab extends LitElement {
           }}
         ></form-field>
         <div class="actions">
-          <button
-            class="primary-btn"
-            ?disabled=${this.origin.trim() === '' || this.busy}
+          <ui-button
+            variant="primary"
+            ?disabled=${this.origin.trim() === ''}
+            ?loading=${this.busy}
             @click=${() => void this.addOrigin()}
           >
-            ${this.busy ? msg('Adding...') : msg('Add origin')}
-          </button>
+            ${msg('Add origin')}
+          </ui-button>
         </div>
-      </section>
+      </ui-card>
       ${this.removeTarget !== null
         ? html`<confirm-dialog
             open
@@ -169,12 +178,7 @@ export class Oauth2OriginsTab extends LitElement {
       color: var(--theme-color-text-muted);
     }
     .card {
-      background: var(--theme-color-surface);
-      border: 1px solid var(--theme-color-border);
-      border-radius: 8px;
-      padding: 20px;
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
     .card h2 {
       margin: 0 0 16px;
@@ -211,43 +215,6 @@ export class Oauth2OriginsTab extends LitElement {
     .actions {
       display: flex;
       justify-content: flex-end;
-    }
-    .primary-btn {
-      padding: 9px 16px;
-      border: none;
-      border-radius: 6px;
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      background: var(--theme-color-primary);
-      color: var(--theme-color-surface);
-      transition: background-color 0.2s ease;
-    }
-    .primary-btn:hover:not(:disabled) {
-      background: var(--theme-color-primary-hover);
-    }
-    .primary-btn:active:not(:disabled) {
-      background: var(--theme-color-primary-active);
-    }
-    .remove-btn {
-      padding: 5px 12px;
-      background: transparent;
-      border: 1px solid var(--theme-color-error);
-      border-radius: 6px;
-      color: var(--theme-color-error);
-      font: inherit;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-    }
-    .remove-btn:hover:not(:disabled) {
-      background: var(--theme-color-error);
-      color: var(--theme-color-surface);
-    }
-    .primary-btn:disabled,
-    .remove-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
   `;
 }

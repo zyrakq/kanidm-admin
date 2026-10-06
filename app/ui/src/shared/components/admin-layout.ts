@@ -135,7 +135,7 @@ export class AdminLayout extends LitElement {
         visibility: hidden;
         z-index: 1500;
         background: var(--theme-color-surface);
-        box-shadow: var(--theme-shadow-lg);
+        box-shadow: var(--theme-elevation-3);
         overflow-y: auto;
       }
       .layout.drawer-open .sidebar {
@@ -155,7 +155,8 @@ export class AdminLayout extends LitElement {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background: var(--theme-overlay-bg);
+        backdrop-filter: blur(var(--theme-overlay-blur));
         z-index: 1400;
         opacity: 0;
         pointer-events: none;

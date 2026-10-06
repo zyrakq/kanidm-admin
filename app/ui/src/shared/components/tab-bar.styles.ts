@@ -24,14 +24,24 @@ export const tabBarStyles = css`
     color: var(--theme-color-text-secondary);
     cursor: pointer;
     white-space: nowrap;
-    transition: color 0.2s ease, border-color 0.2s ease;
+    border-radius: var(--theme-radius-md) var(--theme-radius-md) 0 0;
+    transition:
+      color var(--theme-duration-fast) var(--theme-ease),
+      background-color var(--theme-duration-fast) var(--theme-ease),
+      border-color var(--theme-duration-fast) var(--theme-ease);
   }
   .tab:hover {
     color: var(--theme-color-text-primary);
+    background: var(--theme-color-surface-hover);
+  }
+  .tab:focus-visible {
+    outline: none;
+    box-shadow: var(--theme-focus-ring);
   }
   .tab.active {
     color: var(--theme-color-primary);
     border-bottom-color: var(--theme-color-primary);
+    box-shadow: 0 1px 0 var(--theme-color-primary);
   }
 
   .trigger-label {
@@ -53,8 +63,8 @@ export const tabBarStyles = css`
     padding: 4px;
     background: var(--theme-color-surface);
     border: 1px solid var(--theme-color-border);
-    border-radius: 8px;
-    box-shadow: var(--theme-shadow-md);
+    border-radius: var(--theme-radius-lg);
+    box-shadow: var(--theme-elevation-2), var(--theme-highlight);
     z-index: 1000;
   }
 
@@ -64,17 +74,19 @@ export const tabBarStyles = css`
     padding: 10px 12px;
     background: none;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--theme-radius-sm);
     font: inherit;
     font-weight: 500;
     color: var(--theme-color-text-secondary);
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition:
+      background-color var(--theme-duration-fast) var(--theme-ease),
+      color var(--theme-duration-fast) var(--theme-ease);
   }
 
   .menu-item:hover {
-    background: var(--theme-color-background);
+    background: var(--theme-color-surface-hover);
     color: var(--theme-color-text-primary);
   }
 
@@ -117,15 +129,23 @@ export const tabBarStyles = css`
       padding: 10px 14px;
       background: var(--theme-color-surface);
       border: 1px solid var(--theme-color-border);
-      border-radius: 6px;
+      border-radius: var(--theme-radius-md);
+      box-shadow: var(--theme-elevation-1), var(--theme-highlight);
       font: inherit;
       font-weight: 500;
       color: var(--theme-color-text-primary);
       cursor: pointer;
-      transition: border-color 0.2s ease;
+      transition:
+        border-color var(--theme-duration-fast) var(--theme-ease),
+        box-shadow var(--theme-duration-fast) var(--theme-ease);
     }
     .menu-trigger:hover {
+      border-color: var(--theme-color-border-strong);
+    }
+    .menu-trigger:focus-visible {
+      outline: none;
       border-color: var(--theme-color-primary);
+      box-shadow: var(--theme-focus-ring);
     }
   }
 `;

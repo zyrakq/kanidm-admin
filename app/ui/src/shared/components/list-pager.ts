@@ -6,6 +6,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
 import './form-field';
+import './ui-button';
 
 const PAGE_SIZE_OPTIONS: { value: string; label: string }[] = [
   { value: '10', label: '10' },
@@ -35,9 +36,9 @@ export class ListPager extends LitElement {
       <div class="pager">
         <span class="range">${msg(str`${from}–${to} of ${this.total}`)}</span>
         <div class="controls">
-          <button
-            class="page-btn"
-            type="button"
+          <ui-button
+            variant="secondary"
+            size="sm"
             ?disabled=${this.page <= 1}
             @click=${() =>
               this.dispatchEvent(
@@ -49,10 +50,10 @@ export class ListPager extends LitElement {
               )}
           >
             ${msg('Previous')}
-          </button>
-          <button
-            class="page-btn"
-            type="button"
+          </ui-button>
+          <ui-button
+            variant="secondary"
+            size="sm"
             ?disabled=${this.page >= this.pageCount}
             @click=${() =>
               this.dispatchEvent(
@@ -64,7 +65,7 @@ export class ListPager extends LitElement {
               )}
           >
             ${msg('Next')}
-          </button>
+          </ui-button>
         </div>
         <form-field
           class="size-field"
@@ -107,23 +108,6 @@ export class ListPager extends LitElement {
       display: flex;
       gap: 8px;
       padding-bottom: 9px;
-    }
-    .page-btn {
-      border: 1px solid var(--theme-color-border);
-      border-radius: 6px;
-      padding: 6px 12px;
-      font: inherit;
-      font-weight: 500;
-      background: transparent;
-      color: var(--theme-color-text-primary);
-      cursor: pointer;
-    }
-    .page-btn:hover {
-      background: var(--theme-color-background);
-    }
-    .page-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
     }
     .size-field {
       margin-left: auto;

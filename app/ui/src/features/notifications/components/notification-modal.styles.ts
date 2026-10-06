@@ -11,7 +11,8 @@ export const notificationModalStyles = css`
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--theme-overlay-bg);
+    backdrop-filter: blur(var(--theme-overlay-blur));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -32,8 +33,9 @@ export const notificationModalStyles = css`
 
   .modal-card {
     background: var(--theme-color-surface-elevated);
-    border-radius: 8px;
-    box-shadow: var(--theme-shadow-lg);
+    border: 1px solid var(--theme-color-border);
+    border-radius: var(--theme-radius-xl);
+    box-shadow: var(--theme-elevation-3), var(--theme-highlight);
     max-width: 600px;
     width: 100%;
     max-height: 80vh;
@@ -84,23 +86,23 @@ export const notificationModalStyles = css`
   }
 
   .modal-icon-success {
-    background: #d1fae5;
-    color: #10b981;
+    background: var(--theme-color-success-soft);
+    color: var(--theme-color-success);
   }
 
   .modal-icon-error {
-    background: #fee2e2;
-    color: #ef4444;
+    background: var(--theme-color-error-soft);
+    color: var(--theme-color-error);
   }
 
   .modal-icon-warning {
-    background: #fef3c7;
-    color: #f59e0b;
+    background: var(--theme-color-warning-soft);
+    color: var(--theme-color-warning);
   }
 
   .modal-icon-info {
-    background: #dbeafe;
-    color: #3b82f6;
+    background: var(--theme-color-info-soft);
+    color: var(--theme-color-info);
   }
 
   .modal-title-text {
@@ -122,20 +124,20 @@ export const notificationModalStyles = css`
     color: var(--theme-color-text-secondary);
     font-size: 20px;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: var(--theme-radius-md);
     transition:
       background-color 0.2s ease,
       color 0.2s ease;
   }
 
   .modal-close:hover {
-    background: var(--theme-color-background);
+    background: var(--theme-color-surface-hover);
     color: var(--theme-color-text-primary);
   }
 
   .modal-close:focus {
-    outline: 2px solid var(--theme-color-primary);
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: var(--theme-focus-ring);
   }
 
   .modal-content {

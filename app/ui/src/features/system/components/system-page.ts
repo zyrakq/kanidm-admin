@@ -15,6 +15,8 @@ import '@/shared/components/admin-layout';
 import '@/shared/components/data-table';
 import '@/shared/components/confirm-dialog';
 import '@/shared/components/form-field';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-button';
 import type { TableColumn } from '@/shared/components/data-table';
 import { systemService } from '../services/system.service';
 import { domainService } from '@/features/domain';
@@ -193,14 +195,13 @@ export class SystemPage extends LitElement {
               : (this.deniedNamesAddText = e.detail.value)}
         ></form-field>
         <div class="form-actions">
-          <button
-            class="btn-primary"
-            type="button"
-            ?disabled=${busy}
+          <ui-button
+            variant="primary"
+            ?loading=${busy}
             @click=${() => void this.submitAppend(kind)}
           >
-            ${busy ? msg('Working...') : msg('Add')}
-          </button>
+            ${msg('Add')}
+          </ui-button>
         </div>
       </form>
     `;
@@ -233,7 +234,7 @@ export class SystemPage extends LitElement {
           <h1>${msg('System')}</h1>
         </div>
 
-        <section class="card">
+        <ui-card>
           <h2>${msg('Account policy')}</h2>
           <div class="toggle-row">
             <div class="toggle-text">
@@ -258,9 +259,9 @@ export class SystemPage extends LitElement {
               <span class="slider"></span>
             </label>
           </div>
-        </section>
+        </ui-card>
 
-        <section class="card">
+        <ui-card>
           <h2>${msg('Password badlist')}</h2>
           <p class="description">
             ${msg(
@@ -275,9 +276,9 @@ export class SystemPage extends LitElement {
             .searchable=${true}
             .emptyMessage=${msg('The badlist is empty.')}
           ></data-table>
-        </section>
+        </ui-card>
 
-        <section class="card">
+        <ui-card>
           <h2>${msg('Denied names')}</h2>
           <p class="description">
             ${msg('Names in this list cannot be used for persons, groups, or accounts.')}
@@ -290,7 +291,7 @@ export class SystemPage extends LitElement {
             .searchable=${true}
             .emptyMessage=${msg('The denied names list is empty.')}
           ></data-table>
-        </section>
+        </ui-card>
 
         ${this.renderRemoveDialog()}
       </admin-layout>

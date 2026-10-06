@@ -18,34 +18,6 @@ export const applicationListPageStyles = css`
     font-weight: 600;
     color: var(--theme-color-text-primary);
   }
-  .btn-primary,
-  .btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 14px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  .btn-primary {
-    background: var(--theme-color-primary);
-    color: #ffffff;
-  }
-  .btn-primary:hover:not(:disabled) {
-    background: var(--theme-color-primary-hover);
-  }
-  .btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  .btn-secondary {
-    background: var(--theme-color-surface);
-    color: var(--theme-color-text-primary);
-    border: 1px solid var(--theme-color-border);
-  }
   .mono {
     font-family: var(--theme-font-mono, monospace);
     font-size: 13px;
@@ -86,7 +58,7 @@ export const applicationListPageStyles = css`
   .attrs-table th {
     font-weight: 600;
     color: var(--theme-color-text-secondary);
-    background: var(--theme-color-surface);
+    background: var(--theme-color-surface-sunken);
   }
   .attrs-table td:first-child {
     font-family: var(--theme-font-mono, monospace);
@@ -111,7 +83,7 @@ export const applicationListPageStyles = css`
     height: 28px;
     padding: 0;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--theme-radius-md);
     background: none;
     color: var(--theme-color-error);
     cursor: pointer;
@@ -120,6 +92,6 @@ export const applicationListPageStyles = css`
   }
   .btn-delete:hover {
     background: var(--theme-color-error);
-    color: #ffffff;
+    color: var(--theme-color-on-primary);
   }
 `;

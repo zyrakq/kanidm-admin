@@ -13,7 +13,10 @@ import '@/shared/components/admin-layout';
 import '@/shared/components/data-table';
 import '@/shared/components/modal-dialog';
 import '@/shared/components/confirm-dialog';
-import '@/shared/components/ui-icon';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-badge';
+import '@/shared/components/ui-empty-state';
+import '@/shared/components/ui-skeleton';
 import type { TableColumn } from '@/shared/components/data-table';
 import type { RecycleBinEntry } from '../types/recycle-bin.types';
 import { recycleBinService } from '../services/recycle-bin.service';
@@ -102,26 +105,28 @@ export class RecycleBinPage extends LitElement {
         header: msg('Classes'),
         render: (row) =>
           (row.classes as string[]).length > 0
-            ? html`${(row.classes as string[]).map(
-                (cls) => html`<span class="badge">${cls}</span>`
-              )}`
+            ? html`<span style="display:inline-flex;flex-wrap:wrap;gap:4px"
+                >${(row.classes as string[]).map(
+                  (cls) => html`<ui-badge>${cls}</ui-badge>`
+                )}</span
+              >`
             : '—',
       },
       {
         key: 'actions',
         header: '',
         render: (row) =>
-          html`<button
-            class="btn-primary"
-            type="button"
+          html`<ui-button
+            variant="primary"
+            size="sm"
+            icon="refresh"
             @click=${(e: Event) => {
               e.stopPropagation();
               this.reviveTarget = row as unknown as RecycleBinEntry;
             }}
           >
-            <ui-icon name="refresh" size="16"></ui-icon>
             ${msg('Revive')}
-          </button>`,
+          </ui-button>`,
       },
     ];
   }
@@ -129,7 +134,7 @@ export class RecycleBinPage extends LitElement {
   private renderAttrs(entry: KanidmEntry) {
     const keys = Object.keys(entry.attrs);
     if (keys.length === 0) {
-      return html`<p class="empty">${msg('No attributes.')}</p>`;
+      return html`<ui-empty-state>${msg('No attributes.')}</ui-empty-state>`;
     }
     return html`
       <ul class="attr-list">
@@ -187,10 +192,10 @@ export class RecycleBinPage extends LitElement {
           @modal-close=${() => (this.detailOpen = false)}
         >
           ${this.detailLoading
-            ? html`<p class="empty">${msg('Loading...')}</p>`
+            ? html`<ui-skeleton height="20px" .lines=${4}></ui-skeleton>`
             : this.detailEntry
               ? this.renderAttrs(this.detailEntry)
-              : html`<p class="empty">${msg('No attributes.')}</p>`}
+              : html`<ui-empty-state>${msg('No attributes.')}</ui-empty-state>`}
         </modal-dialog>
       </admin-layout>
     `;

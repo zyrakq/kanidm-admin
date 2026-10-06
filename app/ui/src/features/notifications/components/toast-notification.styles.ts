@@ -3,7 +3,7 @@ import { css } from 'lit';
 export const toastNotificationStyles = css`
   :host {
     display: block;
-    animation: slideIn 0.3s ease-out;
+    animation: slideIn var(--theme-duration) var(--theme-ease);
   }
 
   @keyframes slideIn {
@@ -38,11 +38,12 @@ export const toastNotificationStyles = css`
     gap: 0.75rem;
     padding: 1rem;
     background: var(--theme-color-surface-elevated);
-    border-radius: 8px;
-    box-shadow: var(--theme-shadow-lg);
+    border: 1px solid var(--theme-color-border);
+    border-radius: var(--theme-radius-lg);
+    box-shadow: var(--theme-elevation-3), var(--theme-highlight);
     min-width: 320px;
     max-width: 420px;
-    border-left: 4px solid;
+    border-left: 3px solid;
     opacity: var(--toast-opacity, 1);
     transition:
       background-color 0.2s ease,
@@ -78,23 +79,23 @@ export const toastNotificationStyles = css`
   }
 
   .toast-success .toast-icon {
-    background: #d1fae5;
-    color: #10b981;
+    background: var(--theme-color-success-soft);
+    color: var(--theme-color-success);
   }
 
   .toast-error .toast-icon {
-    background: #fee2e2;
-    color: #ef4444;
+    background: var(--theme-color-error-soft);
+    color: var(--theme-color-error);
   }
 
   .toast-warning .toast-icon {
-    background: #fef3c7;
-    color: #f59e0b;
+    background: var(--theme-color-warning-soft);
+    color: var(--theme-color-warning);
   }
 
   .toast-info .toast-icon {
-    background: #dbeafe;
-    color: #3b82f6;
+    background: var(--theme-color-info-soft);
+    color: var(--theme-color-info);
   }
 
   .toast-message {
@@ -138,13 +139,12 @@ export const toastNotificationStyles = css`
   }
 
   .toast-clickable:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+    border-color: var(--theme-color-border-strong);
   }
 
   .toast-clickable:active {
     transform: translateY(0);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
   .toast-close {
@@ -168,9 +168,9 @@ export const toastNotificationStyles = css`
   }
 
   .toast-close:focus {
-    outline: 2px solid var(--theme-color-primary);
-    outline-offset: 2px;
-    border-radius: 2px;
+    outline: none;
+    box-shadow: var(--theme-focus-ring);
+    border-radius: var(--theme-radius-sm);
   }
 
   @media (max-width: 640px) {

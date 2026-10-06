@@ -19,6 +19,7 @@ import '@/shared/components/modal-dialog';
 import '@/shared/components/confirm-dialog';
 import '@/shared/components/form-field';
 import '@/shared/components/ui-icon';
+import '@/shared/components/ui-button';
 import type { TableColumn } from '@/shared/components/data-table';
 import type { PersonSummary } from '../types/person.types';
 import { personService } from '../services/person.service';
@@ -180,10 +181,9 @@ export class PersonListPage extends LitElement {
       <admin-layout>
         <div class="page-head">
           <h1>${msg('Persons')}</h1>
-          <button class="btn-primary" type="button" @click=${this.openCreate}>
-            <ui-icon name="plus" size="16"></ui-icon>
+          <ui-button variant="primary" icon="plus" @click=${this.openCreate}>
             ${msg('Create person')}
-          </button>
+          </ui-button>
         </div>
 
         <data-table
@@ -224,22 +224,19 @@ export class PersonListPage extends LitElement {
               (this.createDisplayName = e.detail.value)}
           ></form-field>
           <div slot="footer">
-            <button
-              class="btn-secondary"
-              type="button"
+            <ui-button
               ?disabled=${this.createBusy}
               @click=${() => (this.createOpen = false)}
             >
               ${msg('Cancel')}
-            </button>
-            <button
-              class="btn-primary"
-              type="button"
-              ?disabled=${this.createBusy}
+            </ui-button>
+            <ui-button
+              variant="primary"
+              ?loading=${this.createBusy}
               @click=${() => void this.submitCreate()}
             >
-              ${this.createBusy ? msg('Working...') : msg('Create')}
-            </button>
+              ${msg('Create')}
+            </ui-button>
           </div>
         </modal-dialog>
 

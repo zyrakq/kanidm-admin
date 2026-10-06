@@ -12,6 +12,11 @@ import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { apiFetch } from '@/shared/services/http-client';
 import { navigate } from '@/shared/services/router.service';
+import '@/shared/components/confirm-dialog';
+import '@/shared/components/form-field';
+import '@/shared/components/ui-button';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-skeleton';
 import { serviceAccountService } from '../services/service-account.service';
 import type { ServiceAccountDetail } from '../types/service-account.types';
 import { saOverviewTabStyles } from './sa-overview-tab.styles';
@@ -237,7 +242,7 @@ export class SaOverviewTab extends LitElement {
 
   private renderProfile(): ReturnType<typeof html> {
     return html`
-      <section class="card">
+      <ui-card><section>
         <h2>${msg('Profile')}</h2>
         <form-field
           field-id="sa-displayname"
@@ -263,15 +268,15 @@ export class SaOverviewTab extends LitElement {
             this.setField('mail', e.detail.value)}
         ></form-field>
         <div class="actions">
-          <button
-            class="primary-btn"
-            ?disabled=${this.saving}
+          <ui-button
+            variant="primary"
+            ?loading=${this.saving}
             @click=${this.saveProfile}
           >
-            ${this.saving ? msg('Saving...') : msg('Save')}
-          </button>
+            ${msg('Save')}
+          </ui-button>
         </div>
-      </section>
+      </section></ui-card>
     `;
   }
 
@@ -280,7 +285,7 @@ export class SaOverviewTab extends LitElement {
     if (!sa) return nothing;
     const busy = this.addingGroup || this.removingGroup !== null;
     return html`
-      <section class="card">
+      <ui-card><section>
         <h2>${msg('Group membership')}</h2>
         ${sa.memberOf.length === 0
           ? html`<p class="muted">${msg('Not a member of any group.')}</p>`
@@ -290,27 +295,29 @@ export class SaOverviewTab extends LitElement {
                   (group) => html`
                     <li>
                       <span class="mono">${group}</span>
-                      <button
-                        class="remove-btn"
+                      <ui-button
+                        size="sm"
+                        variant="danger-ghost"
                         ?disabled=${busy}
+                        ?loading=${this.removingGroup === group}
                         @click=${() => this.removeGroup(group)}
                       >
                         ${this.removingGroup === group
                           ? msg('Removing...')
                           : msg('Remove')}
-                      </button>
+                      </ui-button>
                     </li>
                   `
                 )}
               </ul>
             `}
         <div class="add-group">
-          <input
-            class="input"
+          <form-field
+            field-id="sa-new-group"
             placeholder=${msg('Group name or uuid')}
             .value=${this.newGroup}
-            @input=${(e: Event) => {
-              this.newGroup = (e.target as HTMLInputElement).value;
+            @field-input=${(e: CustomEvent<{ value: string }>) => {
+              this.newGroup = e.detail.value;
             }}
             @keydown=${(e: KeyboardEvent) => {
               if (e.key === 'Enter') {
@@ -318,22 +325,24 @@ export class SaOverviewTab extends LitElement {
                 void this.addGroup();
               }
             }}
-          />
-          <button
-            class="primary-btn"
+          ></form-field>
+          <ui-button
+            variant="primary"
+            icon="plus"
             ?disabled=${busy || this.newGroup.trim() === ''}
+            ?loading=${this.addingGroup}
             @click=${this.addGroup}
           >
-            ${this.addingGroup ? msg('Adding...') : msg('Add')}
-          </button>
+            ${msg('Add')}
+          </ui-button>
         </div>
-      </section>
+      </section></ui-card>
     `;
   }
 
   private renderConvert(): ReturnType<typeof html> {
     return html`
-      <section class="card">
+      <ui-card><section>
         <h2>${msg('Convert to person')}</h2>
         <p class="muted">
           ${msg(
@@ -341,11 +350,11 @@ export class SaOverviewTab extends LitElement {
           )}
         </p>
         <div class="actions">
-          <button class="danger-btn" @click=${this.openConfirm}>
+          <ui-button variant="danger-ghost" @click=${this.openConfirm}>
             ${msg('Convert to person')}
-          </button>
+          </ui-button>
         </div>
-      </section>
+      </section></ui-card>
     `;
   }
 
@@ -354,49 +363,24 @@ export class SaOverviewTab extends LitElement {
       return nothing;
     }
     return html`
-      <div class="modal-backdrop" @click=${this.closeConfirm}>
-        <div
-          class="modal"
-          role="dialog"
-          aria-modal="true"
-          aria-label=${msg('Convert to person')}
-          @click=${(event: Event) => event.stopPropagation()}
-        >
-          <h3 class="modal-title">${msg('Convert to person')}</h3>
-          <p class="modal-text">
-            ${msg(
-              'Convert this service account into a person account? You will be taken to the person page.'
-            )}
-          </p>
-          <div class="modal-actions">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click=${this.closeConfirm}
-            >
-              ${msg('Cancel')}
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              ?disabled=${this.converting}
-              @click=${this.convertToPerson}
-            >
-              ${this.converting ? msg('Converting...') : msg('Convert')}
-            </button>
-          </div>
-        </div>
-      </div>
+      <confirm-dialog
+        .open=${true}
+        .busy=${this.converting}
+        .message=${msg(
+          'Convert this service account into a person account? You will be taken to the person page.'
+        )}
+        .confirmLabel=${msg('Convert')}
+        @cancel=${this.closeConfirm}
+        @confirm=${() => void this.convertToPerson()}
+      ></confirm-dialog>
     `;
   }
 
   render() {
     if (!this.sa) {
-      return html`<p class="muted">
-        ${this.loading
-          ? msg('Loading...')
-          : msg('Service account not available.')}
-      </p>`;
+      return this.loading
+        ? html`<ui-skeleton height="56px" .lines=${2}></ui-skeleton>`
+        : html`<p class="muted">${msg('Service account not available.')}</p>`;
     }
     return html`
       ${this.renderProfile()} ${this.renderGroups()} ${this.renderConvert()}

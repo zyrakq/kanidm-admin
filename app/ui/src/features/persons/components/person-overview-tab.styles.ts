@@ -11,16 +11,11 @@ export const personOverviewTabStyles = css`
     color: var(--theme-color-text-muted);
   }
 
-  .card {
-    background: var(--theme-color-surface);
-    border: 1px solid var(--theme-color-border);
-    border-radius: 8px;
-    padding: 20px;
+  ui-card {
     margin-bottom: 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   }
 
-  .card h2 {
+  h2 {
     margin: 0 0 16px;
     font-size: 16px;
     font-weight: 600;
@@ -30,31 +25,6 @@ export const personOverviewTabStyles = css`
   .actions {
     display: flex;
     justify-content: flex-end;
-  }
-
-  .primary-btn {
-    padding: 9px 16px;
-    border: none;
-    border-radius: 6px;
-    background: var(--theme-color-primary);
-    color: var(--theme-color-surface);
-    font: inherit;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-
-  .primary-btn:hover:not(:disabled) {
-    background: var(--theme-color-primary-hover);
-  }
-
-  .primary-btn:active:not(:disabled) {
-    background: var(--theme-color-primary-active);
-  }
-
-  .primary-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
   }
 
   .group-list {
@@ -72,8 +42,14 @@ export const personOverviewTabStyles = css`
     justify-content: space-between;
     gap: 12px;
     padding: 8px 12px;
+    background: var(--theme-color-surface-sunken);
     border: 1px solid var(--theme-color-border);
-    border-radius: 6px;
+    border-radius: var(--theme-radius-md);
+    transition: border-color var(--theme-duration) var(--theme-ease);
+  }
+
+  .group-list li:hover {
+    border-color: var(--theme-color-border-strong);
   }
 
   .mono {
@@ -83,31 +59,9 @@ export const personOverviewTabStyles = css`
     word-break: break-all;
   }
 
-  .remove-btn {
-    flex-shrink: 0;
-    padding: 4px 12px;
-    border: 1px solid var(--theme-color-error);
-    border-radius: 6px;
-    background: transparent;
-    color: var(--theme-color-error);
-    font: inherit;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-
-  .remove-btn:hover:not(:disabled) {
-    background: var(--theme-color-error);
-    color: var(--theme-color-surface);
-  }
-
-  .remove-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
   .add-group {
     display: flex;
+    align-items: flex-start;
     gap: 8px;
   }
 

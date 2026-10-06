@@ -10,6 +10,9 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
+import '@/shared/components/form-field';
+import '@/shared/components/modal-dialog';
+import '@/shared/components/ui-button';
 import { serviceAccountService } from '../services/service-account.service';
 import type { ApiTokenView } from '../types/service-account.types';
 
@@ -137,56 +140,46 @@ export class SaApiTokensTab extends LitElement {
       return nothing;
     }
     return html`
-      <div class="modal-backdrop" @click=${this.closeCreate}>
-        <div
-          class="modal"
-          role="dialog"
-          aria-modal="true"
-          aria-label=${msg('Create API token')}
-          @click=${(event: Event) => event.stopPropagation()}
-        >
-          <h3 class="modal-title">${msg('Create API token')}</h3>
-          <form @submit=${this.handleCreate}>
-            <label class="field">
-              <span class="field-label">${msg('Label')}</span>
-              <input
-                type="text"
-                required
-                .value=${this.label}
-                @input=${(
-                  event: Event & { target: HTMLInputElement }
-                ) => (this.label = event.target.value)}
-              />
-            </label>
-            <label class="field">
-              <span class="field-label">${msg('Expiry (optional)')}</span>
-              <input
-                type="datetime-local"
-                .value=${this.expiry}
-                @input=${(
-                  event: Event & { target: HTMLInputElement }
-                ) => (this.expiry = event.target.value)}
-              />
-            </label>
-            <div class="modal-actions">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                @click=${this.closeCreate}
-              >
-                ${msg('Cancel')}
-              </button>
-              <button
-                type="submit"
-                class="btn btn-primary"
-                ?disabled=${this.creating}
-              >
-                ${this.creating ? msg('Creating...') : msg('Create')}
-              </button>
-            </div>
-          </form>
+      <modal-dialog
+        heading=${msg('Create API token')}
+        .open=${true}
+        .busy=${this.creating}
+        @modal-close=${this.closeCreate}
+      >
+        <form class="modal-form" @submit=${this.handleCreate}>
+          <form-field
+            label=${msg('Label')}
+            field-id="sa-token-label"
+            required
+            .value=${this.label}
+            @field-input=${(event: CustomEvent<{ value: string }>) =>
+              (this.label = event.detail.value)}
+            @keydown=${(event: KeyboardEvent) => {
+              if (event.key === 'Enter') void this.handleCreate(event);
+            }}
+          ></form-field>
+          <form-field
+            label=${msg('Expiry (optional)')}
+            field-id="sa-token-expiry"
+            type="datetime-local"
+            .value=${this.expiry}
+            @field-input=${(event: CustomEvent<{ value: string }>) =>
+              (this.expiry = event.detail.value)}
+          ></form-field>
+        </form>
+        <div slot="footer">
+          <ui-button ?disabled=${this.creating} @click=${this.closeCreate}>
+            ${msg('Cancel')}
+          </ui-button>
+          <ui-button
+            variant="primary"
+            ?loading=${this.creating}
+            @click=${this.handleCreate}
+          >
+            ${msg('Create')}
+          </ui-button>
         </div>
-      </div>
+      </modal-dialog>
     `;
   }
 
@@ -195,51 +188,33 @@ export class SaApiTokensTab extends LitElement {
       return nothing;
     }
     return html`
-      <div
-        class="modal-backdrop"
-        @click=${this.closeCreatedModal}
+      <modal-dialog
+        heading=${msg('API token created')}
+        .open=${true}
+        @modal-close=${this.closeCreatedModal}
       >
-        <div
-          class="modal"
-          role="dialog"
-          aria-modal="true"
-          aria-label=${msg('API token created')}
-          @click=${(event: Event) => event.stopPropagation()}
-        >
-          <h3 class="modal-title">${msg('API token created')}</h3>
-          <p class="warning">
-            ${msg(
-              'This token will not be shown again. Copy it now and store it securely.'
-            )}
-          </p>
-          <code class="generated">${this.createdToken}</code>
-          <div class="modal-actions">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click=${this.handleCopyToken}
-            >
-              ${msg('Copy')}
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click=${this.closeCreatedModal}
-            >
-              ${msg('Done')}
-            </button>
-          </div>
+        <p class="warning">
+          ${msg(
+            'This token will not be shown again. Copy it now and store it securely.'
+          )}
+        </p>
+        <code class="generated">${this.createdToken}</code>
+        <div slot="footer">
+          <ui-button @click=${this.handleCopyToken}>${msg('Copy')}</ui-button>
+          <ui-button variant="primary" @click=${this.closeCreatedModal}>
+            ${msg('Done')}
+          </ui-button>
         </div>
-      </div>
+      </modal-dialog>
     `;
   }
 
   render() {
     return html`
       <div class="toolbar">
-        <button class="btn btn-primary" @click=${this.openCreate}>
+        <ui-button variant="primary" icon="plus" @click=${this.openCreate}>
           ${msg('Create API token')}
-        </button>
+        </ui-button>
       </div>
       <data-table
         .columns=${[
@@ -265,16 +240,18 @@ export class SaApiTokensTab extends LitElement {
             key: 'actions',
             header: '',
             render: (row: Record<string, unknown>) => html`
-              <button
-                class="revoke-btn"
+              <ui-button
+                size="sm"
+                variant="danger-ghost"
                 ?disabled=${this.revokingId !== null}
+                ?loading=${this.revokingId === row.token_id}
                 @click=${() =>
                   this.revoke(row as unknown as ApiTokenView)}
               >
                 ${this.revokingId === row.token_id
                   ? msg('Revoking...')
                   : msg('Revoke')}
-              </button>
+              </ui-button>
             `,
           },
         ]}
@@ -295,124 +272,31 @@ export class SaApiTokensTab extends LitElement {
       justify-content: flex-end;
       margin-bottom: 12px;
     }
-    .btn {
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      border: 1px solid transparent;
-      font-size: 0.875rem;
-      font-weight: 500;
-      font-family: inherit;
-      cursor: pointer;
-      transition:
-        background-color 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease;
-    }
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .btn-primary {
-      background: var(--theme-color-primary);
-      color: var(--theme-color-background);
-    }
-    .btn-primary:hover:not(:disabled) {
-      background: var(--theme-color-primary-hover);
-    }
-    .btn-secondary {
-      background: transparent;
-      border-color: var(--theme-color-border);
-      color: var(--theme-color-text-secondary);
-    }
-    .btn-secondary:hover:not(:disabled) {
-      color: var(--theme-color-text-primary);
-      border-color: var(--theme-color-text-secondary);
-    }
-    .revoke-btn {
-      padding: 4px 12px;
-      border: 1px solid var(--theme-color-error);
-      border-radius: 6px;
-      background: transparent;
-      color: var(--theme-color-error);
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease, color 0.2s ease;
-    }
-    .revoke-btn:hover:not(:disabled) {
-      background: var(--theme-color-error);
-      color: var(--theme-color-surface);
-    }
-    .revoke-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.4);
+    .modal-form {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-    }
-    .modal {
-      background: var(--theme-color-surface);
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-      padding: 1.25rem;
-      width: min(24rem, calc(100vw - 2rem));
-    }
-    .modal-title {
-      margin: 0 0 1rem;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--theme-color-text-primary);
+      flex-direction: column;
+      gap: 12px;
     }
     .warning {
-      margin: 0 0 0.75rem;
-      font-size: 0.8125rem;
+      margin: 0 0 12px;
+      font-size: 13px;
       font-weight: 500;
       color: var(--theme-color-warning);
     }
     .generated {
       display: block;
-      font-size: 0.8125rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
       color: var(--theme-color-text-primary);
       word-break: break-all;
-      background: var(--theme-color-background);
-      padding: 0.5rem;
-      border-radius: 6px;
-      margin-bottom: 0.75rem;
-    }
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 0.375rem;
-      margin-bottom: 1rem;
-    }
-    .field-label {
-      font-size: 0.8125rem;
-      font-weight: 500;
-      color: var(--theme-color-text-secondary);
-    }
-    .field input {
-      padding: 0.5rem 0.75rem;
+      background: var(--theme-color-surface-sunken);
       border: 1px solid var(--theme-color-border);
-      border-radius: 6px;
-      background: var(--theme-color-background);
-      color: var(--theme-color-text-primary);
-      font-family: inherit;
-      font-size: 0.875rem;
+      padding: 8px 12px;
+      border-radius: var(--theme-radius-md);
     }
-    .field input:focus {
-      outline: none;
-      border-color: var(--theme-color-primary);
-    }
-    .modal-actions {
+    [slot='footer'] {
       display: flex;
-      justify-content: flex-end;
-      gap: 0.5rem;
+      gap: 8px;
     }
   `;
 }

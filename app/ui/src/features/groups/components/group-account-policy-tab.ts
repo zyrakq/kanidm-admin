@@ -14,6 +14,9 @@ import { authService } from '@/features/auth';
 import { notificationService } from '@/features/notifications';
 import { attrFirst } from '@/shared/types/kanidm';
 import '@/shared/components/confirm-dialog';
+import '@/shared/components/ui-card';
+import '@/shared/components/ui-button';
+import '@/shared/components/form-field';
 import { groupService } from '../services/group.service';
 import { ACCOUNT_POLICY_ATTRS, type GroupDetail } from '../types/group.types';
 
@@ -191,17 +194,18 @@ export class GroupAccountPolicyTab extends LitElement {
         <div class="attr-field">
           ${key === CA_LIST_ATTR
             ? html`
-                <label class="attr-label" for="ap-${key}">${label()}</label>
-                <textarea
-                  id="ap-${key}"
-                  class="input ca-textarea"
-                  rows="4"
+                <form-field
+                  class="ca-textarea"
+                  fieldId="ap-${key}"
+                  label=${label()}
+                  type="textarea"
+                  .rows=${4}
                   placeholder="[ ]"
                   .value=${value}
-                  @input=${(e: Event) => {
-                    this.setValue(key, (e.target as HTMLTextAreaElement).value);
+                  @field-input=${(e: CustomEvent<{ value: string }>) => {
+                    this.setValue(key, e.detail.value);
                   }}
-                ></textarea>
+                ></form-field>
               `
             : html`
                 <form-field
@@ -219,22 +223,24 @@ export class GroupAccountPolicyTab extends LitElement {
               `}
         </div>
         <div class="attr-actions">
-          <button
-            class="primary-btn"
+          <ui-button
+            variant="primary"
             ?disabled=${this.savingAttr !== null || this.purgingAttr !== null}
+            ?loading=${this.savingAttr === key}
             @click=${() => void this.saveAttr(key)}
           >
             ${this.savingAttr === key ? msg('Saving...') : msg('Save')}
-          </button>
-          <button
-            class="remove-btn"
+          </ui-button>
+          <ui-button
+            variant="secondary"
             ?disabled=${this.savingAttr !== null ||
             this.purgingAttr !== null ||
             value === ''}
+            ?loading=${this.purgingAttr === key}
             @click=${() => void this.purge(key)}
           >
             ${this.purgingAttr === key ? msg('Removing...') : msg('Purge')}
-          </button>
+          </ui-button>
         </div>
       </div>
     `;
@@ -250,38 +256,38 @@ export class GroupAccountPolicyTab extends LitElement {
         <p class="muted">
           ${msg('This group is not an account policy group.')}
         </p>
-        <section class="card">
-          <h2>${msg('Account policy')}</h2>
+        <ui-card>
+          <h2 slot="header">${msg('Account policy')}</h2>
           <p class="muted">
             ${msg(
               'Enabling turns this group into an account policy group: policy attributes applied to its members are managed here.'
             )}
           </p>
           <div class="actions">
-            <button
-              class="primary-btn"
-              ?disabled=${this.enabling}
+            <ui-button
+              variant="primary"
+              ?loading=${this.enabling}
               @click=${() => void this.enable()}
             >
               ${this.enabling ? msg('Enabling...') : msg('Enable account policy')}
-            </button>
+            </ui-button>
           </div>
-        </section>
+        </ui-card>
       `;
     }
     return html`
-      <section class="card">
-        <h2>${msg('Account policy')}</h2>
+      <ui-card>
+        <h2 slot="header">${msg('Account policy')}</h2>
         <div class="actions disable-row">
-          <button
-            class="danger-btn"
+          <ui-button
+            variant="danger"
             ?disabled=${this.disabling}
             @click=${() => {
               this.disableOpen = true;
             }}
           >
             ${msg('Disable account policy...')}
-          </button>
+          </ui-button>
         </div>
         ${NUMERIC_ATTRS.map(({ key, label }) => this.renderAttrRow(key, label))}
         ${this.renderAttrRow(FALLBACK_ATTR, () =>
@@ -290,7 +296,7 @@ export class GroupAccountPolicyTab extends LitElement {
         ${this.renderAttrRow(CA_LIST_ATTR, () =>
           msg('WebAuthn attestation CA list (JSON)')
         )}
-      </section>
+      </ui-card>
       ${this.disableOpen
         ? html`<confirm-dialog
             open
@@ -318,16 +324,11 @@ export class GroupAccountPolicyTab extends LitElement {
       font-size: 14px;
       color: var(--theme-color-text-muted);
     }
-    .card {
-      background: var(--theme-color-surface);
-      border: 1px solid var(--theme-color-border);
-      border-radius: 8px;
-      padding: 20px;
+    ui-card {
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
-    .card h2 {
-      margin: 0 0 16px;
+    h2 {
+      margin: 0;
       font-size: 16px;
       font-weight: 600;
       color: var(--theme-color-text-primary);
@@ -351,81 +352,14 @@ export class GroupAccountPolicyTab extends LitElement {
       flex: 1;
       min-width: 0;
     }
-    .attr-label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--theme-color-text-primary);
-    }
     .attr-actions {
       display: flex;
       gap: 8px;
       flex-shrink: 0;
       padding-top: 4px;
     }
-    .input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 9px 12px;
-      border: 1px solid var(--theme-color-border);
-      border-radius: 6px;
-      font: inherit;
-      color: var(--theme-color-text-primary);
-      background: var(--theme-color-surface);
-      transition: border-color 0.2s ease;
-    }
-    .input:focus {
-      outline: none;
-      border-color: var(--theme-color-primary);
-    }
     .ca-textarea {
-      resize: vertical;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 13px;
-    }
-    .primary-btn,
-    .danger-btn,
-    .remove-btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      font: inherit;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease, color 0.2s ease;
-    }
-    .primary-btn {
-      background: var(--theme-color-primary);
-      color: var(--theme-color-surface);
-    }
-    .primary-btn:hover:not(:disabled) {
-      background: var(--theme-color-primary-hover);
-    }
-    .primary-btn:active:not(:disabled) {
-      background: var(--theme-color-primary-active);
-    }
-    .danger-btn {
-      background: var(--theme-color-error);
-      color: var(--theme-color-surface);
-    }
-    .danger-btn:hover:not(:disabled) {
-      filter: brightness(0.9);
-    }
-    .remove-btn {
-      background: transparent;
-      border: 1px solid var(--theme-color-border);
-      color: var(--theme-color-text-secondary);
-    }
-    .remove-btn:hover:not(:disabled) {
-      border-color: var(--theme-color-error);
-      color: var(--theme-color-error);
-    }
-    .primary-btn:disabled,
-    .danger-btn:disabled,
-    .remove-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+      --field-margin: 0;
     }
   `;
 }
