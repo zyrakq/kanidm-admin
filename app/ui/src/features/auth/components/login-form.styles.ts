@@ -152,4 +152,40 @@ export const loginFormStyles = css`
       font-size: 0.875rem;
     }
   }
+
+  @media (min-width: 769px) {
+    :host {
+      max-width: 760px;
+    }
+
+    .auth-card {
+      display: flex;
+      align-items: stretch;
+      gap: 2.5rem;
+      padding: 2.5rem 3rem;
+      text-align: left;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      padding-right: 2.5rem;
+      border-right: 1px solid var(--theme-color-border);
+    }
+
+    .logo {
+      width: 200px;
+      height: 200px;
+      margin-bottom: 0;
+    }
+
+    .panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+  }
 `;

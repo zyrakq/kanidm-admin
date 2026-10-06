@@ -90,74 +90,84 @@ export class LoginForm extends LitElement {
 
     return html`
       <div class="auth-card">
-        <img src=${logo} alt="Kanidm" class="logo" />
+        <div class="brand">
+          <img src=${logo} alt="Kanidm" class="logo" />
+        </div>
 
-        <h1 class="title">${msg('Welcome to Kanidm')}</h1>
-        <p class="subtitle">${msg('Sign in to continue')}</p>
+        <div class="panel">
+          <h1 class="title">${msg('Welcome to Kanidm')}</h1>
+          <p class="subtitle">${msg('Sign in to continue')}</p>
 
-        ${this.isAuthenticated
-          ? html`
-              <div class="user-info">
-                <span class="user-name"
-                  >${this.user?.displayName || this.user?.username}</span
-                >
-              </div>
-              <div class="actions">
-                <button
-                  class="btn btn-primary"
-                  @click=${() => {
-                    const target = firstVisiblePath(authService.getGroups());
-                    window.location.assign(target ?? '/admin/no-access');
-                  }}
-                >
-                  ${msg('Go to Dashboard')}
-                </button>
-              </div>
-            `
-          : html`
-              <form class="form" @submit=${this.handleSubmit}>
-                <div class="field">
-                  <label class="label" for="login-username"
-                    >${msg('Username')}</label
-                  >
-                  <input
-                    id="login-username"
-                    class="input"
-                    type="text"
-                    autocomplete="username"
-                    .value=${this.username}
-                    @input=${this.handleUsernameInput}
-                    ?disabled=${this.loading}
-                    required
-                  />
-                </div>
-                <div class="field">
-                  <label class="label" for="login-password"
-                    >${msg('Password')}</label
-                  >
-                  <input
-                    id="login-password"
-                    class="input"
-                    type="password"
-                    autocomplete="current-password"
-                    .value=${this.password}
-                    @input=${this.handlePasswordInput}
-                    ?disabled=${this.loading}
-                    required
-                  />
-                </div>
-                ${this.error
-                  ? html`<p class="error" role="alert">${this.error}</p>`
-                  : nothing}
-                <button
-                  class="btn btn-primary"
-                  type="submit"
-                  ?disabled=${this.loading}
-                >
-                  ${this.loading ? msg('Signing in...') : msg('Sign In')}
-                </button>
-              </form>
-            `}
+          ${
+            this.isAuthenticated
+              ? html`
+                  <div class="user-info">
+                    <span class="user-name"
+                      >${this.user?.displayName || this.user?.username}</span
+                    >
+                  </div>
+                  <div class="actions">
+                    <button
+                      class="btn btn-primary"
+                      @click=${() => {
+                        const target = firstVisiblePath(
+                          authService.getGroups()
+                        );
+                        window.location.assign(target ?? '/admin/no-access');
+                      }}
+                    >
+                      ${msg('Go to Dashboard')}
+                    </button>
+                  </div>
+                `
+              : html`
+                  <form class="form" @submit=${this.handleSubmit}>
+                    <div class="field">
+                      <label class="label" for="login-username"
+                        >${msg('Username')}</label
+                      >
+                      <input
+                        id="login-username"
+                        class="input"
+                        type="text"
+                        autocomplete="username"
+                        .value=${this.username}
+                        @input=${this.handleUsernameInput}
+                        ?disabled=${this.loading}
+                        required
+                      />
+                    </div>
+                    <div class="field">
+                      <label class="label" for="login-password"
+                        >${msg('Password')}</label
+                      >
+                      <input
+                        id="login-password"
+                        class="input"
+                        type="password"
+                        autocomplete="current-password"
+                        .value=${this.password}
+                        @input=${this.handlePasswordInput}
+                        ?disabled=${this.loading}
+                        required
+                      />
+                    </div>
+                    ${
+                      this.error
+                        ? html`<p class="error" role="alert">${this.error}</p>`
+                        : nothing
+                    }
+                    <button
+                      class="btn btn-primary"
+                      type="submit"
+                      ?disabled=${this.loading}
+                    >
+                      ${this.loading ? msg('Signing in...') : msg('Sign In')}
+                    </button>
+                  </form>
+                `
+          }
+        </div>
       </div>
     `;
   }
