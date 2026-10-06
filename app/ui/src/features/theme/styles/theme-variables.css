@@ -43,25 +43,25 @@
 
 /* ========== Dark Theme ========== */
 :root[theme="dark"] {
-  /* Primary colors - matching Kanidm logo design (green) */
-  --theme-color-primary: #10B981;
-  --theme-color-primary-hover: #059669;
-  --theme-color-primary-active: #047857;
+  /* Primary colors - logo orange, lightened for dark backgrounds */
+  --theme-color-primary: #ff7a45;
+  --theme-color-primary-hover: #ff8f5e;
+  --theme-color-primary-active: #e85d2a;
 
   /* Elevated surface for modals and toasts */
-  --theme-color-surface-elevated: #343a40;
+  --theme-color-surface-elevated: #252526;
 
-  /* Background colors - Kanidm dark theme colors */
-  --theme-color-background: #212529;
-  --theme-color-surface: #2c3136;
+  /* Background colors - obsidian / anthracite */
+  --theme-color-background: #141414;
+  --theme-color-surface: #1c1c1d;
 
-  /* Text colors - Kanidm dark theme colors */
-  --theme-color-text-primary: #dee2e6;
-  --theme-color-text-secondary: #adb5bd;
-  --theme-color-text-muted: #6c757d;
+  /* Text colors */
+  --theme-color-text-primary: #ececec;
+  --theme-color-text-secondary: #a1a1a6;
+  --theme-color-text-muted: #6e6e73;
 
   /* Border colors */
-  --theme-color-border: #495057;
+  --theme-color-border: #333335;
 
   /* Semantic colors - adjusted for dark mode */
   --theme-color-success: #34d399;
