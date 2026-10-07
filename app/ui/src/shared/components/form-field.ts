@@ -33,6 +33,15 @@ export class FormField extends LitElement {
   @state() private open = false;
   @state() private activeIndex = -1;
   @state() private filter = '';
+  /** Viewport-space placement for the fixed-position combobox listbox. */
+  @state()
+  private listboxPos: {
+    left: number;
+    top?: number;
+    bottom?: number;
+    width: number;
+    maxHeight: number;
+  } | null = null;
 
   private get listboxId(): string {
     return (this.fieldId || 'combobox') + '-listbox';
@@ -50,8 +59,11 @@ export class FormField extends LitElement {
     if (this.open) return;
     this.filter = '';
     this.activeIndex = -1;
+    this.updateListboxPosition();
     this.open = true;
     document.addEventListener('click', this.onDocClick);
+    window.addEventListener('scroll', this.onReposition, true);
+    window.addEventListener('resize', this.onReposition);
   }
 
   private closeCombobox(): void {
@@ -59,6 +71,35 @@ export class FormField extends LitElement {
     this.filter = '';
     this.activeIndex = -1;
     document.removeEventListener('click', this.onDocClick);
+    window.removeEventListener('scroll', this.onReposition, true);
+    window.removeEventListener('resize', this.onReposition);
+  }
+
+  // The listbox is position:fixed so it escapes clipping ancestors
+  // (e.g. ui-card's overflow:hidden); re-anchor it while scrolling.
+  private onReposition = (): void => {
+    if (this.open) this.updateListboxPosition();
+  };
+
+  private updateListboxPosition(): void {
+    const anchor = this.renderRoot.querySelector<HTMLElement>('.combobox');
+    if (!anchor) return;
+    const rect = anchor.getBoundingClientRect();
+    const gap = 4;
+    const margin = 8;
+    const spaceBelow = window.innerHeight - rect.bottom - margin;
+    const spaceAbove = rect.top - margin;
+    // Flip upward when there is not enough room below and more room above.
+    const dropUp = spaceBelow < 160 && spaceAbove > spaceBelow;
+    const maxHeight = Math.max(60, Math.min(240, (dropUp ? spaceAbove : spaceBelow) - gap));
+    this.listboxPos = dropUp
+      ? {
+          left: rect.left,
+          bottom: window.innerHeight - rect.top + gap,
+          width: rect.width,
+          maxHeight,
+        }
+      : { left: rect.left, top: rect.bottom + gap, width: rect.width, maxHeight };
   }
 
   private toggleCombobox(): void {
@@ -76,6 +117,8 @@ export class FormField extends LitElement {
   disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener('click', this.onDocClick);
+    window.removeEventListener('scroll', this.onReposition, true);
+    window.removeEventListener('resize', this.onReposition);
   }
 
   private handleComboboxInput(e: Event): void {
@@ -127,8 +170,13 @@ export class FormField extends LitElement {
 
   private renderListbox() {
     const filtered = this.filteredOptions;
+    const pos = this.listboxPos;
+    const style = pos
+      ? `left:${pos.left}px;width:${pos.width}px;max-height:${pos.maxHeight}px;` +
+        (pos.top !== undefined ? `top:${pos.top}px;` : `bottom:${pos.bottom}px;`)
+      : '';
     return html`
-      <div class="listbox" role="listbox" id=${this.listboxId}>
+      <div class="listbox" role="listbox" id=${this.listboxId} style=${style}>
         ${filtered.length === 0
           ? html`<div class="listbox-empty">${msg('No results')}</div>`
           : filtered.map(
@@ -342,15 +390,11 @@ export class FormField extends LitElement {
       color: var(--theme-color-text-primary);
     }
     .listbox {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      right: 0;
+      position: fixed;
       background: var(--theme-color-surface-elevated);
       border: 1px solid var(--theme-color-border);
       border-radius: var(--theme-radius-md);
       box-shadow: var(--theme-elevation-3), var(--theme-highlight);
-      max-height: 240px;
       overflow-y: auto;
       padding: 4px;
       z-index: 900;
