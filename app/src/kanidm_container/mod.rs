@@ -19,6 +19,7 @@
 pub mod image;
 pub mod log_file;
 pub mod provision;
+pub mod styles;
 
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
@@ -102,6 +103,7 @@ pub(crate) async fn start_container(
 
     provision::log_dev_credentials(&effective.url, &credentials);
     provision::smoke_auth(&effective, &credentials.idm_admin_password).await?;
+    provision::smoke_css(&effective).await?;
 
     info!(url = %effective.url, "dev Kanidm container ready");
     Ok((

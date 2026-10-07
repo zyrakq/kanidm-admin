@@ -16,6 +16,7 @@ use testcontainers::{ContainerAsync, ContainerRequest, GenericImage, ImageExt};
 use tracing::{info, warn};
 
 use super::log_file::{file_consumer, LogSubfolder};
+use super::styles;
 
 /// Kanidm HTTPS port inside the container.
 pub const KANIDM_HTTPS_PORT: u16 = 8443;
@@ -119,6 +120,7 @@ pub fn server_request(
         .with_env_var(KANIDM_BINDADDRESS.0, KANIDM_BINDADDRESS.1)
         .with_copy_to(CHAIN_PEM_PATH, material.chain_pem.clone())
         .with_copy_to(KEY_PEM_PATH, material.key_pem.clone())
+        .with_copy_to(styles::OVERRIDE_CSS_PATH, styles::OVERRIDE_CSS.as_bytes().to_vec())
         .with_label(CONTAINER_LABEL_KEY, CONTAINER_LABEL_VALUE)
         .with_startup_timeout(STARTUP_TIMEOUT)
 }
@@ -362,15 +364,18 @@ mod tests {
         );
 
         // Copy-to seeding: CopyToContainer fields are private, so
-        // assert via the count and the Debug render.
+        // assert via the count and the Debug render. Three seeds:
+        // chain.pem, key.pem and the override stylesheet replacing
+        // the image's /hpkg placeholder.
         assert_eq!(
             request.copy_to_sources().count(),
-            2,
-            "expected chain + key seeding"
+            3,
+            "expected chain + key + override.css seeding"
         );
         let debug = format!("{:?}", request.copy_to_sources().collect::<Vec<_>>());
         assert!(debug.contains(CHAIN_PEM_PATH));
         assert!(debug.contains(KEY_PEM_PATH));
+        assert!(debug.contains(styles::OVERRIDE_CSS_PATH));
         assert!(debug.contains("Data("));
     }
 }

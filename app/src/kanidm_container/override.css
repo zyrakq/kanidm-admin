@@ -1,0 +1,155 @@
+/* kanidm-admin dev override — matches the admin console design language */
+
+/* ---------- Light theme (default / [data-bs-theme="light"]) ---------- */
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  background-color: #f9fafb;
+  color: #1f2937;
+}
+
+/* Card treatment for the login panel. max-width comes from style.css
+   (680px) and is kept. */
+.form-signin {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 3rem 2.5rem;
+  box-shadow:
+    0 2px 4px rgba(16, 24, 40, 0.05),
+    0 6px 14px rgba(16, 24, 40, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Domain display name heading. */
+.form-signin h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Admin-style inputs: Bootstrap inputs resolve --bs-body-bg /
+   --bs-border-color internally, so set the properties directly and
+   re-assert them on :focus. */
+#login .form-control {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.9375rem;
+  color: #1f2937;
+  transition:
+    border-color 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+#login .form-control:focus {
+  background-color: #f3f4f6;
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.28);
+  outline: 0;
+}
+
+/* Primary button: override Bootstrap's button custom properties so
+   hover/active/focus states follow, then add shape + glow. */
+.btn-primary {
+  --bs-btn-bg: #ff6b35;
+  --bs-btn-hover-bg: #e85d2a;
+  --bs-btn-active-bg: #d94e1f;
+  --bs-btn-color: #1a0f0a;
+  --bs-btn-hover-color: #1a0f0a;
+  --bs-btn-active-color: #1a0f0a;
+  --bs-btn-border-color: #ff6b35;
+  --bs-btn-hover-border-color: #e85d2a;
+  --bs-btn-active-border-color: #d94e1f;
+  --bs-btn-focus-box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.28);
+  --bs-btn-focus-shadow-rgb: 255, 107, 53;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow:
+    0 1px 2px rgba(217, 78, 31, 0.35),
+    0 4px 12px rgba(255, 107, 53, 0.28);
+  transition:
+    background-color 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+a {
+  color: #ff6b35;
+  transition: color 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+a:hover {
+  color: #e85d2a;
+}
+
+.form-check-input {
+  accent-color: #ff6b35;
+}
+
+/* Supporting text on the card. */
+.form-signin .text-muted,
+.form-signin .form-text {
+  color: #4b5563;
+}
+
+/* ---------- Dark theme ([data-bs-theme="dark"]) ---------- */
+
+[data-bs-theme="dark"] body {
+  background-color: #141414;
+  color: #ececec;
+}
+
+[data-bs-theme="dark"] .form-signin {
+  background-color: #232324;
+  border-color: #333335;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+[data-bs-theme="dark"] .form-signin h3 {
+  color: #ececec;
+}
+
+[data-bs-theme="dark"] #login .form-control {
+  background-color: #101011;
+  border-color: #333335;
+  color: #ececec;
+}
+
+[data-bs-theme="dark"] #login .form-control:focus {
+  background-color: #101011;
+  border-color: #ff7a45;
+  box-shadow: 0 0 0 3px rgba(255, 122, 69, 0.35);
+}
+
+[data-bs-theme="dark"] .btn-primary {
+  --bs-btn-bg: #ff7a45;
+  --bs-btn-hover-bg: #ff8f5e;
+  --bs-btn-active-bg: #e85d2a;
+  --bs-btn-color: #1a0f0a;
+  --bs-btn-hover-color: #1a0f0a;
+  --bs-btn-active-color: #1a0f0a;
+  --bs-btn-border-color: #ff7a45;
+  --bs-btn-hover-border-color: #ff8f5e;
+  --bs-btn-active-border-color: #e85d2a;
+  --bs-btn-focus-box-shadow: 0 0 0 3px rgba(255, 122, 69, 0.35);
+  --bs-btn-focus-shadow-rgb: 255, 122, 69;
+}
+
+[data-bs-theme="dark"] a {
+  color: #ff7a45;
+}
+
+[data-bs-theme="dark"] a:hover {
+  color: #ff8f5e;
+}
+
+[data-bs-theme="dark"] .form-signin .text-muted,
+[data-bs-theme="dark"] .form-signin .form-text {
+  color: #a1a1a6;
+}

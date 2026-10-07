@@ -19,6 +19,7 @@ use tracing::{info, warn};
 use crate::settings::kanidm::KanidmSettings;
 
 use super::image::exec_stdout;
+use super::styles::{OVERRIDE_CSS_MARKER, OVERRIDE_CSS_PATH};
 
 /// Built-in accounts recovered on every start: recover-account
 /// generates a NEW random password per call, so both are recovered
@@ -31,6 +32,10 @@ pub const IDM_ADMIN_USERNAME: &str = "idm_admin";
 /// request readiness by a moment.
 const RETRY_ATTEMPTS: u32 = 10;
 const RETRY_BASE_DELAY_MS: u64 = 250;
+
+/// Server URL endpoint serving the UI package files; the container
+/// path (OVERRIDE_CSS_PATH) and this URL path are distinct namespaces.
+const OVERRIDE_CSS_ENDPOINT: &str = "/pkg/override.css";
 
 /// Both recovered credentials, ready for logging and smoke auth.
 pub struct DevCredentials {
@@ -170,6 +175,49 @@ pub(super) async fn smoke_auth(
     Err(format!(
         "idm_admin smoke auth did not succeed after {RETRY_ATTEMPTS} attempts: {last_error} \
          (full container logs are captured under logs/kanidm-dev/server/)"
+    )
+    .into())
+}
+
+/// Startup check that the dev container serves the mounted override
+/// stylesheet: fetch /pkg/override.css through the production client
+/// path (real TLS verification against the container CA) and require
+/// the embedded marker in the body. Runs AFTER smoke_auth, which has
+/// already proven full request readiness, so a single attempt
+/// suffices — no retry loop. Hard error: a silently unstyled dev
+/// login page must never go unnoticed.
+pub(super) async fn smoke_css(
+    effective: &KanidmSettings,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let builder = crate::auth::ops::client_builder_from_settings(effective)
+        .map_err(|error| format!("failed to build override-css client: {error:?}"))?;
+    let client = builder
+        .build()
+        .map_err(|error| format!("failed to build override-css client: {error:?}"))?;
+
+    let response = client
+        .client()
+        .get(client.make_url(OVERRIDE_CSS_ENDPOINT))
+        .send()
+        .await
+        .map_err(|error| {
+            format!("failed to fetch {OVERRIDE_CSS_ENDPOINT} from the dev Kanidm: {error}")
+        })?;
+    let status = response.status();
+    let body = response
+        .text()
+        .await
+        .map_err(|error| format!("failed to read the {OVERRIDE_CSS_ENDPOINT} body: {error}"))?;
+
+    if status.is_success() && body.contains(OVERRIDE_CSS_MARKER) {
+        info!("dev Kanidm serves the override stylesheet ({OVERRIDE_CSS_PATH})");
+        return Ok(());
+    }
+    Err(format!(
+        "dev Kanidm {OVERRIDE_CSS_ENDPOINT} check failed: status {status}, body does not carry \
+         the override marker (the container image may predate the /hpkg UI package layout or \
+         the override mount failed; full container logs are captured under \
+         logs/kanidm-dev/server/)"
     )
     .into())
 }
