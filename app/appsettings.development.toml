@@ -8,5 +8,5 @@ enabled = true
 [testcontainer.kanidm_mail_sender]
 enabled = true
 
-[testcontainer.mailcrab]
+[testcontainer.mailpit]
 enabled = true
