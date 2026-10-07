@@ -1,4 +1,5 @@
 mod auth;
+mod branding;
 mod frontend;
 mod frontend_assets;
 mod kanidm_container;
