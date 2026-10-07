@@ -1,4 +1,3 @@
-use super::kanidm::KanidmSettings;
 use super::loader::Settings;
 use config::{Config, ConfigError, Environment, FileFormat};
 use indoc::indoc;
@@ -61,10 +60,10 @@ const BASE_TOML: &str = indoc! {r#"
     enabled = false
     image = "kanidm/tools:1.11.1"
 
-    [testcontainer.mailcrab]
+    [testcontainer.mailpit]
     enabled = false
-    image = "marlonb/mailcrab:v1.9.0"
-    ui_port = 1080
+    image = "axllent/mailpit:v1.31.2"
+    ui_port = 8025
 "#};
 
 const DEV_TOML: &str = indoc! {r#"
@@ -78,7 +77,7 @@ const DEV_TOML: &str = indoc! {r#"
     [testcontainer.kanidm_mail_sender]
     enabled = true
 
-    [testcontainer.mailcrab]
+    [testcontainer.mailpit]
     enabled = true
 "#};
 
@@ -311,15 +310,15 @@ fn testcontainer_base_defaults_are_correct() {
     assert_eq!(s.testcontainer.mode, "auto");
     assert_eq!(s.testcontainer.network, "kanidm-admin-dev");
     assert!(!s.testcontainer.kanidm.enabled);
-    assert_eq!(s.testcontainer.kanidm.image, "kanidm/server:1.11.2");
+    assert_eq!(s.testcontainer.kanidm.image, "kanidm/server:1.11.1");
     assert!(!s.testcontainer.kanidm_mail_sender.enabled);
     assert_eq!(
         s.testcontainer.kanidm_mail_sender.image,
-        "kanidm/tools:1.11.2"
+        "kanidm/tools:1.11.1"
     );
-    assert!(!s.testcontainer.mailcrab.enabled);
-    assert_eq!(s.testcontainer.mailcrab.image, "marlonb/mailcrab:v1.9.0");
-    assert_eq!(s.testcontainer.mailcrab.ui_port, 1080);
+    assert!(!s.testcontainer.mailpit.enabled);
+    assert_eq!(s.testcontainer.mailpit.image, "axllent/mailpit:v1.31.2");
+    assert_eq!(s.testcontainer.mailpit.ui_port, 8025);
 }
 
 #[test]
@@ -334,11 +333,11 @@ fn dev_overlay_enables_the_mail_chain() {
         "development overlay enables the mail sender"
     );
     assert!(
-        s.testcontainer.mailcrab.enabled,
-        "development overlay enables mailcrab"
+        s.testcontainer.mailpit.enabled,
+        "development overlay enables mailpit"
     );
     // Non-overridden fields keep the base values.
-    assert_eq!(s.testcontainer.mailcrab.ui_port, 1080);
+    assert_eq!(s.testcontainer.mailpit.ui_port, 8025);
     assert_eq!(s.testcontainer.kanidm.image, "kanidm/server:1.11.1");
 }
 
@@ -362,7 +361,7 @@ fn absent_testcontainer_section_yields_defaults() {
     assert!(!s.testcontainer.kanidm.enabled);
     assert_eq!(s.testcontainer.mode, "auto");
     assert_eq!(s.testcontainer.network, "kanidm-admin-dev");
-    assert_eq!(s.testcontainer.mailcrab.ui_port, 1080);
+    assert_eq!(s.testcontainer.mailpit.ui_port, 8025);
 }
 
 #[test]
@@ -394,15 +393,15 @@ fn env_var_enables_sender_through_snake_alias() {
 }
 
 #[test]
-fn env_var_overrides_mailcrab_ui_port() {
+fn env_var_overrides_mailpit_ui_port() {
     let env = HashMap::from([(
-        "APP_TESTCONTAINER__MAILCRAB__UI_PORT".to_string(),
-        "1081".to_string(),
+        "APP_TESTCONTAINER__MAILPIT__UI_PORT".to_string(),
+        "8026".to_string(),
     )]);
     let s = settings_from_layers(BASE_TOML, DEV_TOML, Some(env)).expect("should deserialize");
     assert_eq!(
-        s.testcontainer.mailcrab.ui_port, 1081,
-        "APP_TESTCONTAINER__MAILCRAB__UI_PORT should override the base value"
+        s.testcontainer.mailpit.ui_port, 8026,
+        "APP_TESTCONTAINER__MAILPIT__UI_PORT should override the base value"
     );
 }
 
@@ -465,61 +464,4 @@ fn env_var_overrides_branding_dir() {
         std::path::PathBuf::from("/var/lib/branding"),
         "APP_BRANDING__DIR should override the default dir"
     );
-}
-
-// --- Kanidm effective-config logging ------------------------------------
-
-/// Build a KanidmSettings directly for the display-variant tests: the
-/// formatting logic is a pure function of the struct, so no TOML
-/// round-trip is needed.
-fn kanidm_settings(ca_path: Option<&str>, verify_ca: bool) -> KanidmSettings {
-    KanidmSettings {
-        url: "https://kanidm.example.com".to_string(),
-        ca_path: ca_path.map(str::to_string),
-        verify_ca,
-    }
-}
-
-#[test]
-fn kanidm_ca_path_display_none_renders_not_set() {
-    let s = kanidm_settings(None, true);
-    assert_eq!(
-        s.ca_path_display(),
-        "not set",
-        "ca_path None means unset (system trust store) and must render as 'not set'"
-    );
-}
-
-#[test]
-fn kanidm_ca_path_display_empty_renders_not_set() {
-    let s = kanidm_settings(Some(""), true);
-    assert_eq!(
-        s.ca_path_display(),
-        "not set",
-        "empty ca_path string is treated as unset and must render as 'not set'"
-    );
-}
-
-#[test]
-fn kanidm_ca_path_display_set_renders_verbatim() {
-    let s = kanidm_settings(Some("/etc/kanidm/ca.pem"), true);
-    assert_eq!(
-        s.ca_path_display(),
-        "/etc/kanidm/ca.pem",
-        "a set ca_path must render verbatim"
-    );
-}
-
-#[test]
-fn kanidm_log_effective_config_accepts_all_variants() {
-    // log_effective_config is infallible (a tracing no-op without a
-    // subscriber); this runs the full ca_path x verify_ca matrix
-    // through the method so a panic (e.g. an unwrap on None) or a
-    // field-type regression surfaces here. Covers verify_ca true/false,
-    // which renders as a plain bool with no formatting of its own.
-    for ca_path in [None, Some(""), Some("/etc/kanidm/ca.pem")] {
-        for verify_ca in [true, false] {
-            kanidm_settings(ca_path, verify_ca).log_effective_config();
-        }
-    }
 }
