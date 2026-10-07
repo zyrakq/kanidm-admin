@@ -2,7 +2,7 @@
 //
 // Per-run file capture for the dev testcontainers, replacing
 // console mirroring: every log frame from the cert-generate,
-// kanidm server, mail-sender and mailcrab containers is appended
+// kanidm server, mail-sender and mailpit containers is appended
 // to its own run file under logs/testcontainers/<container>/,
 // while the console keeps only app-level key events.
 //
@@ -55,8 +55,8 @@ pub(crate) enum LogSubfolder {
     Server,
     /// Long-running kanidm-mail-sender container.
     MailSender,
-    /// Long-running mailcrab container.
-    Mailcrab,
+    /// Long-running mailpit container.
+    Mailpit,
 }
 
 impl LogSubfolder {
@@ -65,7 +65,7 @@ impl LogSubfolder {
             LogSubfolder::CertGenerate => "kanidm-cert",
             LogSubfolder::Server => "kanidm-server",
             LogSubfolder::MailSender => "kanidm-mail-sender",
-            LogSubfolder::Mailcrab => "mailcrab",
+            LogSubfolder::Mailpit => "mailpit",
         }
     }
 
@@ -74,7 +74,7 @@ impl LogSubfolder {
             LogSubfolder::CertGenerate => "cert-generate",
             LogSubfolder::Server => "server",
             LogSubfolder::MailSender => "mail-sender",
-            LogSubfolder::Mailcrab => "mailcrab",
+            LogSubfolder::Mailpit => "mailpit",
         }
     }
 }
@@ -378,7 +378,7 @@ mod tests {
         assert_eq!(LogSubfolder::CertGenerate.dir_name(), "kanidm-cert");
         assert_eq!(LogSubfolder::Server.dir_name(), "kanidm-server");
         assert_eq!(LogSubfolder::MailSender.dir_name(), "kanidm-mail-sender");
-        assert_eq!(LogSubfolder::Mailcrab.dir_name(), "mailcrab");
+        assert_eq!(LogSubfolder::Mailpit.dir_name(), "mailpit");
     }
 
     #[test]
