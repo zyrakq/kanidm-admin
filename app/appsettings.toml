@@ -12,3 +12,7 @@ url = "https://localhost:8443"
 [kanidm_container]
 enabled = false
 image = "kanidm/server:1.11.1"
+
+[branding]
+dir = ""
+max_size_bytes = 524288
