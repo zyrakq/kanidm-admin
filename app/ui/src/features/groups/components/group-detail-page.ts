@@ -92,11 +92,15 @@ export class GroupDetailPage extends LitElement {
   }
 
   /**
-   * Rename changes the group's name id: adopt the new id and reload
-   * (the router syncs the URL on its next navigation).
+   * Rename changes the group's name id: adopt the new id, sync the
+   * address bar immediately (replace — the old URL is dead after a
+   * rename) and reload.
    */
   private handleGroupRenamed(e: CustomEvent<{ newId: string }>): void {
     this.id = e.detail.newId;
+    navigate(`/admin/groups/${encodeURIComponent(e.detail.newId)}`, {
+      replace: true,
+    });
     void this.load();
   }
 

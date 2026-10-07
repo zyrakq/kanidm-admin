@@ -4,7 +4,7 @@ import { Router } from '@lit-labs/router';
 import { authService } from '@/features/auth';
 import { localizationService } from '@/features/localization';
 import { canAccess, firstVisiblePath, type SectionId } from '@/shared/access/section-access';
-import { registerRouter } from '@/shared/services/router.service';
+import { navigate, registerRouter } from '@/shared/services/router.service';
 import '@/features/theme/services/favicon.service';
 
 // Route targets. Section features register their pages here as they are
@@ -47,7 +47,7 @@ export class AppComponent extends LitElement {
         await authService.init();
         if (authService.isAuthenticated()) {
           const target = firstVisiblePath(authService.getGroups());
-          this._router.goto(target ?? '/admin/no-access');
+          navigate(target ?? '/admin/no-access', { replace: true });
           return false;
         }
         return true;
@@ -57,7 +57,7 @@ export class AppComponent extends LitElement {
       path: '/dashboard',
       // Legacy bookmark: the dashboard was removed; land on /admin.
       enter: async () => {
-        this._router.goto('/admin');
+        navigate('/admin', { replace: true });
         return false;
       },
       render: () => html``,
@@ -169,7 +169,7 @@ export class AppComponent extends LitElement {
   private async guardAdmin(): Promise<boolean> {
     await authService.init();
     if (!authService.isAuthenticated()) {
-      this._router.goto('/');
+      navigate('/', { replace: true });
       return false;
     }
     return true;
@@ -181,7 +181,7 @@ export class AppComponent extends LitElement {
       return false;
     }
     if (!canAccess(authService.getGroups(), section)) {
-      this._router.goto('/admin/no-access');
+      navigate('/admin/no-access', { replace: true });
       return false;
     }
     return true;
