@@ -5,11 +5,11 @@
 // idm_message_senders membership + read-write API token), builds
 // the two config TOMLs the sender requires (flat client config +
 // mail sender config, both mode-aware), starts the container with
-// the kanidm CA and the mailcrab CA mounted, and proves the whole
-// chain with a one-shot test mail delivered to mailcrab. Host
+// the kanidm CA and the mailpit CA mounted, and proves the whole
+// chain with a one-shot test mail delivered to mailpit. Host
 // mode runs the sender on the host network (network_mode "host",
 // no shared docker network): kanidm is reached through the app's
-// effective loopback URL and mailcrab through its loopback-
+// effective loopback URL and mailpit through its loopback-
 // published SMTP port, so every leg keeps FULL TLS verification.
 
 use testcontainers::bollard::models::{HostConfig, PortMap};
@@ -21,7 +21,7 @@ use tracing::warn;
 use super::kanidm::{split_image_tag, IDM_ADMIN_USERNAME};
 use super::log_file::{file_consumer, LogSubfolder};
 use super::mail_certs::MailPki;
-use super::mailcrab::MAILCRAB_SMTP_PORT;
+use super::mailpit::MAILPIT_SMTP_PORT;
 use super::{DevKanidm, Mode, CONTAINER_LABEL_KEY, CONTAINER_LABEL_VALUE, STARTUP_TIMEOUT};
 use crate::settings::kanidm::KanidmSettings;
 use crate::settings::testcontainer::MailSenderContainerSettings;
@@ -62,12 +62,13 @@ connect_timeout = 10
     )
 }
 
-/// Mail sender config TOML (exact content from the design). The
-/// `schedule` key is omitted on purpose: kanidm-mail-sender
-/// defaults to checking every 5 s when no schedule is set. The
-/// relay is mode-aware (loopback in host mode, the mailcrab DNS
-/// name otherwise) and its port is single-sourced from the
-/// mailcrab SMTP constant.
+/// Mail sender config TOML. The `schedule` key is omitted on
+/// purpose: kanidm-mail-sender defaults to checking every 5 s
+/// when no schedule is set. The relay is mode-aware (loopback in
+/// host mode, the mailpit DNS name otherwise) and its port is
+/// single-sourced from the mailpit SMTP constant. No
+/// mail_username/mail_password: mailpit runs certificate-trust
+/// only (both fields are Option in the sender and are omitted).
 fn mail_sender_toml(token: &str, instance_url: &str, mail_relay: &str) -> String {
     format!(
         "token = \"{token}\"
@@ -76,8 +77,6 @@ instance_url = \"{instance_url}\"
 mail_from_address = \"noreply@localhost\"
 mail_reply_to_address = \"noreply@localhost\"
 mail_relay = \"{mail_relay}\"
-mail_username = \"mailcrab\"
-mail_password = \"mailcrab\"
 mail_connect_timeout_seconds = 15
 "
     )
@@ -136,13 +135,13 @@ fn sender_request(
     client_toml: String,
     mail_toml: String,
     kanidm_ca: Vec<u8>,
-    mailcrab_ca: Vec<u8>,
+    mailpit_ca: Vec<u8>,
 ) -> ContainerRequest<GenericImage> {
     let (name, tag) = split_image_tag(image);
     let request = GenericImage::new(name, tag)
         .with_wait_for(WaitFor::message_on_stderr(READINESS_MARKER))
         .with_cmd(SENDER_CMD)
-        .with_env_var("SSL_CERT_FILE", "/etc/pki/trust/anchors/mailcrab-dev-ca.pem")
+        .with_env_var("SSL_CERT_FILE", "/etc/pki/trust/anchors/mailpit-dev-ca.pem")
         .with_copy_to(
             CopyTargetOptions::new("/data/kanidm/config").with_mode(0o600),
             client_toml.into_bytes(),
@@ -156,8 +155,8 @@ fn sender_request(
             kanidm_ca,
         )
         .with_copy_to(
-            CopyTargetOptions::new("/etc/pki/trust/anchors/mailcrab-dev-ca.pem").with_mode(0o644),
-            mailcrab_ca,
+            CopyTargetOptions::new("/etc/pki/trust/anchors/mailpit-dev-ca.pem").with_mode(0o644),
+            mailpit_ca,
         )
         .with_container_name("kanidm-mail-sender")
         .with_label(CONTAINER_LABEL_KEY, CONTAINER_LABEL_VALUE)
@@ -172,7 +171,7 @@ fn sender_request(
 /// Host-config modifier for the sender in host mode: run on the
 /// host network (`network_mode = "host"`), so `localhost` inside
 /// the sender is the host's loopback — the kanidm HTTPS port and
-/// the mailcrab SMTP port, both published loopback-only, are
+/// the mailpit SMTP port, both published loopback-only, are
 /// reachable without any shared-network DNS. Nothing is
 /// published (the tools image has no EXPOSE).
 fn host_network() -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
@@ -185,7 +184,7 @@ fn host_network() -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
 
 /// Provision + start the sender and prove the mail chain with
 /// the one-shot test mail (the `-t` smoke must exit 0 and the
-/// mailcrab API must hold at least one message afterwards). The
+/// mailpit API must hold at least one message afterwards). The
 /// kanidm-poll smoke lives in mod.rs (`assert_sender_polling`),
 /// run against the returned container's stderr.
 pub(crate) async fn run(
@@ -194,7 +193,7 @@ pub(crate) async fn run(
     network: &str,
     dev: &DevKanidm,
     pki: &MailPki,
-    mailcrab_upstream: &str,
+    mailpit_upstream: &str,
 ) -> Result<ContainerAsync<GenericImage>, Box<dyn std::error::Error + Send + Sync>> {
     // 1. Provision the service account + API token as idm_admin.
     let token = provision(&dev.effective, &dev.credentials.idm_admin_password).await?;
@@ -202,7 +201,7 @@ pub(crate) async fn run(
     // 2. Mode-aware endpoints. Host mode: the sender runs on the
     //    host network, so kanidm is the app's effective URL (the
     //    loopback-published ephemeral port, certificate SAN
-    //    `localhost`) and the relay is mailcrab's loopback-
+    //    `localhost`) and the relay is mailpit's loopback-
     //    published SMTP port. In-container mode: the shared-network
     //    DNS names, as before.
     let uri = match mode {
@@ -210,8 +209,8 @@ pub(crate) async fn run(
         Mode::InContainer => "https://kanidm:8443",
     };
     let mail_relay = match mode {
-        Mode::Host => format!("smtps://localhost:{MAILCRAB_SMTP_PORT}"),
-        Mode::InContainer => format!("smtps://mailcrab:{MAILCRAB_SMTP_PORT}"),
+        Mode::Host => format!("smtps://localhost:{MAILPIT_SMTP_PORT}"),
+        Mode::InContainer => format!("smtps://mailpit:{MAILPIT_SMTP_PORT}"),
     };
 
     // 3. Build the configs and start the container (readiness via
@@ -257,25 +256,26 @@ pub(crate) async fn run(
             )
         })?;
 
-    // 6. The test mail must have arrived in mailcrab.
-    assert_mail_delivered(mailcrab_upstream).await?;
+    // 6. The test mail must have arrived in mailpit.
+    assert_mail_delivered(mailpit_upstream).await?;
 
     Ok(container)
 }
 
-/// Smoke assertion: the mailcrab API holds at least one message
-/// (the `-t` test mail the sender just delivered).
+/// Smoke assertion: the mailpit API holds at least one message
+/// (the `-t` test mail the sender just delivered). Mailpit's
+/// messages API returns a JSON object with a `total` count.
 async fn assert_mail_delivered(
-    mailcrab_upstream: &str,
+    mailpit_upstream: &str,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let url = format!("{mailcrab_upstream}/_/mailcrab/api/messages");
+    let url = format!("{mailpit_upstream}/_/mailpit/api/v1/messages");
     let response = reqwest::Client::new()
         .get(&url)
         .send()
         .await
         .map_err(|error| {
             format!(
-                "failed to reach the mailcrab API at {mailcrab_upstream} after the \
+                "failed to reach the mailpit API at {mailpit_upstream} after the \
                  test mail: {error} (container logs are captured under \
                  logs/testcontainers/kanidm-mail-sender/)"
             )
@@ -283,11 +283,14 @@ async fn assert_mail_delivered(
     let messages: serde_json::Value = response
         .json()
         .await
-        .map_err(|error| format!("the mailcrab API response was not valid JSON: {error}"))?;
-    let count = messages.as_array().map(|messages| messages.len()).unwrap_or(0);
-    if count == 0 {
+        .map_err(|error| format!("the mailpit API response was not valid JSON: {error}"))?;
+    let total = messages
+        .get("total")
+        .and_then(|total| total.as_u64())
+        .unwrap_or(0);
+    if total == 0 {
         return Err(format!(
-            "no message reached mailcrab at {mailcrab_upstream} after the test mail \
+            "no message reached mailpit at {mailpit_upstream} after the test mail \
              (container logs are captured under logs/testcontainers/kanidm-mail-sender/)"
         )
         .into());
@@ -325,8 +328,6 @@ mod tests {
                 mail_from_address = "noreply@localhost"
                 mail_reply_to_address = "noreply@localhost"
                 mail_relay = "smtps://localhost:1025"
-                mail_username = "mailcrab"
-                mail_password = "mailcrab"
                 mail_connect_timeout_seconds = 15
             "#}
         );
@@ -354,9 +355,9 @@ mod tests {
             Mode::InContainer,
             "kanidm-admin-dev",
             client_config_toml("https://kanidm:8443"),
-            mail_sender_toml("tok", "https://kanidm:8443", "smtps://mailcrab:1025"),
+            mail_sender_toml("tok", "https://kanidm:8443", "smtps://mailpit:1025"),
             b"kanidm-ca".to_vec(),
-            b"mailcrab-ca".to_vec(),
+            b"mailpit-ca".to_vec(),
         );
 
         // Readiness: exactly one stderr log wait on the marker.
@@ -391,17 +392,17 @@ mod tests {
             .collect();
         assert_eq!(
             env.get("SSL_CERT_FILE").map(String::as_str),
-            Some("/etc/pki/trust/anchors/mailcrab-dev-ca.pem")
+            Some("/etc/pki/trust/anchors/mailpit-dev-ca.pem")
         );
 
         // Four copies: client TOML, mail TOML, kanidm CA,
-        // mailcrab CA.
+        // mailpit CA.
         assert_eq!(request.copy_to_sources().count(), 4);
         let debug = format!("{:?}", request.copy_to_sources().collect::<Vec<_>>());
         assert!(debug.contains("/data/kanidm/config"));
         assert!(debug.contains("/data/kanidm/mail-sender"));
         assert!(debug.contains("/data/kanidm/ca.pem"));
-        assert!(debug.contains("/etc/pki/trust/anchors/mailcrab-dev-ca.pem"));
+        assert!(debug.contains("/etc/pki/trust/anchors/mailpit-dev-ca.pem"));
     }
 
     #[test]
@@ -413,7 +414,7 @@ mod tests {
             client_config_toml("https://localhost:55001"),
             mail_sender_toml("tok", "https://localhost:55001", "smtps://localhost:1025"),
             b"kanidm-ca".to_vec(),
-            b"mailcrab-ca".to_vec(),
+            b"mailpit-ca".to_vec(),
         );
 
         // Host mode: the shared docker network is NOT attached
