@@ -4,3 +4,4 @@
 // and served by dedicated routes registered before the SPA fallback.
 
 pub mod sanitize;
+pub mod store;
