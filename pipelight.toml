@@ -1,0 +1,12 @@
+# Pipelight pipeline definitions (https://pipelight.dev).
+# Lint without executing:  pipelight ls
+# Run manually:            pipelight run docker-build
+# The image name matches docker-compose.yml (`image: kanidm-admin`) so the
+# local check builds exactly what `docker compose up -d` runs.
+
+[[pipelines]]
+name = "docker-build"
+
+[[pipelines.steps]]
+name = "build production image"
+commands = ["docker build -t kanidm-admin:local ."]

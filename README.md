@@ -138,6 +138,47 @@ cargo build --release    # SPA is compiled and embedded into the binary
 docker compose up -d     # builds the image and serves on port 4000
 ```
 
+### Docker image build check (pipelight)
+
+The production image build is scripted as a
+[pipelight](https://pipelight.dev) pipeline (`pipelight.toml` at the repo
+root). It builds the same image `docker compose` runs:
+
+```bash
+pipelight run docker-build   # builds kanidm-admin:local
+```
+
+Validate the pipeline definition without building:
+
+```bash
+pipelight ls
+```
+
+The pipeline is manual-only (no triggers). To run it automatically on
+`git push`, opt in with pipelight's git hooks:
+
+```bash
+pipelight enable git-hooks
+```
+
+The same pipeline runs in CI on every push/PR to `master`
+(`.github/workflows/pipelight.yml`).
+
+### Releases
+
+Cut a release by pushing a version tag (or using the *Run workflow* button
+on `.github/workflows/release.yml` with a version input):
+
+```bash
+git tag v0.1.0 && git push origin v0.1.0
+```
+
+The workflow builds the image, pushes `ghcr.io/zyrakq/kanidm-admin:X.Y.Z`
+and `:latest`, and creates a GitHub Release with pull/run instructions.
+Images are amd64; point the container at your Kanidm instance by mounting a
+TOML overlay into `/workspace/app` — there is no env-var override for
+`kanidm.url` (see the release notes for the exact command).
+
 ## Configuration
 
 Settings are layered TOML files: `app/appsettings.toml` (base), then

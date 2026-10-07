@@ -1,0 +1,103 @@
+# Release: build the production image, push it to ghcr.io, and create a
+# GitHub Release with pull/run instructions.
+#
+# Triggers:
+#  - pushing a tag `vX.Y.Z` (semver is derived from the tag name)
+#  - manual dispatch with a `version` input (e.g. "0.2.0"); the release step
+#    creates the `v<version>` tag if it does not exist yet.
+#
+# amd64 only for the first release (multi-arch deferred).
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version without the v prefix (e.g. 0.2.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write   # create the GitHub Release (and tag on dispatch)
+  packages: write   # push the image to ghcr.io
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Uniform version resolution for both triggers: dispatch input, or the
+      # pushed tag with its `v` prefix stripped (vX.Y.Z -> X.Y.Z).
+      - name: Resolve version
+        id: ver
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/zyrakq/kanidm-admin
+          tags: |
+            type=raw,value=${{ steps.ver.outputs.version }}
+            type=raw,value=latest
+
+      # If the build or push fails, the workflow aborts here — no release
+      # is created for a broken image.
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          generate_release_notes: true
+          body: |
+            ## Container image
+
+            Package page: https://github.com/zyrakq/kanidm-admin/pkgs/container/kanidm-admin
+
+            ```bash
+            docker pull ghcr.io/zyrakq/kanidm-admin:v${{ steps.ver.outputs.version }}
+            docker pull ghcr.io/zyrakq/kanidm-admin:latest
+            ```
+
+            ## Run
+
+            ```bash
+            docker run -d -p 4000:4000 ghcr.io/zyrakq/kanidm-admin:v${{ steps.ver.outputs.version }}
+            ```
+
+            The image ships with the baked-in default configuration
+            (`kanidm.url = "https://localhost:8443"`). There is **no env-var
+            override** — point it at your Kanidm instance by mounting a TOML
+            overlay into `/workspace/app`:
+
+            ```bash
+            docker run -d -p 4000:4000 \
+              -v /path/to/appsettings.production.toml:/workspace/app/appsettings.production.toml:ro \
+              ghcr.io/zyrakq/kanidm-admin:v${{ steps.ver.outputs.version }}
+            ```

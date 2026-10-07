@@ -1,0 +1,51 @@
+# CI: validate pipelight.toml and run the docker-build pipeline against the
+# built-in Docker daemon on the runner.
+#
+# pipelight v0.10.0 has no prebuilt binaries — it is installed from git with
+# cargo. `pipelight run` detaches by default, which would leave this job
+# green while the build still runs in the background; `--attach=true` keeps
+# the run in the foreground and propagates the pipeline's exit status
+# (verified against pipelight v0.10.0 source: cli/src/types/mod.rs declares
+# `attach` as a global flag, cli/src/services/detach.rs keeps the process
+# in the foreground when it is set).
+name: pipelight
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Install-from-git takes minutes; cache ~/.cargo (binary + registry)
+      # keyed on the pinned pipelight version so repeat runs are fast.
+      - name: Cache cargo (pipelight install)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo
+          key: pipelight-v0.10.0
+
+      - name: Install pipelight v0.10.0
+        run: |
+          if command -v pipelight >/dev/null 2>&1; then
+            echo "pipelight restored from cache"
+            pipelight --version
+            exit 0
+          fi
+          cargo install --git https://github.com/pipelight/pipelight --tag v0.10.0 --locked
+
+      # Safe lint: parses pipelight.toml and lists pipelines, no execution.
+      - name: Lint pipelight config
+        run: pipelight ls
+
+      # Attached run: blocks until the pipeline finishes and fails the job
+      # if the docker build fails. Bounded by the step timeout.
+      - name: Run docker-build pipeline
+        run: pipelight run docker-build --attach=true
+        timeout-minutes: 45

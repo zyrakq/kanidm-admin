@@ -12,6 +12,9 @@ dist-ssr
 
 target
 
+# Pipelight runtime state (pipeline logs)
+.pipelight/
+
 thoughts
 
 # Agent-produced screenshots (review material, never committed)
