@@ -1,7 +1,7 @@
 // app/src/testcontainer/mod.rs
 //
 // Single responsibility: orchestrate the dev backend containers —
-// kanidm, kanidm-mail-sender and mailcrab — on a shared Docker
+// kanidm, kanidm-mail-sender and mailpit — on a shared Docker
 // network, and hand main.rs the effective kanidm settings plus a
 // process-lifetime handle. When [testcontainer.kanidm].enabled is
 // false, `start` is a pass-through of the [kanidm] settings, so
@@ -10,7 +10,7 @@
 // The container flow: ensure the shared network, (in-container
 // mode) attach the app's own container, generate the dev mail
 // PKI, run the kanidm cert-generate + server containers, recover
-// the built-in credentials, then mailcrab and the mail sender,
+// the built-in credentials, then mailpit and the mail sender,
 // and prove the chain with smoke checks (kanidm auth, the
 // sender's test mail and its kanidm poll) before serving. The
 // generated kanidm CA is written to a temp file (the closest to
@@ -24,9 +24,10 @@
 mod kanidm;
 mod log_file;
 mod mail_certs;
-mod mailcrab;
+mod mailpit;
 mod mail_sender;
 mod network;
+mod styles;
 
 // Re-exports consumed only by the Docker-gated proxy integration
 // tests (cfg(test)); the gated test in this module uses the module
@@ -35,7 +36,7 @@ mod network;
 pub(crate) use kanidm::{
     parse_recover_account_password, ADMIN_USERNAME, IDM_ADMIN_USERNAME,
 };
-pub(crate) use mailcrab::MailcrabContainer;
+pub(crate) use mailpit::MailpitContainer;
 pub(crate) use network::Mode;
 
 use std::os::unix::fs::OpenOptionsExt;
@@ -120,7 +121,7 @@ pub(crate) enum TestcontainersHandle {
     Containers {
         kanidm: DevKanidm,
         sender: Option<ContainerAsync<GenericImage>>,
-        mailcrab: Option<MailcrabContainer>,
+        mailpit: Option<MailpitContainer>,
         temp_ca: PathBuf,
         mode: Mode,
         ui_port: u16,
@@ -128,13 +129,13 @@ pub(crate) enum TestcontainersHandle {
 }
 
 impl TestcontainersHandle {
-    /// Base URL the app (and tests) reach the mailcrab UI/API at:
+    /// Base URL the app (and tests) reach the mailpit UI/API at:
     /// loopback + the fixed UI port in host mode, the container
-    /// DNS name in in-container mode. None when mailcrab is not
+    /// DNS name in in-container mode. None when mailpit is not
     /// running (or containers are disabled).
-    pub(crate) fn mailcrab_upstream(&self) -> Option<String> {
+    pub(crate) fn mailpit_upstream(&self) -> Option<String> {
         let TestcontainersHandle::Containers {
-            mailcrab,
+            mailpit,
             mode,
             ui_port,
             ..
@@ -142,12 +143,12 @@ impl TestcontainersHandle {
         else {
             return None;
         };
-        if mailcrab.is_none() {
+        if mailpit.is_none() {
             return None;
         }
         Some(match mode {
             Mode::Host => format!("http://127.0.0.1:{ui_port}"),
-            Mode::InContainer => "http://mailcrab:1080".to_string(),
+            Mode::InContainer => "http://mailpit:8025".to_string(),
         })
     }
 }
@@ -182,7 +183,7 @@ pub(crate) async fn start(
 /// run it without a full Settings layer.
 ///
 /// Order matters: kanidm first (the sender provisions against
-/// it), mailcrab second (the sender smoke asserts its API already
+/// it), mailpit second (the sender smoke asserts its API already
 /// holds a message), the sender last.
 pub(crate) async fn start_containers(
     tc: &TestcontainerSettings,
@@ -197,7 +198,7 @@ pub(crate) async fn start_containers(
     }
 
     // The mail PKI is only needed when the mail chain runs.
-    let pki = if tc.mailcrab.enabled {
+    let pki = if tc.mailpit.enabled {
         Some(mail_certs::generate(mode)?)
     } else {
         None
@@ -224,12 +225,12 @@ pub(crate) async fn start_containers(
         effective: effective.clone(),
     };
 
-    let mailcrab = if tc.mailcrab.enabled {
+    let mailpit = if tc.mailpit.enabled {
         let pki = pki
             .as_ref()
-            .expect("mailcrab enabled implies the mail PKI was generated");
+            .expect("mailpit enabled implies the mail PKI was generated");
         Some(
-            mailcrab::run(&tc.mailcrab.image, mode, &tc.network, tc.mailcrab.ui_port, pki)
+            mailpit::run(&tc.mailpit.image, mode, &tc.network, tc.mailpit.ui_port, pki)
                 .await?,
         )
     } else {
@@ -239,8 +240,8 @@ pub(crate) async fn start_containers(
     let sender = if tc.kanidm_mail_sender.enabled {
         let pki = pki
             .as_ref()
-            .expect("sender enabled implies mailcrab enabled implies the mail PKI");
-        let upstream = mailcrab::upstream_base(mode, tc.mailcrab.ui_port);
+            .expect("sender enabled implies mailpit enabled implies the mail PKI");
+        let upstream = mailpit::upstream_base(mode, tc.mailpit.ui_port);
         let container =
             mail_sender::run(&tc.kanidm_mail_sender, mode, &tc.network, &dev, pki, &upstream)
                 .await?;
@@ -256,10 +257,10 @@ pub(crate) async fn start_containers(
         TestcontainersHandle::Containers {
             kanidm: dev,
             sender,
-            mailcrab,
+            mailpit,
             temp_ca,
             mode,
-            ui_port: tc.mailcrab.ui_port,
+            ui_port: tc.mailpit.ui_port,
         },
     ))
 }
@@ -416,7 +417,7 @@ mod tests {
 
     /// Full flow against a real Docker daemon: all three
     /// containers start, the sender's test mail is visible in the
-    /// mailcrab API, and the temp CA is cleaned up on drop.
+    /// mailpit API, and the temp CA is cleaned up on drop.
     /// Ignored by default (needs Docker); run explicitly with
     /// `cargo test -- --ignored`.
     #[tokio::test]
@@ -425,7 +426,7 @@ mod tests {
         let mut settings = TestcontainerSettings::default();
         settings.kanidm.enabled = true;
         settings.kanidm_mail_sender.enabled = true;
-        settings.mailcrab.enabled = true;
+        settings.mailpit.enabled = true;
 
         let (effective, handle) = start_containers(&settings)
             .await
@@ -440,16 +441,19 @@ mod tests {
 
         // The sender's startup smoke mail is already delivered.
         let upstream = handle
-            .mailcrab_upstream()
-            .expect("mailcrab upstream with mailcrab enabled");
+            .mailpit_upstream()
+            .expect("mailpit upstream with mailpit enabled");
         let response = reqwest::Client::new()
-            .get(format!("{upstream}/_/mailcrab/api/messages"))
+            .get(format!("{upstream}/_/mailpit/api/v1/messages"))
             .send()
             .await
-            .expect("mailcrab API reachable");
-        let messages: serde_json::Value = response.json().await.expect("mailcrab API JSON");
-        let count = messages.as_array().map(|messages| messages.len()).unwrap_or(0);
-        assert!(count >= 1, "the sender test mail must be listed");
+            .expect("mailpit API reachable");
+        let messages: serde_json::Value = response.json().await.expect("mailpit API JSON");
+        let total = messages
+            .get("total")
+            .and_then(|total| total.as_u64())
+            .unwrap_or(0);
+        assert!(total >= 1, "the sender test mail must be listed");
 
         // Dropping the handle deletes the temp CA file (the
         // containers themselves are removed by ContainerAsync's
