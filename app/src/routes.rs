@@ -35,15 +35,15 @@ use crate::status::{self, KanidmStatusProbe};
 ///   POST /api/auth/reauth   — privilege step-up (refreshes cookie)
 ///   GET  /api/auth/profile  — signed-in user plus their Kanidm groups
 ///   ANY  /api/kanidm/{*path} — authenticated proxy to the Kanidm server
-///   GET  /_/mailcrab        — 301 to /_/mailcrab/ (mailcrab testcontainer only)
-///   GET  /_/mailcrab/ws     — mailcrab WebSocket bridge (mailcrab testcontainer only)
-///   ANY  /_/mailcrab/{*path} — mailcrab dev UI forward (mailcrab testcontainer only)
+///   GET  /_/mailpit        — 301 to /_/mailpit/ (mailpit testcontainer only)
+///   GET  /_/mailpit/api/events — mailpit WebSocket bridge (mailpit testcontainer only)
+///   ANY  /_/mailpit/{*path} — mailpit dev UI forward (mailpit testcontainer only)
 ///   GET/PUT/DELETE /api/branding[/{slot}] — branding manifest/upload/remove
 ///   GET  /branding/{slot}   — serve an uploaded branding file
 pub fn build(
     state: AppState,
     status_probe: Arc<dyn KanidmStatusProbe>,
-    mailcrab_upstream: Option<String>,
+    mailpit_upstream: Option<String>,
     branding_routes: Router,
 ) -> Router {
     let router = Router::new()
@@ -57,11 +57,11 @@ pub fn build(
         .merge(crate::proxy::bulk::routes())
         .merge(crate::proxy::handler::routes());
 
-    // The mailcrab dev proxy exists only while the mailcrab
+    // The mailpit dev proxy exists only while the mailpit
     // testcontainer is enabled; the conditional stays here so
     // main.rs remains a plain sequence of calls.
-    let router = match mailcrab_upstream {
-        Some(upstream) => router.merge(crate::mailcrab_proxy::routes(upstream)),
+    let router = match mailpit_upstream {
+        Some(upstream) => router.merge(crate::mailpit_proxy::routes(upstream)),
         None => router,
     };
 
