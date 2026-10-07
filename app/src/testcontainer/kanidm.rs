@@ -14,10 +14,11 @@ use testcontainers::bollard::models::{HostConfig, PortBinding, PortMap};
 use testcontainers::core::wait::ExitWaitStrategy;
 use testcontainers::core::{CmdWaitFor, ExecCommand, IntoContainerPort, WaitFor};
 use testcontainers::runners::AsyncRunner;
-use testcontainers::{ContainerAsync, ContainerRequest, GenericImage, ImageExt};
+use testcontainers::{ContainerAsync, ContainerRequest, CopyTargetOptions, GenericImage, ImageExt};
 use tracing::{info, warn};
 
 use super::log_file::{file_consumer, LogSubfolder};
+use super::styles::{OVERRIDE_CSS, OVERRIDE_CSS_MARKER, OVERRIDE_CSS_PATH};
 use super::{
     DevCredentials, Mode, CONTAINER_LABEL_KEY, CONTAINER_LABEL_VALUE, STARTUP_TIMEOUT,
 };
@@ -100,7 +101,7 @@ fn kanidm_origin(mode: Mode) -> String {
 /// Host-config modifier that publishes nothing: clears port
 /// bindings and disables publish-all. Used by the transient
 /// cert-generate container (both modes), the server in
-/// in-container mode, and (via re-export) mailcrab in
+/// in-container mode, and (via re-export) mailpit in
 /// in-container mode. Without it the runner would publish every
 /// EXPOSEd port ephemeral on 0.0.0.0 — the kanidm/server image
 /// EXPOSEs 8443 AND 3636.
@@ -149,8 +150,10 @@ fn cert_generate_request(image: &str, mode: Mode) -> ContainerRequest<GenericIma
 }
 
 /// Request for container B: the server, seeded with A's TLS
-/// material. No `with_cmd` — the image's own `CMD ["kanidmd",
-/// "server"]` runs.
+/// material AND the dev login-page override stylesheet (copied
+/// over the image's /hpkg/override.css placeholder at seed time).
+/// No `with_cmd` — the image's own `CMD ["kanidmd", "server"]`
+/// runs.
 fn server_request(
     image: &str,
     mode: Mode,
@@ -170,6 +173,10 @@ fn server_request(
         .with_env_var(KANIDM_BINDADDRESS.0, KANIDM_BINDADDRESS.1)
         .with_copy_to(CHAIN_PEM_PATH, chain_pem)
         .with_copy_to(KEY_PEM_PATH, key_pem)
+        .with_copy_to(
+            CopyTargetOptions::new(OVERRIDE_CSS_PATH).with_mode(0o644),
+            OVERRIDE_CSS.as_bytes().to_vec(),
+        )
         .with_container_name("kanidm")
         .with_network(network)
         .with_label(CONTAINER_LABEL_KEY, CONTAINER_LABEL_VALUE)
@@ -202,6 +209,11 @@ pub(crate) async fn run(
                  (is Docker installed and running?): {error}"
             )
         })?;
+
+    // The seeded override stylesheet must actually be in place:
+    // a silently unstyled dev login page must never go
+    // unnoticed. grep -F exits 0 iff the marker is present.
+    verify_override_css(&container).await?;
 
     let host_port = match mode {
         Mode::Host => Some(
@@ -263,6 +275,29 @@ async fn extract_file(
         .copy_file_from(path, Vec::new())
         .await
         .map_err(|error| format!("failed to copy {path} out of the container: {error}").into())
+}
+
+/// Verify the seeded login-page stylesheet: `grep -F` the marker
+/// comment inside the running container at the seeded path. The
+/// exec fails (non-zero exit → exec error) when the file is
+/// missing or lacks the marker, which surfaces as a startup
+/// error — styles are a hard requirement, not best-effort.
+async fn verify_override_css(
+    container: &ContainerAsync<GenericImage>,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    container
+        .exec(
+            ExecCommand::new(["grep", "-F", OVERRIDE_CSS_MARKER, OVERRIDE_CSS_PATH])
+                .with_cmd_ready_condition(CmdWaitFor::exit_code(0)),
+        )
+        .await
+        .map_err(|error| {
+            format!(
+                "the dev login-page stylesheet is not correctly seeded at \
+                 {OVERRIDE_CSS_PATH} (grep for the marker failed): {error}"
+            )
+        })?;
+    Ok(())
 }
 
 /// Run a command inside the running container (expecting exit
@@ -612,15 +647,16 @@ mod tests {
             Some("true")
         );
 
-        // Copy-to seeding: chain + key.
+        // Copy-to seeding: chain + key + override stylesheet.
         assert_eq!(
             request.copy_to_sources().count(),
-            2,
-            "expected chain + key seeding"
+            3,
+            "expected chain + key + override.css seeding"
         );
         let debug = format!("{:?}", request.copy_to_sources().collect::<Vec<_>>());
         assert!(debug.contains(CHAIN_PEM_PATH));
         assert!(debug.contains(KEY_PEM_PATH));
+        assert!(debug.contains(OVERRIDE_CSS_PATH));
     }
 
     #[test]
