@@ -1,11 +1,15 @@
-// app/src/testcontainer/mailcrab.rs
+// app/src/testcontainer/mailpit.rs
 //
-// Mailcrab container: the catch-all dev mail sink with a web UI
-// under the /_/mailcrab prefix. Started with TLS auth enabled and
-// the dev PKI (mail_certs.rs) mounted at the RELATIVE cert/key
-// paths mailcrab's SMTP TLS endpoint serves (WORKDIR /app), so
-// the sender verifies it with real TLS. Readiness is app-side
-// (wait_ready): in-container mode publishes no port, so no
+// Mailpit container: the catch-all dev mail sink with a web UI
+// under the /_/mailpit prefix (MP_WEBROOT — mailpit serves its UI
+// AND API under the webroot, so the app reverse proxy forwards
+// paths verbatim). Started with implicit-TLS SMTP only: the dev
+// PKI (mail_certs.rs) is copied to /certs (cert 0644, key 0600)
+// and referenced via MP_SMTP_TLS_CERT/MP_SMTP_TLS_KEY with
+// MP_SMTP_REQUIRE_TLS=true — no SMTP username/password anywhere,
+// matching the vendored mailpit-stack step-ca deployment.
+// Readiness is app-side (wait_ready) on the messages API under
+// the webroot: in-container mode publishes no port, so no
 // testcontainers http strategy could probe it. Host mode
 // publishes the fixed UI port on 0.0.0.0 and the SMTP port
 // loopback-only (the sender on the host network relays via
@@ -23,33 +27,34 @@ use super::mail_certs::MailPki;
 use super::{Mode, CONTAINER_LABEL_KEY, CONTAINER_LABEL_VALUE, STARTUP_TIMEOUT};
 
 /// Container name / DNS name on the shared network.
-pub(crate) const MAILCRAB_CONTAINER_NAME: &str = "mailcrab";
+pub(crate) const MAILPIT_CONTAINER_NAME: &str = "mailpit";
 
-/// Mailcrab UI (HTTP) and SMTP ports inside the container.
-pub(crate) const MAILCRAB_HTTP_PORT: u16 = 1080;
-pub(crate) const MAILCRAB_SMTP_PORT: u16 = 1025;
+/// Mailpit UI (HTTP) and SMTP ports inside the container.
+pub(crate) const MAILPIT_UI_PORT: u16 = 8025;
+pub(crate) const MAILPIT_SMTP_PORT: u16 = 1025;
 
 /// Bounded retry for the readiness probe: same shape as the
 /// kanidm smoke auth loop.
 const RETRY_ATTEMPTS: u32 = 10;
 const RETRY_BASE_DELAY_MS: u64 = 250;
 
-/// Running mailcrab container plus the upstream base URL used to
+/// Running mailpit container plus the upstream base URL used to
 /// reach it (loopback + UI port in host mode, the DNS name
 /// otherwise). Held by TestcontainersHandle for the process
 /// lifetime.
 #[allow(dead_code)]
-pub(crate) struct MailcrabContainer {
+pub(crate) struct MailpitContainer {
     pub(crate) container: ContainerAsync<GenericImage>,
     pub(crate) upstream: String,
 }
 
-/// Container request for mailcrab: TLS auth on, the /_/mailcrab
-/// prefix, fixed in-container ports, and the dev PKI mounted at
-/// the relative cert/key paths (WORKDIR /app). No with_wait_for:
-/// readiness is app-side (wait_ready) because in-container mode
-/// publishes no port a testcontainers http strategy could probe.
-pub(crate) fn mailcrab_request(
+/// Container request for mailpit: implicit-TLS SMTP (no auth),
+/// the /_/mailpit webroot, fixed in-container ports, and the dev
+/// PKI copied to /certs at the absolute paths the MP_SMTP_TLS_*
+/// env vars point at. No with_wait_for: readiness is app-side
+/// (wait_ready) because in-container mode publishes no port a
+/// testcontainers http strategy could probe.
+pub(crate) fn mailpit_request(
     image: &str,
     mode: Mode,
     network: &str,
@@ -58,33 +63,33 @@ pub(crate) fn mailcrab_request(
 ) -> ContainerRequest<GenericImage> {
     let (name, tag) = split_image_tag(image);
     let request = GenericImage::new(name, tag)
-        .with_env_var("ENABLE_TLS_AUTH", "true")
-        .with_env_var("MAILCRAB_PREFIX", "_/mailcrab")
-        .with_env_var("HTTP_PORT", "1080")
-        .with_env_var("SMTP_PORT", "1025")
+        .with_env_var("MP_WEBROOT", "_/mailpit")
+        .with_env_var("MP_SMTP_TLS_CERT", "/certs/cert.pem")
+        .with_env_var("MP_SMTP_TLS_KEY", "/certs/key.pem")
+        .with_env_var("MP_SMTP_REQUIRE_TLS", "true")
         .with_copy_to(
-            CopyTargetOptions::new("/app/cert.pem").with_mode(0o644),
+            CopyTargetOptions::new("/certs/cert.pem").with_mode(0o644),
             pki.cert_pem.clone(),
         )
         .with_copy_to(
-            CopyTargetOptions::new("/app/key.pem").with_mode(0o600),
+            CopyTargetOptions::new("/certs/key.pem").with_mode(0o600),
             pki.key_pem.clone(),
         )
-        .with_container_name(MAILCRAB_CONTAINER_NAME)
+        .with_container_name(MAILPIT_CONTAINER_NAME)
         .with_network(network)
         .with_label(CONTAINER_LABEL_KEY, CONTAINER_LABEL_VALUE)
         .with_startup_timeout(STARTUP_TIMEOUT);
 
     match mode {
         Mode::Host => request
-            .with_mapped_port(ui_port, MAILCRAB_HTTP_PORT.tcp())
-            .with_mapped_port(MAILCRAB_SMTP_PORT, MAILCRAB_SMTP_PORT.tcp())
+            .with_mapped_port(ui_port, MAILPIT_UI_PORT.tcp())
+            .with_mapped_port(MAILPIT_SMTP_PORT, MAILPIT_SMTP_PORT.tcp())
             .with_host_config_modifier(loopback_smtp()),
         Mode::InContainer => request.with_host_config_modifier(publish_nothing()),
     }
 }
 
-/// Host-config modifier for mailcrab in host mode: rewrites the
+/// Host-config modifier for mailpit in host mode: rewrites the
 /// SMTP binding (the runner derives it from with_mapped_port
 /// with a wildcard host IP) to loopback-only — the sender runs
 /// on the host network and relays via localhost, and nothing
@@ -94,10 +99,10 @@ fn loopback_smtp() -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
     |config: &mut HostConfig| {
         let mut bindings = config.port_bindings.take().unwrap_or_default();
         bindings.insert(
-            format!("{MAILCRAB_SMTP_PORT}/tcp"),
+            format!("{MAILPIT_SMTP_PORT}/tcp"),
             Some(vec![PortBinding {
                 host_ip: Some("127.0.0.1".to_string()),
-                host_port: Some(MAILCRAB_SMTP_PORT.to_string()),
+                host_port: Some(MAILPIT_SMTP_PORT.to_string()),
             }]),
         );
         config.port_bindings = Some(bindings);
@@ -105,17 +110,17 @@ fn loopback_smtp() -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
     }
 }
 
-/// Base URL the app and the sender reach mailcrab at: loopback +
+/// Base URL the app and the sender reach mailpit at: loopback +
 /// the fixed UI port in host mode, the container DNS name
 /// otherwise. Pure.
 pub(crate) fn upstream_base(mode: Mode, ui_port: u16) -> String {
     match mode {
         Mode::Host => format!("http://127.0.0.1:{ui_port}"),
-        Mode::InContainer => "http://mailcrab:1080".to_string(),
+        Mode::InContainer => "http://mailpit:8025".to_string(),
     }
 }
 
-/// Start mailcrab and wait until its API answers. Returns the
+/// Start mailpit and wait until its API answers. Returns the
 /// running container plus the upstream base URL.
 pub(crate) async fn run(
     image: &str,
@@ -123,52 +128,54 @@ pub(crate) async fn run(
     network: &str,
     ui_port: u16,
     pki: &MailPki,
-) -> Result<MailcrabContainer, Box<dyn std::error::Error + Send + Sync>> {
+) -> Result<MailpitContainer, Box<dyn std::error::Error + Send + Sync>> {
     let upstream = upstream_base(mode, ui_port);
 
-    let container = mailcrab_request(image, mode, network, ui_port, pki)
-        .with_log_consumer(file_consumer(LogSubfolder::Mailcrab))
+    let container = mailpit_request(image, mode, network, ui_port, pki)
+        .with_log_consumer(file_consumer(LogSubfolder::Mailpit))
         .start()
         .await
         .map_err(|error| {
             format!(
-                "failed to start the mailcrab container \
+                "failed to start the mailpit container \
                  (is Docker installed and running?): {error}"
             )
         })?;
 
     wait_ready(&upstream).await?;
-    Ok(MailcrabContainer { container, upstream })
+    Ok(MailpitContainer { container, upstream })
 }
 
-/// Bounded-retry readiness probe on the mailcrab version API
-/// (10 × 250 ms growing to a 2 s cap — same shape as the kanidm
-/// smoke auth loop).
+/// Bounded-retry readiness probe on the mailpit messages API
+/// under the webroot (10 × 250 ms growing to a 2 s cap — same
+/// shape as the kanidm smoke auth loop). The API is the smoke
+/// surface too: `GET /_/mailpit/api/v1/messages` returns a JSON
+/// object with a `total` field.
 async fn wait_ready(upstream: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let client = reqwest::Client::new();
-    let url = format!("{upstream}/_/mailcrab/api/version");
+    let url = format!("{upstream}/_/mailpit/api/v1/messages");
 
     let mut last_error = String::from("no attempt made");
     for attempt in 0..RETRY_ATTEMPTS {
         match client.get(&url).send().await {
             Ok(response) if response.status().is_success() => return Ok(()),
             Ok(response) => {
-                last_error = format!("mailcrab API returned {}", response.status());
+                last_error = format!("mailpit API returned {}", response.status());
             }
             Err(error) => {
-                last_error = format!("mailcrab API unreachable: {error}");
+                last_error = format!("mailpit API unreachable: {error}");
             }
         }
         warn!(
-            "mailcrab readiness attempt {} failed: {}",
+            "mailpit readiness attempt {} failed: {}",
             attempt + 1,
             last_error
         );
         tokio::time::sleep(retry_delay(attempt)).await;
     }
     Err(format!(
-        "mailcrab did not become ready at {upstream} after {RETRY_ATTEMPTS} attempts: \
-         {last_error} (container logs are captured under logs/testcontainers/mailcrab/)"
+        "mailpit did not become ready at {upstream} after {RETRY_ATTEMPTS} attempts: \
+         {last_error} (container logs are captured under logs/testcontainers/mailpit/)"
     )
     .into())
 }
@@ -193,22 +200,22 @@ mod tests {
 
     #[test]
     fn upstream_base_follows_the_mode() {
-        assert_eq!(upstream_base(Mode::Host, 1080), "http://127.0.0.1:1080");
-        assert_eq!(upstream_base(Mode::Host, 1081), "http://127.0.0.1:1081");
+        assert_eq!(upstream_base(Mode::Host, 8025), "http://127.0.0.1:8025");
+        assert_eq!(upstream_base(Mode::Host, 8026), "http://127.0.0.1:8026");
         assert_eq!(
-            upstream_base(Mode::InContainer, 1080),
-            "http://mailcrab:1080"
+            upstream_base(Mode::InContainer, 8025),
+            "http://mailpit:8025"
         );
     }
 
     #[test]
-    fn request_sets_tls_prefix_ports_and_copies() {
+    fn request_sets_tls_webroot_and_copies() {
         let pki = test_pki(Mode::Host);
-        let request = mailcrab_request(
-            "marlonb/mailcrab:v1.9.0",
+        let request = mailpit_request(
+            "axllent/mailpit:v1.31.2",
             Mode::Host,
             "kanidm-admin-dev",
-            1080,
+            8025,
             &pki,
         );
 
@@ -217,20 +224,31 @@ mod tests {
             .map(|(name, value)| (name.to_string(), value.to_string()))
             .collect();
         assert_eq!(
-            env.get("ENABLE_TLS_AUTH").map(String::as_str),
-            Some("true")
+            env.get("MP_WEBROOT").map(String::as_str),
+            Some("_/mailpit")
         );
         assert_eq!(
-            env.get("MAILCRAB_PREFIX").map(String::as_str),
-            Some("_/mailcrab")
+            env.get("MP_SMTP_TLS_CERT").map(String::as_str),
+            Some("/certs/cert.pem")
         );
-        assert_eq!(env.get("HTTP_PORT").map(String::as_str), Some("1080"));
-        assert_eq!(env.get("SMTP_PORT").map(String::as_str), Some("1025"));
+        assert_eq!(
+            env.get("MP_SMTP_TLS_KEY").map(String::as_str),
+            Some("/certs/key.pem")
+        );
+        assert_eq!(
+            env.get("MP_SMTP_REQUIRE_TLS").map(String::as_str),
+            Some("true")
+        );
+        // No SMTP auth env vars — certificate trust only.
+        assert!(
+            !env.keys().any(|key| key.contains("AUTH")),
+            "mailpit must run without SMTP auth env: {env:?}"
+        );
 
         // Identity on the shared network + label.
         assert_eq!(
             request.container_name().as_deref(),
-            Some(MAILCRAB_CONTAINER_NAME)
+            Some(MAILPIT_CONTAINER_NAME)
         );
         assert_eq!(request.network().as_deref(), Some("kanidm-admin-dev"));
         assert_eq!(
@@ -238,18 +256,18 @@ mod tests {
             Some("true")
         );
 
-        // cert + key mounted at the relative WORKDIR paths.
+        // cert (0644) + key (0600) copied to /certs.
         assert_eq!(request.copy_to_sources().count(), 2);
         let debug = format!("{:?}", request.copy_to_sources().collect::<Vec<_>>());
-        assert!(debug.contains("/app/cert.pem"));
-        assert!(debug.contains("/app/key.pem"));
+        assert!(debug.contains("/certs/cert.pem"));
+        assert!(debug.contains("/certs/key.pem"));
 
         // Host mode maps the fixed UI port and the SMTP port
         // (the modifier then pins the SMTP binding to loopback).
         let ports = request.ports().expect("host mode maps the UI and SMTP ports");
         let debug = format!("{ports:?}");
         assert!(
-            debug.contains("1080"),
+            debug.contains("8025"),
             "the mapped host port is the configured UI port: {ports:?}"
         );
         assert!(
@@ -261,11 +279,11 @@ mod tests {
     #[test]
     fn in_container_mode_publishes_nothing() {
         let pki = test_pki(Mode::InContainer);
-        let request = mailcrab_request(
-            "marlonb/mailcrab:v1.9.0",
+        let request = mailpit_request(
+            "axllent/mailpit:v1.31.2",
             Mode::InContainer,
             "kanidm-admin-dev",
-            1080,
+            8025,
             &pki,
         );
         assert!(
@@ -281,10 +299,10 @@ mod tests {
         let mut config = HostConfig {
             port_bindings: Some(PortMap::from([
                 (
-                    "1080/tcp".to_string(),
+                    "8025/tcp".to_string(),
                     Some(vec![PortBinding {
                         host_ip: None,
-                        host_port: Some("1080".to_string()),
+                        host_port: Some("8025".to_string()),
                     }]),
                 ),
                 (
@@ -302,7 +320,7 @@ mod tests {
 
         let bindings = config.port_bindings.expect("bindings stay present");
         let ui = bindings
-            .get("1080/tcp")
+            .get("8025/tcp")
             .and_then(|binding| binding.as_ref())
             .and_then(|list| list.first());
         assert_eq!(
@@ -312,7 +330,7 @@ mod tests {
         );
         assert_eq!(
             ui.and_then(|binding| binding.host_port.as_deref()),
-            Some("1080")
+            Some("8025")
         );
 
         let smtp = bindings
