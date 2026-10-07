@@ -638,10 +638,6 @@
   <source>Copied to clipboard.</source>
   <target>Copiado al portapapeles.</target>
 </trans-unit>
-<trans-unit id="s6ebc9bd6feae62a3">
-  <source>Loading…</source>
-  <target>Cargando…</target>
-</trans-unit>
 <trans-unit id="s0a9232b482fc0073">
   <source>RADIUS</source>
   <target>RADIUS</target>
@@ -1018,10 +1014,6 @@
   <source>POSIX details</source>
   <target>Detalles POSIX</target>
 </trans-unit>
-<trans-unit id="s6de08134276519ac">
-  <source>Loading POSIX details...</source>
-  <target>Cargando los detalles POSIX...</target>
-</trans-unit>
 <trans-unit id="s97fc9f19fa5d5748">
   <source>SPN</source>
   <target>SPN</target>
@@ -1146,10 +1138,6 @@
   <source>Expiry (optional)</source>
   <target>Caducidad (opcional)</target>
 </trans-unit>
-<trans-unit id="s99775221d3003db4">
-  <source>Creating...</source>
-  <target>Creando...</target>
-</trans-unit>
 <trans-unit id="se5fe443f9abbf9c2">
   <source>API token created</source>
   <target>Token API creado</target>
@@ -1177,10 +1165,6 @@
 <trans-unit id="s326ed73aa4037f76">
   <source>This password will not be shown again. Copy it now and share it securely.</source>
   <target>Esta contraseña no se volverá a mostrar. Cópiela ahora y compártala de forma segura.</target>
-</trans-unit>
-<trans-unit id="s8bf481a0b5d8a689">
-  <source>Generating...</source>
-  <target>Generando...</target>
 </trans-unit>
 <trans-unit id="s9b419aa580d5ee0b">
   <source>Generate password</source>
@@ -1217,10 +1201,6 @@
 <trans-unit id="s1b283cdcdcc0ec63">
   <source>Convert this service account into a person account? You will be taken to the person page.</source>
   <target>¿Convertir esta cuenta de servicio en una cuenta de persona? Se le llevará a la página de la persona.</target>
-</trans-unit>
-<trans-unit id="sd1964fa8b0e8ec56">
-  <source>Converting...</source>
-  <target>Convirtiendo...</target>
 </trans-unit>
 <trans-unit id="sfa0c605f107fc998">
   <source>Convert</source>
@@ -1433,10 +1413,6 @@
 <trans-unit id="sc8d6855822afde83">
   <source>No image</source>
   <target>Sin imagen</target>
-</trans-unit>
-<trans-unit id="se7692167f1edeef2">
-  <source>Uploading...</source>
-  <target>Subiendo...</target>
 </trans-unit>
 <trans-unit id="sd24aaff71404c9e1">
   <source>Upload image</source>
@@ -2728,6 +2704,34 @@
 <trans-unit id="s295aaf895fc4b36a">
   <source>This panel was tested with Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — the server reports <ph id="1">${s.serverVersion ?? '—'}</ph>. Some features may not work.</source>
   <target>Este panel se probó con Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — el servidor informa <ph id="1">${s.serverVersion ?? '—'}</ph>. Es posible que algunas funciones no funcionen.</target>
+</trans-unit>
+<trans-unit id="s61c69c3c48f6bfde">
+  <source>Upload replacement logos and favicons. Removing an upload restores the bundled default.</source>
+  <target>Sube logotipos y favicons de reemplazo. Al eliminar una subida se restaura el recurso incluido.</target>
+</trans-unit>
+<trans-unit id="s15369b64cf4a286d">
+  <source>Logo (light)</source>
+  <target>Logotipo (claro)</target>
+</trans-unit>
+<trans-unit id="s84dcdef6fb5908e5">
+  <source>Logo (dark)</source>
+  <target>Logotipo (oscuro)</target>
+</trans-unit>
+<trans-unit id="s91171a4b350a71d8">
+  <source>Favicon (light)</source>
+  <target>Favicon (claro)</target>
+</trans-unit>
+<trans-unit id="sc6c7cac5fe59fc02">
+  <source>Favicon (dark)</source>
+  <target>Favicon (oscuro)</target>
+</trans-unit>
+<trans-unit id="s30c34c6981441d19">
+  <source>Remove the uploaded image? The default returns.</source>
+  <target>¿Eliminar la imagen subida? Se restaurará la predeterminada.</target>
+</trans-unit>
+<trans-unit id="se0d99ec33512a85a">
+  <source>Branding</source>
+  <target>Marca</target>
 </trans-unit>
 </body>
 </file>

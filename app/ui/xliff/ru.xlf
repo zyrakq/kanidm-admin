@@ -638,10 +638,6 @@
   <source>Copied to clipboard.</source>
   <target>Скопировано в буфер обмена.</target>
 </trans-unit>
-<trans-unit id="s6ebc9bd6feae62a3">
-  <source>Loading…</source>
-  <target>Загрузка…</target>
-</trans-unit>
 <trans-unit id="s0a9232b482fc0073">
   <source>RADIUS</source>
   <target>RADIUS</target>
@@ -1018,10 +1014,6 @@
   <source>POSIX details</source>
   <target>Данные POSIX</target>
 </trans-unit>
-<trans-unit id="s6de08134276519ac">
-  <source>Loading POSIX details...</source>
-  <target>Загрузка данных POSIX...</target>
-</trans-unit>
 <trans-unit id="s97fc9f19fa5d5748">
   <source>SPN</source>
   <target>SPN</target>
@@ -1146,10 +1138,6 @@
   <source>Expiry (optional)</source>
   <target>Срок действия (необязательно)</target>
 </trans-unit>
-<trans-unit id="s99775221d3003db4">
-  <source>Creating...</source>
-  <target>Создание...</target>
-</trans-unit>
 <trans-unit id="se5fe443f9abbf9c2">
   <source>API token created</source>
   <target>API-токен создан</target>
@@ -1177,10 +1165,6 @@
 <trans-unit id="s326ed73aa4037f76">
   <source>This password will not be shown again. Copy it now and share it securely.</source>
   <target>Этот пароль больше не будет показан. Скопируйте его сейчас и передайте безопасным способом.</target>
-</trans-unit>
-<trans-unit id="s8bf481a0b5d8a689">
-  <source>Generating...</source>
-  <target>Генерация...</target>
 </trans-unit>
 <trans-unit id="s9b419aa580d5ee0b">
   <source>Generate password</source>
@@ -1217,10 +1201,6 @@
 <trans-unit id="s1b283cdcdcc0ec63">
   <source>Convert this service account into a person account? You will be taken to the person page.</source>
   <target>Преобразовать этот сервисный аккаунт в аккаунт персоны? Вы будете перенаправлены на страницу персоны.</target>
-</trans-unit>
-<trans-unit id="sd1964fa8b0e8ec56">
-  <source>Converting...</source>
-  <target>Преобразование...</target>
 </trans-unit>
 <trans-unit id="sfa0c605f107fc998">
   <source>Convert</source>
@@ -1433,10 +1413,6 @@
 <trans-unit id="sc8d6855822afde83">
   <source>No image</source>
   <target>Нет изображения</target>
-</trans-unit>
-<trans-unit id="se7692167f1edeef2">
-  <source>Uploading...</source>
-  <target>Загрузка...</target>
 </trans-unit>
 <trans-unit id="sd24aaff71404c9e1">
   <source>Upload image</source>
@@ -2728,6 +2704,34 @@
 <trans-unit id="s295aaf895fc4b36a">
   <source>This panel was tested with Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — the server reports <ph id="1">${s.serverVersion ?? '—'}</ph>. Some features may not work.</source>
   <target>Эта панель протестирована с Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — на сервере установлен <ph id="1">${s.serverVersion ?? '—'}</ph>. Часть функций может не работать.</target>
+</trans-unit>
+<trans-unit id="s61c69c3c48f6bfde">
+  <source>Upload replacement logos and favicons. Removing an upload restores the bundled default.</source>
+  <target>Загрузите собственные логотипы и фавиконы. После удаления загруженного файла восстанавливается встроенный вариант.</target>
+</trans-unit>
+<trans-unit id="s15369b64cf4a286d">
+  <source>Logo (light)</source>
+  <target>Логотип (светлый)</target>
+</trans-unit>
+<trans-unit id="s84dcdef6fb5908e5">
+  <source>Logo (dark)</source>
+  <target>Логотип (тёмный)</target>
+</trans-unit>
+<trans-unit id="s91171a4b350a71d8">
+  <source>Favicon (light)</source>
+  <target>Фавикон (светлый)</target>
+</trans-unit>
+<trans-unit id="sc6c7cac5fe59fc02">
+  <source>Favicon (dark)</source>
+  <target>Фавикон (тёмный)</target>
+</trans-unit>
+<trans-unit id="s30c34c6981441d19">
+  <source>Remove the uploaded image? The default returns.</source>
+  <target>Удалить загруженное изображение? Будет восстановлен встроенный вариант.</target>
+</trans-unit>
+<trans-unit id="se0d99ec33512a85a">
+  <source>Branding</source>
+  <target>Брендинг</target>
 </trans-unit>
 </body>
 </file>
