@@ -1,7 +1,7 @@
 // app/src/settings/testcontainer.rs
 //
 // [testcontainer] section: opt-in multi-container dev backend
-// (kanidm + kanidm-mail-sender + mailcrab) on a shared Docker
+// (kanidm + kanidm-mail-sender + mailpit) on a shared Docker
 // network. When enabled, the app starts the containers at startup
 // and derives effective [kanidm] settings pointing at the
 // container kanidm with real CA verification. Disabled by
@@ -20,11 +20,11 @@ const DEFAULT_NETWORK: &str = "kanidm-admin-dev";
 /// workspace uses (1.11.1).
 const DEFAULT_KANIDM_IMAGE: &str = "kanidm/server:1.11.1";
 const DEFAULT_SENDER_IMAGE: &str = "kanidm/tools:1.11.1";
-const DEFAULT_MAILCRAB_IMAGE: &str = "marlonb/mailcrab:v1.9.0";
+const DEFAULT_MAILPIT_IMAGE: &str = "axllent/mailpit:v1.31.2";
 
-/// Default host port for the mailcrab UI — the only fixed 0.0.0.0
+/// Default host port for the mailpit UI — the only fixed 0.0.0.0
 /// binding in the dev chain.
-const DEFAULT_MAILCRAB_UI_PORT: u16 = 1080;
+const DEFAULT_MAILPIT_UI_PORT: u16 = 8025;
 
 /// [testcontainer] table: mode, shared network and the
 /// per-container sub-tables. Every field defaults, so absent or
@@ -49,9 +49,9 @@ pub struct TestcontainerSettings {
     /// carrying both key shapes as a duplicate field.)
     #[serde(default, alias = "kanidm-mail-sender")]
     pub kanidm_mail_sender: MailSenderContainerSettings,
-    /// Mailcrab container settings.
+    /// Mailpit container settings.
     #[serde(default)]
-    pub mailcrab: MailcrabContainerSettings,
+    pub mailpit: MailpitContainerSettings,
 }
 
 impl Default for TestcontainerSettings {
@@ -61,20 +61,20 @@ impl Default for TestcontainerSettings {
             network: default_network(),
             kanidm: KanidmContainerSettings::default(),
             kanidm_mail_sender: MailSenderContainerSettings::default(),
-            mailcrab: MailcrabContainerSettings::default(),
+            mailpit: MailpitContainerSettings::default(),
         }
     }
 }
 
 impl TestcontainerSettings {
-    /// Fail-fast validation of the enablement chain: mailcrab
+    /// Fail-fast validation of the enablement chain: mailpit
     /// needs the sender (its smoke test asserts a delivered mail),
     /// the sender needs kanidm (it provisions against it). Error
     /// messages name the TOML tables.
     pub fn validate(&self) -> Result<(), String> {
-        if self.mailcrab.enabled && !self.kanidm_mail_sender.enabled {
+        if self.mailpit.enabled && !self.kanidm_mail_sender.enabled {
             return Err(
-                "[testcontainer.mailcrab] requires [testcontainer.kanidm-mail-sender] to be enabled"
+                "[testcontainer.mailpit] requires [testcontainer.kanidm-mail-sender] to be enabled"
                     .to_string(),
             );
         }
@@ -130,26 +130,26 @@ impl Default for MailSenderContainerSettings {
     }
 }
 
-/// [testcontainer.mailcrab]: the mailcrab mail sink container.
+/// [testcontainer.mailpit]: the mailpit mail sink container.
 #[derive(Debug, Clone, Deserialize)]
-pub struct MailcrabContainerSettings {
-    /// Start mailcrab (requires the mail sender).
+pub struct MailpitContainerSettings {
+    /// Start mailpit (requires the mail sender).
     #[serde(default = "default_enabled")]
     pub enabled: bool,
-    /// Mailcrab image to run.
-    #[serde(default = "default_mailcrab_image")]
+    /// Mailpit image to run.
+    #[serde(default = "default_mailpit_image")]
     pub image: String,
-    /// Host port the mailcrab UI is published on (host mode).
-    #[serde(default = "default_mailcrab_ui_port")]
+    /// Host port the mailpit UI is published on (host mode).
+    #[serde(default = "default_mailpit_ui_port")]
     pub ui_port: u16,
 }
 
-impl Default for MailcrabContainerSettings {
+impl Default for MailpitContainerSettings {
     fn default() -> Self {
         Self {
             enabled: default_enabled(),
-            image: default_mailcrab_image(),
-            ui_port: default_mailcrab_ui_port(),
+            image: default_mailpit_image(),
+            ui_port: default_mailpit_ui_port(),
         }
     }
 }
@@ -174,12 +174,12 @@ fn default_sender_image() -> String {
     DEFAULT_SENDER_IMAGE.to_string()
 }
 
-fn default_mailcrab_image() -> String {
-    DEFAULT_MAILCRAB_IMAGE.to_string()
+fn default_mailpit_image() -> String {
+    DEFAULT_MAILPIT_IMAGE.to_string()
 }
 
-fn default_mailcrab_ui_port() -> u16 {
-    DEFAULT_MAILCRAB_UI_PORT
+fn default_mailpit_ui_port() -> u16 {
+    DEFAULT_MAILPIT_UI_PORT
 }
 
 #[cfg(test)]
@@ -207,9 +207,9 @@ mod tests {
         assert_eq!(s.kanidm.image, "kanidm/server:1.11.1");
         assert!(!s.kanidm_mail_sender.enabled);
         assert_eq!(s.kanidm_mail_sender.image, "kanidm/tools:1.11.1");
-        assert!(!s.mailcrab.enabled);
-        assert_eq!(s.mailcrab.image, "marlonb/mailcrab:v1.9.0");
-        assert_eq!(s.mailcrab.ui_port, 1080);
+        assert!(!s.mailpit.enabled);
+        assert_eq!(s.mailpit.image, "axllent/mailpit:v1.31.2");
+        assert_eq!(s.mailpit.ui_port, 8025);
     }
 
     #[test]
@@ -218,9 +218,9 @@ mod tests {
             [kanidm]
             enabled = true
 
-            [mailcrab]
+            [mailpit]
             enabled = true
-            ui_port = 1081
+            ui_port = 8026
         "#};
         let s = from_toml(toml).expect("should deserialize");
         assert!(s.kanidm.enabled);
@@ -228,9 +228,9 @@ mod tests {
             s.kanidm.image, "kanidm/server:1.11.1",
             "absent image keeps the pinned default"
         );
-        assert!(s.mailcrab.enabled);
-        assert_eq!(s.mailcrab.ui_port, 1081);
-        assert_eq!(s.mailcrab.image, "marlonb/mailcrab:v1.9.0");
+        assert!(s.mailpit.enabled);
+        assert_eq!(s.mailpit.ui_port, 8026);
+        assert_eq!(s.mailpit.image, "axllent/mailpit:v1.31.2");
         assert_eq!(s.mode, "auto", "absent scalars keep defaults");
         assert_eq!(s.network, "kanidm-admin-dev");
     }
@@ -257,14 +257,14 @@ mod tests {
     }
 
     #[test]
-    fn validate_rejects_mailcrab_without_sender() {
+    fn validate_rejects_mailpit_without_sender() {
         let mut s = TestcontainerSettings::default();
         s.kanidm.enabled = true;
-        s.mailcrab.enabled = true;
-        let error = s.validate().expect_err("mailcrab requires the sender");
+        s.mailpit.enabled = true;
+        let error = s.validate().expect_err("mailpit requires the sender");
         assert_eq!(
             error,
-            "[testcontainer.mailcrab] requires [testcontainer.kanidm-mail-sender] to be enabled"
+            "[testcontainer.mailpit] requires [testcontainer.kanidm-mail-sender] to be enabled"
         );
     }
 
@@ -284,7 +284,7 @@ mod tests {
         let mut full = TestcontainerSettings::default();
         full.kanidm.enabled = true;
         full.kanidm_mail_sender.enabled = true;
-        full.mailcrab.enabled = true;
+        full.mailpit.enabled = true;
         assert!(full.validate().is_ok());
 
         let mut kanidm_only = TestcontainerSettings::default();
