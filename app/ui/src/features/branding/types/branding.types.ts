@@ -1,10 +1,7 @@
 // Branding API contract — mirrors the backend manifest DTO.
 
 export type BrandingSlot =
-  | 'logo-light'
-  | 'logo-dark'
-  | 'favicon-light'
-  | 'favicon-dark';
+  'logo-light' | 'logo-dark' | 'favicon-light' | 'favicon-dark';
 
 export interface BrandingSlotEntry {
   present: boolean;

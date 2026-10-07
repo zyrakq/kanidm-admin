@@ -80,15 +80,17 @@ export class BrandingSlotCard extends LitElement {
       <ui-card class="card">
         <h2>${this.heading}</h2>
         <div class="preview">
-          ${this.previewMissing
-            ? html`<div class="placeholder">${msg('No image')}</div>`
-            : html`<img
-                src=${this.previewUrl}
-                alt=${this.heading}
-                @error=${() => {
-                  this.previewMissing = true;
-                }}
-              />`}
+          ${
+            this.previewMissing
+              ? html`<div class="placeholder">${msg('No image')}</div>`
+              : html`<img
+                  src=${this.previewUrl}
+                  alt=${this.heading}
+                  @error=${() => {
+                    this.previewMissing = true;
+                  }}
+                />`
+          }
         </div>
         <div class="actions">
           <input
@@ -114,19 +116,21 @@ export class BrandingSlotCard extends LitElement {
           </ui-button>
         </div>
       </ui-card>
-      ${this.removeOpen
-        ? html`<confirm-dialog
-            open
-            danger
-            .busy=${this.removing}
-            confirmLabel=${msg('Remove')}
-            message=${msg('Remove the uploaded image? The default returns.')}
-            @confirm=${() => void this.removeImage()}
-            @cancel=${() => {
-              this.removeOpen = false;
-            }}
-          ></confirm-dialog>`
-        : nothing}
+      ${
+        this.removeOpen
+          ? html`<confirm-dialog
+              open
+              danger
+              .busy=${this.removing}
+              confirmLabel=${msg('Remove')}
+              message=${msg('Remove the uploaded image? The default returns.')}
+              @confirm=${() => void this.removeImage()}
+              @cancel=${() => {
+                this.removeOpen = false;
+              }}
+            ></confirm-dialog>`
+          : nothing
+      }
     `;
   }
 

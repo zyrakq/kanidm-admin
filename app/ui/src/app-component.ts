@@ -3,7 +3,11 @@ import { customElement } from 'lit/decorators.js';
 import { Router } from '@lit-labs/router';
 import { authService } from '@/features/auth';
 import { localizationService } from '@/features/localization';
-import { canAccess, firstVisiblePath, type SectionId } from '@/shared/access/section-access';
+import {
+  canAccess,
+  firstVisiblePath,
+  type SectionId,
+} from '@/shared/access/section-access';
 import { navigate, registerRouter } from '@/shared/services/router.service';
 import '@/features/theme/services/favicon.service';
 
@@ -92,13 +96,16 @@ export class AppComponent extends LitElement {
     },
     {
       path: '/admin/service-accounts',
-      render: () => html`<service-account-list-page></service-account-list-page>`,
+      render: () =>
+        html`<service-account-list-page></service-account-list-page>`,
       enter: async () => this.guardSection('service-accounts'),
     },
     {
       path: '/admin/service-accounts/:id',
       render: ({ id }) =>
-        html`<service-account-detail-page .id=${id ?? ''}></service-account-detail-page>`,
+        html`<service-account-detail-page
+          .id=${id ?? ''}
+        ></service-account-detail-page>`,
       enter: async () => this.guardSection('service-accounts'),
     },
     {

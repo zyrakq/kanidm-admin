@@ -1,5 +1,8 @@
 // Public API — only export from here.
-export { BrandingService, brandingService } from './services/branding.service.ts';
+export {
+  BrandingService,
+  brandingService,
+} from './services/branding.service.ts';
 export type {
   BrandingSlot,
   BrandingSlotEntry,

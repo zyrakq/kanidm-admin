@@ -120,7 +120,9 @@ export function canAccess(groups: string[], section: SectionId): boolean {
 
 /** All sections visible for the given group names, in display order. */
 export function visibleSections(groups: string[]): SectionDef[] {
-  return SECTIONS.filter((s) => s.requiredGroups.some((r) => groups.includes(r)));
+  return SECTIONS.filter((s) =>
+    s.requiredGroups.some((r) => groups.includes(r))
+  );
 }
 
 /** Path of the first visible section, or null when none are visible. */
