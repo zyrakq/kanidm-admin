@@ -3,7 +3,7 @@ mod branding;
 mod frontend;
 mod frontend_assets;
 mod logging;
-mod mailcrab_proxy;
+mod mailpit_proxy;
 mod preflight;
 mod proxy;
 mod routes;
@@ -39,7 +39,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         routes::build(
             state,
             status_probe,
-            _testcontainers_handle.mailcrab_upstream(),
+            _testcontainers_handle.mailpit_upstream(),
             branding::router(std::sync::Arc::new(branding_store)),
         ),
         &settings.frontend,
