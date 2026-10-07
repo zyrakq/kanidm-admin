@@ -29,10 +29,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     kanidm_settings.log_effective_config();
     let state = auth::app_state_from_settings(&kanidm_settings)?;
     let status_probe = status::probe_from_settings(&kanidm_settings)?;
+    let branding_store = branding::BrandingStore::new(
+        settings.branding.effective_dir(&manifest_dir),
+        settings.branding.max_size_bytes,
+    );
 
     let listener = TcpListener::bind(&settings.server.address).await?;
     let router = routes::mount_fallback(
-        routes::build(state, status_probe),
+        routes::build(
+            state,
+            status_probe,
+            branding::router(std::sync::Arc::new(branding_store)),
+        ),
         &settings.frontend,
         &manifest_dir,
     );

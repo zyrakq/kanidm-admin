@@ -35,7 +35,13 @@ use crate::status::{self, KanidmStatusProbe};
 ///   POST /api/auth/reauth   — privilege step-up (refreshes cookie)
 ///   GET  /api/auth/profile  — signed-in user plus their Kanidm groups
 ///   ANY  /api/kanidm/{*path} — authenticated proxy to the Kanidm server
-pub fn build(state: AppState, status_probe: Arc<dyn KanidmStatusProbe>) -> Router {
+///   GET/PUT/DELETE /api/branding[/{slot}] — branding manifest/upload/remove
+///   GET  /branding/{slot}   — serve an uploaded branding file
+pub fn build(
+    state: AppState,
+    status_probe: Arc<dyn KanidmStatusProbe>,
+    branding_routes: Router,
+) -> Router {
     Router::new()
         .route("/api/health", get(health_check))
         .route("/api/hello", get(hello_handler))
@@ -47,6 +53,10 @@ pub fn build(state: AppState, status_probe: Arc<dyn KanidmStatusProbe>) -> Route
         .merge(crate::proxy::bulk::routes())
         .merge(crate::proxy::handler::routes())
         .with_state(state)
+        // The branding router carries its own state (BrandingState), so it
+        // is a stateless `Router<()>`; merge it only after `with_state`
+        // has turned the main router stateless too (axum 0.8 semantics).
+        .merge(branding_routes)
 }
 
 /// Attach the SPA fallback service chosen by `frontend.serve_from`.
