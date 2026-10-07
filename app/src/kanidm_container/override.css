@@ -153,3 +153,252 @@ a:hover {
 [data-bs-theme="dark"] .form-signin .form-text {
   color: #a1a1a6;
 }
+
+/* ---------- htmx web UI: shared theme tokens ---------- */
+
+/* The htmx UI (navbar, apps, profile) leans on Bootstrap 5.3 custom
+   properties. Re-route them through the admin palette; this file loads
+   last, so these equal-specificity overrides win. */
+:root {
+  --bs-body-font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --bs-body-bg: #f9fafb;
+  --bs-body-color: #1f2937;
+  --bs-border-color: #e5e7eb;
+  --bs-border-radius: 8px;
+  --bs-tertiary-bg: #f3f4f6;
+  --bs-secondary-color: #4b5563;
+  --bs-link-color: #ff6b35;
+  --bs-link-hover-color: #e85d2a;
+}
+
+[data-bs-theme="dark"] {
+  --bs-body-bg: #141414;
+  --bs-body-color: #ececec;
+  --bs-border-color: #333335;
+  --bs-tertiary-bg: #1c1c1d;
+  --bs-secondary-color: #a1a1a6;
+  --bs-link-color: #ff7a45;
+  --bs-link-hover-color: #ff8f5e;
+}
+
+/* ---------- Navbar ---------- */
+
+.navbar {
+  --bs-navbar-color: #4b5563;
+  --bs-navbar-hover-color: #ff6b35;
+  --bs-navbar-active-color: #ff6b35;
+  --bs-navbar-brand-color: #1f2937;
+  --bs-navbar-brand-hover-color: #ff6b35;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.06),
+    0 1px 3px rgba(16, 24, 40, 0.08);
+}
+
+.navbar-brand > div {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+[data-bs-theme="dark"] .navbar {
+  --bs-navbar-color: #a1a1a6;
+  --bs-navbar-hover-color: #ff7a45;
+  --bs-navbar-active-color: #ff7a45;
+  --bs-navbar-brand-color: #ececec;
+  --bs-navbar-brand-hover-color: #ff7a45;
+  border-bottom-color: #333335;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .navbar-brand > div {
+  color: #ececec;
+}
+
+/* ---------- Headings and separators ---------- */
+
+main h2 {
+  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+hr {
+  border-top: 1px solid #e5e7eb;
+  opacity: 1;
+}
+
+[data-bs-theme="dark"] main h2 {
+  color: #ececec;
+}
+
+[data-bs-theme="dark"] hr {
+  border-top-color: #333335;
+}
+
+/* ---------- Cards (app tiles, generic surfaces) ---------- */
+
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.06),
+    0 1px 3px rgba(16, 24, 40, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+main .card.text-center {
+  transition:
+    border-color 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+main .card.text-center:hover {
+  border-color: #d1d5db;
+  box-shadow:
+    0 2px 4px rgba(16, 24, 40, 0.05),
+    0 6px 14px rgba(16, 24, 40, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+.card label {
+  color: #1f2937;
+  font-weight: 500;
+}
+
+[data-bs-theme="dark"] .card {
+  background-color: #1c1c1d;
+  border-color: #333335;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] main .card.text-center:hover {
+  border-color: #4a4a4d;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    0 8px 18px rgba(0, 0, 0, 0.4);
+}
+
+[data-bs-theme="dark"] .card label {
+  color: #ececec;
+}
+
+/* ---------- Profile side menu ---------- */
+
+.side-menu-item {
+  border-radius: 8px;
+  color: #4b5563;
+  transition:
+    background-color 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    color 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.side-menu-item:hover {
+  background-color: #f3f4f6;
+  color: #ff6b35;
+}
+
+.side-menu-item.active {
+  background-color: rgba(255, 107, 53, 0.1);
+  color: #ff6b35;
+}
+
+[data-bs-theme="dark"] .side-menu-item {
+  color: #a1a1a6;
+}
+
+[data-bs-theme="dark"] .side-menu-item:hover {
+  background-color: #262627;
+  color: #ff7a45;
+}
+
+[data-bs-theme="dark"] .side-menu-item.active {
+  background-color: rgba(255, 122, 69, 0.14);
+  color: #ff7a45;
+}
+
+/* Menu icons are grayed via invert(40%) in style.css; lift them in
+   dark mode so they stay visible on the dark surface. */
+[data-bs-theme="dark"] .icon-container img {
+  filter: invert(70%);
+}
+
+/* ---------- Profile settings pane ---------- */
+
+#settings-window .form-control {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #1f2937;
+  transition:
+    border-color 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+#settings-window .form-control:focus {
+  background-color: #f3f4f6;
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.28);
+  outline: 0;
+}
+
+#settings-window .form-control-plaintext {
+  color: #1f2937;
+}
+
+.col-form-label.fw-bold {
+  color: #1f2937;
+}
+
+[data-bs-theme="dark"] #settings-window .form-control {
+  background-color: #101011;
+  border-color: #333335;
+  color: #ececec;
+}
+
+[data-bs-theme="dark"] #settings-window .form-control:focus {
+  background-color: #101011;
+  border-color: #ff7a45;
+  box-shadow: 0 0 0 3px rgba(255, 122, 69, 0.35);
+}
+
+[data-bs-theme="dark"] #settings-window .form-control-plaintext {
+  color: #ececec;
+}
+
+[data-bs-theme="dark"] .col-form-label.fw-bold {
+  color: #ececec;
+}
+
+/* ---------- Sign-out modal ---------- */
+
+.modal-content {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow:
+    0 4px 8px rgba(16, 24, 40, 0.06),
+    0 16px 36px rgba(16, 24, 40, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+[data-bs-theme="dark"] .modal-content {
+  background-color: #1c1c1d;
+  border-color: #333335;
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    0 20px 44px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- Credentials commit bar ---------- */
+
+/* style.css hardcodes a white background here; give it the raised
+   surface in dark mode. */
+[data-bs-theme="dark"] #cred-update-commit-bar {
+  background-color: #232324;
+}
