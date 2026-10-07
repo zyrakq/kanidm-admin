@@ -16,6 +16,7 @@
  * ```
  */
 import { themeService } from './theme.service';
+import { brandingService } from '@/features/branding';
 
 export class FaviconService {
   private static instance: FaviconService | null = null;
@@ -53,6 +54,11 @@ export class FaviconService {
     this.unsubscribe = themeService.subscribe((theme) => {
       this.updateFavicons(theme);
     });
+
+    // Re-apply favicons when the branding manifest changes
+    window.addEventListener('branding-changed', () => {
+      this.updateFavicons(this.currentTheme);
+    });
   }
 
   /**
@@ -66,10 +72,13 @@ export class FaviconService {
       this.faviconPaths.ico(theme),
       'image/x-icon'
     );
+    const svgOverride = brandingService.overrideUrl(
+      theme === 'dark' ? 'favicon-dark' : 'favicon-light'
+    );
     this.updateLink(
       'icon-svg',
       'icon',
-      this.faviconPaths.svg(theme),
+      svgOverride ?? this.faviconPaths.svg(theme),
       'image/svg+xml'
     );
     this.updateLink(
