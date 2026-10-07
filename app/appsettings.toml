@@ -21,10 +21,10 @@ image = "kanidm/server:1.11.2"
 enabled = false
 image = "kanidm/tools:1.11.2"
 
-[testcontainer.mailcrab]
+[testcontainer.mailpit]
 enabled = false
-image = "marlonb/mailcrab:v1.9.0"
-ui_port = 1080
+image = "axllent/mailpit:v1.31.2"
+ui_port = 8025
 
 [branding]
 dir = ""
