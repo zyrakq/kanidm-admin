@@ -14,7 +14,8 @@ export type SectionId =
   | 'system'
   | 'sync'
   | 'recycle-bin'
-  | 'messages';
+  | 'messages'
+  | 'branding';
 
 export interface SectionDef {
   id: SectionId;
@@ -98,6 +99,13 @@ export const SECTIONS: SectionDef[] = [
     icon: 'mail',
     label: () => msg('Messages'),
     requiredGroups: ['idm_message_admins'],
+  },
+  {
+    id: 'branding',
+    href: '/admin/branding',
+    icon: 'grid',
+    label: () => msg('Branding'),
+    requiredGroups: ['idm_admins'],
   },
 ];
 
