@@ -1,11 +1,11 @@
-// app/src/mailcrab_proxy/http.rs
+// app/src/mailpit_proxy/http.rs
 //
-// Verbatim HTTP forwarder for /_/mailcrab/{*path}: method,
+// Verbatim HTTP forwarder for /_/mailpit/{*path}: method,
 // headers (minus hop-by-hop), body, status and response headers
 // all pass through 1:1 — the path is NOT stripped because
-// mailcrab serves its UI and API under its own /_/mailcrab
-// prefix. Redirects pass through untouched (the shared client
-// has Policy::none), so mailcrab's own Location headers keep the
+// mailpit serves its UI and API under its own /_/mailpit
+// webroot. Redirects pass through untouched (the shared client
+// has Policy::none), so mailpit's own Location headers keep the
 // prefix.
 
 use axum::body::{to_bytes, Body};
@@ -35,7 +35,7 @@ const HOP_BY_HOP_HEADERS: [&str; 10] = [
     "host",
 ];
 
-/// Forward one request to the mailcrab upstream, verbatim.
+/// Forward one request to the mailpit upstream, verbatim.
 pub(super) async fn forward(
     Extension(upstream): Extension<Upstream>,
     request: Request,
@@ -101,14 +101,14 @@ fn forwarded_headers(headers: &HeaderMap) -> HeaderMap {
 
 /// 502 with a short plain-text body naming the upstream URL.
 fn bad_gateway(url: &str, error: &reqwest::Error) -> Response {
-    tracing::warn!("mailcrab forward to {url} failed: {error}");
+    tracing::warn!("mailpit forward to {url} failed: {error}");
     bad_gateway_body(url)
 }
 
 fn bad_gateway_body(url: &str) -> Response {
     (
         StatusCode::BAD_GATEWAY,
-        format!("mailcrab upstream {url} is unreachable"),
+        format!("mailpit upstream {url} is unreachable"),
     )
         .into_response()
 }

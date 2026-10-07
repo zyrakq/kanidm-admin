@@ -1,11 +1,14 @@
-// app/src/mailcrab_proxy/ws.rs
+// app/src/mailpit_proxy/ws.rs
 //
-// WebSocket bridge for /_/mailcrab/ws: upgrades the client
-// socket, connects to the mailcrab upstream's /_/mailcrab/ws
-// endpoint and pumps messages in both directions. The mail UI
-// uses this socket for live updates; without the bridge it would
-// need a second port/CORS origin that in-container mode does not
-// even publish.
+// WebSocket bridge for /_/mailpit/api/events: upgrades the
+// client socket, connects to the mailpit upstream's
+// /_/mailpit/api/events endpoint (mailpit's live-events API,
+// NOT /ws) and pumps messages in both directions. The mail UI
+// uses this socket for live updates; without the bridge it
+// would need a second port/CORS origin that in-container mode
+// does not even publish. The bridge sends no Origin header, so
+// mailpit's cross-site WebSocket hijack origin check (v1.28.2+)
+// passes.
 
 use axum::extract::ws::{Message, WebSocketUpgrade};
 use axum::extract::Extension;
@@ -15,7 +18,7 @@ use tokio_tungstenite::tungstenite::Message as TungsteniteMessage;
 
 use super::Upstream;
 
-/// Bridge one client WebSocket to the mailcrab upstream.
+/// Bridge one client WebSocket to the mailpit upstream.
 pub(super) async fn bridge(
     Extension(upstream): Extension<Upstream>,
     ws: WebSocketUpgrade,
@@ -25,7 +28,7 @@ pub(super) async fn bridge(
         let upstream_socket = match tokio_tungstenite::connect_async(&ws_url).await {
             Ok((socket, _)) => socket,
             Err(error) => {
-                tracing::warn!("mailcrab websocket connect to {ws_url} failed: {error}");
+                tracing::warn!("mailpit websocket connect to {ws_url} failed: {error}");
                 let _ = client_socket.close().await;
                 return;
             }
@@ -66,7 +69,8 @@ pub(super) async fn bridge(
 }
 
 /// The upstream WebSocket URL: scheme swapped http→ws / https→wss,
-/// path fixed to the mailcrab ws endpoint.
+/// path fixed to the mailpit live-events endpoint under the
+/// webroot.
 fn upstream_ws_url(upstream_base: &str) -> String {
     let ws_base = if let Some(rest) = upstream_base.strip_prefix("https://") {
         format!("wss://{rest}")
@@ -75,7 +79,7 @@ fn upstream_ws_url(upstream_base: &str) -> String {
     } else {
         upstream_base.to_string()
     };
-    format!("{ws_base}/_/mailcrab/ws")
+    format!("{ws_base}/_/mailpit/api/events")
 }
 
 /// axum → tungstenite message. Binary/Ping/Pong are pure variant
@@ -112,14 +116,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ws_url_swaps_scheme_and_targets_the_bridge_path() {
+    fn ws_url_swaps_scheme_and_targets_the_live_events_path() {
         assert_eq!(
-            upstream_ws_url("http://127.0.0.1:1080"),
-            "ws://127.0.0.1:1080/_/mailcrab/ws"
+            upstream_ws_url("http://127.0.0.1:8025"),
+            "ws://127.0.0.1:8025/_/mailpit/api/events"
         );
         assert_eq!(
-            upstream_ws_url("https://mailcrab:1080"),
-            "wss://mailcrab:1080/_/mailcrab/ws"
+            upstream_ws_url("https://mailpit:8025"),
+            "wss://mailpit:8025/_/mailpit/api/events"
         );
     }
 }
