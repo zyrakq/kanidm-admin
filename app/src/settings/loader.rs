@@ -1,6 +1,7 @@
 use config::{Config, ConfigError, Environment, File};
 use serde::Deserialize;
 
+use super::branding::BrandingSettings;
 use super::frontend::FrontendSettings;
 use super::kanidm::KanidmSettings;
 use super::kanidm_container::KanidmContainerSettings;
@@ -15,6 +16,10 @@ pub struct Settings {
     /// means defaults (disabled); see settings/kanidm_container.rs.
     #[serde(default)]
     pub kanidm_container: KanidmContainerSettings,
+    /// Optional: UI-uploaded branding overrides (logos/favicons). An
+    /// absent section means defaults; see settings/branding.rs.
+    #[serde(default)]
+    pub branding: BrandingSettings,
 }
 
 impl Settings {

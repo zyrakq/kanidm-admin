@@ -341,6 +341,54 @@ fn env_var_overrides_kanidm_container_image() {
     );
 }
 
+// --- [branding] section ---------------------------------------------------
+
+#[test]
+fn branding_defaults_when_section_absent() {
+    let s = settings_from_toml(BASE_TOML, "").expect("should deserialize");
+    assert_eq!(s.branding.dir, "", "dir should default to empty");
+    assert_eq!(
+        s.branding.max_size_bytes, 512 * 1024,
+        "max_size_bytes should default to 512 KiB"
+    );
+    assert_eq!(
+        s.branding.effective_dir(std::path::Path::new("/tmp/manifest")),
+        std::path::PathBuf::from("/tmp/manifest/branding"),
+        "empty dir should resolve to <manifest>/branding"
+    );
+}
+
+#[test]
+fn branding_overlay_parses() {
+    let overlay = indoc! {r#"
+        [branding]
+        dir = "/srv/branding"
+        max_size_bytes = 1048576
+    "#};
+    let s = settings_from_toml(BASE_TOML, overlay).expect("should deserialize");
+    assert_eq!(s.branding.dir, "/srv/branding");
+    assert_eq!(s.branding.max_size_bytes, 1048576);
+    assert_eq!(
+        s.branding.effective_dir(std::path::Path::new("/tmp/manifest")),
+        std::path::PathBuf::from("/srv/branding"),
+        "set dir should resolve to the literal path"
+    );
+}
+
+#[test]
+fn env_var_overrides_branding_dir() {
+    let env = HashMap::from([(
+        "APP_BRANDING__DIR".to_string(),
+        "/var/lib/branding".to_string(),
+    )]);
+    let s = settings_from_layers(BASE_TOML, "", Some(env)).expect("should deserialize");
+    assert_eq!(
+        s.branding.effective_dir(std::path::Path::new("/tmp/manifest")),
+        std::path::PathBuf::from("/var/lib/branding"),
+        "APP_BRANDING__DIR should override the default dir"
+    );
+}
+
 // --- Kanidm effective-config logging ------------------------------------
 
 /// Build a KanidmSettings directly for the display-variant tests: the
