@@ -212,7 +212,8 @@ pub(crate) async fn run(
 
     // The seeded override stylesheet must actually be in place:
     // a silently unstyled dev login page must never go
-    // unnoticed. grep -F exits 0 iff the marker is present.
+    // unnoticed. The kanidm image is distroless, so the check
+    // copies the file out and verifies the marker app-side.
     verify_override_css(&container).await?;
 
     let host_port = match mode {
@@ -277,26 +278,30 @@ async fn extract_file(
         .map_err(|error| format!("failed to copy {path} out of the container: {error}").into())
 }
 
-/// Verify the seeded login-page stylesheet: `grep -F` the marker
-/// comment inside the running container at the seeded path. The
-/// exec fails (non-zero exit → exec error) when the file is
-/// missing or lacks the marker, which surfaces as a startup
+/// Verify the seeded login-page stylesheet: copy the seeded file
+/// out of the running container and check it carries the marker
+/// comment. The kanidm image is distroless (no shell, no grep),
+/// so the check runs on the app side over the copied-out bytes.
+/// A missing file or a missing marker surfaces as a startup
 /// error — styles are a hard requirement, not best-effort.
 async fn verify_override_css(
     container: &ContainerAsync<GenericImage>,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    container
-        .exec(
-            ExecCommand::new(["grep", "-F", OVERRIDE_CSS_MARKER, OVERRIDE_CSS_PATH])
-                .with_cmd_ready_condition(CmdWaitFor::exit_code(0)),
+    let seeded = extract_file(container, OVERRIDE_CSS_PATH).await.map_err(|error| {
+        format!(
+            "the dev login-page stylesheet is not correctly seeded at \
+             {OVERRIDE_CSS_PATH} (copy-out failed): {error}"
         )
-        .await
-        .map_err(|error| {
-            format!(
-                "the dev login-page stylesheet is not correctly seeded at \
-                 {OVERRIDE_CSS_PATH} (grep for the marker failed): {error}"
-            )
-        })?;
+    })?;
+    let seeded = String::from_utf8(seeded)
+        .map_err(|error| format!("the seeded override.css is not UTF-8: {error}"))?;
+    if !seeded.contains(OVERRIDE_CSS_MARKER) {
+        return Err(format!(
+            "the dev login-page stylesheet at {OVERRIDE_CSS_PATH} lacks the \
+             expected marker comment — the seeded file is not the dev override"
+        )
+        .into());
+    }
     Ok(())
 }
 
