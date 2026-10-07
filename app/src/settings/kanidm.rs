@@ -5,7 +5,6 @@
 // without a Kanidm instance.
 
 use serde::Deserialize;
-use tracing::info;
 
 // Clone: testcontainer::start returns an owned copy of these
 // settings in the disabled (non-container) path.
@@ -25,30 +24,4 @@ pub struct KanidmSettings {
 
 fn default_verify_ca() -> bool {
     true
-}
-
-impl KanidmSettings {
-    /// Log the effective connection config (url, ca_path, verify_ca)
-    /// as one structured `info!` line. Called from `main` on the value
-    /// returned by `kanidm_container::start`, i.e. after env overrides
-    /// and container-mode substitution have been resolved, so the
-    /// values shown are the ones the app actually connects with.
-    pub fn log_effective_config(&self) {
-        info!(
-            url = %self.url,
-            ca_path = %self.ca_path_display(),
-            verify_ca = self.verify_ca,
-            "Kanidm effective config"
-        );
-    }
-
-    /// Display form of `ca_path` for logs: `None` and the empty string
-    /// both mean unset (the client falls back to the system trust
-    /// store) and render as "not set"; any other value is verbatim.
-    pub(crate) fn ca_path_display(&self) -> &str {
-        match self.ca_path.as_deref() {
-            Some(path) if !path.is_empty() => path,
-            _ => "not set",
-        }
-    }
 }
