@@ -14,5 +14,6 @@ kill:
     pkill -f "cargo run" 2>/dev/null || true
     pkill -f "just run" 2>/dev/null || true
     pkill -f "bun run build --watch" 2>/dev/null || true
+    pkill -f ":4000" 2>/dev/null || true
     sleep 2
     echo "done"
