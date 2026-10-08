@@ -34,7 +34,7 @@ import '@/features/sync/components/sync-list-page';
 import '@/features/sync/components/sync-detail-page';
 import '@/features/recycle-bin/components/recycle-bin-page';
 import '@/features/messages/components/messages-page';
-import '@/features/branding/components/branding-page';
+import '@/features/customization/components/customization-page';
 
 @customElement('app-component')
 export class AppComponent extends LitElement {
@@ -156,9 +156,9 @@ export class AppComponent extends LitElement {
       enter: async () => this.guardSection('messages'),
     },
     {
-      path: '/admin/branding',
-      render: () => html`<branding-page></branding-page>`,
-      enter: async () => this.guardSection('branding'),
+      path: '/admin/customization',
+      render: () => html`<customization-page></customization-page>`,
+      enter: async () => this.guardSection('customization'),
     },
     {
       path: '/admin/no-access',

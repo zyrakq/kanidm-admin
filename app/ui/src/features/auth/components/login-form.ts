@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { ThemeController } from '@/features/theme';
-import { brandingService } from '@/features/branding';
+import { customizationService } from '@/features/customization';
 import { authService } from '../services/auth.service';
 import { firstVisiblePath } from '@/shared/access/section-access';
 import { ApiError } from '@/shared/services/http-client';
@@ -27,8 +27,8 @@ export class LoginForm extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
-    await brandingService.init();
-    window.addEventListener('branding-changed', () => this.requestUpdate());
+    await customizationService.init();
+    window.addEventListener('customization-changed', () => this.requestUpdate());
     await authService.init();
     this.syncState();
   }
@@ -92,7 +92,7 @@ export class LoginForm extends LitElement {
   render() {
     const slot = this.theme.theme === 'dark' ? 'logo-dark' : 'logo-light';
     const logo =
-      brandingService.overrideUrl(slot) ??
+      customizationService.overrideUrl(slot) ??
       (this.theme.theme === 'dark' ? logoDark : logoLight);
 
     return html`

@@ -16,7 +16,7 @@
  * ```
  */
 import { themeService } from './theme.service';
-import { brandingService } from '@/features/branding';
+import { customizationService } from '@/features/customization';
 
 export class FaviconService {
   private static instance: FaviconService | null = null;
@@ -55,8 +55,8 @@ export class FaviconService {
       this.updateFavicons(theme);
     });
 
-    // Re-apply favicons when the branding manifest changes
-    window.addEventListener('branding-changed', () => {
+    // Re-apply favicons when the customization manifest changes
+    window.addEventListener('customization-changed', () => {
       this.updateFavicons(this.currentTheme);
     });
   }
@@ -72,7 +72,7 @@ export class FaviconService {
       this.faviconPaths.ico(theme),
       'image/x-icon'
     );
-    const svgOverride = brandingService.overrideUrl(
+    const svgOverride = customizationService.overrideUrl(
       theme === 'dark' ? 'favicon-dark' : 'favicon-light'
     );
     this.updateLink(

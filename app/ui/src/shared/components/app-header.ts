@@ -2,7 +2,7 @@ import { LitElement, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
-import { brandingService } from '@/features/branding';
+import { customizationService } from '@/features/customization';
 import { ThemeController } from '@/features/theme';
 import '@/features/localization/components/locale-switcher';
 import '@/features/auth/components/session-indicator';
@@ -23,16 +23,16 @@ export class AppHeader extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
-    // Registered before init() so the 'branding-changed' event the init
-    // fetch dispatches already triggers the re-render with overrides.
-    window.addEventListener('branding-changed', () => this.requestUpdate());
-    await brandingService.init();
+    // Registered before init() so the 'customization-changed' event the
+    // init fetch dispatches already triggers the re-render with overrides.
+    window.addEventListener('customization-changed', () => this.requestUpdate());
+    await customizationService.init();
   }
 
   render() {
     const slot = this.theme.theme === 'dark' ? 'logo-dark' : 'logo-light';
     const logo =
-      brandingService.overrideUrl(slot) ??
+      customizationService.overrideUrl(slot) ??
       (this.theme.theme === 'dark' ? logoDark : logoLight);
 
     return html`
