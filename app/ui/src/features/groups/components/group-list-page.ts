@@ -26,6 +26,8 @@ import type { GroupSummary } from '../types/group.types';
 import { groupService } from '../services/group.service';
 import { groupListPageStyles } from './group-list-page.styles';
 
+const HIDE_SYSTEM_KEY = 'kanidm-groups-hide-system';
+
 @customElement('group-list-page')
 @localized()
 export class GroupListPage extends LitElement {
@@ -38,9 +40,11 @@ export class GroupListPage extends LitElement {
   @state() private deleteBusy = false;
   @state() private bulkTargets: GroupSummary[] | null = null;
   @state() private bulkBusy = false;
+  @state() private hideSystem = true;
 
   connectedCallback(): void {
     super.connectedCallback();
+    this.hideSystem = localStorage.getItem(HIDE_SYSTEM_KEY) !== 'false';
     void this.load();
   }
 
@@ -58,6 +62,17 @@ export class GroupListPage extends LitElement {
   private toastError(error: unknown, fallback: string): void {
     const message = error instanceof ApiError ? error.message : fallback;
     notificationService.error(message);
+  }
+
+  private toggleHideSystem(): void {
+    this.hideSystem = !this.hideSystem;
+    localStorage.setItem(HIDE_SYSTEM_KEY, String(this.hideSystem));
+  }
+
+  private get visibleGroups(): GroupSummary[] {
+    return this.hideSystem
+      ? this.groups.filter((group) => !group.isSystem)
+      : this.groups;
   }
 
   private openCreate(): void {
@@ -192,14 +207,27 @@ export class GroupListPage extends LitElement {
       <admin-layout>
         <div class="page-head">
           <h1>${msg('Groups')}</h1>
-          <ui-button variant="primary" icon="plus" @click=${this.openCreate}>
-            ${msg('Create group')}
-          </ui-button>
+          <div class="head-tools">
+            <label class="toggle-inline">
+              <span>${msg('Hide system groups')}</span>
+              <span class="switch">
+                <input
+                  type="checkbox"
+                  .checked=${this.hideSystem}
+                  @change=${this.toggleHideSystem}
+                />
+                <span class="slider"></span>
+              </span>
+            </label>
+            <ui-button variant="primary" icon="plus" @click=${this.openCreate}>
+              ${msg('Create group')}
+            </ui-button>
+          </div>
         </div>
 
         <data-table
           .columns=${this.columns}
-          .rows=${this.groups}
+          .rows=${this.visibleGroups}
           .loading=${this.loading}
           .searchable=${true}
           .selectable=${true}

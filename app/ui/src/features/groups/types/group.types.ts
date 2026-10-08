@@ -11,6 +11,17 @@ export interface GroupSummary {
   displayName: string | null;
   memberCount: number;
   isPosix: boolean;
+  /** True when the entry carries class=builtin (Kanidm base plugin marker). */
+  isSystem: boolean;
+}
+
+/**
+ * System-group marker: the Kanidm base plugin adds class=builtin to every
+ * internally-created entry (vendor/kanidm/server/lib/src/plugins/base.rs).
+ * Missing or malformed class attr → NOT system (fail open).
+ */
+export function isSystemEntry(entry: KanidmEntry): boolean {
+  return attrList(entry, 'class').includes('builtin');
 }
 
 /** Full group detail (entry attrs projected). */
@@ -34,6 +45,7 @@ export function toGroupSummary(entry: KanidmEntry): GroupSummary {
     displayName: attrFirst(entry, 'displayname') ?? null,
     memberCount: attrList(entry, 'member').length,
     isPosix: hasAttr(entry, 'gidnumber'),
+    isSystem: isSystemEntry(entry),
   };
 }
 

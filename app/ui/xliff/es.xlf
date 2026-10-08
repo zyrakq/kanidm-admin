@@ -2777,6 +2777,10 @@
   <source>Branding</source>
   <target>Marca</target>
 </trans-unit>
+<trans-unit id="sf22cb99dedd49ad2">
+  <source>Hide system groups</source>
+  <target>Ocultar grupos del sistema</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

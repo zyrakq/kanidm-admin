@@ -672,6 +672,7 @@
 'sf179b6dbf06c79ad': `Deshabilitar PKCE elimina la protección contra repetición del flujo de código de autorización y no es seguro. ¿Continuar?`,
 'sf187dbd717af5fa9': `¿Finalizar esta cuenta de sincronización? TODAS las entradas sincronizadas se convertirán en personas y grupos estáticos y dejarán de estar gestionadas por el proveedor de sincronización. Esta acción es IRREVERSIBLE.`,
 'sf1e9d421f35b51e5': `Aplicación`,
+'sf22cb99dedd49ad2': `Ocultar grupos del sistema`,
 'sf249dcf6c6b6f8ed': `No se pudo iniciar sesión. Inténtelo de nuevo.`,
 'sf3ac3fa56911b610': `Tipo de credencial mínimo`,
 'sf3f26778222aba63': `Error al eliminar el CSS.`,
