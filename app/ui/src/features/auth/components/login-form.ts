@@ -27,8 +27,13 @@ export class LoginForm extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
-    await customizationService.init();
+    // Register BEFORE init: the init-time refresh dispatches
+    // 'customization-changed', and the first render happens during the
+    // await — without the listener already attached, that event is
+    // missed and the logo stays on the bundled default until the next
+    // customization change.
     window.addEventListener('customization-changed', () => this.requestUpdate());
+    await customizationService.init();
     await authService.init();
     this.syncState();
   }

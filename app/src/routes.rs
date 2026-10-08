@@ -93,9 +93,40 @@ pub fn mount_fallback(
 }
 
 /// Build the static file service that serves the SPA with an index.html fallback.
-pub fn static_files(settings: &FrontendSettings, manifest_dir: &Path) -> ServeDir<ServeFile> {
+///
+/// HTML responses get `Cache-Control: no-cache` so a stale index.html
+/// (pointing at old hashed bundles) can never be pinned by the browser's
+/// heuristic cache across deploys; hashed assets keep normal caching.
+pub fn static_files(settings: &FrontendSettings, manifest_dir: &Path) -> Router {
     let public_dir = settings.resolve_public_dir(manifest_dir);
-    ServeDir::new(&public_dir).fallback(ServeFile::new(public_dir.join("index.html")))
+    let svc = tower::ServiceBuilder::new()
+        .layer(axum::middleware::from_fn(no_cache_html))
+        .service(
+            ServeDir::new(&public_dir)
+                .fallback(ServeFile::new(public_dir.join("index.html"))),
+        );
+    Router::new().fallback_service(svc)
+}
+
+/// Add `Cache-Control: no-cache` to `text/html` responses.
+async fn no_cache_html(
+    req: axum::extract::Request,
+    next: axum::middleware::Next,
+) -> Response {
+    let mut res = next.run(req).await;
+    let is_html = res
+        .headers()
+        .get(header::CONTENT_TYPE)
+        .and_then(|v| v.to_str().ok())
+        .map(|v| v.starts_with("text/html"))
+        .unwrap_or(false);
+    if is_html {
+        res.headers_mut().insert(
+            header::CACHE_CONTROL,
+            header::HeaderValue::from_static("no-cache"),
+        );
+    }
+    res
 }
 
 /// Serve a request from the compile-time embedded asset set.

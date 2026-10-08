@@ -1,4 +1,6 @@
 // Public API — only export from here.
+// Side effect: injects the theme override <link> tags (after the bundle).
+import './services/theme-override-loader.ts';
 export {
   CustomizationService,
   customizationService,

@@ -10,6 +10,7 @@ import {
 } from '@/shared/access/section-access';
 import { navigate, registerRouter } from '@/shared/services/router.service';
 import '@/features/theme/services/favicon.service';
+import '@/features/customization';
 
 // Route targets. Section features register their pages here as they are
 // implemented (batches 3-8); until then the routes below cover the
