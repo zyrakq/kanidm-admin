@@ -2773,6 +2773,14 @@
   <source>Customization</source>
   <target>自定义</target>
 </trans-unit>
+<trans-unit id="s93b03c6bf0d1d378">
+  <source>Theme styles</source>
+  <target>主题样式</target>
+</trans-unit>
+<trans-unit id="se0d99ec33512a85a">
+  <source>Branding</source>
+  <target>品牌</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

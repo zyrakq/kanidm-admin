@@ -1,6 +1,6 @@
-// Customization admin page: four upload cards (light/dark logo and
-// favicon) plus two CSS theme-override cards, and a note that deleting
-// restores the bundled defaults.
+// Customization admin page, split into two subsections: theme styles
+// (light/dark CSS overrides) and branding (light/dark logo and favicon).
+// Deleting an upload restores the bundled default.
 
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
@@ -30,6 +30,7 @@ export class CustomizationPage extends LitElement {
             'Upload replacement logos, favicons and theme CSS. Removing an upload restores the bundled default.'
           )}
         </p>
+        <h2>${msg('Theme styles')}</h2>
         <div class="grid">
           <customization-slot-card
             slot="theme-light"
@@ -41,6 +42,9 @@ export class CustomizationPage extends LitElement {
             kind="css"
             heading=${msg('Theme override (dark)')}
           ></customization-slot-card>
+        </div>
+        <h2>${msg('Branding')}</h2>
+        <div class="grid">
           <customization-slot-card
             slot="logo-light"
             heading=${msg('Logo (light)')}
@@ -85,9 +89,18 @@ export class CustomizationPage extends LitElement {
       color: var(--theme-color-text-primary);
     }
     .intro {
-      margin: 0 0 16px;
+      margin: 0 0 24px;
       font-size: 14px;
       color: var(--theme-color-text-muted);
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--theme-color-text-secondary);
+    }
+    h2:not(:first-of-type) {
+      margin-top: 28px;
     }
     .grid {
       display: grid;

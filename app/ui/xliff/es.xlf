@@ -2773,6 +2773,14 @@
   <source>Customization</source>
   <target>Personalización</target>
 </trans-unit>
+<trans-unit id="s93b03c6bf0d1d378">
+  <source>Theme styles</source>
+  <target>Estilos de tema</target>
+</trans-unit>
+<trans-unit id="se0d99ec33512a85a">
+  <source>Branding</source>
+  <target>Marca</target>
+</trans-unit>
 </body>
 </file>
 </xliff>
