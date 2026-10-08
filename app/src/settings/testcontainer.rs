@@ -22,9 +22,15 @@ const DEFAULT_KANIDM_IMAGE: &str = "kanidm/server:1.11.1";
 const DEFAULT_SENDER_IMAGE: &str = "kanidm/tools:1.11.1";
 const DEFAULT_MAILPIT_IMAGE: &str = "axllent/mailpit:v1.31.2";
 
-/// Default host port for the mailpit UI — the only fixed 0.0.0.0
-/// binding in the dev chain.
+/// Default host port for the mailpit UI — published loopback-only
+/// (the UI is reached through the app's /_/mailpit proxy).
 const DEFAULT_MAILPIT_UI_PORT: u16 = 8025;
+
+/// Default host-side HTTPS port for the dev kanidm server in host
+/// mode: fixed so the effective URL is stable across runs. One
+/// above the app's own default port (4000) so both can run
+/// side by side.
+const DEFAULT_KANIDM_HOST_PORT: u16 = 4001;
 
 /// [testcontainer] table: mode, shared network and the
 /// per-container sub-tables. Every field defaults, so absent or
@@ -98,6 +104,11 @@ pub struct KanidmContainerSettings {
     /// Official kanidm/server image to run.
     #[serde(default = "default_kanidm_image")]
     pub image: String,
+    /// Host-side HTTPS port the dev server is published on in
+    /// host mode (loopback-only). Fixed so the effective URL is
+    /// stable across runs.
+    #[serde(default = "default_kanidm_host_port")]
+    pub host_port: u16,
 }
 
 impl Default for KanidmContainerSettings {
@@ -105,6 +116,7 @@ impl Default for KanidmContainerSettings {
         Self {
             enabled: default_enabled(),
             image: default_kanidm_image(),
+            host_port: default_kanidm_host_port(),
         }
     }
 }
@@ -170,6 +182,10 @@ fn default_kanidm_image() -> String {
     DEFAULT_KANIDM_IMAGE.to_string()
 }
 
+fn default_kanidm_host_port() -> u16 {
+    DEFAULT_KANIDM_HOST_PORT
+}
+
 fn default_sender_image() -> String {
     DEFAULT_SENDER_IMAGE.to_string()
 }
@@ -205,6 +221,7 @@ mod tests {
         assert_eq!(s.network, "kanidm-admin-dev");
         assert!(!s.kanidm.enabled);
         assert_eq!(s.kanidm.image, "kanidm/server:1.11.1");
+        assert_eq!(s.kanidm.host_port, 4001);
         assert!(!s.kanidm_mail_sender.enabled);
         assert_eq!(s.kanidm_mail_sender.image, "kanidm/tools:1.11.1");
         assert!(!s.mailpit.enabled);
@@ -217,6 +234,7 @@ mod tests {
         let toml = indoc! {r#"
             [kanidm]
             enabled = true
+            host_port = 4002
 
             [mailpit]
             enabled = true
@@ -224,6 +242,7 @@ mod tests {
         "#};
         let s = from_toml(toml).expect("should deserialize");
         assert!(s.kanidm.enabled);
+        assert_eq!(s.kanidm.host_port, 4002);
         assert_eq!(
             s.kanidm.image, "kanidm/server:1.11.1",
             "absent image keeps the pinned default"

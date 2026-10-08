@@ -3,7 +3,6 @@ mod customization;
 mod frontend;
 mod frontend_assets;
 mod logging;
-mod mailpit_proxy;
 mod preflight;
 mod proxy;
 mod routes;
@@ -47,6 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     );
 
     info!("Server running at http://{}", settings.server.address);
+    info!("Kanidm at {}", kanidm_settings.url);
     axum::serve(listener, router).await?;
 
     Ok(())

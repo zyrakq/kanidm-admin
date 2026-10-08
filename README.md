@@ -122,7 +122,7 @@ To develop against an existing Kanidm instance instead:
 [kanidm]
 url = "https://idm.example.com"
 
-[kanidm_container]
+[testcontainer.kanidm]
 enabled = false
 ```
 
@@ -190,8 +190,46 @@ Settings are layered TOML files: `app/appsettings.toml` (base), then
 | `frontend.serve_from`   | `disk` (dev) / `embedded` (prod) | Serve the SPA from disk or the embedded assets |
 | `frontend.watch`        | `false`                        | `bun watch` live rebuild (development)          |
 | `kanidm.url`            | `https://localhost:8443`       | Kanidm server URL                               |
-| `kanidm_container.enabled` | `false` (`true` in dev)     | Start an ephemeral Kanidm container at startup  |
-| `kanidm_container.image`   | `kanidm/server:1.11.2`      | Image used for the dev container                |
+| `testcontainer.kanidm.enabled` | `false` (`true` in dev) | Start an ephemeral Kanidm container at startup  |
+| `testcontainer.kanidm.image`   | `kanidm/server:1.11.2` | Image used for the dev container                |
+| `testcontainer.kanidm.host_port` | `4001`               | Fixed loopback HTTPS port for the dev Kanidm    |
+
+## Dev testcontainers
+
+When `[testcontainer.kanidm].enabled` is `true` (the development
+default), the backend starts a small chain of Docker containers at
+startup instead of using `[kanidm]`:
+
+- **Kanidm** — ephemeral `kanidm/server` container, provisioned with
+  the built-in admin credentials (recovered and logged at startup).
+  Its HTTPS port is bound to `127.0.0.1` on the fixed
+  `testcontainer.kanidm.host_port` (default `4001`), so the URL
+  `https://localhost:4001` is stable across runs and printed in the
+  startup log.
+- **Kanidm mail sender** (`testcontainer.kanidm-mail-sender`) —
+  worker container polling Kanidm for outgoing mail and relaying it.
+  No ports are published for it.
+- **Mailpit** (`testcontainer.mailpit`) — catch-all SMTP server with
+  a web UI. The UI is reachable through the admin app at
+  `/_/mailpit` (the app proxies it when mailpit runs); its SMTP port
+  is bound to `127.0.0.1:1025` for host-mode mail delivery.
+
+All containers share the `testcontainer.network` Docker network
+(default `kanidm-admin-dev`); `testcontainer.mode` selects `auto`,
+`host` or `in-container` networking. Non-loopback ports stay closed
+except the mailpit UI port (`mailpit.ui_port`, default `8025`).
+Container logs are captured under `logs/testcontainers/`.
+
+To develop against an existing Kanidm instance instead:
+
+```toml
+# app/appsettings.toml (or a local overlay)
+[kanidm]
+url = "https://idm.example.com"
+
+[testcontainer.kanidm]
+enabled = false
+```
 
 ## Kanidm Compatibility
 

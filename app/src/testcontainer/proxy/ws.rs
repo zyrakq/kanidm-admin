@@ -1,4 +1,4 @@
-// app/src/mailpit_proxy/ws.rs
+// app/src/testcontainer/proxy/ws.rs
 //
 // WebSocket bridge for /_/mailpit/api/events: upgrades the
 // client socket, connects to the mailpit upstream's

@@ -1,4 +1,4 @@
-// app/src/mailpit_proxy/http.rs
+// app/src/testcontainer/proxy/http.rs
 //
 // Verbatim HTTP forwarder for /_/mailpit/{*path}: method,
 // headers (minus hop-by-hop), body, status and response headers

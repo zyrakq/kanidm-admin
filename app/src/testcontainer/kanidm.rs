@@ -79,9 +79,6 @@ pub(crate) struct KanidmServer {
     /// app and the mail sender.
     pub(crate) ca_pem: Vec<u8>,
     pub(crate) credentials: DevCredentials,
-    /// Host-side port mapped to the container's 8443 (host mode
-    /// only; None in in-container mode).
-    pub(crate) host_port: Option<u16>,
 }
 
 /// Domain (and certificate SAN) for the dev server: `localhost`
@@ -112,16 +109,18 @@ pub(super) fn publish_nothing() -> impl Fn(&mut HostConfig) + Send + Sync + 'sta
     }
 }
 
-/// Host-config modifier for the server in host mode: a
-/// loopback-only ephemeral binding for 8443, nothing else
-/// published (3636 stays unreachable).
-fn loopback_https() -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
-    |config: &mut HostConfig| {
+/// Host-config modifier for the server in host mode: a FIXED
+/// loopback-only binding for 8443 on the configured host port,
+/// nothing else published (3636 stays unreachable). The runner
+/// derives the same binding from with_mapped_port with a wildcard
+/// IP; this pins both the IP and the port.
+fn loopback_https(host_port: u16) -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
+    move |config: &mut HostConfig| {
         config.port_bindings = Some(PortMap::from([(
             format!("{KANIDM_HTTPS_PORT}/tcp"),
             Some(vec![PortBinding {
                 host_ip: Some("127.0.0.1".to_string()),
-                host_port: None,
+                host_port: Some(host_port.to_string()),
             }]),
         )]));
         config.publish_all_ports = Some(false);
@@ -158,6 +157,7 @@ fn server_request(
     image: &str,
     mode: Mode,
     network: &str,
+    host_port: u16,
     chain_pem: Vec<u8>,
     key_pem: Vec<u8>,
 ) -> ContainerRequest<GenericImage> {
@@ -183,7 +183,7 @@ fn server_request(
         .with_startup_timeout(STARTUP_TIMEOUT);
 
     match mode {
-        Mode::Host => request.with_host_config_modifier(loopback_https()),
+        Mode::Host => request.with_host_config_modifier(loopback_https(host_port)),
         Mode::InContainer => request.with_host_config_modifier(publish_nothing()),
     }
 }
@@ -195,11 +195,12 @@ pub(crate) async fn run(
     image: &str,
     mode: Mode,
     network: &str,
+    host_port: u16,
 ) -> Result<KanidmServer, Box<dyn std::error::Error + Send + Sync>> {
     let (chain_pem, key_pem) = generate_certificates(image, mode).await?;
     info!("dev Kanidm certificates generated");
 
-    let container = server_request(image, mode, network, chain_pem.clone(), key_pem)
+    let container = server_request(image, mode, network, host_port, chain_pem.clone(), key_pem)
         .with_log_consumer(file_consumer(LogSubfolder::Server))
         .start()
         .await
@@ -216,22 +217,12 @@ pub(crate) async fn run(
     // copies the file out and verifies the marker app-side.
     verify_override_css(&container).await?;
 
-    let host_port = match mode {
-        Mode::Host => Some(
-            container
-                .get_host_port_ipv4(KANIDM_HTTPS_PORT.tcp())
-                .await?,
-        ),
-        Mode::InContainer => None,
-    };
-
     let credentials = recover_builtin_credentials(&container).await?;
 
     Ok(KanidmServer {
         container,
         ca_pem: chain_pem,
         credentials,
-        host_port,
     })
 }
 
@@ -400,20 +391,19 @@ pub(crate) fn log_dev_credentials(url: &str, credentials: &DevCredentials) {
     );
 }
 
-/// Effective [kanidm] settings in container mode: the mapped
-/// container URL in host mode (the generated certificate's SAN is
-/// the domain, so hostname verification passes), the in-container
+/// Effective [kanidm] settings in container mode: the fixed
+/// loopback URL in host mode (the generated certificate's SAN is
+/// `localhost`, so hostname verification passes), the in-container
 /// DNS URL otherwise; the temp CA file; REAL certificate
 /// verification. Pure function.
 pub(crate) fn effective_settings(
     mode: Mode,
-    host_port: Option<u16>,
+    host_port: u16,
     ca_path: &str,
 ) -> KanidmSettings {
-    let url = match (mode, host_port) {
-        (Mode::Host, Some(port)) => format!("https://localhost:{port}"),
-        (Mode::InContainer, _) => "https://kanidm:8443".to_string(),
-        (Mode::Host, None) => unreachable!("host mode always resolves a mapped port"),
+    let url = match mode {
+        Mode::Host => format!("https://localhost:{host_port}"),
+        Mode::InContainer => "https://kanidm:8443".to_string(),
     };
     KanidmSettings {
         url,
@@ -602,6 +592,7 @@ mod tests {
             "kanidm/server:1.11.1",
             Mode::Host,
             "kanidm-admin-dev",
+            4001,
             b"chain".to_vec(),
             b"key".to_vec(),
         );
@@ -693,14 +684,37 @@ mod tests {
 
     #[test]
     fn effective_settings_follow_the_mode() {
-        let host = effective_settings(Mode::Host, Some(55001), "/tmp/ca.pem");
+        let host = effective_settings(Mode::Host, 55001, "/tmp/ca.pem");
         assert_eq!(host.url, "https://localhost:55001");
         assert_eq!(host.ca_path.as_deref(), Some("/tmp/ca.pem"));
         assert!(host.verify_ca);
 
-        let in_container = effective_settings(Mode::InContainer, None, "/tmp/ca.pem");
+        let in_container = effective_settings(Mode::InContainer, 4001, "/tmp/ca.pem");
         assert_eq!(in_container.url, "https://kanidm:8443");
         assert_eq!(in_container.ca_path.as_deref(), Some("/tmp/ca.pem"));
         assert!(in_container.verify_ca);
+    }
+
+    #[test]
+    fn loopback_https_modifier_pins_a_fixed_loopback_binding() {
+        let mut config = HostConfig::default();
+        loopback_https(4001)(&mut config);
+
+        let bindings = config.port_bindings.expect("bindings present");
+        let https = bindings
+            .get("8443/tcp")
+            .and_then(|binding| binding.as_ref())
+            .and_then(|list| list.first());
+        assert_eq!(
+            https.and_then(|binding| binding.host_ip.as_deref()),
+            Some("127.0.0.1"),
+            "the HTTPS binding is loopback-only"
+        );
+        assert_eq!(
+            https.and_then(|binding| binding.host_port.as_deref()),
+            Some("4001"),
+            "the HTTPS host port is the configured fixed port"
+        );
+        assert_eq!(config.publish_all_ports, Some(false));
     }
 }

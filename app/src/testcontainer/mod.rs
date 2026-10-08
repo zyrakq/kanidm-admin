@@ -27,6 +27,8 @@ mod mail_certs;
 mod mailpit;
 mod mail_sender;
 mod network;
+pub(crate) mod proxy;
+
 mod styles;
 
 // Re-exports consumed only by the Docker-gated proxy integration
@@ -204,7 +206,7 @@ pub(crate) async fn start_containers(
         None
     };
 
-    let server = kanidm::run(&tc.kanidm.image, mode, &tc.network).await?;
+    let server = kanidm::run(&tc.kanidm.image, mode, &tc.network, tc.kanidm.host_port).await?;
 
     // The temp CA file must outlive this function: main.rs builds
     // the auth state from the returned settings AFTER start()
@@ -213,7 +215,7 @@ pub(crate) async fn start_containers(
     // shutdown).
     let temp_ca = write_temp_ca(&server.ca_pem)?;
     let effective =
-        kanidm::effective_settings(mode, server.host_port, &temp_ca.to_string_lossy());
+        kanidm::effective_settings(mode, tc.kanidm.host_port, &temp_ca.to_string_lossy());
 
     kanidm::log_dev_credentials(&effective.url, &server.credentials);
     kanidm::smoke_auth(&effective, &server.credentials.idm_admin_password).await?;

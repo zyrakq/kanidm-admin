@@ -1,4 +1,4 @@
-// app/src/mailpit_proxy/mod.rs
+// app/src/testcontainer/proxy/mod.rs
 //
 // Dev-only reverse proxy for the mailpit UI under /_/mailpit,
 // mounted by routes::build only when the mailpit testcontainer

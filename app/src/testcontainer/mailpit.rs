@@ -84,27 +84,30 @@ pub(crate) fn mailpit_request(
         Mode::Host => request
             .with_mapped_port(ui_port, MAILPIT_UI_PORT.tcp())
             .with_mapped_port(MAILPIT_SMTP_PORT, MAILPIT_SMTP_PORT.tcp())
-            .with_host_config_modifier(loopback_smtp()),
+            .with_host_config_modifier(loopback_bindings(ui_port)),
         Mode::InContainer => request.with_host_config_modifier(publish_nothing()),
     }
 }
 
 /// Host-config modifier for mailpit in host mode: rewrites the
-/// SMTP binding (the runner derives it from with_mapped_port
-/// with a wildcard host IP) to loopback-only — the sender runs
-/// on the host network and relays via localhost, and nothing
-/// else may reach the SMTP socket. The fixed UI binding keeps
-/// its wildcard IP (the one intentionally public port).
-fn loopback_smtp() -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
-    |config: &mut HostConfig| {
+/// runner-derived bindings (with_mapped_port uses a wildcard host
+/// IP) so BOTH the UI and the SMTP socket are loopback-only. The
+/// UI is reached exclusively through the app's /_/mailpit proxy —
+/// a public UI port would defeat the prefix UX; the SMTP socket is
+/// reached by the host-network sender via localhost. Nothing may
+/// reach mailpit from outside the host.
+fn loopback_bindings(ui_port: u16) -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
+    move |config: &mut HostConfig| {
         let mut bindings = config.port_bindings.take().unwrap_or_default();
-        bindings.insert(
-            format!("{MAILPIT_SMTP_PORT}/tcp"),
-            Some(vec![PortBinding {
-                host_ip: Some("127.0.0.1".to_string()),
-                host_port: Some(MAILPIT_SMTP_PORT.to_string()),
-            }]),
-        );
+        for port in [ui_port, MAILPIT_SMTP_PORT] {
+            bindings.insert(
+                format!("{port}/tcp"),
+                Some(vec![PortBinding {
+                    host_ip: Some("127.0.0.1".to_string()),
+                    host_port: Some(port.to_string()),
+                }]),
+            );
+        }
         config.port_bindings = Some(bindings);
         config.publish_all_ports = Some(false);
     }
@@ -293,7 +296,7 @@ mod tests {
     }
 
     #[test]
-    fn loopback_smtp_modifier_pins_smtp_to_loopback_only() {
+    fn loopback_bindings_modifier_pins_ui_and_smtp_to_loopback() {
         // HostConfig as the runner builds it for host mode: both
         // mapped ports carry wildcard host IPs.
         let mut config = HostConfig {
@@ -316,36 +319,47 @@ mod tests {
             ..Default::default()
         };
 
-        loopback_smtp()(&mut config);
+        loopback_bindings(8025)(&mut config);
 
         let bindings = config.port_bindings.expect("bindings stay present");
-        let ui = bindings
-            .get("8025/tcp")
-            .and_then(|binding| binding.as_ref())
-            .and_then(|list| list.first());
-        assert_eq!(
-            ui.and_then(|binding| binding.host_ip.as_deref()),
-            None,
-            "the UI binding keeps its wildcard IP"
-        );
-        assert_eq!(
-            ui.and_then(|binding| binding.host_port.as_deref()),
-            Some("8025")
-        );
-
-        let smtp = bindings
-            .get("1025/tcp")
-            .and_then(|binding| binding.as_ref())
-            .and_then(|list| list.first());
-        assert_eq!(
-            smtp.and_then(|binding| binding.host_ip.as_deref()),
-            Some("127.0.0.1"),
-            "the SMTP binding is loopback-only"
-        );
-        assert_eq!(
-            smtp.and_then(|binding| binding.host_port.as_deref()),
-            Some("1025")
-        );
+        for (key, port) in [("8025/tcp", "8025"), ("1025/tcp", "1025")] {
+            let binding = bindings
+                .get(key)
+                .and_then(|binding| binding.as_ref())
+                .and_then(|list| list.first());
+            assert_eq!(
+                binding.and_then(|binding| binding.host_ip.as_deref()),
+                Some("127.0.0.1"),
+                "{key} must be loopback-only"
+            );
+            assert_eq!(
+                binding.and_then(|binding| binding.host_port.as_deref()),
+                Some(port)
+            );
+        }
         assert_eq!(config.publish_all_ports, Some(false));
+    }
+
+    #[test]
+    fn loopback_bindings_follow_a_custom_ui_port() {
+        let mut config = HostConfig {
+            port_bindings: Some(PortMap::from([(
+                "8026/tcp".to_string(),
+                Some(vec![PortBinding {
+                    host_ip: None,
+                    host_port: Some("8026".to_string()),
+                }]),
+            )])),
+            ..Default::default()
+        };
+        loopback_bindings(8026)(&mut config);
+        let binding = config
+            .port_bindings
+            .expect("bindings present")
+            .get("8026/tcp")
+            .and_then(|binding| binding.as_ref())
+            .and_then(|list| list.first())
+            .and_then(|binding| binding.host_ip.clone());
+        assert_eq!(binding.as_deref(), Some("127.0.0.1"));
     }
 }

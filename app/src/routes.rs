@@ -61,7 +61,7 @@ pub fn build(
     // testcontainer is enabled; the conditional stays here so
     // main.rs remains a plain sequence of calls.
     let router = match mailpit_upstream {
-        Some(upstream) => router.merge(crate::mailpit_proxy::routes(upstream)),
+        Some(upstream) => router.merge(crate::testcontainer::proxy::routes(upstream)),
         None => router,
     };
 
