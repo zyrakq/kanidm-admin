@@ -33,6 +33,8 @@ export class SessionIndicator extends LitElement {
   private theme = new ThemeController(this);
   private localeCtrl = new LocaleController(this);
   private mq = window.matchMedia('(max-width: 768px)');
+  /** Guest trigger is mobile-only: desktop already shows theme/locale in the header. */
+  @state() private isMobile = this.mq.matches;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -120,6 +122,7 @@ export class SessionIndicator extends LitElement {
   // --- Drawer mode (mobile only; desktop dropdown stays) ---
 
   private handleBreakpointChange = (e: MediaQueryListEvent): void => {
+    this.isMobile = e.matches;
     // Crossing to desktop: the drawer has no meaning there.
     if (!e.matches && (this.drawerOpen || this.sheetOpen)) {
       this.closeDrawer();
@@ -182,6 +185,11 @@ export class SessionIndicator extends LitElement {
   render() {
     // Guest mode: the trigger is always rendered so logged-out users
     // (especially on mobile) can reach theme and language controls.
+    // Desktop guests don't need it — theme-toggler/locale-switcher are
+    // already visible in the header.
+    if (!this.user && !this.isMobile) {
+      return nothing;
+    }
     const countdown =
       this.user && this.remainingMs !== null
         ? html`<span
