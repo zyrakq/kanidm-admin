@@ -91,7 +91,7 @@ export class CustomizationPage extends LitElement {
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr));
       gap: 16px;
     }
   `;

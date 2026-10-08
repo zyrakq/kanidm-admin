@@ -37,6 +37,15 @@ export const messagesPageStyles = css`
        aligns with the input bottom edge. */
     --field-margin: 0;
   }
+  /* Match the button's box to the input's (padding 9px, 16px font,
+     1.5 line-height) so both are exactly the same height and the
+     flex-end alignment lines them up edge to edge. */
+  .send-test-row ui-button::part(button) {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    font-size: inherit;
+    line-height: inherit;
+  }
   .mono {
     font-family: var(--theme-font-mono, monospace);
     font-size: 13px;
