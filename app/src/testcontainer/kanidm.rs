@@ -5,10 +5,11 @@
 // one-shot cert-generate container whose TLS material is extracted
 // as bytes, then a server container seeded with those bytes —
 // recover the built-in admin/idm_admin credentials and derive the
-// effective [kanidm] settings. Mode-aware: domain, origin and
-// port publishing follow host vs in-container mode. Also hosts
-// the shared image-split and publish-nothing helpers the other
-// container modules reuse.
+// effective [kanidm] settings. Mode-aware: domain and origin follow
+// host vs in-container mode, while the HTTPS port is always
+// published loopback-only so a host browser can reach the dev
+// server. Also hosts the shared image-split and publish-nothing
+// helpers the other container modules reuse.
 
 use testcontainers::bollard::models::{HostConfig, PortBinding, PortMap};
 use testcontainers::core::wait::ExitWaitStrategy;
@@ -97,11 +98,9 @@ fn kanidm_origin(mode: Mode) -> String {
 
 /// Host-config modifier that publishes nothing: clears port
 /// bindings and disables publish-all. Used by the transient
-/// cert-generate container (both modes), the server in
-/// in-container mode, and (via re-export) mailpit in
-/// in-container mode. Without it the runner would publish every
-/// EXPOSEd port ephemeral on 0.0.0.0 — the kanidm/server image
-/// EXPOSEs 8443 AND 3636.
+/// cert-generate container in both modes. Without it the runner
+/// would publish every EXPOSEd port ephemeral on 0.0.0.0 — the
+/// kanidm/server image EXPOSEs 8443 AND 3636.
 pub(super) fn publish_nothing() -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
     |config: &mut HostConfig| {
         config.port_bindings = Some(PortMap::new());
@@ -109,11 +108,14 @@ pub(super) fn publish_nothing() -> impl Fn(&mut HostConfig) + Send + Sync + 'sta
     }
 }
 
-/// Host-config modifier for the server in host mode: a FIXED
+/// Host-config modifier for the server in BOTH modes: a FIXED
 /// loopback-only binding for 8443 on the configured host port,
-/// nothing else published (3636 stays unreachable). The runner
-/// derives the same binding from with_mapped_port with a wildcard
-/// IP; this pins both the IP and the port.
+/// nothing else published (3636 stays unreachable). In-container
+/// mode publishes the same loopback port so a host browser can
+/// reach the dev Kanidm directly; the app itself still talks to
+/// the container over the Docker DNS name. The runner derives the
+/// same binding from with_mapped_port with a wildcard IP; this
+/// pins both the IP and the port.
 fn loopback_https(host_port: u16) -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
     move |config: &mut HostConfig| {
         config.port_bindings = Some(PortMap::from([(
@@ -182,10 +184,11 @@ fn server_request(
         .with_label(CONTAINER_LABEL_KEY, CONTAINER_LABEL_VALUE)
         .with_startup_timeout(STARTUP_TIMEOUT);
 
-    match mode {
-        Mode::Host => request.with_host_config_modifier(loopback_https(host_port)),
-        Mode::InContainer => request.with_host_config_modifier(publish_nothing()),
-    }
+    // Both modes publish the fixed loopback HTTPS port so a host
+    // browser can reach the dev Kanidm directly for testing; the
+    // app itself still talks to the container over the Docker DNS
+    // name in in-container mode.
+    request.with_host_config_modifier(loopback_https(host_port))
 }
 
 /// Run the two-container flow: cert-generate (A) → extract →
@@ -653,6 +656,27 @@ mod tests {
         assert!(debug.contains(CHAIN_PEM_PATH));
         assert!(debug.contains(KEY_PEM_PATH));
         assert!(debug.contains(OVERRIDE_CSS_PATH));
+    }
+
+    #[test]
+    fn server_request_publishes_loopback_https_in_container_mode_too() {
+        // In-container mode the app talks to the container over
+        // Docker DNS, but the SAME fixed loopback binding is
+        // applied so a host browser can reach the dev Kanidm.
+        let request = server_request(
+            "kanidm/server:1.11.1",
+            Mode::InContainer,
+            "kanidm-admin-dev",
+            4001,
+            b"chain".to_vec(),
+            b"key".to_vec(),
+        );
+
+        assert_eq!(request.container_name().as_deref(), Some("kanidm"));
+        assert_eq!(request.network().as_deref(), Some("kanidm-admin-dev"));
+        assert!(request.expose_ports().contains(&KANIDM_HTTPS_PORT.tcp()));
+        let env = env_map(&request);
+        assert_eq!(env.get("KANIDM_DOMAIN").map(String::as_str), Some("kanidm"));
     }
 
     #[test]

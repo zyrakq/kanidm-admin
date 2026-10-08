@@ -152,9 +152,11 @@ docker compose -f docker-compose.yml -f docker-compose.testcontainers.yml up -d 
 ```
 
 Inside the container the app talks to the dev chain over Docker DNS
-names (`https://kanidm:8443`, `smtps://mailpit:1025`, Mailpit UI at
-`http://localhost:8025`) on the shared `kanidm-admin-dev` network —
-no `localhost` ports are involved for the app itself. `testcontainer.mode = "auto"`
+names (`https://kanidm:8443`, `smtps://mailpit:1025`) on the shared
+`kanidm-admin-dev` network — no `localhost` ports are involved for
+the app itself. The browser-facing ports are still published
+loopback-only (Kanidm UI at `https://localhost:4001`, Mailpit UI at
+`http://localhost:8025`). `testcontainer.mode = "auto"`
 detects this automatically (`/.dockerenv` plus a local socket) and
 picks `in-container` networking; the plain variant (`docker compose
 up`) and the host-mode `cargo run` flow are unchanged.
@@ -232,9 +234,12 @@ once the env var is present:
 - **Kanidm** — ephemeral `kanidm/server` container, provisioned with
   the built-in admin credentials (recovered and logged at startup).
   Its HTTPS port is bound to `127.0.0.1` on the fixed
-  `testcontainer.kanidm.host_port` (default `4001`), so the URL
-  `https://localhost:4001` is stable across runs and printed in the
-  startup log.
+  `testcontainer.kanidm.host_port` (default `4001`) in **both**
+  networking modes, so a host browser can open the dev Kanidm UI
+  directly. In host mode the URL `https://localhost:4001` matches
+  the certificate SAN; in-container mode the SAN is the container
+  DNS name (`kanidm`), so the browser shows a certificate warning
+  on the published port — expected for the throwaway dev chain.
 - **Kanidm mail sender** (`testcontainer.kanidm-mail-sender`) —
   worker container polling Kanidm for outgoing mail and relaying it.
   No ports are published for it.
@@ -246,9 +251,11 @@ once the env var is present:
 
 All containers share the `testcontainer.network` Docker network
 (default `kanidm-admin-dev`); `testcontainer.mode` selects `auto`,
-`host` or `in-container` networking. In host mode all dev ports are
-published loopback-only; in-container mode publishes none except
-the loopback-only mailpit UI port. Container
+`host` or `in-container` networking. Both browser-facing ports —
+the Kanidm HTTPS port and the Mailpit UI — are published
+loopback-only in either mode; the mail sender publishes no ports.
+In host mode the app itself also reaches the chain over loopback;
+in-container mode it uses Docker DNS names instead. Container
 logs are captured under `logs/testcontainers/`.
 
 The same chain also runs when the admin app itself is a container:

@@ -225,6 +225,17 @@ pub(crate) async fn start_containers(
     kanidm::log_dev_credentials(&effective.url, &server.credentials);
     kanidm::smoke_auth(&effective, &server.credentials.idm_admin_password).await?;
 
+    // In-container mode the effective URL is the Docker DNS name
+    // (app-internal), so point the host browser at the published
+    // loopback port instead. The certificate SAN is the container
+    // DNS name, hence the expected browser warning.
+    if mode == Mode::InContainer {
+        info!(
+            "dev Kanidm UI published at https://localhost:{} (the certificate SAN is the container DNS name, so the browser shows a certificate warning)",
+            tc.kanidm.host_port
+        );
+    }
+
     let dev = DevKanidm {
         container: server.container,
         ca_pem: server.ca_pem,
