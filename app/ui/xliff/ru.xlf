@@ -2705,10 +2705,6 @@
   <source>This panel was tested with Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — the server reports <ph id="1">${s.serverVersion ?? '—'}</ph>. Some features may not work.</source>
   <target>Эта панель протестирована с Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — на сервере установлен <ph id="1">${s.serverVersion ?? '—'}</ph>. Часть функций может не работать.</target>
 </trans-unit>
-<trans-unit id="s61c69c3c48f6bfde">
-  <source>Upload replacement logos and favicons. Removing an upload restores the bundled default.</source>
-  <target>Загрузите собственные логотипы и фавиконы. После удаления загруженного файла восстанавливается встроенный вариант.</target>
-</trans-unit>
 <trans-unit id="s15369b64cf4a286d">
   <source>Logo (light)</source>
   <target>Логотип (светлый)</target>
@@ -2729,9 +2725,53 @@
   <source>Remove the uploaded image? The default returns.</source>
   <target>Удалить загруженное изображение? Будет восстановлен встроенный вариант.</target>
 </trans-unit>
-<trans-unit id="se0d99ec33512a85a">
-  <source>Branding</source>
-  <target>Брендинг</target>
+<trans-unit id="s08d6f8999efe9106">
+  <source>Upload replacement logos, favicons and theme CSS. Removing an upload restores the bundled default.</source>
+  <target>Загрузите замену логотипов, фавиконов и CSS тем. После удаления загрузки возвращается встроенный вариант по умолчанию.</target>
+</trans-unit>
+<trans-unit id="s48c4dfde0b52f591">
+  <source>Theme override (light)</source>
+  <target>Переопределение темы (светлая)</target>
+</trans-unit>
+<trans-unit id="s52edb11b975e5271">
+  <source>Theme override (dark)</source>
+  <target>Переопределение темы (тёмная)</target>
+</trans-unit>
+<trans-unit id="seb8cba4451aa1ed2">
+  <source>CSS uploaded.</source>
+  <target>CSS загружен.</target>
+</trans-unit>
+<trans-unit id="s6b57e2efaa6d855c">
+  <source>Failed to upload the CSS.</source>
+  <target>Не удалось загрузить CSS.</target>
+</trans-unit>
+<trans-unit id="s449b1328352cf23e">
+  <source>CSS removed.</source>
+  <target>CSS удалён.</target>
+</trans-unit>
+<trans-unit id="sf3f26778222aba63">
+  <source>Failed to remove the CSS.</source>
+  <target>Не удалось удалить CSS.</target>
+</trans-unit>
+<trans-unit id="s179ebb8d0b9ed769">
+  <source>No custom styles</source>
+  <target>Нет своих стилей</target>
+</trans-unit>
+<trans-unit id="s529854138984ac13">
+  <source>Upload CSS</source>
+  <target>Загрузить CSS</target>
+</trans-unit>
+<trans-unit id="sc25a485620084628">
+  <source>Remove CSS...</source>
+  <target>Удалить CSS...</target>
+</trans-unit>
+<trans-unit id="s98d266814c6e2747">
+  <source>Remove the uploaded CSS? The default returns.</source>
+  <target>Удалить загруженный CSS? Вернётся значение по умолчанию.</target>
+</trans-unit>
+<trans-unit id="sd12f594a3184c056">
+  <source>Customization</source>
+  <target>Персонализация</target>
 </trans-unit>
 </body>
 </file>

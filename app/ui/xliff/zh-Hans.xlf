@@ -2705,10 +2705,6 @@
   <source>This panel was tested with Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — the server reports <ph id="1">${s.serverVersion ?? '—'}</ph>. Some features may not work.</source>
   <target>此面板已使用 Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> 测试 — 服务器报告为 <ph id="1">${s.serverVersion ?? '—'}</ph>。部分功能可能无法使用。</target>
 </trans-unit>
-<trans-unit id="s61c69c3c48f6bfde">
-  <source>Upload replacement logos and favicons. Removing an upload restores the bundled default.</source>
-  <target>上传替换的徽标和网站图标。删除上传后将恢复内置的默认图像。</target>
-</trans-unit>
 <trans-unit id="s15369b64cf4a286d">
   <source>Logo (light)</source>
   <target>徽标（浅色）</target>
@@ -2729,9 +2725,53 @@
   <source>Remove the uploaded image? The default returns.</source>
   <target>删除已上传的图像？将恢复默认图像。</target>
 </trans-unit>
-<trans-unit id="se0d99ec33512a85a">
-  <source>Branding</source>
-  <target>品牌定制</target>
+<trans-unit id="s08d6f8999efe9106">
+  <source>Upload replacement logos, favicons and theme CSS. Removing an upload restores the bundled default.</source>
+  <target>上传替换的徽标、网站图标和主题 CSS。删除上传后将恢复内置默认值。</target>
+</trans-unit>
+<trans-unit id="s48c4dfde0b52f591">
+  <source>Theme override (light)</source>
+  <target>主题覆盖（浅色）</target>
+</trans-unit>
+<trans-unit id="s52edb11b975e5271">
+  <source>Theme override (dark)</source>
+  <target>主题覆盖（深色）</target>
+</trans-unit>
+<trans-unit id="seb8cba4451aa1ed2">
+  <source>CSS uploaded.</source>
+  <target>CSS 已上传。</target>
+</trans-unit>
+<trans-unit id="s6b57e2efaa6d855c">
+  <source>Failed to upload the CSS.</source>
+  <target>CSS 上传失败。</target>
+</trans-unit>
+<trans-unit id="s449b1328352cf23e">
+  <source>CSS removed.</source>
+  <target>CSS 已删除。</target>
+</trans-unit>
+<trans-unit id="sf3f26778222aba63">
+  <source>Failed to remove the CSS.</source>
+  <target>删除 CSS 失败。</target>
+</trans-unit>
+<trans-unit id="s179ebb8d0b9ed769">
+  <source>No custom styles</source>
+  <target>暂无自定义样式</target>
+</trans-unit>
+<trans-unit id="s529854138984ac13">
+  <source>Upload CSS</source>
+  <target>上传 CSS</target>
+</trans-unit>
+<trans-unit id="sc25a485620084628">
+  <source>Remove CSS...</source>
+  <target>删除 CSS...</target>
+</trans-unit>
+<trans-unit id="s98d266814c6e2747">
+  <source>Remove the uploaded CSS? The default returns.</source>
+  <target>删除已上传的 CSS？将恢复默认样式。</target>
+</trans-unit>
+<trans-unit id="sd12f594a3184c056">
+  <source>Customization</source>
+  <target>自定义</target>
 </trans-unit>
 </body>
 </file>

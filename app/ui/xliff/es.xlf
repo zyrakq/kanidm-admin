@@ -2705,10 +2705,6 @@
   <source>This panel was tested with Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — the server reports <ph id="1">${s.serverVersion ?? '—'}</ph>. Some features may not work.</source>
   <target>Este panel se probó con Kanidm <ph id="0">${s.supportedRange ?? '—'}</ph> — el servidor informa <ph id="1">${s.serverVersion ?? '—'}</ph>. Es posible que algunas funciones no funcionen.</target>
 </trans-unit>
-<trans-unit id="s61c69c3c48f6bfde">
-  <source>Upload replacement logos and favicons. Removing an upload restores the bundled default.</source>
-  <target>Sube logotipos y favicons de reemplazo. Al eliminar una subida se restaura el recurso incluido.</target>
-</trans-unit>
 <trans-unit id="s15369b64cf4a286d">
   <source>Logo (light)</source>
   <target>Logotipo (claro)</target>
@@ -2729,9 +2725,53 @@
   <source>Remove the uploaded image? The default returns.</source>
   <target>¿Eliminar la imagen subida? Se restaurará la predeterminada.</target>
 </trans-unit>
-<trans-unit id="se0d99ec33512a85a">
-  <source>Branding</source>
-  <target>Marca</target>
+<trans-unit id="s08d6f8999efe9106">
+  <source>Upload replacement logos, favicons and theme CSS. Removing an upload restores the bundled default.</source>
+  <target>Suba logotipos, favicons y CSS de tema de reemplazo. Al eliminar una subida se restaura el valor predeterminado incluido.</target>
+</trans-unit>
+<trans-unit id="s48c4dfde0b52f591">
+  <source>Theme override (light)</source>
+  <target>Tema personalizado (claro)</target>
+</trans-unit>
+<trans-unit id="s52edb11b975e5271">
+  <source>Theme override (dark)</source>
+  <target>Tema personalizado (oscuro)</target>
+</trans-unit>
+<trans-unit id="seb8cba4451aa1ed2">
+  <source>CSS uploaded.</source>
+  <target>CSS subido.</target>
+</trans-unit>
+<trans-unit id="s6b57e2efaa6d855c">
+  <source>Failed to upload the CSS.</source>
+  <target>Error al subir el CSS.</target>
+</trans-unit>
+<trans-unit id="s449b1328352cf23e">
+  <source>CSS removed.</source>
+  <target>CSS eliminado.</target>
+</trans-unit>
+<trans-unit id="sf3f26778222aba63">
+  <source>Failed to remove the CSS.</source>
+  <target>Error al eliminar el CSS.</target>
+</trans-unit>
+<trans-unit id="s179ebb8d0b9ed769">
+  <source>No custom styles</source>
+  <target>Sin estilos personalizados</target>
+</trans-unit>
+<trans-unit id="s529854138984ac13">
+  <source>Upload CSS</source>
+  <target>Subir CSS</target>
+</trans-unit>
+<trans-unit id="sc25a485620084628">
+  <source>Remove CSS...</source>
+  <target>Eliminar CSS...</target>
+</trans-unit>
+<trans-unit id="s98d266814c6e2747">
+  <source>Remove the uploaded CSS? The default returns.</source>
+  <target>¿Eliminar el CSS subido? Se restaurará el valor predeterminado.</target>
+</trans-unit>
+<trans-unit id="sd12f594a3184c056">
+  <source>Customization</source>
+  <target>Personalización</target>
 </trans-unit>
 </body>
 </file>
