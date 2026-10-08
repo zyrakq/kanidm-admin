@@ -185,9 +185,16 @@ async fn delete_handler(
 
 async fn serve_handler(
     State(store): State<CustomizationState>,
-    Path(slot): Path<String>,
+    Path(slot_name): Path<String>,
 ) -> Result<Response, CustomizationApiError> {
-    let slot = Slot::parse(&slot).ok_or_else(CustomizationApiError::not_found)?;
+    // Static <link> tags request stylesheets with a .css suffix
+    // (/customization/theme-light.css); strip it before parsing. The
+    // API routes (PUT/DELETE) use bare slot names.
+    let slot = slot_name
+        .strip_suffix(".css")
+        .and_then(Slot::parse)
+        .or_else(|| Slot::parse(slot_name.as_str()))
+        .ok_or_else(CustomizationApiError::not_found)?;
     let Some((content_type, bytes)) = store.read(slot)? else {
         // Unset CSS slots serve an empty override instead of 404 (see
         // module docs); image slots keep the 404 behavior.
@@ -435,6 +442,19 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(res.status(), StatusCode::NOT_FOUND);
+    }
+
+    #[tokio::test]
+    async fn unset_css_slot_serves_placeholder_with_css_suffix() {
+        let (app, _dir) = app();
+        let res = app
+            .oneshot(req("GET", "/customization/theme-light.css"))
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        assert_eq!(res.headers()["content-type"], "text/css");
+        let bytes = res.into_body().collect().await.unwrap().to_bytes();
+        assert_eq!(bytes.as_ref(), b"/* custom styles */");
     }
 
     #[tokio::test]
