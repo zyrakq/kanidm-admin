@@ -242,6 +242,7 @@ export class CustomizationSlotCard extends LitElement {
     .actions {
       display: flex;
       justify-content: flex-end;
+      flex-wrap: wrap;
       gap: 8px;
     }
     input[type='file'] {

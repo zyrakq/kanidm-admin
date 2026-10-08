@@ -33,6 +33,9 @@ export const messagesPageStyles = css`
   .send-test-row form-field {
     flex: 1;
     min-width: 220px;
+    /* Kill the field's error-space margin so the button bottom
+       aligns with the input bottom edge. */
+    --field-margin: 0;
   }
   .mono {
     font-family: var(--theme-font-mono, monospace);
