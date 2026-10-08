@@ -132,8 +132,16 @@ export class Oauth2ScopeMapsTab extends LitElement {
 
   private renderMapTable(maps: ScopeMap[], sup: boolean) {
     const columns: TableColumn[] = [
-      { key: 'group', header: msg('Group'), render: (row) => this.mono(String(row.group)) },
-      { key: 'scopes', header: msg('Scopes'), render: (row) => this.mono(String(row.scopes)) },
+      {
+        key: 'group',
+        header: msg('Group'),
+        render: (row) => this.mono(String(row.group)),
+      },
+      {
+        key: 'scopes',
+        header: msg('Scopes'),
+        render: (row) => this.mono(String(row.scopes)),
+      },
       {
         key: 'actions',
         header: msg('Actions'),
@@ -154,7 +162,10 @@ export class Oauth2ScopeMapsTab extends LitElement {
     return html`
       <data-table
         .columns=${columns}
-        .rows=${maps.map((map) => ({ group: map.group, scopes: map.scopes.join(' ') }))}
+        .rows=${maps.map((map) => ({
+          group: map.group,
+          scopes: map.scopes.join(' '),
+        }))}
         .emptyMessage=${msg('No entries.')}
       ></data-table>
     `;
@@ -220,9 +231,7 @@ export class Oauth2ScopeMapsTab extends LitElement {
     return html`
       <ui-card class="card">
         <h2>${msg('Scope maps')}</h2>
-        <p class="muted">
-          ${msg('Scopes granted to members of a group.')}
-        </p>
+        <p class="muted">${msg('Scopes granted to members of a group.')}</p>
         ${this.renderMapTable(detail.scopeMaps, false)}
       </ui-card>
       <ui-card class="card">

@@ -103,10 +103,7 @@ export class SaCredentialsTab extends LitElement {
     this.generatedPassword = null;
   }
 
-  private renderCredRow(cred: {
-    uuid: string;
-    type_: CredentialDetailType;
-  }) {
+  private renderCredRow(cred: { uuid: string; type_: CredentialDetailType }) {
     return html`
       <li>
         <ui-card interactive>
@@ -148,7 +145,11 @@ export class SaCredentialsTab extends LitElement {
   render() {
     if (this.loading) {
       return html`
-        <div class="loading" role="status" aria-label=${msg('Loading credentials…')}>
+        <div
+          class="loading"
+          role="status"
+          aria-label=${msg('Loading credentials…')}
+        >
           <ui-skeleton height="40px"></ui-skeleton>
           <ui-skeleton height="56px" .lines=${2}></ui-skeleton>
         </div>
@@ -168,7 +169,9 @@ export class SaCredentialsTab extends LitElement {
         </div>
 
         ${this.creds.length === 0
-          ? html`<ui-empty-state icon="key">${msg('No credentials enrolled.')}</ui-empty-state>`
+          ? html`<ui-empty-state icon="key"
+              >${msg('No credentials enrolled.')}</ui-empty-state
+            >`
           : html`
               <ul class="cred-list">
                 ${this.creds.map((cred) => this.renderCredRow(cred))}

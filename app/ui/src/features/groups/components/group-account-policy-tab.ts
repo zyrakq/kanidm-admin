@@ -108,7 +108,9 @@ export class GroupAccountPolicyTab extends LitElement {
     if (this.enabling) return;
     this.enabling = true;
     try {
-      await authService.withStepUp(() => groupService.enableAccountPolicy(this.id));
+      await authService.withStepUp(() =>
+        groupService.enableAccountPolicy(this.id)
+      );
       notificationService.success(msg('Account policy enabled.'));
       this.dirty = false;
       this.emitChanged();
@@ -123,7 +125,9 @@ export class GroupAccountPolicyTab extends LitElement {
     if (this.disabling) return;
     this.disabling = true;
     try {
-      await authService.withStepUp(() => groupService.disableAccountPolicy(this.id));
+      await authService.withStepUp(() =>
+        groupService.disableAccountPolicy(this.id)
+      );
       notificationService.success(msg('Account policy disabled.'));
       this.disableOpen = false;
       this.dirty = false;
@@ -149,7 +153,9 @@ export class GroupAccountPolicyTab extends LitElement {
         const parsed: unknown = JSON.parse(raw);
         values = Array.isArray(parsed) ? parsed.map(String) : [String(parsed)];
       } catch {
-        notificationService.error(msg('Attestation CA list must be valid JSON.'));
+        notificationService.error(
+          msg('Attestation CA list must be valid JSON.')
+        );
         return;
       }
     } else if (raw === '') {
@@ -160,7 +166,9 @@ export class GroupAccountPolicyTab extends LitElement {
     }
     this.savingAttr = key;
     try {
-      await authService.withStepUp(() => groupService.setPolicyAttr(this.id, key, values));
+      await authService.withStepUp(() =>
+        groupService.setPolicyAttr(this.id, key, values)
+      );
       notificationService.success(msg('Policy attribute saved.'));
       this.dirty = false;
       this.emitChanged();
@@ -269,7 +277,9 @@ export class GroupAccountPolicyTab extends LitElement {
               ?loading=${this.enabling}
               @click=${() => void this.enable()}
             >
-              ${this.enabling ? msg('Enabling...') : msg('Enable account policy')}
+              ${this.enabling
+                ? msg('Enabling...')
+                : msg('Enable account policy')}
             </ui-button>
           </div>
         </ui-card>

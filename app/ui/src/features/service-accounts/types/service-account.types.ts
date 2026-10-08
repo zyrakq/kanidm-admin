@@ -27,7 +27,9 @@ export interface ServiceAccountDetail {
 }
 
 /** Map a v1 entry to the summary row. */
-export function toServiceAccountSummary(entry: KanidmEntry): ServiceAccountSummary {
+export function toServiceAccountSummary(
+  entry: KanidmEntry
+): ServiceAccountSummary {
   return {
     id: attrFirst(entry, 'name') ?? attrFirst(entry, 'uuid') ?? '',
     displayName: attrFirst(entry, 'displayname') ?? '',
@@ -36,7 +38,9 @@ export function toServiceAccountSummary(entry: KanidmEntry): ServiceAccountSumma
 }
 
 /** Map a v1 entry to the detail model. */
-export function toServiceAccountDetail(entry: KanidmEntry): ServiceAccountDetail {
+export function toServiceAccountDetail(
+  entry: KanidmEntry
+): ServiceAccountDetail {
   return {
     id: attrFirst(entry, 'name') ?? attrFirst(entry, 'uuid') ?? '',
     uuid: attrFirst(entry, 'uuid') ?? null,
@@ -92,10 +96,7 @@ export interface CredentialStatusView {
 }
 
 /** Session state (UatStatusState, lowercase externally-tagged enum). */
-export type UatStatusState =
-  | { expiresat: number }
-  | 'neverexpires'
-  | 'revoked';
+export type UatStatusState = { expiresat: number } | 'neverexpires' | 'revoked';
 
 /** Session purpose (UatPurposeStatus, lowercase enum). */
 export type UatPurposeStatus = 'readonly' | 'readwrite' | 'privilegecapable';

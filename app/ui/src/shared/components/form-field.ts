@@ -52,7 +52,9 @@ export class FormField extends LitElement {
   }
 
   private get filteredOptions() {
-    return this.options.filter((o) => o.label.toLowerCase().includes(this.filter.toLowerCase()));
+    return this.options.filter((o) =>
+      o.label.toLowerCase().includes(this.filter.toLowerCase())
+    );
   }
 
   private openCombobox(): void {
@@ -91,7 +93,10 @@ export class FormField extends LitElement {
     const spaceAbove = rect.top - margin;
     // Flip upward when there is not enough room below and more room above.
     const dropUp = spaceBelow < 160 && spaceAbove > spaceBelow;
-    const maxHeight = Math.max(60, Math.min(240, (dropUp ? spaceAbove : spaceBelow) - gap));
+    const maxHeight = Math.max(
+      60,
+      Math.min(240, (dropUp ? spaceAbove : spaceBelow) - gap)
+    );
     this.listboxPos = dropUp
       ? {
           left: rect.left,
@@ -99,7 +104,12 @@ export class FormField extends LitElement {
           width: rect.width,
           maxHeight,
         }
-      : { left: rect.left, top: rect.bottom + gap, width: rect.width, maxHeight };
+      : {
+          left: rect.left,
+          top: rect.bottom + gap,
+          width: rect.width,
+          maxHeight,
+        };
   }
 
   private toggleCombobox(): void {
@@ -146,7 +156,10 @@ export class FormField extends LitElement {
       if (!this.open) {
         this.openCombobox();
       } else {
-        this.activeIndex = Math.min(this.activeIndex + 1, this.filteredOptions.length - 1);
+        this.activeIndex = Math.min(
+          this.activeIndex + 1,
+          this.filteredOptions.length - 1
+        );
       }
     } else if (e.key === 'ArrowUp') {
       e.stopPropagation();
@@ -173,7 +186,9 @@ export class FormField extends LitElement {
     const pos = this.listboxPos;
     const style = pos
       ? `left:${pos.left}px;width:${pos.width}px;max-height:${pos.maxHeight}px;` +
-        (pos.top !== undefined ? `top:${pos.top}px;` : `bottom:${pos.bottom}px;`)
+        (pos.top !== undefined
+          ? `top:${pos.top}px;`
+          : `bottom:${pos.bottom}px;`)
       : '';
     return html`
       <div class="listbox" role="listbox" id=${this.listboxId} style=${style}>
@@ -182,10 +197,13 @@ export class FormField extends LitElement {
           : filtered.map(
               (option, i) => html`
                 <div
-                  class=${'listbox-option' + (i === this.activeIndex ? ' active' : '')}
+                  class=${'listbox-option' +
+                  (i === this.activeIndex ? ' active' : '')}
                   role="option"
                   id=${this.listboxId + '-opt-' + i}
-                  aria-selected=${option.value === this.value ? 'true' : 'false'}
+                  aria-selected=${option.value === this.value
+                    ? 'true'
+                    : 'false'}
                   @click=${() => this.selectOption(i)}
                 >
                   ${option.label}
@@ -197,7 +215,10 @@ export class FormField extends LitElement {
   }
 
   private handleInput(e: Event): void {
-    const target = e.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+    const target = e.target as
+      | HTMLInputElement
+      | HTMLSelectElement
+      | HTMLTextAreaElement;
     this.value = target.value;
     // Re-emit so parent components using change-tracking can listen.
     this.dispatchEvent(
@@ -227,7 +248,9 @@ export class FormField extends LitElement {
             ?required=${this.required}
             aria-expanded=${this.open}
             aria-controls=${this.listboxId}
-            aria-activedescendant=${this.activeIndex >= 0 ? this.listboxId + '-opt-' + this.activeIndex : ''}
+            aria-activedescendant=${this.activeIndex >= 0
+              ? this.listboxId + '-opt-' + this.activeIndex
+              : ''}
             aria-autocomplete="list"
             autocomplete="off"
             @input=${this.handleComboboxInput}
@@ -242,7 +265,10 @@ export class FormField extends LitElement {
             ?disabled=${this.disabled}
             @click=${() => this.toggleCombobox()}
           >
-            <ui-icon name=${this.open ? 'chevron-up' : 'chevron-down'} size="16"></ui-icon>
+            <ui-icon
+              name=${this.open ? 'chevron-up' : 'chevron-down'}
+              size="16"
+            ></ui-icon>
           </button>
           ${this.open ? this.renderListbox() : nothing}
         </div>
@@ -259,7 +285,10 @@ export class FormField extends LitElement {
         >
           ${this.options.map(
             (option) => html`
-              <option value=${option.value} ?selected=${option.value === this.value}>
+              <option
+                value=${option.value}
+                ?selected=${option.value === this.value}
+              >
                 ${option.label}
               </option>
             `
@@ -295,10 +324,13 @@ export class FormField extends LitElement {
     }
     return html`
       <div class="field">
-        ${this.label ? label : nothing}
-        ${control}
-        ${this.hint && !this.error ? html`<p class="hint">${this.hint}</p>` : nothing}
-        ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : nothing}
+        ${this.label ? label : nothing} ${control}
+        ${this.hint && !this.error
+          ? html`<p class="hint">${this.hint}</p>`
+          : nothing}
+        ${this.error
+          ? html`<p class="error" role="alert">${this.error}</p>`
+          : nothing}
       </div>
     `;
   }

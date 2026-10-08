@@ -24,7 +24,9 @@ export const localeSwitcherStyles = css`
     font-size: 0.8125rem;
     font-weight: 600;
     color: var(--theme-color-text-secondary);
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
 
   .trigger:hover {

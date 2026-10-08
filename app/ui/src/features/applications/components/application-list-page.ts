@@ -150,13 +150,18 @@ export class ApplicationListPage extends LitElement {
     this.bulkBusy = true;
     try {
       const response = await authService.withStepUp(() =>
-        bulkDelete('application', targets.map((target) => target.name))
+        bulkDelete(
+          'application',
+          targets.map((target) => target.name)
+        )
       );
       const failures = response.results
         .filter((result) => !result.ok)
         .map((result) => `${result.id}: ${friendlyDeleteFailure(result)}`);
       if (failures.length === 0) {
-        notificationService.success(msg(str`Deleted ${response.deleted} entries`));
+        notificationService.success(
+          msg(str`Deleted ${response.deleted} entries`)
+        );
       } else {
         notificationService.error(
           msg(
@@ -298,10 +303,7 @@ export class ApplicationListPage extends LitElement {
       <admin-layout>
         <div class="page-head">
           <h1>${msg('Applications')}</h1>
-          <ui-button
-            variant="primary"
-            @click=${() => void this.openCreate()}
-          >
+          <ui-button variant="primary" @click=${() => void this.openCreate()}>
             ${msg('Create application')}
           </ui-button>
         </div>
@@ -382,7 +384,6 @@ export class ApplicationListPage extends LitElement {
               ></confirm-dialog>
             `
           : nothing}
-
         ${this.bulkTargets
           ? html`
               <confirm-dialog
@@ -398,7 +399,6 @@ export class ApplicationListPage extends LitElement {
               ></confirm-dialog>
             `
           : nothing}
-
         ${this.detailLoading
           ? html`<modal-dialog
               heading=${msg('Application')}

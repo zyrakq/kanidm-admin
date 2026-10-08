@@ -22,12 +22,16 @@ export class ConfirmDialog extends LitElement {
 
   private handleModalClose(): void {
     if (!this.busy) {
-      this.dispatchEvent(new CustomEvent('cancel', { bubbles: true, composed: true }));
+      this.dispatchEvent(
+        new CustomEvent('cancel', { bubbles: true, composed: true })
+      );
     }
   }
 
   private handleConfirm(): void {
-    this.dispatchEvent(new CustomEvent('confirm', { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent('confirm', { bubbles: true, composed: true })
+    );
   }
 
   render() {
@@ -51,7 +55,9 @@ export class ConfirmDialog extends LitElement {
             ?loading=${this.busy}
             @click=${this.handleConfirm}
           >
-            ${this.busy ? msg('Working...') : this.confirmLabel || msg('Confirm')}
+            ${this.busy
+              ? msg('Working...')
+              : this.confirmLabel || msg('Confirm')}
           </ui-button>
         </div>
       </modal-dialog>

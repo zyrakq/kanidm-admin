@@ -15,12 +15,12 @@ Runtime i18n/l10n support for Lit-based web applications using @lit/localize.
 
 ## Supported Locales
 
-| Code | Name (Native) | Name (English) | Flag |
-|------|---------------|----------------|------|
-| en | English | English | 🇬🇧 |
-| ru | Русский | Russian | 🇷🇺 |
-| es | Español | Spanish | 🇪🇸 |
-| zh-Hans | 简体中文 | Chinese (Simplified) | 🇨🇳 |
+| Code    | Name (Native) | Name (English)       | Flag |
+| ------- | ------------- | -------------------- | ---- |
+| en      | English       | English              | 🇬🇧   |
+| ru      | Русский       | Russian              | 🇷🇺   |
+| es      | Español       | Spanish              | 🇪🇸   |
+| zh-Hans | 简体中文      | Chinese (Simplified) | 🇨🇳   |
 
 ## Quick Start
 
@@ -108,6 +108,7 @@ Generates TypeScript modules in `src/features/localization/generated/locales/`.
 ## Adding New Locale
 
 1. Update `lit-localize.json`:
+
 ```json
 {
   "targetLocales": ["ru", "es", "zh-Hans", "fr"]
@@ -115,6 +116,7 @@ Generates TypeScript modules in `src/features/localization/generated/locales/`.
 ```
 
 2. Add metadata to `src/features/localization/data/locale-metadata.ts`:
+
 ```typescript
 fr: {
   code: 'fr',
@@ -181,10 +183,10 @@ class MyElement extends LitElement {
 
 ## CLI Commands
 
-| Command | Description |
-|---------|-------------|
+| Command            | Description                     |
+| ------------------ | ------------------------------- |
 | `bun i18n:extract` | Extract messages to XLIFF files |
-| `bun i18n:build` | Build translations from XLIFF |
+| `bun i18n:build`   | Build translations from XLIFF   |
 
 ## Configuration
 

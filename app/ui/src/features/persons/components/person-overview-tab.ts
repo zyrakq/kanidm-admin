@@ -273,76 +273,80 @@ export class PersonOverviewTab extends LitElement {
 
   private renderProfile(): ReturnType<typeof html> {
     return html`
-      <ui-card><section>
-        <h2>${msg('Profile')}</h2>
-        <form-field
-          field-id="ov-displayname"
-          label=${msg('Display name')}
-          .value=${this.displayName}
-          @field-input=${(e: CustomEvent<{ value: string }>) =>
-            this.setField('displayName', e.detail.value)}
-        ></form-field>
-        <form-field
-          field-id="ov-legalname"
-          label=${msg('Legal name')}
-          .value=${this.legalName}
-          hint=${msg('Leave empty to remove the legal name.')}
-          @field-input=${(e: CustomEvent<{ value: string }>) =>
-            this.setField('legalName', e.detail.value)}
-        ></form-field>
-        <form-field
-          field-id="ov-mail"
-          label=${msg('Mail addresses')}
-          .value=${this.mail}
-          hint=${msg('Comma-separated list of mail addresses.')}
-          @field-input=${(e: CustomEvent<{ value: string }>) =>
-            this.setField('mail', e.detail.value)}
-        ></form-field>
-        <div class="actions">
-          <ui-button
-            variant="primary"
-            ?loading=${this.saving}
-            @click=${this.saveProfile}
-          >
-            ${this.saving ? msg('Saving...') : msg('Save')}
-          </ui-button>
-        </div>
-      </section></ui-card>
+      <ui-card
+        ><section>
+          <h2>${msg('Profile')}</h2>
+          <form-field
+            field-id="ov-displayname"
+            label=${msg('Display name')}
+            .value=${this.displayName}
+            @field-input=${(e: CustomEvent<{ value: string }>) =>
+              this.setField('displayName', e.detail.value)}
+          ></form-field>
+          <form-field
+            field-id="ov-legalname"
+            label=${msg('Legal name')}
+            .value=${this.legalName}
+            hint=${msg('Leave empty to remove the legal name.')}
+            @field-input=${(e: CustomEvent<{ value: string }>) =>
+              this.setField('legalName', e.detail.value)}
+          ></form-field>
+          <form-field
+            field-id="ov-mail"
+            label=${msg('Mail addresses')}
+            .value=${this.mail}
+            hint=${msg('Comma-separated list of mail addresses.')}
+            @field-input=${(e: CustomEvent<{ value: string }>) =>
+              this.setField('mail', e.detail.value)}
+          ></form-field>
+          <div class="actions">
+            <ui-button
+              variant="primary"
+              ?loading=${this.saving}
+              @click=${this.saveProfile}
+            >
+              ${this.saving ? msg('Saving...') : msg('Save')}
+            </ui-button>
+          </div>
+        </section></ui-card
+      >
     `;
   }
 
   private renderValidity(): ReturnType<typeof html> {
     return html`
-      <ui-card><section>
-        <h2>${msg('Account validity')}</h2>
-        <form-field
-          type="datetime-local"
-          field-id="ov-valid-from"
-          label=${msg('Valid from')}
-          .value=${this.validFrom}
-          hint=${msg('Empty value removes the restriction.')}
-          @field-input=${(e: CustomEvent<{ value: string }>) =>
-            this.setField('validFrom', e.detail.value)}
-        ></form-field>
-        <form-field
-          type="datetime-local"
-          field-id="ov-expire"
-          label=${msg('Expires')}
-          .value=${this.expire}
-          hint=${msg('Empty value removes the expiry.')}
-          @field-input=${(e: CustomEvent<{ value: string }>) =>
-            this.setField('expire', e.detail.value)}
-        ></form-field>
-        <div class="actions">
-          <ui-button
-            variant="primary"
-            ?loading=${this.savingValidity}
-            @click=${this.applyValidity}
-          >
-            ${this.savingValidity ? msg('Applying...') : msg('Apply')}
-          </ui-button>
-        </div>
-      </section></ui-card>
+      <ui-card
+        ><section>
+          <h2>${msg('Account validity')}</h2>
+          <form-field
+            type="datetime-local"
+            field-id="ov-valid-from"
+            label=${msg('Valid from')}
+            .value=${this.validFrom}
+            hint=${msg('Empty value removes the restriction.')}
+            @field-input=${(e: CustomEvent<{ value: string }>) =>
+              this.setField('validFrom', e.detail.value)}
+          ></form-field>
+          <form-field
+            type="datetime-local"
+            field-id="ov-expire"
+            label=${msg('Expires')}
+            .value=${this.expire}
+            hint=${msg('Empty value removes the expiry.')}
+            @field-input=${(e: CustomEvent<{ value: string }>) =>
+              this.setField('expire', e.detail.value)}
+          ></form-field>
+          <div class="actions">
+            <ui-button
+              variant="primary"
+              ?loading=${this.savingValidity}
+              @click=${this.applyValidity}
+            >
+              ${this.savingValidity ? msg('Applying...') : msg('Apply')}
+            </ui-button>
+          </div>
+        </section></ui-card
+      >
     `;
   }
 
@@ -351,82 +355,84 @@ export class PersonOverviewTab extends LitElement {
     if (!person) return nothing;
     const busy = this.addingGroup || this.removingGroup !== null;
     return html`
-      <ui-card><section>
-        <h2>${msg('Group membership')}</h2>
-        ${person.memberOf.length === 0
-          ? html`<p class="muted">${msg('Not a member of any group.')}</p>`
-          : (() => {
-              const total = person.memberOf.length;
-              const pageCount = Math.max(
-                1,
-                Math.ceil(total / this.memberPageSize)
-              );
-              const page = Math.min(this.memberPage, pageCount);
-              const pageGroups = person.memberOf.slice(
-                (page - 1) * this.memberPageSize,
-                page * this.memberPageSize
-              );
-              return html`
-                <ul class="group-list">
-                  ${pageGroups.map(
-                    (group) => html`
-                      <li>
-                        <span class="mono">${group}</span>
-                        <ui-button
-                          size="sm"
-                          variant="danger-ghost"
-                          ?disabled=${busy}
-                          ?loading=${this.removingGroup === group}
-                          @click=${() => this.removeGroup(group)}
-                        >
-                          ${this.removingGroup === group
-                            ? msg('Removing...')
-                            : msg('Remove')}
-                        </ui-button>
-                      </li>
-                    `
-                  )}
-                </ul>
-                <list-pager
-                  .total=${total}
-                  .page=${page}
-                  .pageSize=${this.memberPageSize}
-                  @page-change=${(e: CustomEvent<{ page: number }>) =>
-                    (this.memberPage = e.detail.page)}
-                  @page-size-change=${(
-                    e: CustomEvent<{ pageSize: number }>
-                  ) => {
-                    this.memberPageSize = e.detail.pageSize;
-                    this.memberPage = 1;
-                  }}
-                ></list-pager>
-              `;
-            })()}
-        <div class="add-group">
-          <form-field
-            class="group-field"
-            field-id="ov-new-group"
-            type="combobox"
-            placeholder=${msg('Select a group')}
-            .value=${this.newGroup}
-            .options=${this.groups.map((group) => ({
-              value: group.id,
-              label: group.displayName ?? group.id,
-            }))}
-            @field-input=${(e: CustomEvent<{ value: string }>) =>
-              (this.newGroup = e.detail.value)}
-          ></form-field>
-          <ui-button
-            variant="primary"
-            icon="plus"
-            ?disabled=${busy || this.newGroup.trim() === ''}
-            ?loading=${this.addingGroup}
-            @click=${this.addGroup}
-          >
-            ${this.addingGroup ? msg('Adding...') : msg('Add')}
-          </ui-button>
-        </div>
-      </section></ui-card>
+      <ui-card
+        ><section>
+          <h2>${msg('Group membership')}</h2>
+          ${person.memberOf.length === 0
+            ? html`<p class="muted">${msg('Not a member of any group.')}</p>`
+            : (() => {
+                const total = person.memberOf.length;
+                const pageCount = Math.max(
+                  1,
+                  Math.ceil(total / this.memberPageSize)
+                );
+                const page = Math.min(this.memberPage, pageCount);
+                const pageGroups = person.memberOf.slice(
+                  (page - 1) * this.memberPageSize,
+                  page * this.memberPageSize
+                );
+                return html`
+                  <ul class="group-list">
+                    ${pageGroups.map(
+                      (group) => html`
+                        <li>
+                          <span class="mono">${group}</span>
+                          <ui-button
+                            size="sm"
+                            variant="danger-ghost"
+                            ?disabled=${busy}
+                            ?loading=${this.removingGroup === group}
+                            @click=${() => this.removeGroup(group)}
+                          >
+                            ${this.removingGroup === group
+                              ? msg('Removing...')
+                              : msg('Remove')}
+                          </ui-button>
+                        </li>
+                      `
+                    )}
+                  </ul>
+                  <list-pager
+                    .total=${total}
+                    .page=${page}
+                    .pageSize=${this.memberPageSize}
+                    @page-change=${(e: CustomEvent<{ page: number }>) =>
+                      (this.memberPage = e.detail.page)}
+                    @page-size-change=${(
+                      e: CustomEvent<{ pageSize: number }>
+                    ) => {
+                      this.memberPageSize = e.detail.pageSize;
+                      this.memberPage = 1;
+                    }}
+                  ></list-pager>
+                `;
+              })()}
+          <div class="add-group">
+            <form-field
+              class="group-field"
+              field-id="ov-new-group"
+              type="combobox"
+              placeholder=${msg('Select a group')}
+              .value=${this.newGroup}
+              .options=${this.groups.map((group) => ({
+                value: group.id,
+                label: group.displayName ?? group.id,
+              }))}
+              @field-input=${(e: CustomEvent<{ value: string }>) =>
+                (this.newGroup = e.detail.value)}
+            ></form-field>
+            <ui-button
+              variant="primary"
+              icon="plus"
+              ?disabled=${busy || this.newGroup.trim() === ''}
+              ?loading=${this.addingGroup}
+              @click=${this.addGroup}
+            >
+              ${this.addingGroup ? msg('Adding...') : msg('Add')}
+            </ui-button>
+          </div>
+        </section></ui-card
+      >
     `;
   }
 
@@ -441,11 +447,14 @@ export class PersonOverviewTab extends LitElement {
     `;
   }
 
-  static styles = [personOverviewTabStyles, css`
-    form-field {
-      display: block;
-    }
-  `];
+  static styles = [
+    personOverviewTabStyles,
+    css`
+      form-field {
+        display: block;
+      }
+    `,
+  ];
 }
 
 declare global {

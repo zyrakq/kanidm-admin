@@ -41,10 +41,14 @@ export class AdminOverviewPage extends LitElement {
     const groups = authService.getGroups();
     const jobs: Promise<void>[] = [];
     if (groups.includes('idm_people_admins')) {
-      jobs.push(this.count('/api/kanidm/v1/person', (n) => (this.personCount = n)));
+      jobs.push(
+        this.count('/api/kanidm/v1/person', (n) => (this.personCount = n))
+      );
     }
     if (groups.includes('idm_group_admins')) {
-      jobs.push(this.count('/api/kanidm/v1/group', (n) => (this.groupCount = n)));
+      jobs.push(
+        this.count('/api/kanidm/v1/group', (n) => (this.groupCount = n))
+      );
     }
     await Promise.allSettled(jobs);
   }

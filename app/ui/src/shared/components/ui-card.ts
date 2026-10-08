@@ -71,7 +71,9 @@ export class UiCard extends LitElement {
 
   protected firstUpdated(): void {
     for (const name of ['header', 'footer']) {
-      const slot = this.renderRoot.querySelector<HTMLSlotElement>(`slot[name="${name}"]`);
+      const slot = this.renderRoot.querySelector<HTMLSlotElement>(
+        `slot[name="${name}"]`
+      );
       const wrap = slot?.parentElement;
       if (!slot || !wrap) continue;
       const sync = () => {

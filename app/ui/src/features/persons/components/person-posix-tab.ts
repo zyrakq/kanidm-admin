@@ -40,11 +40,15 @@ export class PersonPosixTab extends LitElement {
     this.posixState = 'loading';
     try {
       this.token = await personService.posixShow(this.id);
-      this.gidnumber = this.token.gidnumber !== undefined ? String(this.token.gidnumber) : '';
+      this.gidnumber =
+        this.token.gidnumber !== undefined ? String(this.token.gidnumber) : '';
       this.shell = this.token.shell ?? '';
       this.posixState = 'enabled';
     } catch (error) {
-      if (error instanceof ApiError && (error.code === 'not_found' || error.status === 404)) {
+      if (
+        error instanceof ApiError &&
+        (error.code === 'not_found' || error.status === 404)
+      ) {
         this.token = null;
         this.gidnumber = '';
         this.shell = '';
@@ -65,7 +69,9 @@ export class PersonPosixTab extends LitElement {
     }
     this.saving = true;
     try {
-      await authService.withStepUp(() => personService.posixSet(this.id, gid, shell));
+      await authService.withStepUp(() =>
+        personService.posixSet(this.id, gid, shell)
+      );
       notificationService.success(msg('POSIX attributes saved.'));
       await this.load();
     } catch {
@@ -82,7 +88,9 @@ export class PersonPosixTab extends LitElement {
     }
     this.settingPassword = true;
     try {
-      await authService.withStepUp(() => personService.posixSetPassword(this.id, this.password));
+      await authService.withStepUp(() =>
+        personService.posixSetPassword(this.id, this.password)
+      );
       notificationService.success(msg('POSIX password set.'));
       this.password = '';
     } catch {
@@ -143,7 +151,9 @@ export class PersonPosixTab extends LitElement {
           ?loading=${this.settingPassword}
           @click=${() => void this.setPassword()}
         >
-          ${this.settingPassword ? msg('Setting...') : msg('Set POSIX password')}
+          ${this.settingPassword
+            ? msg('Setting...')
+            : msg('Set POSIX password')}
         </ui-button>
       </section>
     `;
@@ -167,7 +177,8 @@ export class PersonPosixTab extends LitElement {
         <h3>${msg('POSIX attributes')}</h3>
         ${this.token
           ? html`<p class="muted">
-              ${msg('UUID')}: ${this.token.uuid} · ${msg('GID')}: ${this.token.gidnumber}
+              ${msg('UUID')}: ${this.token.uuid} · ${msg('GID')}:
+              ${this.token.gidnumber}
             </p>`
           : nothing}
         ${this.renderPosixForm()}

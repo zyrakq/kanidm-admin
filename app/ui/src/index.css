@@ -33,5 +33,7 @@ body {
   min-height: 100vh;
   background-color: var(--theme-color-background);
   color: var(--theme-color-text-primary);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }

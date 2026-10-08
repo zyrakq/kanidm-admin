@@ -50,11 +50,16 @@ export class GroupDetailPage extends LitElement {
     try {
       this.group = await groupService.get(this.id);
     } catch (error) {
-      if (error instanceof ApiError && (error.code === 'not_found' || error.status === 404)) {
+      if (
+        error instanceof ApiError &&
+        (error.code === 'not_found' || error.status === 404)
+      ) {
         this.notFound = true;
       } else {
         notificationService.error(
-          error instanceof ApiError ? error.message : msg('Failed to load group')
+          error instanceof ApiError
+            ? error.message
+            : msg('Failed to load group')
         );
       }
     } finally {
@@ -79,7 +84,9 @@ export class GroupDetailPage extends LitElement {
       navigate('/admin/groups');
     } catch (error) {
       notificationService.error(
-        error instanceof ApiError ? error.message : msg('Failed to delete group')
+        error instanceof ApiError
+          ? error.message
+          : msg('Failed to delete group')
       );
     } finally {
       this.deleteBusy = false;

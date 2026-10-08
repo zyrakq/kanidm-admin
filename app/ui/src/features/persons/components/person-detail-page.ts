@@ -52,11 +52,16 @@ export class PersonDetailPage extends LitElement {
     try {
       this.person = await personService.get(this.id);
     } catch (error) {
-      if (error instanceof ApiError && (error.code === 'not_found' || error.status === 404)) {
+      if (
+        error instanceof ApiError &&
+        (error.code === 'not_found' || error.status === 404)
+      ) {
         this.notFound = true;
       } else {
         notificationService.error(
-          error instanceof ApiError ? error.message : msg('Failed to load person')
+          error instanceof ApiError
+            ? error.message
+            : msg('Failed to load person')
         );
       }
     } finally {
@@ -81,7 +86,9 @@ export class PersonDetailPage extends LitElement {
       navigate('/admin/persons');
     } catch (error) {
       notificationService.error(
-        error instanceof ApiError ? error.message : msg('Failed to delete person')
+        error instanceof ApiError
+          ? error.message
+          : msg('Failed to delete person')
       );
     } finally {
       this.deleteBusy = false;
@@ -91,7 +98,9 @@ export class PersonDetailPage extends LitElement {
   private renderTab(): ReturnType<typeof html> {
     switch (this.activeTab) {
       case 'credentials':
-        return html`<person-credentials-tab .id=${this.id}></person-credentials-tab>`;
+        return html`<person-credentials-tab
+          .id=${this.id}
+        ></person-credentials-tab>`;
       case 'sessions':
         return html`<person-sessions-tab .id=${this.id}></person-sessions-tab>`;
       case 'ssh':
@@ -134,7 +143,10 @@ export class PersonDetailPage extends LitElement {
             ? html`<p class="muted">${msg('Person not found.')}</p>`
             : html`
                 <header class="person-head">
-                  <ui-avatar name=${this.person.displayName} size="48"></ui-avatar>
+                  <ui-avatar
+                    name=${this.person.displayName}
+                    size="48"
+                  ></ui-avatar>
                   <div>
                     <h1>${this.person.displayName}</h1>
                     <p class="muted mono">${this.person.id}</p>

@@ -51,7 +51,9 @@ export class Oauth2OriginsTab extends LitElement {
     if (!origin || this.busy) return;
     this.busy = true;
     try {
-      await authService.withStepUp(() => oauth2Service.addOrigin(this.id, origin));
+      await authService.withStepUp(() =>
+        oauth2Service.addOrigin(this.id, origin)
+      );
       this.origin = '';
       notificationService.success(msg('Origin added.'));
       await this.load();
@@ -67,7 +69,9 @@ export class Oauth2OriginsTab extends LitElement {
     if (!origin || this.removing) return;
     this.removing = true;
     try {
-      await authService.withStepUp(() => oauth2Service.removeOrigin(this.id, origin));
+      await authService.withStepUp(() =>
+        oauth2Service.removeOrigin(this.id, origin)
+      );
       this.removeTarget = null;
       notificationService.success(msg('Origin removed.'));
       await this.load();

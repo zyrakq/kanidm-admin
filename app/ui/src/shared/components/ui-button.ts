@@ -7,7 +7,12 @@ import { customElement, property } from 'lit/decorators.js';
 import './ui-icon';
 import type { IconName } from './ui-icon';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'danger-ghost';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'danger'
+  | 'ghost'
+  | 'danger-ghost';
 export type ButtonSize = 'sm' | 'md';
 
 @customElement('ui-button')
@@ -51,7 +56,10 @@ export class UiButton extends LitElement {
         ${this.loading
           ? html`<span class="spinner" aria-hidden="true"></span>`
           : this.icon
-            ? html`<ui-icon name=${this.icon} size=${this.size === 'sm' ? 14 : 16}></ui-icon>`
+            ? html`<ui-icon
+                name=${this.icon}
+                size=${this.size === 'sm' ? 14 : 16}
+              ></ui-icon>`
             : nothing}
         <span class="content"><slot></slot></span>
       </button>
@@ -159,7 +167,11 @@ export class UiButton extends LitElement {
 
     :host([variant='danger-ghost']) button {
       background: transparent;
-      border-color: color-mix(in srgb, var(--theme-color-error) 40%, transparent);
+      border-color: color-mix(
+        in srgb,
+        var(--theme-color-error) 40%,
+        transparent
+      );
       color: var(--theme-color-error);
     }
     :host([variant='danger-ghost']) button:hover:not(:disabled) {

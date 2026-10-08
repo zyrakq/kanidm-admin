@@ -102,7 +102,13 @@ export function toApplicationSummary(
 export function toApplicationDetail(
   entry: ScimEntryApplication
 ): ApplicationDetail {
-  const known = new Set(['schemas', 'id', 'name', 'displayname', 'linked_group']);
+  const known = new Set([
+    'schemas',
+    'id',
+    'name',
+    'displayname',
+    'linked_group',
+  ]);
   const attrs: Record<string, string[]> = {};
   for (const [key, value] of Object.entries(entry)) {
     if (!known.has(key)) {

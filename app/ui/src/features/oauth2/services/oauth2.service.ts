@@ -5,10 +5,7 @@
 
 import { ApiError, apiFetch } from '@/shared/services/http-client';
 import { entryBody, type KanidmEntry } from '@/shared/types/kanidm';
-import type {
-  Oauth2RsDetail,
-  Oauth2RsSummary,
-} from '../types/oauth2.types';
+import type { Oauth2RsDetail, Oauth2RsSummary } from '../types/oauth2.types';
 import { toOauth2RsDetail, toOauth2RsSummary } from '../types/oauth2.types';
 
 const BASE = '/api/kanidm/v1/oauth2';
@@ -59,7 +56,11 @@ class Oauth2Service {
    * POST /v1/oauth2/_basic). Attr keys verified against the vendored
    * 1.12 schema: oauth2_strict_redirect_uri (NOT oauth2_rs_strict_redirect_uri).
    */
-  async createBasic(name: string, displayName: string, origin: string): Promise<void> {
+  async createBasic(
+    name: string,
+    displayName: string,
+    origin: string
+  ): Promise<void> {
     await apiFetch<void>(`${BASE}/_basic`, {
       method: 'POST',
       body: JSON.stringify(
@@ -74,7 +75,11 @@ class Oauth2Service {
   }
 
   /** Create a public client (vendor idm_oauth2_rs_public_create). */
-  async createPublic(name: string, displayName: string, origin: string): Promise<void> {
+  async createPublic(
+    name: string,
+    displayName: string,
+    origin: string
+  ): Promise<void> {
     await apiFetch<void>(`${BASE}/_public`, {
       method: 'POST',
       body: JSON.stringify(
@@ -95,7 +100,8 @@ class Oauth2Service {
   async update(id: string, changes: Oauth2UpdateChanges): Promise<void> {
     const attrs: Record<string, string[]> = {};
     if (changes.name !== undefined) attrs['name'] = [changes.name];
-    if (changes.displayName !== undefined) attrs['displayname'] = [changes.displayName];
+    if (changes.displayName !== undefined)
+      attrs['displayname'] = [changes.displayName];
     if (changes.landing !== undefined) {
       attrs['oauth2_rs_origin_landing'] = [changes.landing];
     }
@@ -108,7 +114,9 @@ class Oauth2Service {
 
   /** Delete (vendor idm_oauth2_rs_delete, DELETE /v1/oauth2/{id}). */
   async remove(id: string): Promise<void> {
-    await apiFetch<void>(`${BASE}/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    await apiFetch<void>(`${BASE}/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
   }
 
   /** Basic secret (vendor idm_oauth2_rs_get_basic_secret → string | null). */
@@ -119,7 +127,11 @@ class Oauth2Service {
   }
 
   /** Set scope map (vendor idm_oauth2_rs_update_scope_map, body = scopes). */
-  async updateScopeMap(id: string, group: string, scopes: string[]): Promise<void> {
+  async updateScopeMap(
+    id: string,
+    group: string,
+    scopes: string[]
+  ): Promise<void> {
     await apiFetch<void>(
       `${BASE}/${encodeURIComponent(id)}/_scopemap/${encodeURIComponent(group)}`,
       { method: 'POST', body: JSON.stringify(scopes) }
@@ -135,7 +147,11 @@ class Oauth2Service {
   }
 
   /** Set supplemental scope map (vendor idm_oauth2_rs_update_sup_scope_map). */
-  async updateSupScopeMap(id: string, group: string, scopes: string[]): Promise<void> {
+  async updateSupScopeMap(
+    id: string,
+    group: string,
+    scopes: string[]
+  ): Promise<void> {
     await apiFetch<void>(
       `${BASE}/${encodeURIComponent(id)}/_sup_scopemap/${encodeURIComponent(group)}`,
       { method: 'POST', body: JSON.stringify(scopes) }
@@ -182,7 +198,11 @@ class Oauth2Service {
   }
 
   /** Delete claim map (vendor idm_oauth2_rs_delete_claim_map). */
-  async deleteClaimMap(id: string, claim: string, group: string): Promise<void> {
+  async deleteClaimMap(
+    id: string,
+    claim: string,
+    group: string
+  ): Promise<void> {
     await apiFetch<void>(
       `${BASE}/${encodeURIComponent(id)}/_claimmap/${encodeURIComponent(claim)}/${encodeURIComponent(group)}`,
       { method: 'DELETE' }
@@ -324,9 +344,7 @@ class Oauth2Service {
   async enableStrictRedirect(id: string): Promise<void> {
     await apiFetch<void>(`${BASE}/${encodeURIComponent(id)}`, {
       method: 'PATCH',
-      body: JSON.stringify(
-        entryBody({ oauth2_strict_redirect_uri: ['true'] })
-      ),
+      body: JSON.stringify(entryBody({ oauth2_strict_redirect_uri: ['true'] })),
     });
   }
 
@@ -386,7 +404,10 @@ class Oauth2Service {
    * idm_oauth2_rs_set_refresh_token_expiry): value → PATCH
    * oauth2_refresh_token_expiry: [String(seconds)]; null → DELETE the attr.
    */
-  async setRefreshTokenExpiry(id: string, seconds: number | null): Promise<void> {
+  async setRefreshTokenExpiry(
+    id: string,
+    seconds: number | null
+  ): Promise<void> {
     if (seconds !== null) {
       await apiFetch<void>(`${BASE}/${encodeURIComponent(id)}`, {
         method: 'PATCH',

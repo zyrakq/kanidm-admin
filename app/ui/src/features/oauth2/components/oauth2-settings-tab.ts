@@ -131,7 +131,9 @@ export class Oauth2SettingsTab extends LitElement {
       this.secret = await oauth2Service.getBasicSecret(this.id);
       this.copied = false;
       this.resetOpen = false;
-      notificationService.success(msg('New secret generated. Store it now — it is shown only once.'));
+      notificationService.success(
+        msg('New secret generated. Store it now — it is shown only once.')
+      );
       this.emitChanged();
     } catch {
       notificationService.error(msg('Failed to reset the secret.'));
@@ -157,7 +159,9 @@ export class Oauth2SettingsTab extends LitElement {
       notificationService.success(msg('Refresh token expiry updated.'));
       this.emitChanged();
     } catch {
-      notificationService.error(msg('Failed to update the refresh token expiry.'));
+      notificationService.error(
+        msg('Failed to update the refresh token expiry.')
+      );
     } finally {
       this.busy = false;
     }
@@ -215,224 +219,232 @@ export class Oauth2SettingsTab extends LitElement {
       ${detail.isPublic
         ? nothing
         : html`
-            <ui-card><section>
-              <h2>${msg('Basic secret')}</h2>
-              <p class="muted">
-                ${msg(
-                  'Used for the client-credentials flow. Shown only when requested — store it in a safe place.'
-                )}
-              </p>
-              ${this.secret !== null
-                ? html`
-                    <div class="secret-row">
-                      <code class="mono">${this.secret}</code>
-                      <ui-button
-                        variant="secondary"
-                        size="sm"
-                        @click=${() => void this.copySecret()}
-                      >
-                        ${this.copied ? msg('Copied!') : msg('Copy')}
-                      </ui-button>
-                    </div>
-                  `
-                : html`
-                    <div class="actions">
-                      <ui-button
-                        variant="secondary"
-                        ?loading=${this.secretLoading}
-                        @click=${() => void this.showSecret()}
-                      >
-                        ${msg('Show secret')}
-                      </ui-button>
-                      <ui-button
-                        variant="danger"
-                        @click=${() => {
-                          this.resetOpen = true;
-                        }}
-                      >
-                        ${msg('Reset secret...')}
-                      </ui-button>
-                    </div>
-                  `}
-            </section></ui-card>
+            <ui-card
+              ><section>
+                <h2>${msg('Basic secret')}</h2>
+                <p class="muted">
+                  ${msg(
+                    'Used for the client-credentials flow. Shown only when requested — store it in a safe place.'
+                  )}
+                </p>
+                ${this.secret !== null
+                  ? html`
+                      <div class="secret-row">
+                        <code class="mono">${this.secret}</code>
+                        <ui-button
+                          variant="secondary"
+                          size="sm"
+                          @click=${() => void this.copySecret()}
+                        >
+                          ${this.copied ? msg('Copied!') : msg('Copy')}
+                        </ui-button>
+                      </div>
+                    `
+                  : html`
+                      <div class="actions">
+                        <ui-button
+                          variant="secondary"
+                          ?loading=${this.secretLoading}
+                          @click=${() => void this.showSecret()}
+                        >
+                          ${msg('Show secret')}
+                        </ui-button>
+                        <ui-button
+                          variant="danger"
+                          @click=${() => {
+                            this.resetOpen = true;
+                          }}
+                        >
+                          ${msg('Reset secret...')}
+                        </ui-button>
+                      </div>
+                    `}
+              </section></ui-card
+            >
           `}
-      <ui-card><section>
-        <h2>${msg('General')}</h2>
-        <form-field
-          field-id="set-displayname"
-          label=${msg('Display name')}
-          .value=${this.displayName}
-          @field-input=${(e: CustomEvent<{ value: string }>) => {
-            this.dirty = true;
-            this.displayName = e.detail.value;
-          }}
-        ></form-field>
-        <form-field
-          field-id="set-landing"
-          label=${msg('Landing origin')}
-          .value=${this.landing}
-          hint=${msg('Where the user is redirected after login.')}
-          @field-input=${(e: CustomEvent<{ value: string }>) => {
-            this.dirty = true;
-            this.landing = e.detail.value;
-          }}
-        ></form-field>
-        <div class="actions">
-          <ui-button
-            variant="primary"
-            ?loading=${this.saving}
-            @click=${() => void this.saveBasics()}
-          >
-            ${msg('Save')}
-          </ui-button>
-        </div>
-      </section></ui-card>
-      <ui-card><section>
-        <h2>${msg('Tokens')}</h2>
-        <form-field
-          field-id="set-expiry"
-          label=${msg('Refresh token expiry (seconds)')}
-          type="number"
-          .value=${this.expiryInput}
-          hint=${msg('Leave empty for no expiry.')}
-          @field-input=${(e: CustomEvent<{ value: string }>) => {
-            this.expiryDirty = true;
-            this.expiryInput = e.detail.value;
-          }}
-        ></form-field>
-        <div class="actions">
-          <ui-button
-            variant="secondary"
-            ?disabled=${this.busy}
-            @click=${() => {
-              this.expiryInput = '';
-              this.expiryDirty = true;
-              void this.saveExpiry();
+      <ui-card
+        ><section>
+          <h2>${msg('General')}</h2>
+          <form-field
+            field-id="set-displayname"
+            label=${msg('Display name')}
+            .value=${this.displayName}
+            @field-input=${(e: CustomEvent<{ value: string }>) => {
+              this.dirty = true;
+              this.displayName = e.detail.value;
             }}
-          >
-            ${msg('Clear')}
-          </ui-button>
-          <ui-button
-            variant="primary"
-            ?loading=${this.busy}
-            @click=${() => void this.saveExpiry()}
-          >
-            ${msg('Save')}
-          </ui-button>
-        </div>
-      </section></ui-card>
-      <ui-card><section>
-        <h2>${msg('Security')}</h2>
-        ${this.renderToggleRow(
-          msg('Strict redirect URI validation'),
-          msg('Only exact redirect origins are accepted.'),
-          detail.strictRedirect,
-          () => {
-            const next = !detail.strictRedirect;
-                          void this.toggle(
-              () =>
-                next
-                  ? oauth2Service.enableStrictRedirect(this.id)
-                  : oauth2Service.disableStrictRedirect(this.id),
-              msg('Failed to update strict redirect validation.')
-            );
-          },
-          this.busy
-        )}
-        ${this.renderToggleRow(
-          msg('PKCE'),
-          msg('Proof Key for Code Exchange. Disabling is insecure.'),
-          !detail.pkceDisabled,
-          () => {
-            if (detail.pkceDisabled) {
-                              void this.toggle(
-                () => oauth2Service.enablePkce(this.id),
-                msg('Failed to enable PKCE.')
+          ></form-field>
+          <form-field
+            field-id="set-landing"
+            label=${msg('Landing origin')}
+            .value=${this.landing}
+            hint=${msg('Where the user is redirected after login.')}
+            @field-input=${(e: CustomEvent<{ value: string }>) => {
+              this.dirty = true;
+              this.landing = e.detail.value;
+            }}
+          ></form-field>
+          <div class="actions">
+            <ui-button
+              variant="primary"
+              ?loading=${this.saving}
+              @click=${() => void this.saveBasics()}
+            >
+              ${msg('Save')}
+            </ui-button>
+          </div>
+        </section></ui-card
+      >
+      <ui-card
+        ><section>
+          <h2>${msg('Tokens')}</h2>
+          <form-field
+            field-id="set-expiry"
+            label=${msg('Refresh token expiry (seconds)')}
+            type="number"
+            .value=${this.expiryInput}
+            hint=${msg('Leave empty for no expiry.')}
+            @field-input=${(e: CustomEvent<{ value: string }>) => {
+              this.expiryDirty = true;
+              this.expiryInput = e.detail.value;
+            }}
+          ></form-field>
+          <div class="actions">
+            <ui-button
+              variant="secondary"
+              ?disabled=${this.busy}
+              @click=${() => {
+                this.expiryInput = '';
+                this.expiryDirty = true;
+                void this.saveExpiry();
+              }}
+            >
+              ${msg('Clear')}
+            </ui-button>
+            <ui-button
+              variant="primary"
+              ?loading=${this.busy}
+              @click=${() => void this.saveExpiry()}
+            >
+              ${msg('Save')}
+            </ui-button>
+          </div>
+        </section></ui-card
+      >
+      <ui-card
+        ><section>
+          <h2>${msg('Security')}</h2>
+          ${this.renderToggleRow(
+            msg('Strict redirect URI validation'),
+            msg('Only exact redirect origins are accepted.'),
+            detail.strictRedirect,
+            () => {
+              const next = !detail.strictRedirect;
+              void this.toggle(
+                () =>
+                  next
+                    ? oauth2Service.enableStrictRedirect(this.id)
+                    : oauth2Service.disableStrictRedirect(this.id),
+                msg('Failed to update strict redirect validation.')
               );
-            } else {
-              this.pkceConfirmOpen = true;
-            }
-          },
-          this.busy
-        )}
-        ${this.renderToggleRow(
-          msg('Allow localhost redirects'),
-          msg('Permit loopback redirects for native apps.'),
-          detail.localhostRedirect,
-          () => {
-            const next = !detail.localhostRedirect;
-                          void this.toggle(
-              () =>
-                next
-                  ? oauth2Service.enableLocalhostRedirect(this.id)
-                  : oauth2Service.disableLocalhostRedirect(this.id),
-              msg('Failed to update localhost redirects.')
-            );
-          },
-          this.busy
-        )}
-        ${this.renderToggleRow(
-          msg('Legacy crypto'),
-          msg('Allow legacy signing algorithms. Enabling is insecure.'),
-          detail.legacyCrypto,
-          () => {
-            if (detail.legacyCrypto) {
-                              void this.toggle(
-                () => oauth2Service.disableLegacyCrypto(this.id),
-                msg('Failed to disable legacy crypto.')
+            },
+            this.busy
+          )}
+          ${this.renderToggleRow(
+            msg('PKCE'),
+            msg('Proof Key for Code Exchange. Disabling is insecure.'),
+            !detail.pkceDisabled,
+            () => {
+              if (detail.pkceDisabled) {
+                void this.toggle(
+                  () => oauth2Service.enablePkce(this.id),
+                  msg('Failed to enable PKCE.')
+                );
+              } else {
+                this.pkceConfirmOpen = true;
+              }
+            },
+            this.busy
+          )}
+          ${this.renderToggleRow(
+            msg('Allow localhost redirects'),
+            msg('Permit loopback redirects for native apps.'),
+            detail.localhostRedirect,
+            () => {
+              const next = !detail.localhostRedirect;
+              void this.toggle(
+                () =>
+                  next
+                    ? oauth2Service.enableLocalhostRedirect(this.id)
+                    : oauth2Service.disableLocalhostRedirect(this.id),
+                msg('Failed to update localhost redirects.')
               );
-            } else {
-              this.legacyConfirmOpen = true;
-            }
-          },
-          this.busy
-        )}
-        ${this.renderToggleRow(
-          msg('Prefer short username'),
-          msg('Use the name instead of the spn in tokens.'),
-          detail.preferShortUsername,
-          () => {
-            const next = !detail.preferShortUsername;
-                          void this.toggle(
-              () =>
-                next
-                  ? oauth2Service.preferShortUsername(this.id)
-                  : oauth2Service.preferSpnUsername(this.id),
-              msg('Failed to update username preference.')
-            );
-          },
-          this.busy
-        )}
-        ${this.renderToggleRow(
-          msg('Consent prompt'),
-          msg('Ask the user to confirm access on each login.'),
-          detail.consentPrompt,
-          () => {
-            const next = !detail.consentPrompt;
-                          void this.toggle(
-              () =>
-                next
-                  ? oauth2Service.enableConsentPrompt(this.id)
-                  : oauth2Service.disableConsentPrompt(this.id),
-              msg('Failed to update the consent prompt.')
-            );
-          },
-          this.busy
-        )}
-        ${this.renderToggleRow(
-          msg('Device flow'),
-          msg('Allow sign-in on input-limited devices.'),
-          detail.deviceFlow,
-          () => {
-            const next = !detail.deviceFlow;
-                          void this.toggle(
-              () => oauth2Service.setDeviceFlow(this.id, next),
-              msg('Failed to update the device flow.')
-            );
-          },
-          this.busy
-        )}
-      </section></ui-card>
+            },
+            this.busy
+          )}
+          ${this.renderToggleRow(
+            msg('Legacy crypto'),
+            msg('Allow legacy signing algorithms. Enabling is insecure.'),
+            detail.legacyCrypto,
+            () => {
+              if (detail.legacyCrypto) {
+                void this.toggle(
+                  () => oauth2Service.disableLegacyCrypto(this.id),
+                  msg('Failed to disable legacy crypto.')
+                );
+              } else {
+                this.legacyConfirmOpen = true;
+              }
+            },
+            this.busy
+          )}
+          ${this.renderToggleRow(
+            msg('Prefer short username'),
+            msg('Use the name instead of the spn in tokens.'),
+            detail.preferShortUsername,
+            () => {
+              const next = !detail.preferShortUsername;
+              void this.toggle(
+                () =>
+                  next
+                    ? oauth2Service.preferShortUsername(this.id)
+                    : oauth2Service.preferSpnUsername(this.id),
+                msg('Failed to update username preference.')
+              );
+            },
+            this.busy
+          )}
+          ${this.renderToggleRow(
+            msg('Consent prompt'),
+            msg('Ask the user to confirm access on each login.'),
+            detail.consentPrompt,
+            () => {
+              const next = !detail.consentPrompt;
+              void this.toggle(
+                () =>
+                  next
+                    ? oauth2Service.enableConsentPrompt(this.id)
+                    : oauth2Service.disableConsentPrompt(this.id),
+                msg('Failed to update the consent prompt.')
+              );
+            },
+            this.busy
+          )}
+          ${this.renderToggleRow(
+            msg('Device flow'),
+            msg('Allow sign-in on input-limited devices.'),
+            detail.deviceFlow,
+            () => {
+              const next = !detail.deviceFlow;
+              void this.toggle(
+                () => oauth2Service.setDeviceFlow(this.id, next),
+                msg('Failed to update the device flow.')
+              );
+            },
+            this.busy
+          )}
+        </section></ui-card
+      >
       ${this.resetOpen
         ? html`<confirm-dialog
             open
@@ -459,7 +471,7 @@ export class Oauth2SettingsTab extends LitElement {
             )}
             @confirm=${() => {
               this.pkceConfirmOpen = false;
-                              void this.toggle(
+              void this.toggle(
                 () => oauth2Service.disablePkce(this.id),
                 msg('Failed to disable PKCE.')
               );
@@ -480,7 +492,7 @@ export class Oauth2SettingsTab extends LitElement {
             )}
             @confirm=${() => {
               this.legacyConfirmOpen = false;
-                              void this.toggle(
+              void this.toggle(
                 () => oauth2Service.enableLegacyCrypto(this.id),
                 msg('Failed to enable legacy crypto.')
               );

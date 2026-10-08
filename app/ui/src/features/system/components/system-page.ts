@@ -35,7 +35,8 @@ export class SystemPage extends LitElement {
   @state() private deniedNamesAddText = '';
   @state() private badlistBusy = false;
   @state() private deniedNamesBusy = false;
-  @state() private removeTarget: { kind: ListKind; value: string } | null = null;
+  @state() private removeTarget: { kind: ListKind; value: string } | null =
+    null;
   @state() private removeBusy = false;
 
   // Account-policy minimum credential type on idm_all_persons
@@ -71,8 +72,7 @@ export class SystemPage extends LitElement {
     // Separate fetch: a failure here only disables the policy row,
     // never the whole page.
     try {
-      this.credentialMinimum =
-        await domainService.getCredentialTypeMinimum();
+      this.credentialMinimum = await domainService.getCredentialTypeMinimum();
     } catch {
       this.credentialMinimum = null;
     }
@@ -91,7 +91,8 @@ export class SystemPage extends LitElement {
   }
 
   private async submitAppend(kind: ListKind): Promise<void> {
-    const text = kind === 'badlist' ? this.badlistAddText : this.deniedNamesAddText;
+    const text =
+      kind === 'badlist' ? this.badlistAddText : this.deniedNamesAddText;
     const entries = this.parseEntries(text);
     if (entries.length === 0) {
       notificationService.error(msg('Enter at least one entry, one per line.'));
@@ -109,7 +110,9 @@ export class SystemPage extends LitElement {
           : systemService.deniedNamesAppend(entries)
       );
       notificationService.success(
-        msg(str`Added ${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}.`)
+        msg(
+          str`Added ${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}.`
+        )
       );
       if (kind === 'badlist') {
         this.badlistAddText = '';
@@ -238,7 +241,9 @@ export class SystemPage extends LitElement {
           <h2>${msg('Account policy')}</h2>
           <div class="toggle-row">
             <div class="toggle-text">
-              <span class="toggle-label">${msg('Mandatory two-factor authentication')}</span>
+              <span class="toggle-label"
+                >${msg('Mandatory two-factor authentication')}</span
+              >
               <span class="muted">
                 ${msg(
                   'Applies to all persons. While enabled, password-only credentials cannot be saved: MFA (TOTP or passkey) is required. Turning it off allows password-only logins.'
@@ -250,7 +255,8 @@ export class SystemPage extends LitElement {
                 type="checkbox"
                 .checked=${this.credentialMinimum !== null &&
                 this.credentialMinimum !== 'any'}
-                ?disabled=${this.credentialBusy || this.credentialMinimum === null}
+                ?disabled=${this.credentialBusy ||
+                this.credentialMinimum === null}
                 @change=${(e: Event) =>
                   void this.saveCredentialPolicy(
                     (e.target as HTMLInputElement).checked
@@ -281,7 +287,9 @@ export class SystemPage extends LitElement {
         <ui-card>
           <h2>${msg('Denied names')}</h2>
           <p class="description">
-            ${msg('Names in this list cannot be used for persons, groups, or accounts.')}
+            ${msg(
+              'Names in this list cannot be used for persons, groups, or accounts.'
+            )}
           </p>
           ${this.renderAddForm('deniedNames')}
           <data-table

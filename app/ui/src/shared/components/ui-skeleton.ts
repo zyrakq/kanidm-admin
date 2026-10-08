@@ -16,7 +16,9 @@ export class UiSkeleton extends LitElement {
       (_, i) =>
         html`<div
           class="bar"
-          style="width:${this.lines > 1 && i === this.lines - 1 ? '60%' : this.width};height:${this.height}"
+          style="width:${this.lines > 1 && i === this.lines - 1
+            ? '60%'
+            : this.width};height:${this.height}"
         ></div>`
     )}`;
   }

@@ -69,11 +69,7 @@ export async function apiFetch<T>(
       headers,
     });
   } catch {
-    throw new ApiError(
-      'kanidm_unreachable',
-      'Network request failed.',
-      0
-    );
+    throw new ApiError('kanidm_unreachable', 'Network request failed.', 0);
   }
 
   if (!response.ok) {

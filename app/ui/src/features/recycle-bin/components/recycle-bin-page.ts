@@ -91,8 +91,7 @@ export class RecycleBinPage extends LitElement {
       {
         key: 'id',
         header: msg('Name'),
-        render: (row) =>
-          html`<span class="mono">${String(row.id)}</span>`,
+        render: (row) => html`<span class="mono">${String(row.id)}</span>`,
       },
       {
         key: 'uuid',

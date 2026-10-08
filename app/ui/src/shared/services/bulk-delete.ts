@@ -30,7 +30,10 @@ export interface BulkDeleteResponse {
   results: BulkItemResult[];
 }
 
-export function bulkDelete(kind: BulkKind, ids: string[]): Promise<BulkDeleteResponse> {
+export function bulkDelete(
+  kind: BulkKind,
+  ids: string[]
+): Promise<BulkDeleteResponse> {
   return apiFetch<BulkDeleteResponse>('/api/bulk-delete', {
     method: 'POST',
     body: JSON.stringify({ kind, ids }),

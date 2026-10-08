@@ -54,7 +54,10 @@ export class ServiceAccountDetailPage extends LitElement {
     try {
       this.sa = await serviceAccountService.get(this.id);
     } catch (error) {
-      if (error instanceof ApiError && (error.code === 'not_found' || error.status === 404)) {
+      if (
+        error instanceof ApiError &&
+        (error.code === 'not_found' || error.status === 404)
+      ) {
         this.notFound = true;
       } else {
         notificationService.error(

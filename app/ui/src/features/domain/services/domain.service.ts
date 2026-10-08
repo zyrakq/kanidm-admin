@@ -66,13 +66,10 @@ class DomainService {
 
   /** Toggle account recovery (vendor idm_set_domain_allow_account_recovery). */
   async setAllowAccountRecovery(allow: boolean): Promise<void> {
-    await apiFetch<void>(
-      `${BASE}/domain/_attr/domain_allow_account_recovery`,
-      {
-        method: 'PUT',
-        body: JSON.stringify([allow ? 'true' : 'false']),
-      }
-    );
+    await apiFetch<void>(`${BASE}/domain/_attr/domain_allow_account_recovery`, {
+      method: 'PUT',
+      body: JSON.stringify([allow ? 'true' : 'false']),
+    });
   }
 
   /** Set max queryable LDAP attrs (vendor idm_domain_set_ldap_max_queryable_attrs). */

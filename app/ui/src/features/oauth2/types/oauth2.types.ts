@@ -84,7 +84,11 @@ function toClaimMap(value: string): ClaimMap {
   }
   const second = value.indexOf(':', first + 1);
   if (second === -1) {
-    return { claim: value.slice(0, first), group: value.slice(first + 1), values: [] };
+    return {
+      claim: value.slice(0, first),
+      group: value.slice(first + 1),
+      values: [],
+    };
   }
   return {
     claim: value.slice(0, first),
@@ -113,7 +117,8 @@ export function toOauth2RsSummary(entry: KanidmEntry): Oauth2RsSummary {
     id: attrFirst(entry, 'name') ?? attrFirst(entry, 'uuid') ?? '',
     displayName: attrFirst(entry, 'displayname') ?? '',
     origin: attrFirst(entry, 'oauth2_rs_origin') ?? null,
-    isPublic: entry.attrs['class']?.includes('oauth2_resource_server_public') ?? false,
+    isPublic:
+      entry.attrs['class']?.includes('oauth2_resource_server_public') ?? false,
   };
 }
 
@@ -126,7 +131,8 @@ export function toOauth2RsDetail(entry: KanidmEntry): Oauth2RsDetail {
     displayName: attrFirst(entry, 'displayname') ?? '',
     origins: attrList(entry, 'oauth2_rs_origin'),
     landingOrigin: attrFirst(entry, 'oauth2_rs_origin_landing') ?? null,
-    isPublic: entry.attrs['class']?.includes('oauth2_resource_server_public') ?? false,
+    isPublic:
+      entry.attrs['class']?.includes('oauth2_resource_server_public') ?? false,
     basicSecretPresent: hasAttr(entry, 'oauth2_rs_basic_secret'),
     pkceDisabled: hasAttr(entry, 'oauth2_allow_insecure_client_disable_pkce'),
     strictRedirect: isTrue(entry, 'oauth2_strict_redirect_uri'),

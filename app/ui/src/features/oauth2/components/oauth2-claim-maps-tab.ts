@@ -98,7 +98,10 @@ export class Oauth2ClaimMapsTab extends LitElement {
     }
   }
 
-  private async setJoin(claim: string, join: Oauth2ClaimMapJoin): Promise<void> {
+  private async setJoin(
+    claim: string,
+    join: Oauth2ClaimMapJoin
+  ): Promise<void> {
     if (this.busy) return;
     this.busy = true;
     try {
@@ -142,9 +145,21 @@ export class Oauth2ClaimMapsTab extends LitElement {
 
   private renderClaimTable(maps: ClaimMap[]) {
     const columns: TableColumn[] = [
-      { key: 'claim', header: msg('Claim'), render: (row) => this.mono(String(row.claim)) },
-      { key: 'group', header: msg('Group'), render: (row) => this.mono(String(row.group)) },
-      { key: 'values', header: msg('Values'), render: (row) => this.mono(String(row.values)) },
+      {
+        key: 'claim',
+        header: msg('Claim'),
+        render: (row) => this.mono(String(row.claim)),
+      },
+      {
+        key: 'group',
+        header: msg('Group'),
+        render: (row) => this.mono(String(row.group)),
+      },
+      {
+        key: 'values',
+        header: msg('Values'),
+        render: (row) => this.mono(String(row.values)),
+      },
       {
         key: 'join',
         header: msg('Join'),
@@ -158,7 +173,10 @@ export class Oauth2ClaimMapsTab extends LitElement {
               ?disabled=${this.busy}
               .options=${JOIN_OPTIONS}
               @field-input=${(e: CustomEvent<{ value: string }>) => {
-                void this.setJoin(map.claim, e.detail.value as Oauth2ClaimMapJoin);
+                void this.setJoin(
+                  map.claim,
+                  e.detail.value as Oauth2ClaimMapJoin
+                );
               }}
             ></form-field>
           `;

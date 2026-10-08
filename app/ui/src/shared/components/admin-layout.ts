@@ -21,14 +21,20 @@ export class AdminLayout extends LitElement {
     super.connectedCallback();
     document.addEventListener('keydown', this.handleKeyDown);
     this.mq.addEventListener('change', this.handleBreakpointChange);
-    window.addEventListener('session-drawer-open', this.handleSessionDrawerOpen);
+    window.addEventListener(
+      'session-drawer-open',
+      this.handleSessionDrawerOpen
+    );
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener('keydown', this.handleKeyDown);
     this.mq.removeEventListener('change', this.handleBreakpointChange);
-    window.removeEventListener('session-drawer-open', this.handleSessionDrawerOpen);
+    window.removeEventListener(
+      'session-drawer-open',
+      this.handleSessionDrawerOpen
+    );
     document.body.style.overflow = '';
   }
 
@@ -143,7 +149,9 @@ export class AdminLayout extends LitElement {
         visibility: visible;
       }
       .layout.drawer-animated .sidebar {
-        transition: transform 0.3s ease, visibility 0s linear 0.3s;
+        transition:
+          transform 0.3s ease,
+          visibility 0s linear 0.3s;
       }
       .layout.drawer-animated.drawer-open .sidebar {
         transition: transform 0.3s ease;

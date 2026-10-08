@@ -15,18 +15,26 @@ export class UiQr extends LitElement {
   @property({ attribute: 'copy-label' }) copyLabel = '';
 
   private handleCopy(): void {
-    this.dispatchEvent(new CustomEvent('copy', { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent('copy', { bubbles: true, composed: true })
+    );
   }
 
   render() {
     return html`
-      <div class="collapse" aria-hidden=${this.open ? 'false' : 'true'} ?inert=${!this.open}>
+      <div
+        class="collapse"
+        aria-hidden=${this.open ? 'false' : 'true'}
+        ?inert=${!this.open}
+      >
         <div class="inner">
           <div class="panel">
             <div class="tile">
               <img class="img" src=${this.src} alt=${this.alt} />
             </div>
-            <ui-button icon="copy" @click=${this.handleCopy}>${this.copyLabel}</ui-button>
+            <ui-button icon="copy" @click=${this.handleCopy}
+              >${this.copyLabel}</ui-button
+            >
           </div>
         </div>
       </div>

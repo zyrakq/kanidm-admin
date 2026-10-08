@@ -90,30 +90,28 @@ export class LocaleBottomSheet extends LitElement {
         <div class="sheet-handle" aria-hidden="true"></div>
         <div class="sheet-header">${msg('Select language')}</div>
         <div class="sheet-list" role="listbox">
-          ${this.locales.map(
-            (locale) => {
-              const isActive = locale.code === this.locale.locale;
-              return html`
-                <button
-                  class="sheet-item ${isActive ? 'active' : ''}"
-                  type="button"
-                  role="option"
-                  aria-selected=${isActive ? 'true' : 'false'}
-                  @click=${() => void this.selectLocale(locale.code)}
-                >
-                  <span class="sheet-flag">${locale.flag}</span>
-                  <span class="sheet-name">${locale.name}</span>
-                  ${isActive
-                    ? html`<ui-icon
-                        name="check"
-                        size="16"
-                        class="sheet-check"
-                      ></ui-icon>`
-                    : nothing}
-                </button>
-              `;
-            }
-          )}
+          ${this.locales.map((locale) => {
+            const isActive = locale.code === this.locale.locale;
+            return html`
+              <button
+                class="sheet-item ${isActive ? 'active' : ''}"
+                type="button"
+                role="option"
+                aria-selected=${isActive ? 'true' : 'false'}
+                @click=${() => void this.selectLocale(locale.code)}
+              >
+                <span class="sheet-flag">${locale.flag}</span>
+                <span class="sheet-name">${locale.name}</span>
+                ${isActive
+                  ? html`<ui-icon
+                      name="check"
+                      size="16"
+                      class="sheet-check"
+                    ></ui-icon>`
+                  : nothing}
+              </button>
+            `;
+          })}
         </div>
       </div>
     `;

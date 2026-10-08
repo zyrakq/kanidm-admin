@@ -38,30 +38,30 @@ export class AppHeader extends LitElement {
     return html`
       <header>
         <div class="header-content">
-          ${
-            this.burger
-              ? html`
-                  <button
-                    class="burger-btn"
-                    type="button"
-                    aria-label=${this.drawerOpen ? msg('Close menu') : msg('Open menu')}
-                    aria-expanded=${this.drawerOpen}
-                    @click=${() =>
-                      this.dispatchEvent(
-                        new CustomEvent('admin-drawer-toggle', {
-                          bubbles: true,
-                          composed: true,
-                        })
-                      )}
-                  >
-                    <ui-icon
-                      name=${this.drawerOpen ? 'x' : 'menu'}
-                      size="22"
-                    ></ui-icon>
-                  </button>
-                `
-              : nothing
-          }
+          ${this.burger
+            ? html`
+                <button
+                  class="burger-btn"
+                  type="button"
+                  aria-label=${this.drawerOpen
+                    ? msg('Close menu')
+                    : msg('Open menu')}
+                  aria-expanded=${this.drawerOpen}
+                  @click=${() =>
+                    this.dispatchEvent(
+                      new CustomEvent('admin-drawer-toggle', {
+                        bubbles: true,
+                        composed: true,
+                      })
+                    )}
+                >
+                  <ui-icon
+                    name=${this.drawerOpen ? 'x' : 'menu'}
+                    size="22"
+                  ></ui-icon>
+                </button>
+              `
+            : nothing}
           <div class="left-cluster">
             <img src=${logo} alt="Kanidm Logo" class="logo" />
             <span class="app-name">${msg('Kanidm Admin')}</span>

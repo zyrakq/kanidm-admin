@@ -90,7 +90,9 @@ export class KanidmStatusService {
     this.lastKnown = { ...status };
     // Push to every subscriber (version banner) instead of each
     // component polling /api/status on its own.
-    window.dispatchEvent(new CustomEvent(KanidmStatusService.STATUS_EVENT, { detail: status }));
+    window.dispatchEvent(
+      new CustomEvent(KanidmStatusService.STATUS_EVENT, { detail: status })
+    );
     return status;
   }
 }

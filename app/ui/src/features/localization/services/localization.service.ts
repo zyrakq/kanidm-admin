@@ -81,7 +81,7 @@ class LocalizationService {
       (navigator as unknown as { userLanguage?: string }).userLanguage ||
       '';
 
-    if (allLocales.includes(browserLang as any)) {
+    if ((allLocales as readonly string[]).includes(browserLang)) {
       return browserLang as LocaleCode;
     }
 

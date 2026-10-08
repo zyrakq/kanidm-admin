@@ -117,14 +117,20 @@ export class DataTable extends LitElement {
     }
     return this.rows.filter((row) =>
       this.columns.some((column) =>
-        String(row[column.key] ?? '').toLowerCase().includes(this.searchTerm)
+        String(row[column.key] ?? '')
+          .toLowerCase()
+          .includes(this.searchTerm)
       )
     );
   }
 
   private handleRowClick(row: Record<string, unknown>): void {
     this.dispatchEvent(
-      new CustomEvent('row-click', { detail: { row }, bubbles: true, composed: true })
+      new CustomEvent('row-click', {
+        detail: { row },
+        bubbles: true,
+        composed: true,
+      })
     );
   }
 
@@ -148,9 +154,8 @@ export class DataTable extends LitElement {
       }
     }
     // Lit can't bind the indeterminate state declaratively.
-    const selectAll = this.renderRoot.querySelector<HTMLInputElement>(
-      '.select-all'
-    );
+    const selectAll =
+      this.renderRoot.querySelector<HTMLInputElement>('.select-all');
     if (selectAll) {
       const filtered = this.visibleRows();
       const selectedCount = filtered.filter((row) =>
@@ -228,11 +233,12 @@ export class DataTable extends LitElement {
           <tbody>
             ${this.loading
               ? [0, 1, 2].map(
-                  () => html`<tr class="skeleton-row">
-                    <td colspan=${colCount}>
-                      <ui-skeleton height="16px"></ui-skeleton>
-                    </td>
-                  </tr>`
+                  () =>
+                    html`<tr class="skeleton-row">
+                      <td colspan=${colCount}>
+                        <ui-skeleton height="16px"></ui-skeleton>
+                      </td>
+                    </tr>`
                 )
               : filtered.length === 0
                 ? html`<tr class="state-row">
@@ -242,7 +248,10 @@ export class DataTable extends LitElement {
                   </tr>`
                 : pageRows.map(
                     (row) => html`
-                      <tr class="data-row" @click=${() => this.handleRowClick(row)}>
+                      <tr
+                        class="data-row"
+                        @click=${() => this.handleRowClick(row)}
+                      >
                         ${this.selectable
                           ? html`<td
                               class="col-select"
@@ -251,7 +260,9 @@ export class DataTable extends LitElement {
                               <input
                                 type="checkbox"
                                 .checked=${this.selected.has(this.rowId(row))}
-                                aria-label=${msg(str`Select ${this.rowId(row)}`)}
+                                aria-label=${msg(
+                                  str`Select ${this.rowId(row)}`
+                                )}
                                 @change=${(e: Event) =>
                                   this.toggleRowSelection(
                                     row,
@@ -261,7 +272,8 @@ export class DataTable extends LitElement {
                             </td>`
                           : nothing}
                         ${this.columns.map(
-                          (column) => html`<td>${this.renderCell(row, column)}</td>`
+                          (column) =>
+                            html`<td>${this.renderCell(row, column)}</td>`
                         )}
                       </tr>
                     `

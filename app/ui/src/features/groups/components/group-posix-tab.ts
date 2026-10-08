@@ -53,7 +53,8 @@ export class GroupPosixTab extends LitElement {
 
   private async savePosix(): Promise<void> {
     if (this.saving) return;
-    const gid = this.gidnumber.trim() === '' ? undefined : Number(this.gidnumber);
+    const gid =
+      this.gidnumber.trim() === '' ? undefined : Number(this.gidnumber);
     if (gid !== undefined && Number.isNaN(gid)) {
       notificationService.error(msg('GID number must be a number.'));
       return;

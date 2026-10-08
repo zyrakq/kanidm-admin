@@ -74,7 +74,10 @@ export class PersonListPage extends LitElement {
     this.createBusy = true;
     try {
       await authService.withStepUp(() =>
-        personService.create(this.createId.trim(), this.createDisplayName.trim())
+        personService.create(
+          this.createId.trim(),
+          this.createDisplayName.trim()
+        )
       );
       notificationService.success(
         msg(str`Created person ${this.createId.trim()}`)
@@ -114,13 +117,18 @@ export class PersonListPage extends LitElement {
     this.bulkBusy = true;
     try {
       const response = await authService.withStepUp(() =>
-        bulkDelete('person', targets.map((target) => target.id))
+        bulkDelete(
+          'person',
+          targets.map((target) => target.id)
+        )
       );
       const failures = response.results
         .filter((result) => !result.ok)
         .map((result) => `${result.id}: ${friendlyDeleteFailure(result)}`);
       if (failures.length === 0) {
-        notificationService.success(msg(str`Deleted ${response.deleted} entries`));
+        notificationService.success(
+          msg(str`Deleted ${response.deleted} entries`)
+        );
       } else {
         notificationService.error(
           msg(
@@ -142,8 +150,7 @@ export class PersonListPage extends LitElement {
       {
         key: 'id',
         header: msg('Name'),
-        render: (row) =>
-          html`<span class="mono">${String(row.id)}</span>`,
+        render: (row) => html`<span class="mono">${String(row.id)}</span>`,
       },
       { key: 'displayName', header: msg('Display name') },
       {
@@ -194,9 +201,7 @@ export class PersonListPage extends LitElement {
           .selectable=${true}
           .emptyMessage=${msg('No persons found.')}
           @row-click=${(e: CustomEvent<{ row: PersonSummary }>) =>
-            navigate(
-              `/admin/persons/${encodeURIComponent(e.detail.row.id)}`
-            )}
+            navigate(`/admin/persons/${encodeURIComponent(e.detail.row.id)}`)}
           @bulk-delete=${(e: CustomEvent<{ rows: PersonSummary[] }>) =>
             (this.bulkTargets = e.detail.rows)}
         ></data-table>
@@ -255,7 +260,6 @@ export class PersonListPage extends LitElement {
               ></confirm-dialog>
             `
           : nothing}
-
         ${this.bulkTargets
           ? html`
               <confirm-dialog

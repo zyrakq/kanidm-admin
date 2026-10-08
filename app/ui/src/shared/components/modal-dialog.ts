@@ -67,8 +67,17 @@ export class ModalDialog extends LitElement {
       return nothing;
     }
     return html`
-      <div class="overlay" @click=${this.handleOverlayClick} role="presentation">
-        <div class="card" role="dialog" aria-modal="true" aria-label=${this.heading}>
+      <div
+        class="overlay"
+        @click=${this.handleOverlayClick}
+        role="presentation"
+      >
+        <div
+          class="card"
+          role="dialog"
+          aria-modal="true"
+          aria-label=${this.heading}
+        >
           <div class="card-header">
             <span class="card-title">${this.heading}</span>
             <button

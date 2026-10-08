@@ -130,13 +130,18 @@ export class Oauth2ListPage extends LitElement {
     this.bulkBusy = true;
     try {
       const response = await authService.withStepUp(() =>
-        bulkDelete('oauth2', targets.map((target) => target.id))
+        bulkDelete(
+          'oauth2',
+          targets.map((target) => target.id)
+        )
       );
       const failures = response.results
         .filter((result) => !result.ok)
         .map((result) => `${result.id}: ${friendlyDeleteFailure(result)}`);
       if (failures.length === 0) {
-        notificationService.success(msg(str`Deleted ${response.deleted} entries`));
+        notificationService.success(
+          msg(str`Deleted ${response.deleted} entries`)
+        );
       } else {
         notificationService.error(
           msg(
@@ -172,7 +177,9 @@ export class Oauth2ListPage extends LitElement {
         key: 'origin',
         header: msg('Origin'),
         render: (row) =>
-          row.origin ? html`<span class="mono">${String(row.origin)}</span>` : '—',
+          row.origin
+            ? html`<span class="mono">${String(row.origin)}</span>`
+            : '—',
       },
       {
         key: 'isPublic',
@@ -224,9 +231,7 @@ export class Oauth2ListPage extends LitElement {
           .selectable=${true}
           .emptyMessage=${msg('No OAuth2 clients found.')}
           @row-click=${(e: CustomEvent<{ row: Oauth2RsSummary }>) =>
-            navigate(
-              `/admin/oauth2/${encodeURIComponent(e.detail.row.id)}`
-            )}
+            navigate(`/admin/oauth2/${encodeURIComponent(e.detail.row.id)}`)}
           @bulk-delete=${(e: CustomEvent<{ rows: Oauth2RsSummary[] }>) =>
             (this.bulkTargets = e.detail.rows)}
         ></data-table>
@@ -303,7 +308,6 @@ export class Oauth2ListPage extends LitElement {
               ></confirm-dialog>
             `
           : nothing}
-
         ${this.bulkTargets
           ? html`
               <confirm-dialog

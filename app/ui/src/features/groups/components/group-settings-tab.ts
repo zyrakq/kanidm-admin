@@ -202,7 +202,7 @@ export class GroupSettingsTab extends LitElement {
             .busy=${this.renaming}
             confirmLabel=${msg('Rename')}
             message=${msg(
-              'Renaming changes the group\'s name id. Memberships and references keep working, but the group will be reachable under the new name and the current URL becomes invalid. Continue?'
+              "Renaming changes the group's name id. Memberships and references keep working, but the group will be reachable under the new name and the current URL becomes invalid. Continue?"
             )}
             @confirm=${() => void this.confirmRename()}
             @cancel=${() => {

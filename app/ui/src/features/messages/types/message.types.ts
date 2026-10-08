@@ -114,7 +114,9 @@ export function toMessageSummary(entry: ScimEntryMessageWire): MessageSummary {
     displayName: templateDisplayName(entry.message_template),
     sendAfter: entry.send_after,
     sentAt: entry.sent_at,
-    mailDestination: entry.mail_destination.map((mail) => mail.value).join(', '),
+    mailDestination: entry.mail_destination
+      .map((mail) => mail.value)
+      .join(', '),
   };
 }
 

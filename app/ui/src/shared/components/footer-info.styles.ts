@@ -11,7 +11,9 @@ export const footerInfoStyles = css`
     border-top: 1px solid var(--theme-color-border);
     color: var(--theme-color-text-secondary);
     font-size: 0.875rem;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .toolbar {

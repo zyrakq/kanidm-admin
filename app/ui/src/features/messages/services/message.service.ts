@@ -35,7 +35,9 @@ class MessageService {
 
   /** List messages ready to send (GET /scim/v1/Message/_ready, vendor idm_message_list_ready). */
   async listReady(): Promise<MessageSummary[]> {
-    const envelope = await apiFetch<ScimListMessageWire>(`${BASE}/Message/_ready`);
+    const envelope = await apiFetch<ScimListMessageWire>(
+      `${BASE}/Message/_ready`
+    );
     return envelope.resources.map(toMessageSummary);
   }
 
@@ -49,10 +51,10 @@ class MessageService {
 
   /** Mark a message as sent (POST /scim/v1/Message/{uuid}/_sent, vendor idm_message_mark_sent, empty body). */
   async markSent(uuid: string): Promise<void> {
-    await apiFetch<void>(
-      `${BASE}/Message/${encodeURIComponent(uuid)}/_sent`,
-      { method: 'POST', body: 'null' }
-    );
+    await apiFetch<void>(`${BASE}/Message/${encodeURIComponent(uuid)}/_sent`, {
+      method: 'POST',
+      body: 'null',
+    });
   }
 
   /**

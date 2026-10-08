@@ -15,7 +15,9 @@ export class UiEmptyState extends LitElement {
     return html`
       <div class="wrap">
         ${this.icon
-          ? html`<div class="icon"><ui-icon name=${this.icon} size="22"></ui-icon></div>`
+          ? html`<div class="icon">
+              <ui-icon name=${this.icon} size="22"></ui-icon>
+            </div>`
           : nothing}
         ${this.heading ? html`<p class="heading">${this.heading}</p>` : nothing}
         <p class="text"><slot></slot></p>

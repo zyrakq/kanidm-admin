@@ -1,6 +1,9 @@
 import { LitElement, html } from 'lit';
 import { customElement, state, query } from 'lit/decorators.js';
-import type { Notification } from '../types/notification.types.ts';
+import type {
+  Notification,
+  NotificationType,
+} from '../types/notification.types.ts';
 import './toast-notification.ts';
 import './notification-modal.ts';
 import { toastContainerStyles } from './toast-container.styles';
@@ -259,11 +262,11 @@ export class ToastContainer extends LitElement {
   private handleOpenModal = (event: Event) => {
     const customEvent = event as CustomEvent<{
       message: string;
-      type: string;
+      type: NotificationType;
     }>;
     if (this.modal) {
       this.modal.message = customEvent.detail.message;
-      this.modal.type = customEvent.detail.type as any;
+      this.modal.type = customEvent.detail.type;
       this.modal.open();
     }
   };

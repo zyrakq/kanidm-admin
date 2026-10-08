@@ -70,10 +70,7 @@ export interface CredentialStatusView {
 }
 
 /** Session state (UatStatusState, lowercase externally-tagged enum). */
-export type UatStatusState =
-  | { expiresat: number }
-  | 'neverexpires'
-  | 'revoked';
+export type UatStatusState = { expiresat: number } | 'neverexpires' | 'revoked';
 
 /** Session purpose (UatPurposeStatus, lowercase enum). */
 export type UatPurposeStatus = 'readonly' | 'readwrite' | 'privilegecapable';

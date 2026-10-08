@@ -25,7 +25,11 @@ export class TabBar extends LitElement {
   private select(id: string): void {
     if (id !== this.active) {
       this.dispatchEvent(
-        new CustomEvent('tab-change', { detail: { id }, bubbles: true, composed: true })
+        new CustomEvent('tab-change', {
+          detail: { id },
+          bubbles: true,
+          composed: true,
+        })
       );
     }
   }
@@ -112,7 +116,11 @@ export class TabBar extends LitElement {
     if (changed.has('active')) {
       this.renderRoot
         .querySelector<HTMLButtonElement>('.tab.active')
-        ?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
+        ?.scrollIntoView({
+          inline: 'nearest',
+          block: 'nearest',
+          behavior: 'smooth',
+        });
     }
   }
 

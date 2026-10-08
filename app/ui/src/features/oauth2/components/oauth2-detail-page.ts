@@ -52,11 +52,16 @@ export class Oauth2DetailPage extends LitElement {
     try {
       this.detail = await oauth2Service.get(this.id);
     } catch (error) {
-      if (error instanceof ApiError && (error.code === 'not_found' || error.status === 404)) {
+      if (
+        error instanceof ApiError &&
+        (error.code === 'not_found' || error.status === 404)
+      ) {
         this.notFound = true;
       } else {
         notificationService.error(
-          error instanceof ApiError ? error.message : msg('Failed to load client')
+          error instanceof ApiError
+            ? error.message
+            : msg('Failed to load client')
         );
       }
     } finally {
@@ -95,9 +100,13 @@ export class Oauth2DetailPage extends LitElement {
       case 'origins':
         return html`<oauth2-origins-tab .id=${this.id}></oauth2-origins-tab>`;
       case 'scope-maps':
-        return html`<oauth2-scope-maps-tab .id=${this.id}></oauth2-scope-maps-tab>`;
+        return html`<oauth2-scope-maps-tab
+          .id=${this.id}
+        ></oauth2-scope-maps-tab>`;
       case 'claim-maps':
-        return html`<oauth2-claim-maps-tab .id=${this.id}></oauth2-claim-maps-tab>`;
+        return html`<oauth2-claim-maps-tab
+          .id=${this.id}
+        ></oauth2-claim-maps-tab>`;
       case 'image':
         return html`<oauth2-image-tab .id=${this.id}></oauth2-image-tab>`;
       case 'keys':

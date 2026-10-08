@@ -200,7 +200,12 @@ export class SaSshTab extends LitElement {
             ? html`<p class="error" role="alert">${this.formError}</p>`
             : nothing}
           <div class="form-actions">
-            <ui-button type="submit" variant="primary" icon="plus" ?loading=${this.busy}>
+            <ui-button
+              type="submit"
+              variant="primary"
+              icon="plus"
+              ?loading=${this.busy}
+            >
               ${msg('Add Key')}
             </ui-button>
           </div>

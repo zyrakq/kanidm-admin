@@ -66,7 +66,9 @@ export class GroupMembersTab extends LitElement {
     if (!name || this.adding) return;
     this.adding = true;
     try {
-      await authService.withStepUp(() => groupService.addMembers(this.id, [name]));
+      await authService.withStepUp(() =>
+        groupService.addMembers(this.id, [name])
+      );
       notificationService.success(msg('Member added.'));
       this.newMember = '';
       this.emitChanged();
@@ -85,7 +87,9 @@ export class GroupMembersTab extends LitElement {
       .filter((line) => line !== '');
     this.setting = true;
     try {
-      await authService.withStepUp(() => groupService.setMembers(this.id, members));
+      await authService.withStepUp(() =>
+        groupService.setMembers(this.id, members)
+      );
       notificationService.success(msg('Members updated.'));
       this.emitChanged();
     } catch {

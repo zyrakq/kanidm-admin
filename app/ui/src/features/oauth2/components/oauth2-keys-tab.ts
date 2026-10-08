@@ -52,7 +52,9 @@ export class Oauth2KeysTab extends LitElement {
       const rotateAt = this.rotateAt.trim();
       const iso =
         rotateAt !== '' ? toRfc3339(rotateAt) : toRfc3339(nowLocalInput());
-      await authService.withStepUp(() => oauth2Service.rotateKeys(this.id, iso));
+      await authService.withStepUp(() =>
+        oauth2Service.rotateKeys(this.id, iso)
+      );
       this.rotateOpen = false;
       notificationService.success(msg('Key rotation scheduled.'));
     } catch {
@@ -67,7 +69,9 @@ export class Oauth2KeysTab extends LitElement {
     if (!keyId || this.revoking) return;
     this.revoking = true;
     try {
-      await authService.withStepUp(() => oauth2Service.revokeKey(this.id, keyId));
+      await authService.withStepUp(() =>
+        oauth2Service.revokeKey(this.id, keyId)
+      );
       this.revokeOpen = false;
       this.keyId = '';
       notificationService.success(msg('Key revoked.'));

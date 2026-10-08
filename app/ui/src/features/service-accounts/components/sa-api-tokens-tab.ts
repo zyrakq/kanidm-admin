@@ -245,8 +245,7 @@ export class SaApiTokensTab extends LitElement {
                 variant="danger-ghost"
                 ?disabled=${this.revokingId !== null}
                 ?loading=${this.revokingId === row.token_id}
-                @click=${() =>
-                  this.revoke(row as unknown as ApiTokenView)}
+                @click=${() => this.revoke(row as unknown as ApiTokenView)}
               >
                 ${this.revokingId === row.token_id
                   ? msg('Revoking...')

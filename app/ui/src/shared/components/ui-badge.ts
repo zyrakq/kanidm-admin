@@ -3,7 +3,13 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-export type BadgeVariant = 'neutral' | 'primary' | 'success' | 'error' | 'warning' | 'info';
+export type BadgeVariant =
+  | 'neutral'
+  | 'primary'
+  | 'success'
+  | 'error'
+  | 'warning'
+  | 'info';
 
 @customElement('ui-badge')
 export class UiBadge extends LitElement {

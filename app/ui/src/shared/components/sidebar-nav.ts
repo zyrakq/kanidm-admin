@@ -7,7 +7,10 @@ import { customElement, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { authService } from '@/features/auth';
-import { visibleSections, type SectionDef } from '@/shared/access/section-access';
+import {
+  visibleSections,
+  type SectionDef,
+} from '@/shared/access/section-access';
 import type { IconName } from './ui-icon';
 import './ui-icon';
 
@@ -61,7 +64,9 @@ export class SidebarNav extends LitElement {
         ${this.sections.map(
           (section) => html`
             <a
-              class="item ${this.activePath.startsWith(section.href) ? 'active' : ''}"
+              class="item ${this.activePath.startsWith(section.href)
+                ? 'active'
+                : ''}"
               href=${section.href}
               @click=${() => {
                 this.navigate();

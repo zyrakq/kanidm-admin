@@ -17,7 +17,9 @@ export const themeTogglerStyles = css`
     align-items: center;
     justify-content: center;
     color: var(--theme-color-primary);
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
     font-family: inherit;
   }
 

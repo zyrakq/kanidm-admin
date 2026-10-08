@@ -8,7 +8,10 @@ export interface KanidmEntry {
 }
 
 /** First value of an attribute, or undefined. */
-export function attrFirst(entry: KanidmEntry, attr: string): string | undefined {
+export function attrFirst(
+  entry: KanidmEntry,
+  attr: string
+): string | undefined {
   return entry.attrs[attr]?.[0];
 }
 
@@ -23,8 +26,8 @@ export function hasAttr(entry: KanidmEntry, attr: string): boolean {
 }
 
 /** Build the PATCH/POST entry body kanidm expects: { attrs: {...} }. */
-export function entryBody(
-  attrs: Record<string, string[]>
-): { attrs: Record<string, string[]> } {
+export function entryBody(attrs: Record<string, string[]>): {
+  attrs: Record<string, string[]>;
+} {
   return { attrs };
 }

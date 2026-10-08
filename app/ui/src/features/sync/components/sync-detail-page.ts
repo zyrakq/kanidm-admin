@@ -71,11 +71,16 @@ export class SyncDetailPage extends LitElement {
       this.portalInput = this.detail.credentialPortal ?? '';
       this.yieldInput = this.detail.yieldAttributes.join('\n');
     } catch (error) {
-      if (error instanceof ApiError && (error.code === 'not_found' || error.status === 404)) {
+      if (
+        error instanceof ApiError &&
+        (error.code === 'not_found' || error.status === 404)
+      ) {
         this.notFound = true;
       } else {
         notificationService.error(
-          error instanceof ApiError ? error.message : msg('Failed to load sync account')
+          error instanceof ApiError
+            ? error.message
+            : msg('Failed to load sync account')
         );
       }
     } finally {
@@ -167,7 +172,9 @@ export class SyncDetailPage extends LitElement {
   private async destroyToken(): Promise<void> {
     this.destroyTokenBusy = true;
     try {
-      await authService.withStepUp(() => syncAccountService.destroyToken(this.id));
+      await authService.withStepUp(() =>
+        syncAccountService.destroyToken(this.id)
+      );
       notificationService.success(msg('Sync token destroyed.'));
       this.revealedToken = null;
       this.confirmKind = null;
@@ -183,7 +190,9 @@ export class SyncDetailPage extends LitElement {
   private async forceRefresh(): Promise<void> {
     this.refreshBusy = true;
     try {
-      await authService.withStepUp(() => syncAccountService.forceRefresh(this.id));
+      await authService.withStepUp(() =>
+        syncAccountService.forceRefresh(this.id)
+      );
       notificationService.success(msg('Force refresh requested.'));
     } catch (error) {
       this.toastError(error, msg('Failed to force refresh'));
@@ -234,12 +243,16 @@ export class SyncDetailPage extends LitElement {
       if (kind === 'destroy-token') {
         await this.destroyToken();
       } else if (kind === 'finalise') {
-        await authService.withStepUp(() => syncAccountService.finalise(this.id));
+        await authService.withStepUp(() =>
+          syncAccountService.finalise(this.id)
+        );
         notificationService.success(msg('Sync account finalised.'));
         this.confirmKind = null;
         await this.load();
       } else {
-        await authService.withStepUp(() => syncAccountService.terminate(this.id));
+        await authService.withStepUp(() =>
+          syncAccountService.terminate(this.id)
+        );
         notificationService.success(msg('Sync account terminated.'));
         this.confirmKind = null;
         // The account may no longer exist after termination.
@@ -270,7 +283,9 @@ export class SyncDetailPage extends LitElement {
           )}
         </p>
         ${hasPortal
-          ? html`<p class="portal-value mono">${this.detail?.credentialPortal}</p>`
+          ? html`<p class="portal-value mono">
+              ${this.detail?.credentialPortal}
+            </p>`
           : nothing}
         <div class="row">
           <form-field
@@ -366,9 +381,7 @@ export class SyncDetailPage extends LitElement {
           ? html`
               <div class="token-reveal">
                 <p class="warning">
-                  ${msg(
-                    'Copy this token now — it will NOT be shown again.'
-                  )}
+                  ${msg('Copy this token now — it will NOT be shown again.')}
                 </p>
                 <div class="token-value">
                   <code>${this.revealedToken}</code>
@@ -440,10 +453,8 @@ export class SyncDetailPage extends LitElement {
                     : nothing}
                 </header>
                 <div class="cards">
-                  ${this.renderPortalCard()}
-                  ${this.renderYieldCard()}
-                  ${this.renderTokenCard()}
-                  ${this.renderMaintenanceCard()}
+                  ${this.renderPortalCard()} ${this.renderYieldCard()}
+                  ${this.renderTokenCard()} ${this.renderMaintenanceCard()}
                 </div>
               `}
         ${this.confirmKind

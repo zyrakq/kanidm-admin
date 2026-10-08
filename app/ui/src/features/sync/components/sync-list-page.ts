@@ -112,9 +112,7 @@ export class SyncListPage extends LitElement {
           .searchable=${true}
           .emptyMessage=${msg('No sync accounts found.')}
           @row-click=${(e: CustomEvent<{ row: SyncAccountSummary }>) =>
-            navigate(
-              `/admin/sync/${encodeURIComponent(e.detail.row.id)}`
-            )}
+            navigate(`/admin/sync/${encodeURIComponent(e.detail.row.id)}`)}
         ></data-table>
 
         <modal-dialog

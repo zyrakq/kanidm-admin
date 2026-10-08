@@ -33,7 +33,8 @@ export const personRadiusTabStyles = css`
     font-size: 0.875rem;
     color: var(--theme-color-warning);
     background: var(--theme-color-warning-soft);
-    border: 1px solid color-mix(in srgb, var(--theme-color-warning) 30%, transparent);
+    border: 1px solid
+      color-mix(in srgb, var(--theme-color-warning) 30%, transparent);
     border-radius: var(--theme-radius-md);
   }
 

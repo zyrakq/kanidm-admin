@@ -54,10 +54,10 @@ class GroupService {
 
   /** Rename (vendor group_rename: PUT /v1/group/{id}/_attr/name). */
   async rename(id: string, newName: string): Promise<void> {
-    await apiFetch<void>(
-      `${BASE}/group/${encodeURIComponent(id)}/_attr/name`,
-      { method: 'PUT', body: JSON.stringify([newName]) }
-    );
+    await apiFetch<void>(`${BASE}/group/${encodeURIComponent(id)}/_attr/name`, {
+      method: 'PUT',
+      body: JSON.stringify([newName]),
+    });
   }
 
   /** Set displayname (generic attr path; ATTR_DISPLAYNAME). */
@@ -121,10 +121,10 @@ class GroupService {
 
   /** Set mail (vendor idm_group_set_mail: PUT _attr/mail). */
   async setMail(id: string, mail: string[]): Promise<void> {
-    await apiFetch<void>(
-      `${BASE}/group/${encodeURIComponent(id)}/_attr/mail`,
-      { method: 'PUT', body: JSON.stringify(mail) }
-    );
+    await apiFetch<void>(`${BASE}/group/${encodeURIComponent(id)}/_attr/mail`, {
+      method: 'PUT',
+      body: JSON.stringify(mail),
+    });
   }
 
   /** Purge any attribute (vendor idm_group_purge_attr). */
@@ -187,7 +187,11 @@ class GroupService {
    * ACCOUNT_POLICY_ATTRS wire names from group.types.ts — the server
    * matches the exact snake_case ATTR_* constants.
    */
-  async setPolicyAttr(id: string, attr: string, values: string[]): Promise<void> {
+  async setPolicyAttr(
+    id: string,
+    attr: string,
+    values: string[]
+  ): Promise<void> {
     await apiFetch<void>(
       `${BASE}/group/${encodeURIComponent(id)}/_attr/${encodeURIComponent(attr)}`,
       { method: 'PUT', body: JSON.stringify(values) }

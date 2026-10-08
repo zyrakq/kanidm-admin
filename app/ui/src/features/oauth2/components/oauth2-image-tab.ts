@@ -92,7 +92,11 @@ export class Oauth2ImageTab extends LitElement {
               />`}
         </div>
         <div class="actions">
-          <input type="file" accept="image/*" @change=${this.handleFileChange} />
+          <input
+            type="file"
+            accept="image/*"
+            @change=${this.handleFileChange}
+          />
           <ui-button
             variant="primary"
             ?loading=${this.busy}

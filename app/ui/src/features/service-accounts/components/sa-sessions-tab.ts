@@ -121,8 +121,7 @@ export class SaSessionsTab extends LitElement {
                 variant="danger-ghost"
                 ?disabled=${this.revokingId !== null}
                 ?loading=${this.revokingId === row.session_id}
-                @click=${() =>
-                  this.revoke(row as unknown as SessionItem)}
+                @click=${() => this.revoke(row as unknown as SessionItem)}
               >
                 ${this.revokingId === row.session_id
                   ? msg('Revoking...')

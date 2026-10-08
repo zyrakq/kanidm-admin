@@ -133,13 +133,18 @@ export class ServiceAccountListPage extends LitElement {
     this.bulkBusy = true;
     try {
       const response = await authService.withStepUp(() =>
-        bulkDelete('service_account', targets.map((target) => target.id))
+        bulkDelete(
+          'service_account',
+          targets.map((target) => target.id)
+        )
       );
       const failures = response.results
         .filter((result) => !result.ok)
         .map((result) => `${result.id}: ${friendlyDeleteFailure(result)}`);
       if (failures.length === 0) {
-        notificationService.success(msg(str`Deleted ${response.deleted} entries`));
+        notificationService.success(
+          msg(str`Deleted ${response.deleted} entries`)
+        );
       } else {
         notificationService.error(
           msg(
@@ -161,8 +166,7 @@ export class ServiceAccountListPage extends LitElement {
       {
         key: 'id',
         header: msg('Name'),
-        render: (row) =>
-          html`<span class="mono">${String(row.id)}</span>`,
+        render: (row) => html`<span class="mono">${String(row.id)}</span>`,
       },
       { key: 'displayName', header: msg('Display name') },
       {
@@ -286,7 +290,6 @@ export class ServiceAccountListPage extends LitElement {
               ></confirm-dialog>
             `
           : nothing}
-
         ${this.bulkTargets
           ? html`
               <confirm-dialog

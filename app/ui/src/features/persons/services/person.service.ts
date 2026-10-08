@@ -134,10 +134,10 @@ class PersonService {
   async credentialUpdateStatus(
     token: string
   ): Promise<CredentialUpdateStatusView> {
-    return apiFetch<CredentialUpdateStatusView>(
-      `${BASE}/credential/_status`,
-      { method: 'POST', body: JSON.stringify({ token }) }
-    );
+    return apiFetch<CredentialUpdateStatusView>(`${BASE}/credential/_status`, {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
   }
 
   /**
@@ -150,10 +150,10 @@ class PersonService {
     token: string,
     request: CredentialUpdateRequest
   ): Promise<CredentialUpdateStatusView> {
-    return apiFetch<CredentialUpdateStatusView>(
-      `${BASE}/credential/_update`,
-      { method: 'POST', body: JSON.stringify([request, { token }]) }
-    );
+    return apiFetch<CredentialUpdateStatusView>(`${BASE}/credential/_update`, {
+      method: 'POST',
+      body: JSON.stringify([request, { token }]),
+    });
   }
 
   /**
@@ -221,9 +221,11 @@ class PersonService {
    */
   async sshKeys(id: string): Promise<string[]> {
     // Empty attr returns HTTP 200 with body `null` (not []).
-    return (await apiFetch<string[] | null>(
-      `${BASE}/person/${encodeURIComponent(id)}/_attr/ssh_publickey`
-    )) ?? [];
+    return (
+      (await apiFetch<string[] | null>(
+        `${BASE}/person/${encodeURIComponent(id)}/_attr/ssh_publickey`
+      )) ?? []
+    );
   }
 
   /** Add ssh key (vendor idm_person_account_post_ssh_pubkey: [tag, key]). */
@@ -255,13 +257,10 @@ class PersonService {
     gidnumber: number | null,
     shell: string | null
   ): Promise<void> {
-    await apiFetch<void>(
-      `${BASE}/person/${encodeURIComponent(id)}/_unix`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ shell, gidnumber }),
-      }
-    );
+    await apiFetch<void>(`${BASE}/person/${encodeURIComponent(id)}/_unix`, {
+      method: 'POST',
+      body: JSON.stringify({ shell, gidnumber }),
+    });
   }
 
   /** POSIX password (vendor idm_person_account_unix_cred_put: PUT
@@ -294,10 +293,9 @@ class PersonService {
 
   /** RADIUS delete (vendor idm_account_radius_credential_delete). */
   async radiusDelete(id: string): Promise<void> {
-    await apiFetch<void>(
-      `${BASE}/person/${encodeURIComponent(id)}/_radius`,
-      { method: 'DELETE' }
-    );
+    await apiFetch<void>(`${BASE}/person/${encodeURIComponent(id)}/_radius`, {
+      method: 'DELETE',
+    });
   }
 
   /** Group membership quick-ops via group attr endpoints (design: person

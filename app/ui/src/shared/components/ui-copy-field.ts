@@ -25,13 +25,17 @@ export class UiCopyField extends LitElement {
     try {
       await navigator.clipboard.writeText(this.value);
     } catch {
-      this.dispatchEvent(new CustomEvent('copy-failed', { bubbles: true, composed: true }));
+      this.dispatchEvent(
+        new CustomEvent('copy-failed', { bubbles: true, composed: true })
+      );
       return;
     }
     this.justCopied = true;
     window.clearTimeout(this.resetTimer);
     this.resetTimer = window.setTimeout(() => (this.justCopied = false), 1500);
-    this.dispatchEvent(new CustomEvent('copied', { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent('copied', { bubbles: true, composed: true })
+    );
   }
 
   render() {
@@ -46,7 +50,10 @@ export class UiCopyField extends LitElement {
           aria-label=${this.copyLabel}
           @click=${this.handleCopy}
         >
-          <ui-icon name=${this.justCopied ? 'check' : 'copy'} size="14"></ui-icon>
+          <ui-icon
+            name=${this.justCopied ? 'check' : 'copy'}
+            size="14"
+          ></ui-icon>
         </button>
       </div>
     `;

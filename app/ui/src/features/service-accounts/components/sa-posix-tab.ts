@@ -47,7 +47,10 @@ export class SaPosixTab extends LitElement {
       this.shell = this.token.shell ?? '';
       this.posixState = 'enabled';
     } catch (error) {
-      if (error instanceof ApiError && (error.code === 'not_found' || error.status === 404)) {
+      if (
+        error instanceof ApiError &&
+        (error.code === 'not_found' || error.status === 404)
+      ) {
         this.token = null;
         this.gidnumber = '';
         this.shell = '';
@@ -174,7 +177,8 @@ export class SaPosixTab extends LitElement {
         <h3>${msg('POSIX attributes')}</h3>
         ${this.token
           ? html`<p class="muted">
-              ${msg('UUID')}: ${this.token.uuid} · ${msg('GID')}: ${this.token.gidnumber}
+              ${msg('UUID')}: ${this.token.uuid} · ${msg('GID')}:
+              ${this.token.gidnumber}
             </p>`
           : nothing}
         ${this.renderPosixForm()}

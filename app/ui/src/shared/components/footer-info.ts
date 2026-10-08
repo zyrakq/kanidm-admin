@@ -103,9 +103,7 @@ export class FooterInfo extends LitElement {
     return html`
       <footer>
         <div class="toolbar">
-          <div class="left">
-            ${this.renderStatus()}
-          </div>
+          <div class="left">${this.renderStatus()}</div>
           <div class="spacer"></div>
           <div class="right">
             <a

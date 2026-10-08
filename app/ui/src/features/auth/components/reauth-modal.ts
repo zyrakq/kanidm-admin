@@ -96,9 +96,7 @@ export class ReauthModal extends LitElement {
       <div class="modal-overlay" @click=${this.handleOverlayClick}>
         <div class="modal-card">
           <div class="modal-header">
-            <span class="modal-title"
-              >${msg('Elevated access required')}</span
-            >
+            <span class="modal-title">${msg('Elevated access required')}</span>
           </div>
           <div class="modal-content">
             <p class="modal-message">

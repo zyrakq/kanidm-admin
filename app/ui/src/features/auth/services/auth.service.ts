@@ -216,8 +216,7 @@ class AuthService {
     });
     this.authState = {
       ...this.authState,
-      writeUntil:
-        result.writeUntil !== null ? result.writeUntil * 1000 : null,
+      writeUntil: result.writeUntil !== null ? result.writeUntil * 1000 : null,
     };
   }
 

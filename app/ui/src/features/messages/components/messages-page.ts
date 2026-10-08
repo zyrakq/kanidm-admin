@@ -130,7 +130,8 @@ export class MessagesPage extends LitElement {
       {
         key: 'sendAfter',
         header: msg('Send after'),
-        render: (row) => html`<span class="mono">${String(row.sendAfter)}</span>`,
+        render: (row) =>
+          html`<span class="mono">${String(row.sendAfter)}</span>`,
       },
       {
         key: 'sentAt',

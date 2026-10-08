@@ -231,9 +231,7 @@ export class SaOverviewTab extends LitElement {
       notificationService.success(msg('Converted to person.'));
       this.confirmOpen = false;
       // The service account no longer exists; land on the new person.
-      navigate(
-        `/admin/persons/${encodeURIComponent(this.saId)}`
-      );
+      navigate(`/admin/persons/${encodeURIComponent(this.saId)}`);
     } catch {
       notificationService.error(msg('Failed to convert to person.'));
       this.converting = false;
@@ -242,41 +240,43 @@ export class SaOverviewTab extends LitElement {
 
   private renderProfile(): ReturnType<typeof html> {
     return html`
-      <ui-card><section>
-        <h2>${msg('Profile')}</h2>
-        <form-field
-          field-id="sa-displayname"
-          label=${msg('Display name')}
-          .value=${this.displayName}
-          @field-input=${(e: CustomEvent<{ value: string }>) =>
-            this.setField('displayName', e.detail.value)}
-        ></form-field>
-        <form-field
-          field-id="sa-description"
-          label=${msg('Description')}
-          .value=${this.description}
-          hint=${msg('Leave empty to remove the description.')}
-          @field-input=${(e: CustomEvent<{ value: string }>) =>
-            this.setField('description', e.detail.value)}
-        ></form-field>
-        <form-field
-          field-id="sa-mail"
-          label=${msg('Mail addresses')}
-          .value=${this.mail}
-          hint=${msg('Comma-separated list of mail addresses.')}
-          @field-input=${(e: CustomEvent<{ value: string }>) =>
-            this.setField('mail', e.detail.value)}
-        ></form-field>
-        <div class="actions">
-          <ui-button
-            variant="primary"
-            ?loading=${this.saving}
-            @click=${this.saveProfile}
-          >
-            ${msg('Save')}
-          </ui-button>
-        </div>
-      </section></ui-card>
+      <ui-card
+        ><section>
+          <h2>${msg('Profile')}</h2>
+          <form-field
+            field-id="sa-displayname"
+            label=${msg('Display name')}
+            .value=${this.displayName}
+            @field-input=${(e: CustomEvent<{ value: string }>) =>
+              this.setField('displayName', e.detail.value)}
+          ></form-field>
+          <form-field
+            field-id="sa-description"
+            label=${msg('Description')}
+            .value=${this.description}
+            hint=${msg('Leave empty to remove the description.')}
+            @field-input=${(e: CustomEvent<{ value: string }>) =>
+              this.setField('description', e.detail.value)}
+          ></form-field>
+          <form-field
+            field-id="sa-mail"
+            label=${msg('Mail addresses')}
+            .value=${this.mail}
+            hint=${msg('Comma-separated list of mail addresses.')}
+            @field-input=${(e: CustomEvent<{ value: string }>) =>
+              this.setField('mail', e.detail.value)}
+          ></form-field>
+          <div class="actions">
+            <ui-button
+              variant="primary"
+              ?loading=${this.saving}
+              @click=${this.saveProfile}
+            >
+              ${msg('Save')}
+            </ui-button>
+          </div>
+        </section></ui-card
+      >
     `;
   }
 
@@ -285,76 +285,80 @@ export class SaOverviewTab extends LitElement {
     if (!sa) return nothing;
     const busy = this.addingGroup || this.removingGroup !== null;
     return html`
-      <ui-card><section>
-        <h2>${msg('Group membership')}</h2>
-        ${sa.memberOf.length === 0
-          ? html`<p class="muted">${msg('Not a member of any group.')}</p>`
-          : html`
-              <ul class="group-list">
-                ${sa.memberOf.map(
-                  (group) => html`
-                    <li>
-                      <span class="mono">${group}</span>
-                      <ui-button
-                        size="sm"
-                        variant="danger-ghost"
-                        ?disabled=${busy}
-                        ?loading=${this.removingGroup === group}
-                        @click=${() => this.removeGroup(group)}
-                      >
-                        ${this.removingGroup === group
-                          ? msg('Removing...')
-                          : msg('Remove')}
-                      </ui-button>
-                    </li>
-                  `
-                )}
-              </ul>
-            `}
-        <div class="add-group">
-          <form-field
-            field-id="sa-new-group"
-            placeholder=${msg('Group name or uuid')}
-            .value=${this.newGroup}
-            @field-input=${(e: CustomEvent<{ value: string }>) => {
-              this.newGroup = e.detail.value;
-            }}
-            @keydown=${(e: KeyboardEvent) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                void this.addGroup();
-              }
-            }}
-          ></form-field>
-          <ui-button
-            variant="primary"
-            icon="plus"
-            ?disabled=${busy || this.newGroup.trim() === ''}
-            ?loading=${this.addingGroup}
-            @click=${this.addGroup}
-          >
-            ${msg('Add')}
-          </ui-button>
-        </div>
-      </section></ui-card>
+      <ui-card
+        ><section>
+          <h2>${msg('Group membership')}</h2>
+          ${sa.memberOf.length === 0
+            ? html`<p class="muted">${msg('Not a member of any group.')}</p>`
+            : html`
+                <ul class="group-list">
+                  ${sa.memberOf.map(
+                    (group) => html`
+                      <li>
+                        <span class="mono">${group}</span>
+                        <ui-button
+                          size="sm"
+                          variant="danger-ghost"
+                          ?disabled=${busy}
+                          ?loading=${this.removingGroup === group}
+                          @click=${() => this.removeGroup(group)}
+                        >
+                          ${this.removingGroup === group
+                            ? msg('Removing...')
+                            : msg('Remove')}
+                        </ui-button>
+                      </li>
+                    `
+                  )}
+                </ul>
+              `}
+          <div class="add-group">
+            <form-field
+              field-id="sa-new-group"
+              placeholder=${msg('Group name or uuid')}
+              .value=${this.newGroup}
+              @field-input=${(e: CustomEvent<{ value: string }>) => {
+                this.newGroup = e.detail.value;
+              }}
+              @keydown=${(e: KeyboardEvent) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  void this.addGroup();
+                }
+              }}
+            ></form-field>
+            <ui-button
+              variant="primary"
+              icon="plus"
+              ?disabled=${busy || this.newGroup.trim() === ''}
+              ?loading=${this.addingGroup}
+              @click=${this.addGroup}
+            >
+              ${msg('Add')}
+            </ui-button>
+          </div>
+        </section></ui-card
+      >
     `;
   }
 
   private renderConvert(): ReturnType<typeof html> {
     return html`
-      <ui-card><section>
-        <h2>${msg('Convert to person')}</h2>
-        <p class="muted">
-          ${msg(
-            'Turns this service account into a regular person account. This cannot be undone.'
-          )}
-        </p>
-        <div class="actions">
-          <ui-button variant="danger-ghost" @click=${this.openConfirm}>
-            ${msg('Convert to person')}
-          </ui-button>
-        </div>
-      </section></ui-card>
+      <ui-card
+        ><section>
+          <h2>${msg('Convert to person')}</h2>
+          <p class="muted">
+            ${msg(
+              'Turns this service account into a regular person account. This cannot be undone.'
+            )}
+          </p>
+          <div class="actions">
+            <ui-button variant="danger-ghost" @click=${this.openConfirm}>
+              ${msg('Convert to person')}
+            </ui-button>
+          </div>
+        </section></ui-card
+      >
     `;
   }
 

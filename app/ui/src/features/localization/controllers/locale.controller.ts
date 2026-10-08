@@ -31,7 +31,7 @@ export class LocaleController implements ReactiveController {
  * Triggers re-render when locale changes
  */
 export function localized() {
-  return function <T extends { new (...args: any[]): HTMLElement }>(
+  return function <T extends { new (...args: unknown[]): HTMLElement }>(
     constructor: T
   ): T {
     const connectedCallback = constructor.prototype.connectedCallback;

@@ -77,7 +77,7 @@ export class PersonCredentialsTab extends LitElement {
     try {
       const status = await personService.credentialStatus(this.id);
       this.creds = status.creds ?? [];
-    } catch (error) {
+    } catch {
       notificationService.error(msg('Failed to load credential status.'));
     } finally {
       this.loading = false;
@@ -96,7 +96,7 @@ export class PersonCredentialsTab extends LitElement {
       // failed lookup just hides the link/QR options (token still shown).
       void this.loadKanidmUrl();
       notificationService.success(msg('Credential reset link created.'));
-    } catch (error) {
+    } catch {
       notificationService.error(msg('Failed to create credential reset link.'));
     } finally {
       this.submitting = false;
@@ -158,7 +158,7 @@ export class PersonCredentialsTab extends LitElement {
       );
       notificationService.success(msg(str`Reset link sent to ${email}.`));
       this.closeEmailModal();
-    } catch (error) {
+    } catch {
       notificationService.error(msg('Failed to send reset link.'));
     } finally {
       this.submitting = false;
@@ -173,7 +173,10 @@ export class PersonCredentialsTab extends LitElement {
     return [];
   }
 
-  private openMfaConfirm(cred: { uuid: string; type_: CredentialDetailType }): void {
+  private openMfaConfirm(cred: {
+    uuid: string;
+    type_: CredentialDetailType;
+  }): void {
     const labels = this.totpLabelsOf(cred.type_);
     if (labels.length === 0) {
       return;
@@ -369,7 +372,10 @@ export class PersonCredentialsTab extends LitElement {
           ></form-field>
         </form>
         <div slot="footer">
-          <ui-button ?disabled=${this.submitting} @click=${this.closeEmailModal}>
+          <ui-button
+            ?disabled=${this.submitting}
+            @click=${this.closeEmailModal}
+          >
             ${msg('Cancel')}
           </ui-button>
           <ui-button
@@ -388,7 +394,11 @@ export class PersonCredentialsTab extends LitElement {
   render() {
     if (this.loading) {
       return html`
-        <div class="loading" role="status" aria-label=${msg('Loading credentials…')}>
+        <div
+          class="loading"
+          role="status"
+          aria-label=${msg('Loading credentials…')}
+        >
           <ui-skeleton height="40px"></ui-skeleton>
           <ui-skeleton height="56px" .lines=${2}></ui-skeleton>
         </div>
@@ -416,7 +426,9 @@ export class PersonCredentialsTab extends LitElement {
 
         ${this.renderIntentPanel()}
         ${this.creds.length === 0
-          ? html`<ui-empty-state icon="key">${msg('No credentials enrolled.')}</ui-empty-state>`
+          ? html`<ui-empty-state icon="key"
+              >${msg('No credentials enrolled.')}</ui-empty-state
+            >`
           : html`
               <ul class="cred-list">
                 ${this.creds.map((cred) => this.renderCredRow(cred))}
@@ -424,8 +436,7 @@ export class PersonCredentialsTab extends LitElement {
             `}
       </section>
 
-      ${this.renderEmailModal()}
-      ${this.renderMfaConfirmDialog()}
+      ${this.renderEmailModal()} ${this.renderMfaConfirmDialog()}
     `;
   }
 

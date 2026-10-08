@@ -31,7 +31,18 @@ Add this inline script to your HTML `<head>` before any other scripts:
 ```html
 <head>
   <script>
-    (function(){var e=localStorage.getItem("kanidm-theme"),t;if(e==="light"||e==="dark"){t=e}else if(window.matchMedia("(prefers-color-scheme: dark)").matches){t="dark"}else{t="light"}document.documentElement.setAttribute("theme",t)})();
+    (function () {
+      var e = localStorage.getItem('kanidm-theme'),
+        t;
+      if (e === 'light' || e === 'dark') {
+        t = e;
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        t = 'dark';
+      } else {
+        t = 'light';
+      }
+      document.documentElement.setAttribute('theme', t);
+    })();
   </script>
 </head>
 ```
@@ -55,17 +66,16 @@ themeService.toggleTheme();
 import { LitElement, html } from 'lit';
 import { ThemeController } from '@/features/theme';
 
-customElements.define('my-component', class extends LitElement {
-  private theme = new ThemeController(this);
+customElements.define(
+  'my-component',
+  class extends LitElement {
+    private theme = new ThemeController(this);
 
-  render() {
-    return html`
-      <div class="card">
-        Current theme: ${this.theme.theme}
-      </div>
-    `;
+    render() {
+      return html` <div class="card">Current theme: ${this.theme.theme}</div> `;
+    }
   }
-});
+);
 ```
 
 ### 5. Favicon setup (optional)
@@ -106,13 +116,13 @@ const themeService = ThemeService.getInstance({
 
 ## CSS Variables
 
-| Variable | Light | Dark |
-|----------|-------|------|
-| `--theme-color-primary` | #ff6b35 | #ff6b35 |
-| `--theme-color-background` | #f9fafb | #111827 |
-| `--theme-color-surface` | #ffffff | #1f2937 |
+| Variable                     | Light   | Dark    |
+| ---------------------------- | ------- | ------- |
+| `--theme-color-primary`      | #ff6b35 | #ff6b35 |
+| `--theme-color-background`   | #f9fafb | #111827 |
+| `--theme-color-surface`      | #ffffff | #1f2937 |
 | `--theme-color-text-primary` | #1f2937 | #f9fafb |
-| `--theme-color-border` | #e5e7eb | #374151 |
+| `--theme-color-border`       | #e5e7eb | #374151 |
 
 ## Porting to Other Projects
 
