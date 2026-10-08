@@ -141,6 +141,28 @@ cargo build --release    # SPA is compiled and embedded into the binary
 docker compose up -d     # builds the image and serves on port 4000
 ```
 
+To run the admin app itself as a container **with the dev
+testcontainer chain** (ephemeral Kanidm, mail sender, Mailpit), add
+the compose override. It mounts the host Docker socket into the app
+container and sets `KANIDM_ADMIN_TESTCONTAINERS`, so the backend
+drives the same dev chain through the mounted socket:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.testcontainers.yml up -d --build
+```
+
+Inside the container the app talks to the dev chain over Docker DNS
+names (`https://kanidm:8443`, `smtps://mailpit:1025`, UI proxied at
+`/_/mailpit`) on the shared `kanidm-admin-dev` network — no
+`localhost` ports are involved. `testcontainer.mode = "auto"`
+detects this automatically (`/.dockerenv` plus a local socket) and
+picks `in-container` networking; the plain variant (`docker compose
+up`) and the host-mode `cargo run` flow are unchanged.
+
+> **Note:** mounting `/var/run/docker.sock` gives the container
+> root-equivalent access to the host Docker daemon. Only do this for
+> a trusted local dev image.
+
 ### Docker image build check (pipelight)
 
 The production image build is scripted as a
@@ -223,9 +245,14 @@ once the env var is present:
 
 All containers share the `testcontainer.network` Docker network
 (default `kanidm-admin-dev`); `testcontainer.mode` selects `auto`,
-`host` or `in-container` networking. Non-loopback ports stay closed
-except the mailpit UI port (`mailpit.ui_port`, default `8025`).
-Container logs are captured under `logs/testcontainers/`.
+`host` or `in-container` networking. In host mode all dev ports are
+published loopback-only; in-container mode publishes none. Container
+logs are captured under `logs/testcontainers/`.
+
+The same chain also runs when the admin app itself is a container:
+the [compose override](#docker) mounts the Docker socket and the app
+switches to `in-container` networking, reaching the containers via
+Docker DNS names instead of loopback ports.
 
 To develop against an existing Kanidm instance instead:
 

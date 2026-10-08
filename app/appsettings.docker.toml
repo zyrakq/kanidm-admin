@@ -1,0 +1,22 @@
+# Overlay for the containerized app (docker compose with the dev
+# testcontainers). Selected by APP_ENV=docker in
+# docker-compose.testcontainers.yml; the image bakes this file so
+# the compose variant needs no extra config mounts.
+
+[frontend]
+serve_from = "embedded"
+
+# The app itself runs as a container and drives the dev chain
+# through the mounted Docker socket; the chain is reached via
+# Docker DNS names on the shared network.
+[testcontainer]
+mode = "in-container"
+
+[testcontainer.kanidm]
+enabled = true
+
+[testcontainer.kanidm_mail_sender]
+enabled = true
+
+[testcontainer.mailpit]
+enabled = true

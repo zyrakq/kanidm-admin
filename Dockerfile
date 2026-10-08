@@ -67,10 +67,12 @@ WORKDIR /workspace/app
 COPY --from=rust-builder /workspace/target/release/server /usr/local/bin/server
 
 # ── Layered config ────────────────────────────────────────────────────────────
-# Settings::load() reads appsettings.toml then appsettings.production.toml
-# from CARGO_MANIFEST_DIR = /workspace/app
+# Settings::load() reads appsettings.toml then appsettings.<APP_ENV>.toml
+# from CARGO_MANIFEST_DIR = /workspace/app. appsettings.docker.toml backs
+# the compose testcontainers override (APP_ENV=docker).
 COPY app/appsettings.toml            ./
 COPY app/appsettings.production.toml ./
+COPY app/appsettings.docker.toml     ./
 
 EXPOSE 4000
 

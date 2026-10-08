@@ -1,0 +1,29 @@
+# Compose override for the dev testcontainers: the admin app itself
+# runs as a container and drives the dev chain (kanidm,
+# kanidm-mail-sender, mailpit) through the mounted Docker socket.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.testcontainers.yml up -d --build
+#
+# The chain is reached via Docker DNS names (kanidm, mailpit) on the
+# shared kanidm-admin-dev network declared below — no extra ports
+# are published for the dev containers.
+
+services:
+  kanidm-admin:
+    environment:
+      # Opt in to the dev container chain
+      KANIDM_ADMIN_TESTCONTAINERS: "1"
+      # Select the baked-in appsettings.docker.toml overlay
+      APP_ENV: docker
+    volumes:
+      # The app drives Docker through the host daemon socket
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - kanidm-admin-dev
+
+# Pre-declared with a fixed name so the app container and the
+# spawned dev containers share one network and Docker DNS resolves
+# the container names.
+networks:
+  kanidm-admin-dev:
+    name: kanidm-admin-dev
