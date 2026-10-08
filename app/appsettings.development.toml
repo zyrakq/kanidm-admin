@@ -2,6 +2,9 @@
 serve_from = "disk"
 watch = true
 
+# Which dev containers to run is configured here; whether they run
+# at all is decided by the KANIDM_ADMIN_TESTCONTAINERS env var
+# (set it to any non-empty value to enable).
 [testcontainer.kanidm]
 enabled = true
 

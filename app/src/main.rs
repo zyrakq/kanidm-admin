@@ -25,6 +25,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
     let _frontend_handle = frontend::start(&settings.frontend, &manifest_dir)?;
+    // Container mode turns on only when the
+    // KANIDM_ADMIN_TESTCONTAINERS env var is set (see
+    // testcontainer::start); otherwise the configured [kanidm]
+    // settings pass through unchanged.
     let (kanidm_settings, _testcontainers_handle) = testcontainer::start(&settings).await?;
     let state = auth::app_state_from_settings(&kanidm_settings)?;
     let status_probe = status::probe_from_settings(&kanidm_settings)?;
@@ -34,11 +38,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     );
 
     let listener = TcpListener::bind(&settings.server.address).await?;
+    let mailpit_upstream = _testcontainers_handle.mailpit_upstream();
     let router = routes::mount_fallback(
         routes::build(
             state,
             status_probe,
-            _testcontainers_handle.mailpit_upstream(),
+            mailpit_upstream,
             customization::router(std::sync::Arc::new(customization_store)),
         ),
         &settings.frontend,

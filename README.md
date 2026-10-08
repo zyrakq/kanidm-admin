@@ -110,9 +110,12 @@ cd kanidm-admin
 cargo run            # server starts at http://localhost:4000
 ```
 
-In development mode the app automatically starts an **ephemeral Kanidm
-container** (`kanidm/server:1.11.2` via Docker), provisions it and recovers
-the built-in admin credentials — no pre-existing Kanidm server needed.
+In development mode the app can run an **ephemeral Kanidm container**
+(`kanidm/server:1.11.2` via Docker), provision it and recover the
+built-in admin credentials — no pre-existing Kanidm server needed.
+The containers are **opt-in**: they start only when the
+`KANIDM_ADMIN_TESTCONTAINERS` env var is set (see
+[Dev testcontainers](#dev-testcontainers)).
 Frontend source edits trigger a rebuild (`bun watch`) and are served live.
 
 To develop against an existing Kanidm instance instead:
@@ -196,9 +199,13 @@ Settings are layered TOML files: `app/appsettings.toml` (base), then
 
 ## Dev testcontainers
 
-When `[testcontainer.kanidm].enabled` is `true` (the development
-default), the backend starts a small chain of Docker containers at
-startup instead of using `[kanidm]`:
+The dev containers are **opt-in via the environment**: set
+`KANIDM_ADMIN_TESTCONTAINERS` (any non-empty value) and the backend
+starts a small chain of Docker containers at startup instead of
+using `[kanidm]`. Without the env var the `[kanidm]` settings pass
+through unchanged, no matter what `[testcontainer.*].enabled` says.
+The `enabled` keys only select *which* containers of the chain run
+once the env var is present:
 
 - **Kanidm** — ephemeral `kanidm/server` container, provisioned with
   the built-in admin credentials (recovered and logged at startup).
