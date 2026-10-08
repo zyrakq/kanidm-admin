@@ -27,7 +27,9 @@ export const sessionIndicatorStyles = css`
     border-radius: 999px;
     cursor: pointer;
     color: var(--theme-color-text-secondary);
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
 
   .avatar-btn:hover {
@@ -49,7 +51,9 @@ export const sessionIndicatorStyles = css`
     color: var(--theme-color-text-secondary);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    transition: color 0.2s ease, border-color 0.2s ease;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .countdown.warning {
@@ -117,12 +121,47 @@ export const sessionIndicatorStyles = css`
     cursor: pointer;
     font: inherit;
     font-size: 0.875rem;
-    transition: color 0.2s ease, border-color 0.2s ease;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .sign-out:hover {
     color: var(--theme-color-error);
     border-color: var(--theme-color-error);
+  }
+
+  /* --- Guest mode --- */
+
+  /* Circular 32px stand-in for <ui-avatar size="32"> so the trigger
+     keeps identical geometry in guest mode (no header layout shift). */
+  .guest-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--theme-color-background);
+    border: 1px solid var(--theme-color-border);
+    color: var(--theme-color-text-secondary);
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .avatar-btn:hover .guest-icon {
+    color: var(--theme-color-text-primary);
+  }
+
+  /* Guest dropdown reuses .drawer-row markup inside .menu — compact it. */
+  .menu .drawer-row {
+    padding: 0.5rem 0.625rem;
+    border-bottom: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
   }
 
   @media (max-width: 768px) {
@@ -141,7 +180,9 @@ export const sessionIndicatorStyles = css`
     z-index: 1550;
     transform: translateX(100%);
     visibility: hidden;
-    transition: transform 0.3s ease, visibility 0s linear 0.3s;
+    transition:
+      transform 0.3s ease,
+      visibility 0s linear 0.3s;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
