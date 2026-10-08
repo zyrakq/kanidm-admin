@@ -18,6 +18,12 @@
     </script>
     
     <link rel="stylesheet" href="./src/index.css" />
+    <!-- Theme CSS overrides (customization slots). Both load always;
+         selectors scope each file (:root / :root[theme="dark"]). The
+         backend serves a placeholder body when unset, so these never
+         404 and the cascade order stays stable. -->
+    <link rel="stylesheet" href="/customization/theme-light.css" />
+    <link rel="stylesheet" href="/customization/theme-dark.css" />
     <script type="module">
       import 'urlpattern-polyfill';
       import './src/app-component.ts';

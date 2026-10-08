@@ -1,5 +1,6 @@
-// Customization admin page: four upload cards (light/dark logo and favicon)
-// plus a note that deleting restores the bundled defaults.
+// Customization admin page: four upload cards (light/dark logo and
+// favicon) plus two CSS theme-override cards, and a note that deleting
+// restores the bundled defaults.
 
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
@@ -26,10 +27,20 @@ export class CustomizationPage extends LitElement {
         </div>
         <p class="intro">
           ${msg(
-            'Upload replacement logos and favicons. Removing an upload restores the bundled default.'
+            'Upload replacement logos, favicons and theme CSS. Removing an upload restores the bundled default.'
           )}
         </p>
         <div class="grid">
+          <customization-slot-card
+            slot="theme-light"
+            kind="css"
+            heading=${msg('Theme override (light)')}
+          ></customization-slot-card>
+          <customization-slot-card
+            slot="theme-dark"
+            kind="css"
+            heading=${msg('Theme override (dark)')}
+          ></customization-slot-card>
           <customization-slot-card
             slot="logo-light"
             heading=${msg('Logo (light)')}

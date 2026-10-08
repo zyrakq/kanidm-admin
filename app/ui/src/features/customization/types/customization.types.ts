@@ -4,7 +4,9 @@ export type CustomizationSlot =
   | 'logo-light'
   | 'logo-dark'
   | 'favicon-light'
-  | 'favicon-dark';
+  | 'favicon-dark'
+  | 'theme-light'
+  | 'theme-dark';
 
 export interface CustomizationSlotEntry {
   present: boolean;
@@ -23,4 +25,6 @@ export const CUSTOMIZATION_SLOTS: CustomizationSlot[] = [
   'logo-dark',
   'favicon-light',
   'favicon-dark',
+  'theme-light',
+  'theme-dark',
 ];

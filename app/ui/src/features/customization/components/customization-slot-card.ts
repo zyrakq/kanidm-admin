@@ -1,5 +1,7 @@
-// One customization slot: preview (override or bundled default), upload and
-// remove actions. The preview URL is cache-busted after each mutation.
+// One customization slot: preview (override or bundled default), upload
+// and remove actions. Image slots render an <img> preview; CSS slots
+// fetch the override text and show a truncated code preview. The
+// preview URL is cache-busted after each mutation.
 
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -12,13 +14,18 @@ import '@/shared/components/ui-card';
 import { customizationService } from '../services/customization.service';
 import type { CustomizationSlot } from '../types/customization.types';
 
+/** Characters of CSS shown in the code preview before truncation. */
+const CSS_PREVIEW_LIMIT = 400;
+
 @customElement('customization-slot-card')
 @localized()
 export class CustomizationSlotCard extends LitElement {
   @property() slot: CustomizationSlot = 'logo-light';
+  /** 'image' renders an <img> preview; 'css' renders fetched code text. */
+  @property() kind: 'image' | 'css' = 'image';
   /** Localized card title, set by the page. */
   @property() heading = '';
-  /** Bundled default asset URL for the preview fallback. */
+  /** Bundled default asset URL for the preview fallback (image kind). */
   @property() defaultSrc = '';
 
   @query('input[type="file"]') private fileInput!: HTMLInputElement;
@@ -27,13 +34,43 @@ export class CustomizationSlotCard extends LitElement {
   @state() private removeOpen = false;
   @state() private removing = false;
   @state() private previewMissing = false;
+  /** Truncated override CSS text (css kind); null when unset/unavailable. */
+  @state() private cssPreview: string | null = null;
   /** Bumped after upload/remove so the preview reloads. */
   @state() private version = 0;
+
+  private get isCss(): boolean {
+    return this.kind === 'css';
+  }
 
   private get previewUrl(): string {
     const override = customizationService.overrideUrl(this.slot);
     if (override) return `${override}&c=${this.version}`;
     return `${this.defaultSrc}?c=${this.version}`;
+  }
+
+  async connectedCallback(): Promise<void> {
+    super.connectedCallback();
+    if (this.isCss) await this.loadCssPreview();
+  }
+
+  /** Fetch the override stylesheet and truncate it for the preview. */
+  private async loadCssPreview(): Promise<void> {
+    const override = customizationService.overrideUrl(this.slot);
+    if (!override) {
+      this.cssPreview = null;
+      return;
+    }
+    try {
+      const res = await fetch(`${override}&c=${this.version}`);
+      const text = await res.text();
+      this.cssPreview =
+        text.length > CSS_PREVIEW_LIMIT
+          ? `${text.slice(0, CSS_PREVIEW_LIMIT)}…`
+          : text;
+    } catch {
+      this.cssPreview = null;
+    }
   }
 
   private async upload(file: File): Promise<void> {
@@ -43,15 +80,22 @@ export class CustomizationSlotCard extends LitElement {
       await customizationService.upload(this.slot, file);
       this.previewMissing = false;
       this.version += 1;
-      notificationService.success(msg('Image uploaded.'));
+      if (this.isCss) await this.loadCssPreview();
+      notificationService.success(
+        this.isCss ? msg('CSS uploaded.') : msg('Image uploaded.')
+      );
     } catch {
-      notificationService.error(msg('Failed to upload the image.'));
+      notificationService.error(
+        this.isCss
+          ? msg('Failed to upload the CSS.')
+          : msg('Failed to upload the image.')
+      );
     } finally {
       this.busy = false;
     }
   }
 
-  private async removeImage(): Promise<void> {
+  private async removeOverride(): Promise<void> {
     if (this.removing) return;
     this.removing = true;
     try {
@@ -59,9 +103,16 @@ export class CustomizationSlotCard extends LitElement {
       this.removeOpen = false;
       this.previewMissing = false;
       this.version += 1;
-      notificationService.success(msg('Image removed.'));
+      if (this.isCss) await this.loadCssPreview();
+      notificationService.success(
+        this.isCss ? msg('CSS removed.') : msg('Image removed.')
+      );
     } catch {
-      notificationService.error(msg('Failed to remove the image.'));
+      notificationService.error(
+        this.isCss
+          ? msg('Failed to remove the CSS.')
+          : msg('Failed to remove the image.')
+      );
     } finally {
       this.removing = false;
     }
@@ -76,26 +127,31 @@ export class CustomizationSlotCard extends LitElement {
 
   render() {
     const hasOverride = customizationService.overrideUrl(this.slot) !== null;
+    const accept = this.isCss ? '.css,text/css' : 'image/svg+xml,image/png';
     return html`
       <ui-card class="card">
         <h2>${this.heading}</h2>
         <div class="preview">
           ${
-            this.previewMissing
-              ? html`<div class="placeholder">${msg('No image')}</div>`
-              : html`<img
-                  src=${this.previewUrl}
-                  alt=${this.heading}
-                  @error=${() => {
-                    this.previewMissing = true;
-                  }}
-                />`
+            this.isCss
+              ? html`<pre class="code-preview">
+                  ${this.cssPreview ?? msg('No custom styles')}
+                </pre>`
+              : this.previewMissing
+                ? html`<div class="placeholder">${msg('No image')}</div>`
+                : html`<img
+                    src=${this.previewUrl}
+                    alt=${this.heading}
+                    @error=${() => {
+                      this.previewMissing = true;
+                    }}
+                  />`
           }
         </div>
         <div class="actions">
           <input
             type="file"
-            accept="image/svg+xml,image/png"
+            accept=${accept}
             @change=${this.handleFileChange}
           />
           <ui-button
@@ -103,7 +159,7 @@ export class CustomizationSlotCard extends LitElement {
             ?loading=${this.busy}
             @click=${() => this.fileInput.click()}
           >
-            ${msg('Upload image')}
+            ${this.isCss ? msg('Upload CSS') : msg('Upload image')}
           </ui-button>
           <ui-button
             variant="danger"
@@ -112,7 +168,7 @@ export class CustomizationSlotCard extends LitElement {
               this.removeOpen = true;
             }}
           >
-            ${msg('Remove image...')}
+            ${this.isCss ? msg('Remove CSS...') : msg('Remove image...')}
           </ui-button>
         </div>
       </ui-card>
@@ -123,8 +179,12 @@ export class CustomizationSlotCard extends LitElement {
               danger
               .busy=${this.removing}
               confirmLabel=${msg('Remove')}
-              message=${msg('Remove the uploaded image? The default returns.')}
-              @confirm=${() => void this.removeImage()}
+              message=${
+                this.isCss
+                  ? msg('Remove the uploaded CSS? The default returns.')
+                  : msg('Remove the uploaded image? The default returns.')
+              }
+              @confirm=${() => void this.removeOverride()}
               @cancel=${() => {
                 this.removeOpen = false;
               }}
@@ -160,6 +220,20 @@ export class CustomizationSlotCard extends LitElement {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
+    }
+    .code-preview {
+      margin: 0;
+      align-self: stretch;
+      width: 100%;
+      max-height: 140px;
+      overflow: auto;
+      font-family: var(--theme-font-mono, monospace);
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--theme-color-text-secondary);
+      white-space: pre-wrap;
+      word-break: break-word;
+      text-align: left;
     }
     .placeholder {
       font-size: 13px;
