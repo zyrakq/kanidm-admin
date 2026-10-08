@@ -1,5 +1,5 @@
 mod auth;
-mod branding;
+mod customization;
 mod frontend;
 mod frontend_assets;
 mod logging;
@@ -29,9 +29,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let (kanidm_settings, _testcontainers_handle) = testcontainer::start(&settings).await?;
     let state = auth::app_state_from_settings(&kanidm_settings)?;
     let status_probe = status::probe_from_settings(&kanidm_settings)?;
-    let branding_store = branding::BrandingStore::new(
-        settings.branding.effective_dir(&manifest_dir),
-        settings.branding.max_size_bytes,
+    let customization_store = customization::CustomizationStore::new(
+        settings.customization.effective_dir(&manifest_dir),
+        settings.customization.max_size_bytes,
     );
 
     let listener = TcpListener::bind(&settings.server.address).await?;
@@ -40,7 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             state,
             status_probe,
             _testcontainers_handle.mailpit_upstream(),
-            branding::router(std::sync::Arc::new(branding_store)),
+            customization::router(std::sync::Arc::new(customization_store)),
         ),
         &settings.frontend,
         &manifest_dir,

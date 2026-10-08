@@ -26,6 +26,9 @@ enabled = false
 image = "axllent/mailpit:v1.31.2"
 ui_port = 8025
 
-[branding]
+[customization]
+# Directory for uploaded customization overrides (logos, favicons and
+# theme CSS). Empty means `<manifest_dir>/customization/`.
 dir = ""
+# Max upload size per slot; 512 KiB covers SVG/PNG images and CSS files.
 max_size_bytes = 524288

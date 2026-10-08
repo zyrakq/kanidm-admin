@@ -4,7 +4,7 @@
 // loader.rs assembles the layered configuration; add future optional
 // sections as `#[serde(default)]` fields on Settings in loader.rs.
 
-pub mod branding;
+pub mod customization;
 pub mod frontend;
 pub mod kanidm;
 pub mod loader;

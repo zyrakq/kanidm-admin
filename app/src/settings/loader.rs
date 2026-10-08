@@ -1,7 +1,7 @@
 use config::{Config, ConfigError, Environment, File};
 use serde::Deserialize;
 
-use super::branding::BrandingSettings;
+use super::customization::CustomizationSettings;
 use super::frontend::FrontendSettings;
 use super::kanidm::KanidmSettings;
 use super::server::ServerSettings;
@@ -16,7 +16,7 @@ pub struct Settings {
     /// chain). An absent section means defaults (disabled); see
     /// settings/testcontainer.rs.
     #[serde(default)]
-    pub branding: BrandingSettings,
+    pub customization: CustomizationSettings,
     #[serde(default)]
     pub testcontainer: TestcontainerSettings,
 }

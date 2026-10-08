@@ -38,13 +38,13 @@ use crate::status::{self, KanidmStatusProbe};
 ///   GET  /_/mailpit        — 301 to /_/mailpit/ (mailpit testcontainer only)
 ///   GET  /_/mailpit/api/events — mailpit WebSocket bridge (mailpit testcontainer only)
 ///   ANY  /_/mailpit/{*path} — mailpit dev UI forward (mailpit testcontainer only)
-///   GET/PUT/DELETE /api/branding[/{slot}] — branding manifest/upload/remove
-///   GET  /branding/{slot}   — serve an uploaded branding file
+///   GET/PUT/DELETE /api/customization[/{slot}] — customization manifest/upload/remove
+///   GET  /customization/{slot}   — serve an uploaded customization file
 pub fn build(
     state: AppState,
     status_probe: Arc<dyn KanidmStatusProbe>,
     mailpit_upstream: Option<String>,
-    branding_routes: Router,
+    customization_routes: Router,
 ) -> Router {
     let router = Router::new()
         .route("/api/health", get(health_check))
@@ -66,10 +66,10 @@ pub fn build(
     };
 
     router.with_state(state)
-    // The branding router carries its own state (BrandingState), so it
+    // The customization router carries its own state (CustomizationState), so it
     // is a stateless `Router<()>`; merge it only after `with_state`
     // has turned the main router stateless too (axum 0.8 semantics).
-    .merge(branding_routes)
+    .merge(customization_routes)
 }
 
 /// Attach the SPA fallback service chosen by `frontend.serve_from`.
