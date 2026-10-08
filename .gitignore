@@ -20,4 +20,4 @@ thoughts
 # Agent-produced screenshots (review material, never committed)
 screenshots/
 
-vendor/*
+vendor/*/core
