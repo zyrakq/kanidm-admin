@@ -2753,10 +2753,6 @@
   <source>Failed to remove the CSS.</source>
   <target>Error al eliminar el CSS.</target>
 </trans-unit>
-<trans-unit id="s179ebb8d0b9ed769">
-  <source>No custom styles</source>
-  <target>Sin estilos personalizados</target>
-</trans-unit>
 <trans-unit id="s529854138984ac13">
   <source>Upload CSS</source>
   <target>Subir CSS</target>

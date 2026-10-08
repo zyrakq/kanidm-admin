@@ -63,7 +63,6 @@
 's16b9446e3a70e1f4': `Atributos`,
 's16cc0c31cc93bc6f': `Error al guardar la configuración.`,
 's177625bf30d733d1': `Contraseña POSIX`,
-'s179ebb8d0b9ed769': `Sin estilos personalizados`,
 's17bb460c650d6608': `No se encontraron entradas.`,
 's181f0670e933ae42': str`Se restauró la entrada ${0}`,
 's18440df0416fc7f1': `Aplicando...`,

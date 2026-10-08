@@ -2753,10 +2753,6 @@
   <source>Failed to remove the CSS.</source>
   <target>删除 CSS 失败。</target>
 </trans-unit>
-<trans-unit id="s179ebb8d0b9ed769">
-  <source>No custom styles</source>
-  <target>暂无自定义样式</target>
-</trans-unit>
 <trans-unit id="s529854138984ac13">
   <source>Upload CSS</source>
   <target>上传 CSS</target>
