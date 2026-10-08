@@ -393,9 +393,9 @@ pub(crate) fn log_dev_credentials(url: &str, credentials: &DevCredentials) {
     warn!(
         url = %url,
         admin = ADMIN_USERNAME,
-        admin_password = %credentials.admin_password,
+        admin_password = ?credentials.admin_password,
         idm_admin = IDM_ADMIN_USERNAME,
-        idm_admin_password = %credentials.idm_admin_password,
+        idm_admin_password = ?credentials.idm_admin_password,
         "dev Kanidm credentials — log in with either account"
     );
 }
