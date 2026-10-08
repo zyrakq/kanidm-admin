@@ -39,3 +39,9 @@ Detailed git workflow rules. Includes strict commit formatting requirements, wor
 - Use `git commit -m "message"` for quick commits
 - For complex commits use `git commit` with editor opening
 - Avoid `git commit --amend` after push
+
+## Worktrees
+
+- If working in a git worktree, after finishing the task and creating commits - merge them into the current working branch of the main repo (e.g. `git merge feature/{name}` from the main checkout)
+- Never leave commits only in the worktree branch - the worktree is for isolation during work, not the final destination
+- After merging, the worktree branch may be deleted along with the worktree itself
