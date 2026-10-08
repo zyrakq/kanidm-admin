@@ -27,13 +27,12 @@ mod mail_certs;
 mod mailpit;
 mod mail_sender;
 mod network;
-pub(crate) mod proxy;
 
 mod styles;
 
-// Re-exports consumed only by the Docker-gated proxy integration
-// tests (cfg(test)); the gated test in this module uses the module
-// paths directly.
+// Re-exports consumed only by the Docker-gated integration tests
+// (app/src/proxy/integration.rs); the gated test in this module
+// uses the module paths directly.
 #[cfg(test)]
 pub(crate) use kanidm::{
     parse_recover_account_password, ADMIN_USERNAME, IDM_ADMIN_USERNAME,
@@ -131,27 +130,22 @@ pub(crate) enum TestcontainersHandle {
 }
 
 impl TestcontainersHandle {
-    /// Base URL the app (and tests) reach the mailpit UI/API at:
-    /// loopback + the fixed UI port in host mode, the container
-    /// DNS name in in-container mode. None when mailpit is not
+    /// Host-reachable mailpit UI URL for the startup log:
+    /// `http://localhost:{ui_port}` in both modes (the UI port is
+    /// published loopback-only in both). None when mailpit is not
     /// running (or containers are disabled).
-    pub(crate) fn mailpit_upstream(&self) -> Option<String> {
+    pub(crate) fn mailpit_url(&self) -> Option<String> {
         let TestcontainersHandle::Containers {
             mailpit,
-            mode,
             ui_port,
             ..
         } = self
         else {
             return None;
         };
-        if mailpit.is_none() {
-            return None;
-        }
-        Some(match mode {
-            Mode::Host => format!("http://127.0.0.1:{ui_port}"),
-            Mode::InContainer => "http://mailpit:8025".to_string(),
-        })
+        mailpit
+            .is_some()
+            .then(|| format!("http://localhost:{ui_port}"))
     }
 }
 
@@ -454,10 +448,10 @@ mod tests {
 
         // The sender's startup smoke mail is already delivered.
         let upstream = handle
-            .mailpit_upstream()
-            .expect("mailpit upstream with mailpit enabled");
+            .mailpit_url()
+            .expect("mailpit URL with mailpit enabled");
         let response = reqwest::Client::new()
-            .get(format!("{upstream}/_/mailpit/api/v1/messages"))
+            .get(format!("{upstream}/api/v1/messages"))
             .send()
             .await
             .expect("mailpit API reachable");

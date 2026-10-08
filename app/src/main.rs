@@ -38,12 +38,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     );
 
     let listener = TcpListener::bind(&settings.server.address).await?;
-    let mailpit_upstream = _testcontainers_handle.mailpit_upstream();
     let router = routes::mount_fallback(
         routes::build(
             state,
             status_probe,
-            mailpit_upstream,
             customization::router(std::sync::Arc::new(customization_store)),
         ),
         &settings.frontend,
@@ -52,6 +50,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     info!("Server running at http://{}", settings.server.address);
     info!("Kanidm at {}", kanidm_settings.url);
+    // Unlike the two URLs above, the mailpit URL is logged only
+    // when the mailpit testcontainer actually runs.
+    if let Some(url) = _testcontainers_handle.mailpit_url() {
+        info!("Mailpit at {url}");
+    }
     axum::serve(listener, router).await?;
 
     Ok(())

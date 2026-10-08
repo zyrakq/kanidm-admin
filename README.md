@@ -152,9 +152,9 @@ docker compose -f docker-compose.yml -f docker-compose.testcontainers.yml up -d 
 ```
 
 Inside the container the app talks to the dev chain over Docker DNS
-names (`https://kanidm:8443`, `smtps://mailpit:1025`, UI proxied at
-`/_/mailpit`) on the shared `kanidm-admin-dev` network — no
-`localhost` ports are involved. `testcontainer.mode = "auto"`
+names (`https://kanidm:8443`, `smtps://mailpit:1025`, Mailpit UI at
+`http://localhost:8025`) on the shared `kanidm-admin-dev` network —
+no `localhost` ports are involved for the app itself. `testcontainer.mode = "auto"`
 detects this automatically (`/.dockerenv` plus a local socket) and
 picks `in-container` networking; the plain variant (`docker compose
 up`) and the host-mode `cargo run` flow are unchanged.
@@ -239,14 +239,16 @@ once the env var is present:
   worker container polling Kanidm for outgoing mail and relaying it.
   No ports are published for it.
 - **Mailpit** (`testcontainer.mailpit`) — catch-all SMTP server with
-  a web UI. The UI is reachable through the admin app at
-  `/_/mailpit` (the app proxies it when mailpit runs); its SMTP port
-  is bound to `127.0.0.1:1025` for host-mode mail delivery.
+  a web UI. The UI is published loopback-only on `mailpit.ui_port`
+  (default `8025`) and its URL is printed in the startup log when
+  mailpit runs; the SMTP port is bound to `127.0.0.1:1025` for
+  host-mode mail delivery.
 
 All containers share the `testcontainer.network` Docker network
 (default `kanidm-admin-dev`); `testcontainer.mode` selects `auto`,
 `host` or `in-container` networking. In host mode all dev ports are
-published loopback-only; in-container mode publishes none. Container
+published loopback-only; in-container mode publishes none except
+the loopback-only mailpit UI port. Container
 logs are captured under `logs/testcontainers/`.
 
 The same chain also runs when the admin app itself is a container:

@@ -268,7 +268,7 @@ pub(crate) async fn run(
 async fn assert_mail_delivered(
     mailpit_upstream: &str,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let url = format!("{mailpit_upstream}/_/mailpit/api/v1/messages");
+    let url = format!("{mailpit_upstream}/api/v1/messages");
     let response = reqwest::Client::new()
         .get(&url)
         .send()

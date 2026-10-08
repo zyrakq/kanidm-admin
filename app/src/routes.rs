@@ -35,15 +35,11 @@ use crate::status::{self, KanidmStatusProbe};
 ///   POST /api/auth/reauth   — privilege step-up (refreshes cookie)
 ///   GET  /api/auth/profile  — signed-in user plus their Kanidm groups
 ///   ANY  /api/kanidm/{*path} — authenticated proxy to the Kanidm server
-///   GET  /_/mailpit        — 301 to /_/mailpit/ (mailpit testcontainer only)
-///   GET  /_/mailpit/api/events — mailpit WebSocket bridge (mailpit testcontainer only)
-///   ANY  /_/mailpit/{*path} — mailpit dev UI forward (mailpit testcontainer only)
 ///   GET/PUT/DELETE /api/customization[/{slot}] — customization manifest/upload/remove
 ///   GET  /customization/{slot}   — serve an uploaded customization file
 pub fn build(
     state: AppState,
     status_probe: Arc<dyn KanidmStatusProbe>,
-    mailpit_upstream: Option<String>,
     customization_routes: Router,
 ) -> Router {
     let router = Router::new()
@@ -56,14 +52,6 @@ pub fn build(
         .merge(auth_routes())
         .merge(crate::proxy::bulk::routes())
         .merge(crate::proxy::handler::routes());
-
-    // The mailpit dev proxy exists only while the mailpit
-    // testcontainer is enabled; the conditional stays here so
-    // main.rs remains a plain sequence of calls.
-    let router = match mailpit_upstream {
-        Some(upstream) => router.merge(crate::testcontainer::proxy::routes(upstream)),
-        None => router,
-    };
 
     router.with_state(state)
     // The customization router carries its own state (CustomizationState), so it

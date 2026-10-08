@@ -1,27 +1,29 @@
 // app/src/testcontainer/mailpit.rs
 //
-// Mailpit container: the catch-all dev mail sink with a web UI
-// under the /_/mailpit prefix (MP_WEBROOT — mailpit serves its UI
-// AND API under the webroot, so the app reverse proxy forwards
-// paths verbatim). Started with implicit-TLS SMTP only: the dev
-// PKI (mail_certs.rs) is copied to /certs (cert 0644, key 0600)
-// and referenced via MP_SMTP_TLS_CERT/MP_SMTP_TLS_KEY with
-// MP_SMTP_REQUIRE_TLS=true — no SMTP username/password anywhere,
-// matching the vendored mailpit-stack step-ca deployment.
-// Readiness is app-side (wait_ready) on the messages API under
-// the webroot: in-container mode publishes no port, so no
-// testcontainers http strategy could probe it. Host mode
-// publishes the fixed UI port on 0.0.0.0 and the SMTP port
-// loopback-only (the sender on the host network relays via
-// localhost).
+// Mailpit container: the catch-all dev mail sink. The UI/API is
+// served at the root — no MP_WEBROOT prefix, because mailpit's
+// absolute /assets/* paths break under one. Started with
+// implicit-TLS SMTP only: the dev PKI (mail_certs.rs) is copied to
+// /certs (cert 0644, key 0600) and referenced via
+// MP_SMTP_TLS_CERT/MP_SMTP_TLS_KEY with MP_SMTP_REQUIRE_TLS=true —
+// no SMTP username/password anywhere, matching the vendored
+// mailpit-stack step-ca deployment. The UI port is published
+// loopback-only in both modes so the browser reaches it directly;
+// readiness is app-side (wait_ready) on the messages API. Host
+// mode also publishes the SMTP port loopback-only (the sender on
+// the host network relays via localhost); in-container mode
+// leaves SMTP unpublished (the sender reaches it via the Docker
+// DNS name).
 
-use testcontainers::bollard::models::{HostConfig, PortBinding};
+#[cfg(test)]
+use testcontainers::bollard::models::PortBinding;
+use testcontainers::bollard::models::HostConfig;
 use testcontainers::core::IntoContainerPort;
 use testcontainers::runners::AsyncRunner;
 use testcontainers::{ContainerAsync, ContainerRequest, CopyTargetOptions, GenericImage, ImageExt};
 use tracing::warn;
 
-use super::kanidm::{publish_nothing, split_image_tag};
+use super::kanidm::split_image_tag;
 use super::log_file::{file_consumer, LogSubfolder};
 use super::mail_certs::MailPki;
 use super::{Mode, CONTAINER_LABEL_KEY, CONTAINER_LABEL_VALUE, STARTUP_TIMEOUT};
@@ -49,11 +51,11 @@ pub(crate) struct MailpitContainer {
 }
 
 /// Container request for mailpit: implicit-TLS SMTP (no auth),
-/// the /_/mailpit webroot, fixed in-container ports, and the dev
-/// PKI copied to /certs at the absolute paths the MP_SMTP_TLS_*
-/// env vars point at. No with_wait_for: readiness is app-side
-/// (wait_ready) because in-container mode publishes no port a
-/// testcontainers http strategy could probe.
+/// root webroot (no MP_WEBROOT — mailpit's absolute /assets/*
+/// paths break under a prefix), fixed in-container ports, and the
+/// dev PKI copied to /certs at the absolute paths the
+/// MP_SMTP_TLS_* env vars point at. No with_wait_for: readiness is
+/// app-side (wait_ready).
 pub(crate) fn mailpit_request(
     image: &str,
     mode: Mode,
@@ -63,7 +65,6 @@ pub(crate) fn mailpit_request(
 ) -> ContainerRequest<GenericImage> {
     let (name, tag) = split_image_tag(image);
     let request = GenericImage::new(name, tag)
-        .with_env_var("MP_WEBROOT", "_/mailpit")
         .with_env_var("MP_SMTP_TLS_CERT", "/certs/cert.pem")
         .with_env_var("MP_SMTP_TLS_KEY", "/certs/key.pem")
         .with_env_var("MP_SMTP_REQUIRE_TLS", "true")
@@ -84,29 +85,24 @@ pub(crate) fn mailpit_request(
         Mode::Host => request
             .with_mapped_port(ui_port, MAILPIT_UI_PORT.tcp())
             .with_mapped_port(MAILPIT_SMTP_PORT, MAILPIT_SMTP_PORT.tcp())
-            .with_host_config_modifier(loopback_bindings(ui_port)),
-        Mode::InContainer => request.with_host_config_modifier(publish_nothing()),
+            .with_host_config_modifier(loopback_bindings()),
+        Mode::InContainer => request
+            .with_mapped_port(ui_port, MAILPIT_UI_PORT.tcp())
+            .with_host_config_modifier(loopback_bindings()),
     }
 }
 
-/// Host-config modifier for mailpit in host mode: rewrites the
-/// runner-derived bindings (with_mapped_port uses a wildcard host
-/// IP) so BOTH the UI and the SMTP socket are loopback-only. The
-/// UI is reached exclusively through the app's /_/mailpit proxy —
-/// a public UI port would defeat the prefix UX; the SMTP socket is
-/// reached by the host-network sender via localhost. Nothing may
-/// reach mailpit from outside the host.
-fn loopback_bindings(ui_port: u16) -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
+/// Host-config modifier: rewrites the runner-derived bindings
+/// (with_mapped_port uses a wildcard host IP) so every mapped port
+/// is loopback-only. Host mode maps the UI and SMTP ports (the
+/// host-network sender relays via localhost); in-container mode
+/// maps only the UI port so the browser reaches the UI directly.
+/// Nothing may reach mailpit from outside the host.
+fn loopback_bindings() -> impl Fn(&mut HostConfig) + Send + Sync + 'static {
     move |config: &mut HostConfig| {
         let mut bindings = config.port_bindings.take().unwrap_or_default();
-        for port in [ui_port, MAILPIT_SMTP_PORT] {
-            bindings.insert(
-                format!("{port}/tcp"),
-                Some(vec![PortBinding {
-                    host_ip: Some("127.0.0.1".to_string()),
-                    host_port: Some(port.to_string()),
-                }]),
-            );
+        for binding in bindings.values_mut().flatten().flatten() {
+            binding.host_ip = Some("127.0.0.1".to_string());
         }
         config.port_bindings = Some(bindings);
         config.publish_all_ports = Some(false);
@@ -150,13 +146,13 @@ pub(crate) async fn run(
 }
 
 /// Bounded-retry readiness probe on the mailpit messages API
-/// under the webroot (10 × 250 ms growing to a 2 s cap — same
-/// shape as the kanidm smoke auth loop). The API is the smoke
-/// surface too: `GET /_/mailpit/api/v1/messages` returns a JSON
-/// object with a `total` field.
+/// (10 × 250 ms growing to a 2 s cap — same shape as the kanidm
+/// smoke auth loop). The API is the smoke surface too:
+/// `GET /api/v1/messages` returns a JSON object with a `total`
+/// field.
 async fn wait_ready(upstream: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let client = reqwest::Client::new();
-    let url = format!("{upstream}/_/mailpit/api/v1/messages");
+    let url = format!("{upstream}/api/v1/messages");
 
     let mut last_error = String::from("no attempt made");
     for attempt in 0..RETRY_ATTEMPTS {
@@ -212,7 +208,7 @@ mod tests {
     }
 
     #[test]
-    fn request_sets_tls_webroot_and_copies() {
+    fn request_sets_tls_env_and_copies() {
         let pki = test_pki(Mode::Host);
         let request = mailpit_request(
             "axllent/mailpit:v1.31.2",
@@ -226,10 +222,6 @@ mod tests {
             .env_vars()
             .map(|(name, value)| (name.to_string(), value.to_string()))
             .collect();
-        assert_eq!(
-            env.get("MP_WEBROOT").map(String::as_str),
-            Some("_/mailpit")
-        );
         assert_eq!(
             env.get("MP_SMTP_TLS_CERT").map(String::as_str),
             Some("/certs/cert.pem")
@@ -280,7 +272,7 @@ mod tests {
     }
 
     #[test]
-    fn in_container_mode_publishes_nothing() {
+    fn in_container_mode_maps_only_the_ui_port() {
         let pki = test_pki(Mode::InContainer);
         let request = mailpit_request(
             "axllent/mailpit:v1.31.2",
@@ -289,9 +281,17 @@ mod tests {
             8025,
             &pki,
         );
+        let debug = format!(
+            "{:?}",
+            request.ports().expect("in-container mode maps the UI port")
+        );
         assert!(
-            request.ports().is_none() && request.expose_ports().is_empty(),
-            "in-container mode must not publish any port"
+            debug.contains("8025"),
+            "the UI port is published loopback-only: {debug}"
+        );
+        assert!(
+            !debug.contains("1025"),
+            "the SMTP port stays unpublished (the sender uses the DNS name): {debug}"
         );
     }
 
@@ -319,7 +319,7 @@ mod tests {
             ..Default::default()
         };
 
-        loopback_bindings(8025)(&mut config);
+        loopback_bindings()(&mut config);
 
         let bindings = config.port_bindings.expect("bindings stay present");
         for (key, port) in [("8025/tcp", "8025"), ("1025/tcp", "1025")] {
@@ -352,7 +352,7 @@ mod tests {
             )])),
             ..Default::default()
         };
-        loopback_bindings(8026)(&mut config);
+        loopback_bindings()(&mut config);
         let binding = config
             .port_bindings
             .expect("bindings present")

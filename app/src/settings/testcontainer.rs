@@ -23,7 +23,8 @@ const DEFAULT_SENDER_IMAGE: &str = "kanidm/tools:1.11.1";
 const DEFAULT_MAILPIT_IMAGE: &str = "axllent/mailpit:v1.31.2";
 
 /// Default host port for the mailpit UI — published loopback-only
-/// (the UI is reached through the app's /_/mailpit proxy).
+/// in both modes (the UI is opened directly at
+/// http://localhost:{ui_port}).
 const DEFAULT_MAILPIT_UI_PORT: u16 = 8025;
 
 /// Default host-side HTTPS port for the dev kanidm server in host
