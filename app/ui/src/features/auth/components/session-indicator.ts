@@ -1,7 +1,11 @@
 import { LitElement, html, nothing, type PropertyValues } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { msg, str } from '@lit/localize';
-import { localized, LocaleController, LOCALE_METADATA } from '@/features/localization';
+import {
+  localized,
+  LocaleController,
+  LOCALE_METADATA,
+} from '@/features/localization';
 import { notificationService } from '@/features/notifications';
 import { ThemeController, themeService } from '@/features/theme';
 import { authService } from '../services/auth.service';
@@ -176,12 +180,10 @@ export class SessionIndicator extends LitElement {
   };
 
   render() {
-    if (!this.user) {
-      return nothing;
-    }
-
+    // Guest mode: the trigger is always rendered so logged-out users
+    // (especially on mobile) can reach theme and language controls.
     const countdown =
-      this.remainingMs !== null
+      this.user && this.remainingMs !== null
         ? html`<span
             class="countdown ${this.warning ? 'warning' : ''}"
             aria-label=${msg('Session time remaining')}
@@ -196,18 +198,18 @@ export class SessionIndicator extends LitElement {
           type="button"
           aria-haspopup="menu"
           aria-expanded=${this.menuOpen || this.drawerOpen ? 'true' : 'false'}
-          aria-label=${this.avatarName}
+          aria-label=${this.user ? this.avatarName : msg('Settings')}
           @click=${this.handleTriggerClick}
         >
           ${countdown}
-          <ui-avatar
-            .name=${this.avatarName}
-            size="32"
-          ></ui-avatar>
+          ${this.user
+            ? html`<ui-avatar .name=${this.avatarName} size="32"></ui-avatar>`
+            : html`<span class="guest-icon"
+                ><ui-icon name="settings" size="24"></ui-icon
+              ></span>`}
           <ui-icon name="chevron-down" size="16"></ui-icon>
         </button>
-        ${this.menuOpen ? this.renderMenu() : nothing}
-        ${this.renderDrawer()}
+        ${this.menuOpen ? this.renderMenu() : nothing} ${this.renderDrawer()}
       </div>
     `;
   }
@@ -215,23 +217,20 @@ export class SessionIndicator extends LitElement {
   private renderMenu() {
     const user = this.user;
     if (!user) {
-      return nothing;
+      return this.renderGuestMenu();
     }
     return html`
       <div class="menu" role="menu">
         <div class="menu-header">
           <p class="display-name">${user.displayName || user.username}</p>
           <p class="user-meta">${user.username}</p>
-          ${user.email
-            ? html`<p class="user-meta">${user.email}</p>`
-            : nothing}
+          ${user.email ? html`<p class="user-meta">${user.email}</p>` : nothing}
         </div>
         <div class="divider"></div>
         <div class="session-row">
           <span class="session-label">${msg('Session')}</span>
           ${this.remainingMs !== null
-            ? html`<span
-                class="countdown ${this.warning ? 'warning' : ''}"
+            ? html`<span class="countdown ${this.warning ? 'warning' : ''}"
                 >${this.formatRemaining(this.remainingMs)}</span
               >`
             : nothing}
@@ -244,11 +243,47 @@ export class SessionIndicator extends LitElement {
     `;
   }
 
+  /** Guest dropdown: theme + language only — no profile, countdown or
+   *  sign-out. Reuses .drawer-row markup, compacted via .menu override. */
+  private renderGuestMenu() {
+    const isDark = this.theme.theme === 'dark';
+    const currentLocale = LOCALE_METADATA[this.localeCtrl.locale];
+
+    return html`
+      <div class="menu" role="menu">
+        <button
+          class="drawer-row"
+          type="button"
+          role="menuitem"
+          @click=${this.handleThemeToggle}
+          aria-label=${isDark
+            ? msg('Switch to light theme')
+            : msg('Switch to dark theme')}
+        >
+          <ui-icon name=${isDark ? 'sun' : 'moon'} size="20"></ui-icon>
+          <span class="drawer-row-label">${msg('Dark mode')}</span>
+          <div class="theme-track ${isDark ? 'active' : ''}" aria-hidden="true">
+            <div class="theme-thumb"></div>
+          </div>
+        </button>
+        <button
+          class="drawer-row"
+          type="button"
+          role="menuitem"
+          @click=${this.toggleSheet}
+          aria-label=${msg('Change language')}
+        >
+          <ui-icon name="globe" size="20"></ui-icon>
+          <span class="drawer-row-label">${msg('Language')}</span>
+          <span class="drawer-row-value">${currentLocale.flag}</span>
+          <ui-icon name="chevron-right" size="16"></ui-icon>
+        </button>
+      </div>
+    `;
+  }
+
   private renderDrawer(): unknown {
     const user = this.user;
-    if (!user) {
-      return nothing;
-    }
     const isDark = this.theme.theme === 'dark';
     const currentLocale = LOCALE_METADATA[this.localeCtrl.locale];
 
@@ -257,31 +292,34 @@ export class SessionIndicator extends LitElement {
         class="drawer ${this.drawerOpen ? 'open' : ''}"
         role="dialog"
         aria-modal="true"
-        aria-label=${msg('Session menu')}
+        aria-label=${user ? msg('Session menu') : msg('Settings')}
       >
-        <div class="drawer-profile">
-          <ui-avatar
-            .name=${this.avatarName}
-            size="56"
-          ></ui-avatar>
-          <span class="drawer-username"
-            >${user.displayName || user.username}</span
-          >
-          ${user.email
-            ? html`<span class="drawer-user-subtitle">${user.email}</span>`
-            : nothing}
-        </div>
+        ${user
+          ? html`
+              <div class="drawer-profile">
+                <ui-avatar .name=${this.avatarName} size="56"></ui-avatar>
+                <span class="drawer-username"
+                  >${user.displayName || user.username}</span
+                >
+                ${user.email
+                  ? html`<span class="drawer-user-subtitle"
+                      >${user.email}</span
+                    >`
+                  : nothing}
+              </div>
 
-        <div class="drawer-row">
-          <ui-icon name="clock" size="20"></ui-icon>
-          <span class="drawer-row-label">${msg('Session')}</span>
-          ${this.remainingMs !== null
-            ? html`<span
-                class="countdown ${this.warning ? 'warning' : ''}"
-                >${this.formatRemaining(this.remainingMs)}</span
-              >`
-            : nothing}
-        </div>
+              <div class="drawer-row">
+                <ui-icon name="clock" size="20"></ui-icon>
+                <span class="drawer-row-label">${msg('Session')}</span>
+                ${this.remainingMs !== null
+                  ? html`<span
+                      class="countdown ${this.warning ? 'warning' : ''}"
+                      >${this.formatRemaining(this.remainingMs)}</span
+                    >`
+                  : nothing}
+              </div>
+            `
+          : nothing}
 
         <button
           class="drawer-row"
@@ -310,14 +348,18 @@ export class SessionIndicator extends LitElement {
           <ui-icon name="chevron-right" size="16"></ui-icon>
         </button>
 
-        <button
-          class="drawer-row danger"
-          type="button"
-          @click=${() => void this.handleSignOut()}
-        >
-          <ui-icon name="log-out" size="20"></ui-icon>
-          <span class="drawer-row-label">${msg('Sign Out')}</span>
-        </button>
+        ${user
+          ? html`
+              <button
+                class="drawer-row danger"
+                type="button"
+                @click=${() => void this.handleSignOut()}
+              >
+                <ui-icon name="log-out" size="20"></ui-icon>
+                <span class="drawer-row-label">${msg('Sign Out')}</span>
+              </button>
+            `
+          : nothing}
       </div>
 
       <locale-bottom-sheet
