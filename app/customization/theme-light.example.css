@@ -1,0 +1,18 @@
+/**
+ * Light theme override example — purple/lilac primary palette.
+ *
+ * Usage: copy this file to `<customization dir>/theme-light` (by default
+ * `app/customization/theme-light`) or upload it via Admin → Customization →
+ * "Theme override (light)". It is served at /customization/theme-light.css
+ * and loaded after the built-in palette, so these values win for the
+ * light theme (`:root`).
+ */
+:root {
+  --theme-color-primary: #8b5cf6;
+  --theme-color-primary-hover: #7c4def;
+  --theme-color-primary-active: #6d3ee0;
+  --theme-color-on-primary: #ffffff;
+  --theme-color-primary-soft: rgba(139, 92, 246, 0.12);
+  --theme-primary-glow: 0 1px 2px rgba(109, 62, 224, 0.35),
+    0 4px 12px rgba(139, 92, 246, 0.28);
+}

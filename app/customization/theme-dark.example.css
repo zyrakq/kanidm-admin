@@ -1,0 +1,18 @@
+/**
+ * Dark theme override example — purple/lilac primary palette.
+ *
+ * Usage: copy this file to `<customization dir>/theme-dark` (by default
+ * `app/customization/theme-dark`) or upload it via Admin → Customization →
+ * "Theme override (dark)". It is served at /customization/theme-dark.css
+ * and loaded after the built-in palette; the `:root[theme="dark"]`
+ * selector scopes it to the dark theme only.
+ */
+:root[theme="dark"] {
+  --theme-color-primary: #a78bfa;
+  --theme-color-primary-hover: #b7a1fb;
+  --theme-color-primary-active: #8b5cf6;
+  --theme-color-on-primary: #241547;
+  --theme-color-primary-soft: rgba(167, 139, 250, 0.16);
+  --theme-primary-glow: 0 1px 2px rgba(0, 0, 0, 0.4),
+    0 4px 16px rgba(167, 139, 250, 0.28);
+}

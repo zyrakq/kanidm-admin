@@ -15,7 +15,8 @@ use serde::Serialize;
 
 use crate::customization::sanitize::sanitize_svg;
 
-/// The four overrideable slots (v1 scope).
+/// The six overrideable slots: four image slots (logo/favicon, light
+/// and dark) and two CSS theme-override slots.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum Slot {
@@ -23,14 +24,28 @@ pub enum Slot {
     LogoDark,
     FaviconLight,
     FaviconDark,
+    ThemeLight,
+    ThemeDark,
+}
+
+/// What kind of content a slot accepts; decides the allowed content
+/// types and the serve fallback behavior.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SlotKind {
+    /// SVG/PNG images; SVG is sanitized at write time.
+    Image,
+    /// Stylesheets stored verbatim (the SVG sanitizer must not run).
+    Css,
 }
 
 impl Slot {
-    pub const ALL: [Slot; 4] = [
+    pub const ALL: [Slot; 6] = [
         Slot::LogoLight,
         Slot::LogoDark,
         Slot::FaviconLight,
         Slot::FaviconDark,
+        Slot::ThemeLight,
+        Slot::ThemeDark,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -39,6 +54,8 @@ impl Slot {
             Slot::LogoDark => "logo-dark",
             Slot::FaviconLight => "favicon-light",
             Slot::FaviconDark => "favicon-dark",
+            Slot::ThemeLight => "theme-light",
+            Slot::ThemeDark => "theme-dark",
         }
     }
 
@@ -46,10 +63,28 @@ impl Slot {
     pub fn parse(name: &str) -> Option<Slot> {
         Slot::ALL.iter().copied().find(|s| s.as_str() == name)
     }
+
+    /// Content kind accepted by this slot.
+    pub fn kind(self) -> SlotKind {
+        match self {
+            Slot::ThemeLight | Slot::ThemeDark => SlotKind::Css,
+            Slot::LogoLight | Slot::LogoDark | Slot::FaviconLight | Slot::FaviconDark => {
+                SlotKind::Image
+            }
+        }
+    }
 }
 
-/// Content types accepted for uploads.
-const ALLOWED_TYPES: [&str; 2] = ["image/svg+xml", "image/png"];
+/// Allowed content types per slot kind.
+const IMAGE_TYPES: [&str; 2] = ["image/svg+xml", "image/png"];
+const CSS_TYPES: [&str; 1] = ["text/css"];
+
+fn allowed_types(kind: SlotKind) -> &'static [&'static str] {
+    match kind {
+        SlotKind::Image => &IMAGE_TYPES,
+        SlotKind::Css => &CSS_TYPES,
+    }
+}
 
 /// Persisted manifest entry for one slot.
 #[derive(Debug, Clone, Serialize)]
@@ -65,15 +100,19 @@ pub struct Manifest {
     /// Max mtime across slots (unix seconds, "0" when empty) — the
     /// frontend cache-buster.
     pub version: String,
-    /// All four slots, always.
+    /// All six slots, always.
     pub slots: Vec<(String, SlotEntry)>,
 }
 
 /// Store-level failures, mapped to HTTP responses by the handlers.
 #[derive(Debug)]
 pub enum StoreError {
-    /// Unsupported content type.
-    InvalidType(String),
+    /// Unsupported content type; carries the slot's allowed list so the
+    /// handler can render a per-slot message.
+    InvalidType {
+        content_type: String,
+        allowed: Vec<String>,
+    },
     /// Upload exceeds `max_size_bytes`.
     TooLarge { size: usize, limit: i64 },
     /// Filesystem failure (dir creation, write, read).
@@ -105,12 +144,26 @@ impl CustomizationStore {
         self.dir.join(format!("{}.meta", slot.as_str()))
     }
 
-    /// Validate, sanitize (SVG only) and persist an upload; returns the
-    /// updated manifest entry.
-    pub fn store(&self, slot: Slot, content_type: &str, data: &[u8]) -> Result<SlotEntry, StoreError> {
-        let normalized = content_type.split(';').next().unwrap_or("").trim().to_ascii_lowercase();
-        if !ALLOWED_TYPES.contains(&normalized.as_str()) {
-            return Err(StoreError::InvalidType(normalized));
+    /// Validate, sanitize (SVG images only) and persist an upload;
+    /// returns the updated manifest entry. CSS is stored verbatim.
+    pub fn store(
+        &self,
+        slot: Slot,
+        content_type: &str,
+        data: &[u8],
+    ) -> Result<SlotEntry, StoreError> {
+        let normalized = content_type
+            .split(';')
+            .next()
+            .unwrap_or("")
+            .trim()
+            .to_ascii_lowercase();
+        let allowed = allowed_types(slot.kind());
+        if !allowed.contains(&normalized.as_str()) {
+            return Err(StoreError::InvalidType {
+                content_type: normalized.clone(),
+                allowed: allowed.iter().map(|t| t.to_string()).collect(),
+            });
         }
         if data.len() as i64 > self.max_size_bytes {
             return Err(StoreError::TooLarge {
@@ -119,9 +172,13 @@ impl CustomizationStore {
             });
         }
 
+        // SVG images are sanitized at write time; PNG and CSS are
+        // stored verbatim (the sanitizer is SVG-specific).
         let bytes: Vec<u8> = if normalized == "image/svg+xml" {
-            let text = std::str::from_utf8(data)
-                .map_err(|_| StoreError::InvalidType(normalized.clone()))?;
+            let text = std::str::from_utf8(data).map_err(|_| StoreError::InvalidType {
+                content_type: normalized.clone(),
+                allowed: allowed.iter().map(|t| t.to_string()).collect(),
+            })?;
             sanitize_svg(text).into_bytes()
         } else {
             data.to_vec()
@@ -181,7 +238,7 @@ impl CustomizationStore {
         }
     }
 
-    /// Full manifest: all four slots plus the cache-busting version.
+    /// Full manifest: all six slots plus the cache-busting version.
     pub fn manifest(&self) -> Manifest {
         let slots = Slot::ALL
             .iter()
@@ -217,10 +274,22 @@ mod tests {
     }
 
     #[test]
+    fn slot_kinds() {
+        assert_eq!(Slot::LogoLight.kind(), SlotKind::Image);
+        assert_eq!(Slot::FaviconDark.kind(), SlotKind::Image);
+        assert_eq!(Slot::ThemeLight.kind(), SlotKind::Css);
+        assert_eq!(Slot::ThemeDark.kind(), SlotKind::Css);
+    }
+
+    #[test]
     fn store_and_read_roundtrip_svg() {
         let (s, _dir) = store();
         let entry = s
-            .store(Slot::LogoLight, "image/svg+xml", b"<svg><script>alert(1)</script></svg>")
+            .store(
+                Slot::LogoLight,
+                "image/svg+xml",
+                b"<svg><script>alert(1)</script></svg>",
+            )
             .expect("store should succeed");
         assert!(entry.present);
         let (ctype, bytes) = s.read(Slot::LogoLight).expect("read").expect("present");
@@ -239,6 +308,47 @@ mod tests {
     }
 
     #[test]
+    fn css_roundtrip_is_verbatim() {
+        let (s, _dir) = store();
+        let css = b":root { --theme-color-primary: #8b5cf6; }";
+        let entry = s
+            .store(Slot::ThemeLight, "text/css", css)
+            .expect("store css should succeed");
+        assert!(entry.present);
+        let (ctype, bytes) = s.read(Slot::ThemeLight).expect("read").expect("present");
+        assert_eq!(ctype, "text/css");
+        assert_eq!(bytes, css.to_vec(), "CSS must not be sanitized or transformed");
+    }
+
+    #[test]
+    fn css_content_type_parameters_are_stripped() {
+        let (s, _dir) = store();
+        s.store(Slot::ThemeLight, "text/css; charset=utf-8", b":root{}")
+            .expect("store should succeed");
+        let (ctype, _) = s.read(Slot::ThemeLight).expect("read").expect("present");
+        assert_eq!(ctype, "text/css");
+    }
+
+    #[test]
+    fn css_slot_rejects_image_type() {
+        let (s, _dir) = store();
+        let err = s.store(Slot::ThemeDark, "image/png", b"png").unwrap_err();
+        match err {
+            StoreError::InvalidType { allowed, .. } => {
+                assert_eq!(allowed, vec!["text/css".to_string()]);
+            }
+            other => panic!("expected InvalidType, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn image_slot_rejects_css_type() {
+        let (s, _dir) = store();
+        let err = s.store(Slot::LogoLight, "text/css", b":root{}").unwrap_err();
+        assert!(matches!(err, StoreError::InvalidType { .. }));
+    }
+
+    #[test]
     fn content_type_parameters_are_stripped() {
         let (s, _dir) = store();
         s.store(Slot::LogoDark, "image/svg+xml; charset=utf-8", b"<svg/>")
@@ -251,7 +361,7 @@ mod tests {
     fn unsupported_type_is_rejected() {
         let (s, _dir) = store();
         let err = s.store(Slot::LogoLight, "image/gif", b"GIF8").unwrap_err();
-        assert!(matches!(err, StoreError::InvalidType(_)));
+        assert!(matches!(err, StoreError::InvalidType { .. }));
     }
 
     #[test]
@@ -259,6 +369,15 @@ mod tests {
         let (s, _dir) = store();
         let err = s
             .store(Slot::LogoLight, "image/png", &[0u8; 2048])
+            .unwrap_err();
+        assert!(matches!(err, StoreError::TooLarge { size: 2048, limit: 1024 }));
+    }
+
+    #[test]
+    fn oversized_css_upload_is_rejected() {
+        let (s, _dir) = store();
+        let err = s
+            .store(Slot::ThemeLight, "text/css", &[b'x'; 2048])
             .unwrap_err();
         assert!(matches!(err, StoreError::TooLarge { size: 2048, limit: 1024 }));
     }
@@ -283,7 +402,14 @@ mod tests {
         let names: Vec<&str> = m.slots.iter().map(|(n, _)| n.as_str()).collect();
         assert_eq!(
             names,
-            vec!["logo-light", "logo-dark", "favicon-light", "favicon-dark"]
+            vec![
+                "logo-light",
+                "logo-dark",
+                "favicon-light",
+                "favicon-dark",
+                "theme-light",
+                "theme-dark"
+            ]
         );
         let favicon = &m.slots[2].1;
         assert!(favicon.present);
@@ -291,8 +417,17 @@ mod tests {
     }
 
     #[test]
+    fn version_reflects_latest_upload() {
+        let (s, _dir) = store();
+        assert_eq!(s.manifest().version, "0");
+        s.store(Slot::ThemeDark, "text/css", b":root{}").expect("store");
+        assert_ne!(s.manifest().version, "0");
+    }
+
+    #[test]
     fn missing_file_reads_as_none() {
         let (s, _dir) = store();
         assert!(s.read(Slot::LogoDark).expect("read").is_none());
+        assert!(s.read(Slot::ThemeLight).expect("read").is_none());
     }
 }

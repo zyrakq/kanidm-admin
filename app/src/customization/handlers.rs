@@ -8,6 +8,10 @@
 //   DELETE /api/customization/{slot} — remove override (back to default)
 //   GET    /customization/{slot}     — serve the override file
 //
+// Unset CSS slots serve a `/* custom styles */` placeholder instead of
+// 404: the static <link> tags in index.html load on every page load and
+// must never fail (or log console errors). Image slots keep the 404.
+//
 // Caveat (accepted in the design): endpoints are unauthenticated until
 // the real Kanidm OIDC integration lands.
 
@@ -22,9 +26,15 @@ use axum::{
 };
 use serde::Serialize;
 
-use crate::customization::store::{CustomizationStore, Slot, SlotEntry, StoreError};
+use crate::customization::store::{
+    CustomizationStore, Slot, SlotEntry, SlotKind, StoreError,
+};
 
 pub type CustomizationState = Arc<CustomizationStore>;
+
+/// Body served for unset CSS slots — upstream Kanidm's `override.css`
+/// convention. Keeps the cascade order stable and the console clean.
+const CSS_PLACEHOLDER: &str = "/* custom styles */";
 
 /// Self-contained customization router (state applied inside) so
 /// `routes::build` can merge it regardless of its own state type.
@@ -77,8 +87,9 @@ impl IntoResponse for CustomizationApiError {
 impl From<StoreError> for CustomizationApiError {
     fn from(e: StoreError) -> Self {
         match e {
-            StoreError::InvalidType(t) => Self::bad_request(format!(
-                "Unsupported content type '{t}'. Allowed: image/svg+xml, image/png."
+            StoreError::InvalidType { content_type, allowed } => Self::bad_request(format!(
+                "Unsupported content type '{content_type}'. Allowed: {}.",
+                allowed.join(", ")
             )),
             StoreError::TooLarge { size, limit } => Self::bad_request(format!(
                 "Upload is {size} bytes; the limit is {limit} bytes."
@@ -150,7 +161,9 @@ async fn upload_handler(
             let data = field
                 .bytes()
                 .await
-                .map_err(|_| CustomizationApiError::bad_request("Upload body could not be read."))?;
+                .map_err(|_| {
+                    CustomizationApiError::bad_request("Upload body could not be read.")
+                })?;
             let entry = store.store(slot, &content_type, &data)?;
             return Ok(Json(entry.into()));
         }
@@ -176,6 +189,18 @@ async fn serve_handler(
 ) -> Result<Response, CustomizationApiError> {
     let slot = Slot::parse(&slot).ok_or_else(CustomizationApiError::not_found)?;
     let Some((content_type, bytes)) = store.read(slot)? else {
+        // Unset CSS slots serve an empty override instead of 404 (see
+        // module docs); image slots keep the 404 behavior.
+        if slot.kind() == SlotKind::Css {
+            return Ok((
+                [
+                    (header::CONTENT_TYPE, "text/css".to_string()),
+                    (header::CACHE_CONTROL, "no-cache".to_string()),
+                ],
+                CSS_PLACEHOLDER.to_string(),
+            )
+                .into_response());
+        }
         return Err(CustomizationApiError {
             status: StatusCode::NOT_FOUND,
             code: "not_found",
@@ -202,10 +227,7 @@ mod tests {
 
     fn app() -> (Router, tempfile::TempDir) {
         let dir = tempfile::tempdir().expect("tempdir");
-        let store = Arc::new(CustomizationStore::new(
-            dir.path().to_path_buf(),
-            1024,
-        ));
+        let store = Arc::new(CustomizationStore::new(dir.path().to_path_buf(), 1024));
         (router(store), dir)
     }
 
@@ -213,31 +235,64 @@ mod tests {
     fn multipart_body(content_type: &str, payload: &[u8]) -> (String, Body) {
         let boundary = "customizationboundary";
         let body = format!(
-            "--{b}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"logo.svg\"\r\n\
+            "--{b}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"override\"\r\n\
              Content-Type: {ct}\r\n\r\n{payload}\r\n--{b}--\r\n",
             b = boundary,
             ct = content_type,
             payload = String::from_utf8_lossy(payload),
         );
-        let headers = format!(
-            "Content-Type: multipart/form-data; boundary={boundary}\r\n"
-        );
+        let headers = format!("Content-Type: multipart/form-data; boundary={boundary}\r\n");
         (headers, Body::from(body))
+    }
+
+    fn req(method: &str, uri: &str) -> axum::http::Request<Body> {
+        axum::http::Request::builder()
+            .method(method)
+            .uri(uri)
+            .body(Body::empty())
+            .unwrap()
+    }
+
+    async fn put_multipart(uri: &str, content_type: &str, payload: &[u8]) -> axum::http::Response<axum::body::Body> {
+        let (app, _dir) = app();
+        let (headers, body) = multipart_body(content_type, payload);
+        app.oneshot(
+            axum::http::Request::builder()
+                .method("PUT")
+                .uri(uri)
+                .header(
+                    "content-type",
+                    headers.trim_start_matches("Content-Type: ").trim_end(),
+                )
+                .body(body)
+                .unwrap(),
+        )
+        .await
+        .unwrap()
     }
 
     #[tokio::test]
     async fn manifest_starts_empty() {
         let (app, _dir) = app();
-        let res = app
-            .oneshot(axum::http::Request::builder().uri("/api/customization").body(Body::empty()).unwrap())
-            .await
-            .unwrap();
+        let res = app.oneshot(req("GET", "/api/customization")).await.unwrap();
         assert_eq!(res.status(), StatusCode::OK);
         let bytes = res.into_body().collect().await.unwrap().to_bytes();
         let json: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
         assert_eq!(json["version"], "0");
-        assert_eq!(json["slots"]["logo-light"]["present"], false);
-        assert_eq!(json["slots"]["favicon-dark"]["present"], false);
+        for name in [
+            "logo-light",
+            "logo-dark",
+            "favicon-light",
+            "favicon-dark",
+            "theme-light",
+            "theme-dark",
+        ] {
+            assert_eq!(
+                json["slots"][name]["present"],
+                false,
+                "slot {name} should be listed and absent"
+            );
+        }
     }
 
     #[tokio::test]
@@ -251,7 +306,10 @@ mod tests {
                 axum::http::Request::builder()
                     .method("PUT")
                     .uri("/api/customization/logo-light")
-                    .header("content-type", headers.trim_start_matches("Content-Type: ").trim_end())
+                    .header(
+                        "content-type",
+                        headers.trim_start_matches("Content-Type: ").trim_end(),
+                    )
                     .body(body)
                     .unwrap(),
             )
@@ -266,7 +324,7 @@ mod tests {
         // Manifest now reports the slot and a non-zero version.
         let res = app
             .clone()
-            .oneshot(axum::http::Request::builder().uri("/api/customization").body(Body::empty()).unwrap())
+            .oneshot(req("GET", "/api/customization"))
             .await
             .unwrap();
         let bytes = res.into_body().collect().await.unwrap().to_bytes();
@@ -277,7 +335,7 @@ mod tests {
         // Serve returns sanitized SVG with no-cache.
         let res = app
             .clone()
-            .oneshot(axum::http::Request::builder().uri("/customization/logo-light").body(Body::empty()).unwrap())
+            .oneshot(req("GET", "/customization/logo-light"))
             .await
             .unwrap();
         assert_eq!(res.status(), StatusCode::OK);
@@ -288,21 +346,126 @@ mod tests {
         // Delete resets to default.
         let res = app
             .clone()
-            .oneshot(
-                axum::http::Request::builder()
-                    .method("DELETE")
-                    .uri("/api/customization/logo-light")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
+            .oneshot(req("DELETE", "/api/customization/logo-light"))
             .await
             .unwrap();
         assert_eq!(res.status(), StatusCode::NO_CONTENT);
         let res = app
-            .oneshot(axum::http::Request::builder().uri("/customization/logo-light").body(Body::empty()).unwrap())
+            .oneshot(req("GET", "/customization/logo-light"))
             .await
             .unwrap();
         assert_eq!(res.status(), StatusCode::NOT_FOUND);
+    }
+
+    #[tokio::test]
+    async fn css_slot_roundtrip() {
+        let (app, _dir) = app();
+        let (headers, body) =
+            multipart_body("text/css", ":root { --theme-color-primary: #8b5cf6; }".as_bytes());
+
+        let res = app
+            .clone()
+            .oneshot(
+                axum::http::Request::builder()
+                    .method("PUT")
+                    .uri("/api/customization/theme-light")
+                    .header(
+                        "content-type",
+                        headers.trim_start_matches("Content-Type: ").trim_end(),
+                    )
+                    .body(body)
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        let bytes = res.into_body().collect().await.unwrap().to_bytes();
+        let json: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(json["present"], true);
+        assert_eq!(json["content_type"], "text/css");
+
+        // Serve returns the CSS verbatim with no-cache.
+        let res = app
+            .clone()
+            .oneshot(req("GET", "/customization/theme-light"))
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        assert_eq!(res.headers()["content-type"], "text/css");
+        assert_eq!(res.headers()["cache-control"], "no-cache");
+        let bytes = res.into_body().collect().await.unwrap().to_bytes();
+        assert!(
+            String::from_utf8(bytes.to_vec())
+                .unwrap()
+                .contains("--theme-color-primary"),
+            "CSS body must be stored verbatim"
+        );
+
+        // Delete → back to the placeholder (not a 404).
+        let res = app
+            .clone()
+            .oneshot(req("DELETE", "/api/customization/theme-light"))
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::NO_CONTENT);
+        let res = app
+            .oneshot(req("GET", "/customization/theme-light"))
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        let bytes = res.into_body().collect().await.unwrap().to_bytes();
+        assert_eq!(bytes.as_ref(), b"/* custom styles */");
+    }
+
+    #[tokio::test]
+    async fn unset_css_slot_serves_placeholder_and_image_slot_404s() {
+        let (app, _dir) = app();
+        let res = app
+            .clone()
+            .oneshot(req("GET", "/customization/theme-dark"))
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        assert_eq!(res.headers()["content-type"], "text/css");
+        let bytes = res.into_body().collect().await.unwrap().to_bytes();
+        assert_eq!(bytes.as_ref(), b"/* custom styles */");
+
+        let res = app
+            .oneshot(req("GET", "/customization/logo-light"))
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::NOT_FOUND);
+    }
+
+    #[tokio::test]
+    async fn css_upload_with_image_type_is_400() {
+        let res = put_multipart("/api/customization/theme-light", "image/png", b"png").await;
+        assert_eq!(res.status(), StatusCode::BAD_REQUEST);
+        let bytes = res.into_body().collect().await.unwrap().to_bytes();
+        let json: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(json["error"]["code"], "validation_error");
+        assert!(
+            json["error"]["message"]
+                .as_str()
+                .unwrap()
+                .contains("Allowed: text/css."),
+            "per-slot allowed types must be listed, got: {json}"
+        );
+    }
+
+    #[tokio::test]
+    async fn image_upload_with_css_type_is_400() {
+        let res = put_multipart("/api/customization/logo-dark", "text/css", b":root{}").await;
+        assert_eq!(res.status(), StatusCode::BAD_REQUEST);
+        let bytes = res.into_body().collect().await.unwrap().to_bytes();
+        let json: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        assert!(
+            json["error"]["message"]
+                .as_str()
+                .unwrap()
+                .contains("Allowed: image/svg+xml, image/png."),
+            "per-slot allowed types must be listed, got: {json}"
+        );
     }
 
     #[tokio::test]
@@ -330,12 +493,7 @@ mod tests {
             .unwrap();
         assert_eq!(res.status(), StatusCode::NOT_FOUND, "PUT /api/customization/nope");
         let res = app
-            .oneshot(
-                axum::http::Request::builder()
-                    .uri("/customization/nope")
-                    .body(Body::empty())
-                    .unwrap(),
-            )
+            .oneshot(req("GET", "/customization/nope"))
             .await
             .unwrap();
         assert_eq!(res.status(), StatusCode::NOT_FOUND, "GET /customization/nope");
@@ -350,7 +508,10 @@ mod tests {
                 axum::http::Request::builder()
                     .method("PUT")
                     .uri("/api/customization/logo-dark")
-                    .header("content-type", headers.trim_start_matches("Content-Type: ").trim_end())
+                    .header(
+                        "content-type",
+                        headers.trim_start_matches("Content-Type: ").trim_end(),
+                    )
                     .body(body)
                     .unwrap(),
             )
