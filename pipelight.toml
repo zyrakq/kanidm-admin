@@ -1,16 +1,39 @@
 # Pipelight pipeline definitions (https://pipelight.dev).
 # Lint without executing:  pipelight ls
 # Run manually:            pipelight run docker-build
-# The image name matches docker-compose.yml (`image: kanidm-admin`) so the
-# local check builds exactly what `docker compose up -d` runs.
-# The Dockerfile pins the production feature set itself
-# (`--no-default-features --features customization`): customization stays,
-# the dev-only testcontainer chain is compiled out — no build args needed
-# here, the pipeline always checks the shipped image variant.
+#
+# The Dockerfile selects the cargo feature set through the CARGO_BUILD_FLAGS
+# build arg, so there is one pipeline per shipped image variant:
+#
+#   docker-build            -> kanidm-admin:local            (default: customization + testcontainer)
+#   docker-build-customization -> kanidm-admin:local-customization (--no-default-features --features customization)
+#   docker-build-minimal    -> kanidm-admin:local-minimal    (--no-default-features)
+#
+# Tag names mirror the release workflow's ghcr.io tags
+# (X.Y.Z / X.Y.Z-customization / X.Y.Z-minimal), so the local check builds
+# exactly what a release publishes.
 
 [[pipelines]]
 name = "docker-build"
 
 [[pipelines.steps]]
-name = "build production image"
+name = "build production image (default features)"
 commands = ["docker build -t kanidm-admin:local ."]
+
+[[pipelines]]
+name = "docker-build-customization"
+
+[[pipelines.steps]]
+name = "build production image (customization only)"
+commands = [
+  "docker build --build-arg 'CARGO_BUILD_FLAGS=--no-default-features --features customization' -t kanidm-admin:local-customization .",
+]
+
+[[pipelines]]
+name = "docker-build-minimal"
+
+[[pipelines.steps]]
+name = "build production image (minimal, no features)"
+commands = [
+  "docker build --build-arg CARGO_BUILD_FLAGS=--no-default-features -t kanidm-admin:local-minimal .",
+]

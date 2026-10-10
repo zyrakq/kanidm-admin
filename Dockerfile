@@ -1,3 +1,12 @@
+# The image ships one binary; the cargo feature set is selected through the
+# CARGO_BUILD_FLAGS build arg so the same Dockerfile produces three variants:
+#   ""                                          -> default: customization + testcontainer
+#   "--no-default-features --features customization" -> customization only
+#   "--no-default-features"                     -> minimal (no features)
+# The default (no build arg) matches `cargo build --release` and keeps
+# `docker compose up -d` and its testcontainers override fully working.
+ARG CARGO_BUILD_FLAGS=""
+
 ###############################################################################
 # Stage 1 — Frontend (Bun)
 ###############################################################################
@@ -25,6 +34,11 @@ FROM rust:1-bookworm AS rust-builder
 # the prebuilt dist from stage 1 is embedded by rust-embed instead.
 ENV APP_SKIP_FRONTEND_BUILD=1
 
+# CARGO_BUILD_FLAGS is re-declared inside the stage (ARGs declared before
+# the first FROM are not inherited automatically) and pins the feature set
+# for both cargo invocations below.
+ARG CARGO_BUILD_FLAGS=""
+
 # ── Dependency cache layer ────────────────────────────────────────────────
 # Compile all dependencies using a stub binary.
 # This layer is invalidated only when Cargo.lock changes, not on src edits.
@@ -32,17 +46,16 @@ ENV APP_SKIP_FRONTEND_BUILD=1
 # need it, and its absence keeps this layer independent of build script
 # edits.
 #
-# Feature set is pinned for the production image: the customization
-# feature stays (theme variant storage/upload API), the dev-only
-# testcontainer chain is compiled out. The stub layer must use the exact
-# same flags as the real build below or its cache is useless.
-# `|| true` keeps the stub layer valid even before app/ sources exist.
+# The stub layer must use the exact same CARGO_BUILD_FLAGS as the real
+# build below or its cache is useless (feature flags change the compiled
+# dependency set). `|| true` keeps the stub layer valid even before app/
+# sources exist.
 WORKDIR /workspace
 
 COPY Cargo.toml Cargo.lock ./
 COPY app/Cargo.toml ./app/
 RUN mkdir -p app/src && printf 'fn main() {}' > app/src/main.rs
-RUN cargo build --release --no-default-features --features customization || true
+RUN cargo build --release ${CARGO_BUILD_FLAGS} || true
 
 # ── Real build ────────────────────────────────────────────────────────────────
 COPY app/build.rs                      ./app/
@@ -54,7 +67,7 @@ COPY app/appsettings.production.toml   ./app/
 # release binary at compile time.
 COPY --from=frontend-builder /build/dist ./app/ui/dist
 
-RUN touch app/src/main.rs && cargo build --release --no-default-features --features customization
+RUN touch app/src/main.rs && cargo build --release ${CARGO_BUILD_FLAGS}
 
 ###############################################################################
 # Stage 3 — Runtime (slim)

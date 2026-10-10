@@ -151,11 +151,10 @@ same dev chain through the mounted socket:
 docker compose -f docker-compose.yml -f docker-compose.testcontainers.yml up -d --build
 ```
 
-> **Note:** the shipped image is compiled **without** the testcontainer
-> feature (`--no-default-features --features customization`) — see
-> [Docker image build check](#docker-image-build-check-pipelight). The
-> override above only works with a locally rebuilt image that includes
-> the feature; otherwise the app starts without the dev chain.
+The image `docker compose` builds carries the **default** cargo feature
+set (customization + testcontainer), so the override above works out of
+the box. The slimmer published variants are described in
+[Docker image build check](#docker-image-build-check-pipelight).
 
 Inside the container the app talks to the dev chain over Docker DNS
 names (`https://kanidm:8443`, `smtps://mailpit:1025`) on the shared
@@ -173,19 +172,24 @@ up`) and the host-mode `cargo run` flow are unchanged.
 
 ### Docker image build check (pipelight)
 
-The production image build is scripted as a
-[pipelight](https://pipelight.dev) pipeline (`pipelight.toml` at the repo
-root). It builds the same image `docker compose` runs:
+The production image builds are scripted as
+[pipelight](https://pipelight.dev) pipelines (`pipelight.toml` at the repo
+root) — one per shipped image variant, mirroring the release workflow's
+tags:
 
 ```bash
-pipelight run docker-build   # builds kanidm-admin:local
+pipelight run docker-build               # kanidm-admin:local            (default: customization + testcontainer)
+pipelight run docker-build-customization # kanidm-admin:local-customization (customization only)
+pipelight run docker-build-minimal       # kanidm-admin:local-minimal    (no features)
 ```
 
-The image pins the production feature set in its Dockerfile:
-`cargo build --release --no-default-features --features customization` —
-the customization API (theme variants) stays in, while the dev-only
-testcontainer chain is compiled out, so the image never touches a
-Docker socket.
+The variant is selected through the `CARGO_BUILD_FLAGS` build arg in the
+Dockerfile: `""` (default), `--no-default-features --features
+customization`, or `--no-default-features`. The default build keeps
+`docker compose up -d` and its testcontainers override working; the
+customization variant ships the theme variant API without the
+container-driver crates; the minimal variant compiles every optional
+subsystem out.
 
 Validate the pipeline definition without building:
 
@@ -212,11 +216,11 @@ on `.github/workflows/release.yml` with a version input):
 git tag v0.1.0 && git push origin v0.1.0
 ```
 
-The workflow builds the image, pushes `ghcr.io/zyrakq/kanidm-admin:X.Y.Z`
-and `:latest`, and creates a GitHub Release with pull/run instructions.
-The image is compiled with `--no-default-features --features customization`
-(customization in, dev testcontainer chain out) — the release notes state
-the exact feature set. Images are amd64; point the container at your
+The workflow builds **three image variants** — `X.Y.Z` / `latest`
+(default: customization + testcontainer), `X.Y.Z-customization` /
+`customization` (customization only) and `X.Y.Z-minimal` / `minimal` (no
+features) — and creates a GitHub Release whose notes explain the exact
+feature set of each tag. Images are amd64; point the container at your
 Kanidm instance by mounting a TOML overlay into `/workspace/app` — there
 is no env-var override for `kanidm.url` (see the release notes for the
 exact command).

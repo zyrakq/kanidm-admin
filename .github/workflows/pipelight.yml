@@ -40,12 +40,23 @@ jobs:
           fi
           cargo install --git https://github.com/pipelight/pipelight --tag v0.10.0 --locked
 
-      # Safe lint: parses pipelight.toml and lists pipelines, no execution.
+      # Safe lint: parses pipelight.toml and lists all pipelines, no
+      # execution.
       - name: Lint pipelight config
         run: pipelight ls
 
-      # Attached run: blocks until the pipeline finishes and fails the job
-      # if the docker build fails. Bounded by the step timeout.
-      - name: Run docker-build pipeline
+      # Attached runs: each blocks until its pipeline finishes and fails
+      # the job if the docker build fails. One pipeline per shipped image
+      # variant (default / customization / minimal) — the CI check covers
+      # all three, mirroring what the release workflow publishes.
+      - name: Run docker-build pipeline (default features)
         run: pipelight run docker-build --attach=true
-        timeout-minutes: 45
+        timeout-minutes: 60
+
+      - name: Run docker-build-customization pipeline
+        run: pipelight run docker-build-customization --attach=true
+        timeout-minutes: 60
+
+      - name: Run docker-build-minimal pipeline
+        run: pipelight run docker-build-minimal --attach=true
+        timeout-minutes: 60
