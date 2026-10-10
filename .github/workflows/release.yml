@@ -95,15 +95,40 @@ jobs:
 
             Package page: https://github.com/zyrakq/kanidm-admin/pkgs/container/kanidm-admin
 
-            Every release ships **three image variants** — the same binary
-            and configuration, differing only in the compiled cargo feature
-            set (`CARGO_BUILD_FLAGS` build arg):
+            Every release ships **three image variants** — the same app and
+            configuration, differing only in the compiled cargo feature set
+            (selected via the `CARGO_BUILD_FLAGS` build arg in the Dockerfile).
+            Pick the variant that matches your deployment; all of them are
+            amd64 and configured identically.
 
-            | Tag | Cargo features | Use it when |
-            | --- | --- | --- |
-            | `vX.Y.Z` / `latest` | default: `customization` + `testcontainer` | full build, incl. the dev container chain (needs a Docker socket for the chain) |
-            | `vX.Y.Z-customization` / `customization` | `customization` only | production: theme variant API in, container-driver crates out |
-            | `vX.Y.Z-minimal` / `minimal` | none | smallest binary, no optional subsystems |
+            ### `vX.Y.Z` / `latest` — full build
+
+            Compiled with the default features: `customization` **and**
+            `testcontainer`. Same feature set as `docker compose up -d` and
+            the host `cargo run` dev flow. The bundled dev container chain
+            (ephemeral Kanidm, mail sender, Mailpit) can be driven from
+            inside the container through a mounted Docker socket — useful
+            for trying the app with a throwaway Kanidm. For plain
+            production use behind an existing Kanidm this variant carries
+            the dev-only container-driver crates for nothing.
+
+            ### `vX.Y.Z-customization` / `customization` — recommended for production
+
+            Compiled with `--no-default-features --features customization`:
+            the theme variant storage/upload API stays in, while the
+            container-driver crates (`testcontainers`, `rcgen`) are
+            compiled out — smaller binary, smaller dependency graph, and
+            the image never needs a Docker socket.
+
+            ### `vX.Y.Z-minimal` / `minimal` — bare console
+
+            Compiled with `--no-default-features`: every optional subsystem
+            is compiled out. Core admin console only (persons, groups,
+            service accounts, OAuth2, …) with no theme variant API and no
+            dev container chain. Smallest binary; pick it when you do not
+            need customization at all.
+
+            ### Pull
 
             ```bash
             docker pull ghcr.io/zyrakq/kanidm-admin:v${{ steps.ver.outputs.version }}
