@@ -21,6 +21,8 @@ export interface CustomizationSlotEntry {
 
 /** Per-mode theme info from the manifest. */
 export interface ThemeModeInfo {
+  /** Sorted discovered variant file names for this mode's folder. */
+  available: string[];
   /** Effective variant file name, or null for the built-in default. */
   selected: string | null;
   /** Config/env-set deployment default (may name a missing file). */
@@ -29,8 +31,6 @@ export interface ThemeModeInfo {
 }
 
 export interface ThemeManifest {
-  /** Sorted discovered variant file names (auto-discovery). */
-  available: string[];
   light: ThemeModeInfo;
   dark: ThemeModeInfo;
 }

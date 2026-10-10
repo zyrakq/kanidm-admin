@@ -32,7 +32,9 @@ export class LoginForm extends LitElement {
     // await — without the listener already attached, that event is
     // missed and the logo stays on the bundled default until the next
     // customization change.
-    window.addEventListener('customization-changed', () => this.requestUpdate());
+    window.addEventListener('customization-changed', () =>
+      this.requestUpdate()
+    );
     await customizationService.init();
     await authService.init();
     this.syncState();

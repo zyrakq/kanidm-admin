@@ -2777,14 +2777,6 @@
   <source>Deployment default:</source>
   <target>Predeterminado del despliegue:</target>
 </trans-unit>
-<trans-unit id="s70b51e222c57a9ff">
-  <source>Light mode variant</source>
-  <target>Variante de modo claro</target>
-</trans-unit>
-<trans-unit id="saa0d710d5f0920a9">
-  <source>Dark mode variant</source>
-  <target>Variante de modo oscuro</target>
-</trans-unit>
 <trans-unit id="s9427c1fa71965df7">
   <source>No theme variants uploaded yet.</source>
   <target>Aún no hay variantes de tema subidas.</target>
@@ -2800,6 +2792,14 @@
 <trans-unit id="s44712d2eefcaecb8">
   <source>Delete the theme variant? Pages using it fall back to the default.</source>
   <target>¿Eliminar la variante de tema? Las páginas que la usan vuelven al tema predeterminado.</target>
+</trans-unit>
+<trans-unit id="s2d010c845f7f29ae">
+  <source>Active variant</source>
+  <target>Variante activa</target>
+</trans-unit>
+<trans-unit id="s760fea0a0b77b2ea">
+  <source>Light mode</source>
+  <target>Modo claro</target>
 </trans-unit>
 </body>
 </file>

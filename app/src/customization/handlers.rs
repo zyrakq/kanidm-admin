@@ -6,9 +6,9 @@
 //   GET    /api/customization               — manifest (slots + theme section)
 //   PUT    /api/customization/{slot}        — image slot upload (field `file`)
 //   DELETE /api/customization/{slot}        — remove image override
-//   POST   /api/customization/themes        — theme variant upload (field `file`)
+//   POST   /api/customization/themes/{mode}       — theme variant upload (field `file`)
 //   PUT    /api/customization/theme/{mode}  — set/clear the stored selection
-//   DELETE /api/customization/themes/{name} — remove a theme variant
+//   DELETE /api/customization/themes/{mode}/{name} — remove a theme variant
 //   GET    /customization/{slot}            — serve an image override
 //   GET    /customization/theme-light|dark[.css] — serve the effective
 //            variant CSS; `/* custom styles */` placeholder when none
@@ -49,9 +49,12 @@ pub fn router(store: CustomizationState) -> Router {
             "/api/customization/{slot}",
             put(upload_handler).delete(delete_handler),
         )
-        .route("/api/customization/themes", post(upload_variant_handler))
         .route(
-            "/api/customization/themes/{name}",
+            "/api/customization/themes/{mode}",
+            post(upload_variant_handler),
+        )
+        .route(
+            "/api/customization/themes/{mode}/{name}",
             delete(delete_variant_handler),
         )
         .route("/api/customization/theme/{mode}", put(select_variant_handler))
@@ -146,6 +149,7 @@ impl From<SlotEntry> for SlotEntryDto {
 
 #[derive(Serialize)]
 struct ThemeModeInfoDto {
+    available: Vec<String>,
     selected: Option<String>,
     config_selected: Option<String>,
     source: String,
@@ -153,7 +157,6 @@ struct ThemeModeInfoDto {
 
 #[derive(Serialize)]
 struct ThemeManifestDto {
-    available: Vec<String>,
     light: ThemeModeInfoDto,
     dark: ThemeModeInfoDto,
 }
@@ -167,6 +170,7 @@ struct ManifestDto {
 
 fn theme_mode_info_dto(info: &store::ThemeModeInfo) -> ThemeModeInfoDto {
     ThemeModeInfoDto {
+        available: info.available.clone(),
         selected: info.selected.clone(),
         config_selected: info.config_selected.clone(),
         source: info.source.to_string(),
@@ -183,7 +187,6 @@ async fn manifest_handler(State(store): State<CustomizationState>) -> Json<Manif
             .map(|(name, e)| (name, e.into()))
             .collect(),
         theme: ThemeManifestDto {
-            available: m.theme.available,
             light: theme_mode_info_dto(&m.theme.light),
             dark: theme_mode_info_dto(&m.theme.dark),
         },
@@ -237,8 +240,10 @@ struct VariantNameDto {
 
 async fn upload_variant_handler(
     State(store): State<CustomizationState>,
+    Path(mode): Path<String>,
     mut multipart: Multipart,
 ) -> Result<Json<VariantNameDto>, CustomizationApiError> {
+    let mode = ThemeMode::parse(&mode).ok_or_else(CustomizationApiError::not_found)?;
     while let Some(field) = multipart
         .next_field()
         .await
@@ -259,7 +264,7 @@ async fn upload_variant_handler(
                     "Multipart field 'file' must carry a file name ending in '.css'.",
                 ));
             }
-            let name = store.store_variant(&file_name, &content_type, &data)?;
+            let name = store.store_variant(mode, &file_name, &content_type, &data)?;
             return Ok(Json(VariantNameDto { name }));
         }
     }
@@ -293,9 +298,10 @@ async fn select_variant_handler(
 
 async fn delete_variant_handler(
     State(store): State<CustomizationState>,
-    Path(name): Path<String>,
+    Path((mode, name)): Path<(String, String)>,
 ) -> Result<StatusCode, CustomizationApiError> {
-    store.remove_variant(&name)?;
+    let mode = ThemeMode::parse(&mode).ok_or_else(CustomizationApiError::not_found)?;
+    store.remove_variant(mode, &name)?;
     Ok(StatusCode::NO_CONTENT)
 }
 
@@ -457,7 +463,7 @@ mod tests {
         for name in ["logo-light", "logo-dark", "favicon-light", "favicon-dark"] {
             assert_eq!(json["slots"][name]["present"], false, "slot {name} absent");
         }
-        assert_eq!(json["theme"]["available"], serde_json::json!([]));
+        assert_eq!(json["theme"]["light"]["available"], serde_json::json!([]));
         assert_eq!(json["theme"]["light"]["source"], "builtin");
         assert_eq!(json["theme"]["dark"]["selected"], serde_json::Value::Null);
     }
@@ -506,7 +512,7 @@ mod tests {
         let res = send_multipart(
             app.clone(),
             "POST",
-            "/api/customization/themes",
+            "/api/customization/themes/light",
             "Corporate.CSS",
             "text/css; charset=utf-8",
             b":root { --x: 1; }",
@@ -525,7 +531,7 @@ mod tests {
         let res = app.clone().oneshot(req("GET", "/api/customization")).await.unwrap();
         let json: serde_json::Value =
             serde_json::from_slice(&res.into_body().collect().await.unwrap().to_bytes()).unwrap();
-        assert_eq!(json["theme"]["available"], serde_json::json!(["corporate.css"]));
+        assert_eq!(json["theme"]["light"]["available"], serde_json::json!(["corporate.css"]));
         assert_eq!(json["theme"]["light"]["source"], "selection");
         assert_eq!(json["theme"]["light"]["selected"], "corporate.css");
 
@@ -545,22 +551,22 @@ mod tests {
         assert_eq!(body_string(res).await, "/* custom styles */");
 
         // Delete the variant; deleting again is a 404.
-        let res = app.clone().oneshot(req("DELETE", "/api/customization/themes/corporate.css")).await.unwrap();
+        let res = app.clone().oneshot(req("DELETE", "/api/customization/themes/light/corporate.css")).await.unwrap();
         assert_eq!(res.status(), StatusCode::NO_CONTENT);
-        let res = app.oneshot(req("DELETE", "/api/customization/themes/corporate.css")).await.unwrap();
+        let res = app.oneshot(req("DELETE", "/api/customization/themes/light/corporate.css")).await.unwrap();
         assert_eq!(res.status(), StatusCode::NOT_FOUND);
     }
 
     #[tokio::test]
     async fn variant_upload_invalid_type_and_name_are_400() {
         let (app, _dir) = app();
-        let res = send_multipart(app.clone(), "POST", "/api/customization/themes", "x.css", "image/png", b"png").await;
+        let res = send_multipart(app.clone(), "POST", "/api/customization/themes/light", "x.css", "image/png", b"png").await;
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
         assert!(body_string(res).await.contains("Allowed: text/css."));
-        let res = send_multipart(app.clone(), "POST", "/api/customization/themes", "bad name!.css", "text/css", b":root{}").await;
+        let res = send_multipart(app.clone(), "POST", "/api/customization/themes/light", "bad name!.css", "text/css", b":root{}").await;
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
         assert!(body_string(res).await.contains("Invalid theme variant name"));
-        let res = send_multipart(app, "POST", "/api/customization/themes", "", "text/css", b":root{}").await;
+        let res = send_multipart(app, "POST", "/api/customization/themes/light", "", "text/css", b":root{}").await;
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
         assert!(body_string(res).await.contains("file name"));
     }
@@ -577,9 +583,9 @@ mod tests {
     #[tokio::test]
     async fn deleting_selected_variant_clears_selection() {
         let (app, _dir) = app();
-        let _ = send_multipart(app.clone(), "POST", "/api/customization/themes", "a.css", "text/css", b":root{}").await;
+        let _ = send_multipart(app.clone(), "POST", "/api/customization/themes/light", "a.css", "text/css", b":root{}").await;
         let _ = put_json(app.clone(), "/api/customization/theme/light", r#"{"name":"a.css"}"#).await;
-        let res = app.clone().oneshot(req("DELETE", "/api/customization/themes/a.css")).await.unwrap();
+        let res = app.clone().oneshot(req("DELETE", "/api/customization/themes/light/a.css")).await.unwrap();
         assert_eq!(res.status(), StatusCode::NO_CONTENT);
         let res = app.oneshot(req("GET", "/api/customization")).await.unwrap();
         let json: serde_json::Value =
@@ -591,7 +597,7 @@ mod tests {
     #[tokio::test]
     async fn config_default_resolves_without_selection() {
         let (app, _dir) = app_with_config("corp.css", "");
-        let _ = send_multipart(app.clone(), "POST", "/api/customization/themes", "corp.css", "text/css", b":root{}").await;
+        let _ = send_multipart(app.clone(), "POST", "/api/customization/themes/light", "corp.css", "text/css", b":root{}").await;
         let res = app.clone().oneshot(req("GET", "/customization/theme-light")).await.unwrap();
         assert_eq!(body_string(res).await, ":root{}");
         let res = app.oneshot(req("GET", "/api/customization")).await.unwrap();
@@ -642,5 +648,34 @@ mod tests {
         let (app, _dir) = app();
         let res = send_multipart(app, "PUT", "/api/customization/logo-dark", "override", "image/png", &[b'x'; 2048]).await;
         assert_eq!(res.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[tokio::test]
+    async fn variant_folders_are_separate_namespaces() {
+        let (app, _dir) = app();
+        let _ = send_multipart(app.clone(), "POST", "/api/customization/themes/light", "a.css", "text/css", b":root{}").await;
+        let _ = send_multipart(app.clone(), "POST", "/api/customization/themes/dark", "a.css", "text/css", b":root{--d:1}").await;
+        let res = app.clone().oneshot(req("GET", "/api/customization")).await.unwrap();
+        let json: serde_json::Value =
+            serde_json::from_slice(&res.into_body().collect().await.unwrap().to_bytes()).unwrap();
+        assert_eq!(json["theme"]["light"]["available"], serde_json::json!(["a.css"]));
+        assert_eq!(json["theme"]["dark"]["available"], serde_json::json!(["a.css"]));
+        // Deleting the light copy leaves the dark copy intact.
+        let res = app.clone().oneshot(req("DELETE", "/api/customization/themes/light/a.css")).await.unwrap();
+        assert_eq!(res.status(), StatusCode::NO_CONTENT);
+        let res = app.oneshot(req("GET", "/api/customization")).await.unwrap();
+        let json: serde_json::Value =
+            serde_json::from_slice(&res.into_body().collect().await.unwrap().to_bytes()).unwrap();
+        assert_eq!(json["theme"]["light"]["available"], serde_json::json!([]));
+        assert_eq!(json["theme"]["dark"]["available"], serde_json::json!(["a.css"]));
+    }
+
+    #[tokio::test]
+    async fn unknown_variant_mode_is_404() {
+        let (app, _dir) = app();
+        let res = send_multipart(app.clone(), "POST", "/api/customization/themes/mode", "a.css", "text/css", b":root{}").await;
+        assert_eq!(res.status(), StatusCode::NOT_FOUND);
+        let res = app.oneshot(req("DELETE", "/api/customization/themes/mode/a.css")).await.unwrap();
+        assert_eq!(res.status(), StatusCode::NOT_FOUND);
     }
 }

@@ -12,7 +12,7 @@ import {
   type CustomizationSlotEntry,
   type ThemeManifest,
   type ThemeMode,
-} from '../types/customization.types';
+} from '../types/customization.types.ts';
 
 export class CustomizationService {
   private static instance: CustomizationService | null = null;
@@ -89,22 +89,28 @@ export class CustomizationService {
     await this.refresh();
   }
 
-  /** Upload a theme variant; returns the stored (sanitized) name. */
-  async uploadThemeVariant(file: File): Promise<string> {
+  /** Upload a theme variant into the mode's folder; returns the stored (sanitized) name. */
+  async uploadThemeVariant(mode: ThemeMode, file: File): Promise<string> {
     const body = new FormData();
     body.append('file', file);
-    const res = await apiFetch<{ name: string }>('/api/customization/themes', {
-      method: 'POST',
-      body,
-    });
+    const res = await apiFetch<{ name: string }>(
+      `/api/customization/themes/${mode}`,
+      {
+        method: 'POST',
+        body,
+      }
+    );
     await this.refresh();
     return res.name;
   }
 
-  async removeThemeVariant(name: string): Promise<void> {
-    await apiFetch(`/api/customization/themes/${encodeURIComponent(name)}`, {
-      method: 'DELETE',
-    });
+  async removeThemeVariant(mode: ThemeMode, name: string): Promise<void> {
+    await apiFetch(
+      `/api/customization/themes/${mode}/${encodeURIComponent(name)}`,
+      {
+        method: 'DELETE',
+      }
+    );
     await this.refresh();
   }
 }

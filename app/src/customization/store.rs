@@ -3,10 +3,12 @@
 // Filesystem store for customization overrides. Four image slots
 // (logo/favicon, light and dark), each one file named exactly after the
 // slot plus a `<slot>.meta` sidecar holding the persisted content type.
-// Theme variants are ordinary `.css` files in the `themes/`
-// subdirectory (auto-discovered); the active variant per mode resolves
-// as: stored page selection (`selection.json`) → config-set file name
-// (validated against the discovered list) → none (built-in default).
+// Theme variants are ordinary `.css` files in per-mode subfolders of
+// the `themes/` directory (`themes/light/`, `themes/dark/`; separate
+// namespaces — the same file name may exist in both). The active
+// variant per mode resolves as: stored page selection
+// (`selection.json`) → config-set file name (validated against that
+// mode's discovered list) → none (built-in default).
 // The manifest version is the max mtime across slot files, variant
 // files and the selection file (unix seconds) and doubles as the
 // frontend cache-buster.
@@ -115,6 +117,9 @@ impl ThemeSelection {
 /// Per-mode theme info for the manifest.
 #[derive(Debug, Clone, Serialize)]
 pub struct ThemeModeInfo {
+    /// Sorted discovered variant file names for this mode's folder
+    /// (auto-discovery; each folder is its own namespace).
+    pub available: Vec<String>,
     /// Effective variant file name, or `None` for the built-in default.
     pub selected: Option<String>,
     /// Config/env-set deployment default (as configured, even when the
@@ -127,8 +132,6 @@ pub struct ThemeModeInfo {
 /// Theme section of the manifest.
 #[derive(Debug, Clone, Serialize)]
 pub struct ThemeManifest {
-    /// Sorted discovered variant file names (auto-discovery).
-    pub available: Vec<String>,
     pub light: ThemeModeInfo,
     pub dark: ThemeModeInfo,
 }
@@ -202,22 +205,23 @@ impl CustomizationStore {
         store
     }
 
-    fn themes_dir(&self) -> PathBuf {
-        self.dir.join(THEMES_SUBDIR)
+    fn themes_dir(&self, mode: ThemeMode) -> PathBuf {
+        self.dir.join(THEMES_SUBDIR).join(mode.as_str())
     }
 
     fn selection_path(&self) -> PathBuf {
         self.dir.join(SELECTION_FILE)
     }
 
-    fn variant_path(&self, name: &str) -> PathBuf {
-        self.themes_dir().join(name)
+    fn variant_path(&self, mode: ThemeMode, name: &str) -> PathBuf {
+        self.themes_dir(mode).join(name)
     }
 
-    /// Sorted names of `*.css` files in the themes dir (auto-discovery;
-    /// the identifier is the full file name including `.css`).
-    pub fn list_variants(&self) -> Vec<String> {
-        let mut names: Vec<String> = fs::read_dir(self.themes_dir())
+    /// Sorted names of `*.css` files in the mode's subfolder
+    /// (auto-discovery; the identifier is the full file name including
+    /// `.css`).
+    pub fn list_variants(&self, mode: ThemeMode) -> Vec<String> {
+        let mut names: Vec<String> = fs::read_dir(self.themes_dir(mode))
             .map(|entries| {
                 entries
                     .filter_map(|e| e.ok())
@@ -268,10 +272,12 @@ impl CustomizationStore {
         Ok(lower)
     }
 
-    /// Validate and persist a theme variant upload; returns the stored
-    /// (sanitized) name. CSS is stored verbatim; collisions rejected.
+    /// Validate and persist a theme variant upload into the mode's
+    /// folder; returns the stored (sanitized) name. CSS is stored
+    /// verbatim; collisions are rejected within the mode folder.
     pub fn store_variant(
         &self,
+        mode: ThemeMode,
         name: &str,
         content_type: &str,
         data: &[u8],
@@ -295,34 +301,29 @@ impl CustomizationStore {
                 limit: self.max_size_bytes,
             });
         }
-        if self.variant_path(&name).exists() {
+        if self.variant_path(mode, &name).exists() {
             return Err(StoreError::AlreadyExists { name });
         }
-        fs::create_dir_all(self.themes_dir())?;
+        fs::create_dir_all(self.themes_dir(mode))?;
         // Write via temp file + rename so a partial write is never served.
-        let tmp = self.themes_dir().join(format!(".{name}.tmp"));
+        let tmp = self.themes_dir(mode).join(format!(".{name}.tmp"));
         fs::write(&tmp, data)?;
-        fs::rename(&tmp, self.variant_path(&name))?;
+        fs::rename(&tmp, self.variant_path(mode, &name))?;
         Ok(name)
     }
 
-    /// Delete a variant file and clear any selection entries pointing
-    /// at it. Unknown names are an error.
-    pub fn remove_variant(&self, name: &str) -> Result<(), StoreError> {
+    /// Delete a variant file from the mode's folder and clear that
+    /// mode's selection entry if it points at the file. Unknown names
+    /// are an error.
+    pub fn remove_variant(&self, mode: ThemeMode, name: &str) -> Result<(), StoreError> {
         let name = Self::sanitize_variant_name(name)?;
-        if !self.variant_path(&name).exists() {
+        if !self.variant_path(mode, &name).exists() {
             return Err(StoreError::UnknownVariant { name });
         }
-        fs::remove_file(self.variant_path(&name))?;
+        fs::remove_file(self.variant_path(mode, &name))?;
         let mut selection = self.selection();
-        let mut changed = false;
-        for mode in ThemeMode::ALL {
-            if selection.get(mode).as_deref() == Some(name.as_str()) {
-                selection.set(mode, None);
-                changed = true;
-            }
-        }
-        if changed {
+        if selection.get(mode).as_deref() == Some(name.as_str()) {
+            selection.set(mode, None);
             self.save_selection(&selection)?;
         }
         Ok(())
@@ -340,7 +341,7 @@ impl CustomizationStore {
             return Ok(());
         };
         let name = Self::sanitize_variant_name(&name)?;
-        if !self.variant_path(&name).exists() {
+        if !self.variant_path(mode, &name).exists() {
             return Err(StoreError::UnknownVariant { name });
         }
         let mut selection = self.selection();
@@ -384,14 +385,14 @@ impl CustomizationStore {
         if config.is_empty() {
             return None;
         }
-        if self.list_variants().iter().any(|v| v == config) {
+        if self.list_variants(mode).iter().any(|v| v == config) {
             return Some(config.clone());
         }
         tracing::warn!(
             "configured theme variant '{config}' for {} mode was not found in {}; \
              falling back to the built-in default",
             mode.as_str(),
-            self.themes_dir().display()
+            self.themes_dir(mode).display()
         );
         None
     }
@@ -402,7 +403,7 @@ impl CustomizationStore {
         let Some(name) = self.effective_variant(mode) else {
             return Ok(None);
         };
-        let bytes = match fs::read(self.variant_path(&name)) {
+        let bytes = match fs::read(self.variant_path(mode, &name)) {
             Ok(b) => b,
             Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
             Err(e) => return Err(e.into()),
@@ -423,15 +424,15 @@ impl CustomizationStore {
                 continue;
             }
             let target_name = format!("{slot}.css");
-            if self.variant_path(&target_name).exists() {
+            if self.variant_path(mode, &target_name).exists() {
                 tracing::warn!(
                     "legacy theme file {} collides with {}; removing the legacy file",
                     legacy.display(),
-                    target_name
+                    self.variant_path(mode, &target_name).display()
                 );
                 let _ = fs::remove_file(&legacy);
-            } else if fs::create_dir_all(self.themes_dir()).is_ok() {
-                match fs::rename(&legacy, self.variant_path(&target_name)) {
+            } else if fs::create_dir_all(self.themes_dir(mode)).is_ok() {
+                match fs::rename(&legacy, self.variant_path(mode, &target_name)) {
                     Ok(()) => {
                         let mut selection = self.selection();
                         if selection.get(mode).is_none() {
@@ -555,7 +556,8 @@ impl CustomizationStore {
             .map(|d| d.as_secs() as i64)
     }
 
-    fn theme_info(&self, mode: ThemeMode, available: &[String]) -> ThemeModeInfo {
+    fn theme_info(&self, mode: ThemeMode) -> ThemeModeInfo {
+        let available = self.list_variants(mode);
         let config = match mode {
             ThemeMode::Light => &self.config_light,
             ThemeMode::Dark => &self.config_dark,
@@ -567,6 +569,7 @@ impl CustomizationStore {
         };
         if let Some(name) = self.selection().get(mode) {
             return ThemeModeInfo {
+                available: available.clone(),
                 selected: Some(name),
                 config_selected,
                 source: "selection",
@@ -575,6 +578,7 @@ impl CustomizationStore {
         if let Some(name) = &config_selected {
             if available.iter().any(|v| v == name) {
                 return ThemeModeInfo {
+                    available: available.clone(),
                     selected: Some(name.clone()),
                     config_selected,
                     source: "config",
@@ -582,6 +586,7 @@ impl CustomizationStore {
             }
         }
         ThemeModeInfo {
+            available,
             selected: None,
             config_selected,
             source: "builtin",
@@ -596,17 +601,17 @@ impl CustomizationStore {
             .iter()
             .map(|&s| (s.as_str().to_string(), self.entry(s)))
             .collect::<Vec<_>>();
-        let available = self.list_variants();
         let mut mtimes: Vec<i64> = slots.iter().filter_map(|(_, e)| e.updated_at).collect();
-        for name in &available {
-            mtimes.extend(self.mtime_secs(&self.variant_path(name)));
+        for mode in ThemeMode::ALL {
+            for name in self.list_variants(mode) {
+                mtimes.extend(self.mtime_secs(&self.variant_path(mode, &name)));
+            }
         }
         mtimes.extend(self.mtime_secs(&self.selection_path()));
         let version = mtimes.iter().max().copied().unwrap_or(0).to_string();
         let theme = ThemeManifest {
-            light: self.theme_info(ThemeMode::Light, &available),
-            dark: self.theme_info(ThemeMode::Dark, &available),
-            available,
+            light: self.theme_info(ThemeMode::Light),
+            dark: self.theme_info(ThemeMode::Dark),
         };
         Manifest {
             version,
@@ -741,26 +746,26 @@ mod tests {
     fn variant_store_list_roundtrip() {
         let (s, _dir) = store();
         let name = s
-            .store_variant("Corp.CSS", "text/css; charset=utf-8", b":root{}")
+            .store_variant(ThemeMode::Light, "Corp.CSS", "text/css; charset=utf-8", b":root{}")
             .expect("store");
         assert_eq!(name, "corp.css", "name is lowercased");
-        assert_eq!(s.list_variants(), vec!["corp.css".to_string()]);
+        assert_eq!(s.list_variants(ThemeMode::Light), vec!["corp.css".to_string()]);
     }
 
     #[test]
     fn variant_store_rejects_bad_type_collision_and_size() {
         let (s, _dir) = store();
-        s.store_variant("a.css", "text/css", b":root{}").expect("store");
+        s.store_variant(ThemeMode::Light, "a.css", "text/css", b":root{}").expect("store");
         assert!(matches!(
-            s.store_variant("a.css", "text/css", b":root{}").unwrap_err(),
+            s.store_variant(ThemeMode::Light, "a.css", "text/css", b":root{}").unwrap_err(),
             StoreError::AlreadyExists { .. }
         ));
         assert!(matches!(
-            s.store_variant("b.css", "image/png", b"png").unwrap_err(),
+            s.store_variant(ThemeMode::Light, "b.css", "image/png", b"png").unwrap_err(),
             StoreError::InvalidType { .. }
         ));
         assert!(matches!(
-            s.store_variant("c.css", "text/css", &[b'x'; 2048]).unwrap_err(),
+            s.store_variant(ThemeMode::Light, "c.css", "text/css", &[b'x'; 2048]).unwrap_err(),
             StoreError::TooLarge { .. }
         ));
     }
@@ -771,10 +776,10 @@ mod tests {
         // Config names a missing file → falls through to built-in.
         assert_eq!(s.effective_variant(ThemeMode::Light), None);
         // Upload the file → config now resolves.
-        s.store_variant("corp.css", "text/css", b":root{}").expect("store");
+        s.store_variant(ThemeMode::Light, "corp.css", "text/css", b":root{}").expect("store");
         assert_eq!(s.effective_variant(ThemeMode::Light), Some("corp.css".to_string()));
         // Page selection wins over config.
-        s.store_variant("other.css", "text/css", b":root{}").expect("store");
+        s.store_variant(ThemeMode::Light, "other.css", "text/css", b":root{}").expect("store");
         s.select_variant(ThemeMode::Light, Some("other.css".to_string())).expect("select");
         assert_eq!(s.effective_variant(ThemeMode::Light), Some("other.css".to_string()));
         // Clearing falls back to config.
@@ -796,13 +801,13 @@ mod tests {
     #[test]
     fn remove_variant_clears_selection() {
         let (s, _dir) = store();
-        s.store_variant("a.css", "text/css", b":root{}").expect("store");
+        s.store_variant(ThemeMode::Light, "a.css", "text/css", b":root{}").expect("store");
         s.select_variant(ThemeMode::Light, Some("a.css".to_string())).expect("select");
-        s.remove_variant("a.css").expect("remove");
+        s.remove_variant(ThemeMode::Light, "a.css").expect("remove");
         assert_eq!(s.effective_variant(ThemeMode::Light), None);
         assert_eq!(s.selection().light, None);
         assert!(matches!(
-            s.remove_variant("a.css").unwrap_err(),
+            s.remove_variant(ThemeMode::Light, "a.css").unwrap_err(),
             StoreError::UnknownVariant { .. }
         ));
     }
@@ -825,8 +830,12 @@ mod tests {
         fs::write(dir.path().join("theme-dark"), b":root{--b:2}").unwrap();
         let s2 = CustomizationStore::new(dir.path().to_path_buf(), 1024, String::new(), String::new());
         assert_eq!(
-            s2.list_variants(),
-            vec!["theme-dark.css".to_string(), "theme-light.css".to_string()]
+            s2.list_variants(ThemeMode::Light),
+            vec!["theme-light.css".to_string()]
+        );
+        assert_eq!(
+            s2.list_variants(ThemeMode::Dark),
+            vec!["theme-dark.css".to_string()]
         );
         assert_eq!(s2.selection().light.as_deref(), Some("theme-light.css"));
         assert_eq!(s2.selection().dark.as_deref(), Some("theme-dark.css"));
@@ -841,7 +850,7 @@ mod tests {
     fn version_bumps_on_variant_and_selection_changes() {
         let (s, _dir) = store();
         assert_eq!(s.manifest().version, "0");
-        s.store_variant("a.css", "text/css", b":root{}").expect("store");
+        s.store_variant(ThemeMode::Light, "a.css", "text/css", b":root{}").expect("store");
         let v1 = s.manifest().version.clone();
         assert_ne!(v1, "0");
         // The version has 1-second granularity (max mtime); wait so the
@@ -854,14 +863,43 @@ mod tests {
     #[test]
     fn manifest_theme_section_shape() {
         let (s, _dir) = store_with_config("corp.css", "");
-        s.store_variant("corp.css", "text/css", b":root{}").expect("store");
+        s.store_variant(ThemeMode::Light, "corp.css", "text/css", b":root{}").expect("store");
         let m = s.manifest();
-        assert_eq!(m.theme.available, vec!["corp.css".to_string()]);
+        assert_eq!(m.theme.light.available, vec!["corp.css".to_string()]);
+        assert_eq!(m.theme.dark.available, Vec::<String>::new());
         assert_eq!(m.theme.light.source, "config");
         assert_eq!(m.theme.light.selected.as_deref(), Some("corp.css"));
         assert_eq!(m.theme.light.config_selected.as_deref(), Some("corp.css"));
         assert_eq!(m.theme.dark.source, "builtin");
         assert_eq!(m.theme.dark.selected, None);
         assert_eq!(m.theme.dark.config_selected, None);
+    }
+
+    #[test]
+    fn folders_are_separate_namespaces() {
+        let (s, _dir) = store();
+        s.store_variant(ThemeMode::Light, "a.css", "text/css", b":root{}")
+            .expect("store");
+        s.store_variant(ThemeMode::Dark, "a.css", "text/css", b":root{--d:1}")
+            .expect("store");
+        assert_eq!(s.list_variants(ThemeMode::Light), vec!["a.css".to_string()]);
+        assert_eq!(s.list_variants(ThemeMode::Dark), vec!["a.css".to_string()]);
+        // Select in both modes so the later read proves the light copy
+        // (file and selection) survives the dark removal.
+        s.select_variant(ThemeMode::Light, Some("a.css".to_string()))
+            .expect("select");
+        s.select_variant(ThemeMode::Dark, Some("a.css".to_string()))
+            .expect("select");
+        // Removing the dark copy leaves the light copy untouched and
+        // clears only the dark selection entry.
+        s.remove_variant(ThemeMode::Dark, "a.css").expect("remove");
+        assert_eq!(s.selection().dark, None);
+        let (ctype, bytes) = s.read_variant(ThemeMode::Light).expect("read").expect("present");
+        assert_eq!(ctype, "text/css");
+        assert_eq!(bytes, b":root{}".to_vec());
+        assert!(matches!(
+            s.remove_variant(ThemeMode::Dark, "a.css").unwrap_err(),
+            StoreError::UnknownVariant { .. }
+        ));
     }
 }

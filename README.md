@@ -227,17 +227,20 @@ Settings are layered TOML files: `app/appsettings.toml` (base), then
 
 ### Theme variants
 
-Theme overrides are ordinary `.css` files in the `themes/` subdirectory
-of the customization dir (default `app/customization/themes/`). Files
-mounted there appear automatically in the customization page dropdowns;
-the same file may be selected for both modes (its `:root` /
-`:root[theme='dark']` selectors decide). The active variant per mode
+Theme overrides are ordinary `.css` files in per-mode subfolders of
+the customization dir: `themes/light/` and `themes/dark/` (default
+`app/customization/themes/light|dark/`). Files mounted into a mode's
+folder appear automatically in that mode's dropdown on the
+customization page; the folders are separate namespaces, so the same
+file name may exist in both (its `:root` / `:root[theme='dark']`
+selectors decide what it affects). The active variant per mode
 resolves as: a selection made on the customization page → the
 deployment default set via `[customization.theme]` (env:
 `APP_CUSTOMIZATION__THEME__LIGHT` / `APP_CUSTOMIZATION__THEME__DARK`,
 file name only — the folder is implied) → the built-in default (no
 override stylesheet). Legacy `theme-light` / `theme-dark` files in the
-customization root are migrated into `themes/` at startup.
+customization root are migrated into `themes/light/theme-light.css` /
+`themes/dark/theme-dark.css` at startup.
 
 ## Dev testcontainers
 

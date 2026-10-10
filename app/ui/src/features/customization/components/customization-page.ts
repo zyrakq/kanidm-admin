@@ -5,7 +5,7 @@
 // deployment default (config/env) applies again.
 
 import { LitElement, css, html, nothing } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { notificationService } from '@/features/notifications';
@@ -24,10 +24,9 @@ import '@/shared/components/ui-card';
 export class CustomizationPage extends LitElement {
   @state() private busy = false;
   @state() private uploading = false;
-  /** Variant name pending delete confirmation, or null. */
-  @state() private deleteTarget: string | null = null;
-
-  @query('input.variant-input') private variantInput!: HTMLInputElement;
+  /** Variant pending delete confirmation, or null. */
+  @state() private deleteTarget: { mode: ThemeMode; name: string } | null =
+    null;
 
   async connectedCallback(): Promise<void> {
     super.connectedCallback();
@@ -48,11 +47,11 @@ export class CustomizationPage extends LitElement {
     }
   }
 
-  private async uploadVariant(file: File): Promise<void> {
+  private async uploadVariant(mode: ThemeMode, file: File): Promise<void> {
     if (this.uploading) return;
     this.uploading = true;
     try {
-      await customizationService.uploadThemeVariant(file);
+      await customizationService.uploadThemeVariant(mode, file);
       notificationService.success(msg('Variant uploaded.'));
     } catch {
       notificationService.error(msg('Failed to upload the variant.'));
@@ -63,11 +62,11 @@ export class CustomizationPage extends LitElement {
   }
 
   private async deleteVariant(): Promise<void> {
-    const name = this.deleteTarget;
-    if (!name || this.busy) return;
+    const target = this.deleteTarget;
+    if (!target || this.busy) return;
     this.busy = true;
     try {
-      await customizationService.removeThemeVariant(name);
+      await customizationService.removeThemeVariant(target.mode, target.name);
       this.deleteTarget = null;
       notificationService.success(msg('Variant deleted.'));
     } catch {
@@ -78,17 +77,20 @@ export class CustomizationPage extends LitElement {
     }
   }
 
-  private handleVariantFile(e: Event): void {
+  private handleVariantFile(mode: ThemeMode, e: Event): void {
     const input = e.target as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
-    if (file) void this.uploadVariant(file);
+    if (file) void this.uploadVariant(mode, file);
   }
 
-  private renderModeSelect(mode: ThemeMode, label: string) {
-    const theme = customizationService.theme();
-    const info = theme?.[mode];
-    const variants = theme?.available ?? [];
+  private variantInput(mode: ThemeMode): HTMLInputElement | null {
+    return this.renderRoot.querySelector(`input.variant-input-${mode}`);
+  }
+
+  private renderModeSelect(mode: ThemeMode) {
+    const info = customizationService.theme()?.[mode];
+    const variants = info?.available ?? [];
     const selected = info?.selected ?? '';
     const isConfigDefault = info?.source === 'config';
     const options = [
@@ -98,7 +100,7 @@ export class CustomizationPage extends LitElement {
     return html`
       <form-field
         type="select"
-        label=${label}
+        label=${msg('Active variant')}
         fieldId=${'theme-variant-' + mode}
         .options=${options}
         .value=${selected}
@@ -112,16 +114,12 @@ export class CustomizationPage extends LitElement {
     `;
   }
 
-  private renderThemeSection() {
-    const theme = customizationService.theme();
-    const variants = theme?.available ?? [];
+  private renderModeSection(mode: ThemeMode, heading: string) {
+    const variants = customizationService.theme()?.[mode]?.available ?? [];
     return html`
-      <h2>${msg('Theme styles')}</h2>
-      <ui-card class="theme-card">
-        <div class="theme-selects">
-          ${this.renderModeSelect('light', msg('Light mode variant'))}
-          ${this.renderModeSelect('dark', msg('Dark mode variant'))}
-        </div>
+      <ui-card class="mode-card">
+        <h3>${heading}</h3>
+        ${this.renderModeSelect(mode)}
         <div class="variant-list">
           ${variants.length === 0
             ? html`<p class="empty">
@@ -136,7 +134,7 @@ export class CustomizationPage extends LitElement {
                       size="sm"
                       ?disabled=${this.busy}
                       @click=${() => {
-                        this.deleteTarget = v;
+                        this.deleteTarget = { mode, name: v };
                       }}
                     >
                       ${msg('Delete...')}
@@ -149,18 +147,28 @@ export class CustomizationPage extends LitElement {
           <input
             type="file"
             accept=".css,text/css"
-            class="variant-input"
-            @change=${this.handleVariantFile}
+            class="variant-input variant-input-${mode}"
+            @change=${(e: Event) => this.handleVariantFile(mode, e)}
           />
           <ui-button
             variant="primary"
             ?loading=${this.uploading}
-            @click=${() => this.variantInput.click()}
+            @click=${() => this.variantInput(mode)?.click()}
           >
             ${msg('Upload variant')}
           </ui-button>
         </div>
       </ui-card>
+    `;
+  }
+
+  private renderThemeSection() {
+    return html`
+      <h2>${msg('Theme styles')}</h2>
+      <div class="theme-grid">
+        ${this.renderModeSection('light', msg('Light mode'))}
+        ${this.renderModeSection('dark', msg('Dark mode'))}
+      </div>
       ${this.deleteTarget
         ? html`<confirm-dialog
             open
@@ -250,14 +258,17 @@ export class CustomizationPage extends LitElement {
     h2:not(:first-of-type) {
       margin-top: 28px;
     }
-    .theme-card {
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+      gap: 16px;
       margin-bottom: 8px;
     }
-    .theme-selects {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
-      gap: 16px;
-      margin-bottom: 16px;
+    .mode-card h3 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--theme-color-text-secondary);
     }
     .variant-row {
       display: flex;

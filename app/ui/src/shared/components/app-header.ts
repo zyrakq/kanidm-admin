@@ -25,7 +25,9 @@ export class AppHeader extends LitElement {
     super.connectedCallback();
     // Registered before init() so the 'customization-changed' event the
     // init fetch dispatches already triggers the re-render with overrides.
-    window.addEventListener('customization-changed', () => this.requestUpdate());
+    window.addEventListener('customization-changed', () =>
+      this.requestUpdate()
+    );
     await customizationService.init();
   }
 
