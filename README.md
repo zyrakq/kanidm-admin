@@ -16,6 +16,13 @@ service accounts, OAuth2 clients and more.
 > server installation, configuration and general documentation, see the
 > official [Kanidm book](https://kanidm.github.io/kanidm/stable/).
 
+## Documentation
+
+- [Customization](docs/customization.md) — logo/favicon overrides and
+  light/dark theme variants
+- [Running in containers](docs/containers.md) — Docker Compose, the dev
+  testcontainer chain, image build variants and releases
+
 ## Screenshots
 
 <p align="center">
@@ -115,7 +122,7 @@ In development mode the app can run an **ephemeral Kanidm container**
 built-in admin credentials — no pre-existing Kanidm server needed.
 The containers are **opt-in**: they start only when the
 `[testcontainer]` master switch is enabled (see
-[Dev testcontainers](#dev-testcontainers)).
+[Running in containers](docs/containers.md#dev-testcontainers)).
 Frontend source edits trigger a rebuild (`bun watch`) and are served live.
 
 To develop against an existing Kanidm instance instead:
@@ -141,89 +148,9 @@ cargo build --release    # SPA is compiled and embedded into the binary
 docker compose up -d     # builds the image and serves on port 4000
 ```
 
-To run the admin app itself as a container **with the dev
-testcontainer chain** (ephemeral Kanidm, mail sender, Mailpit), add
-the compose override. It mounts the host Docker socket into the app
-container and enables `[testcontainer]`, so the backend drives the
-same dev chain through the mounted socket:
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.testcontainers.yml up -d --build
-```
-
-The image `docker compose` builds carries the **default** cargo feature
-set (customization + testcontainer), so the override above works out of
-the box. The slimmer published variants are described in
-[Docker image build check](#docker-image-build-check-pipelight).
-
-Inside the container the app talks to the dev chain over Docker DNS
-names (`https://kanidm:8443`, `smtps://mailpit:1025`) on the shared
-`kanidm-admin-dev` network — no `localhost` ports are involved for
-the app itself. The browser-facing ports are still published
-loopback-only (Kanidm UI at `https://localhost:4001`, Mailpit UI at
-`http://localhost:8025`). `testcontainer.mode = "auto"`
-detects this automatically (`/.dockerenv` plus a local socket) and
-picks `in-container` networking; the plain variant (`docker compose
-up`) and the host-mode `cargo run` flow are unchanged.
-
-> **Note:** mounting `/var/run/docker.sock` gives the container
-> root-equivalent access to the host Docker daemon. Only do this for
-> a trusted local dev image.
-
-### Docker image build check (pipelight)
-
-The production image builds are scripted as
-[pipelight](https://pipelight.dev) pipelines (`pipelight.toml` at the repo
-root) — one per shipped image variant, mirroring the release workflow's
-tags:
-
-```bash
-pipelight run docker-build               # kanidm-admin:local            (default: customization + testcontainer)
-pipelight run docker-build-customization # kanidm-admin:local-customization (customization only)
-pipelight run docker-build-minimal       # kanidm-admin:local-minimal    (no features)
-```
-
-The variant is selected through the `CARGO_BUILD_FLAGS` build arg in the
-Dockerfile: `""` (default), `--no-default-features --features
-customization`, or `--no-default-features`. The default build keeps
-`docker compose up -d` and its testcontainers override working; the
-customization variant ships the theme variant API without the
-container-driver crates; the minimal variant compiles every optional
-subsystem out.
-
-Validate the pipeline definition without building:
-
-```bash
-pipelight ls
-```
-
-The pipeline is manual-only (no triggers). To run it automatically on
-`git push`, opt in with pipelight's git hooks:
-
-```bash
-pipelight enable git-hooks
-```
-
-The same pipeline runs in CI on every push/PR to `master`
-(`.github/workflows/pipelight.yml`).
-
-### Releases
-
-Cut a release by pushing a version tag (or using the *Run workflow* button
-on `.github/workflows/release.yml` with a version input):
-
-```bash
-git tag v0.1.0 && git push origin v0.1.0
-```
-
-The workflow builds **three image variants** — `X.Y.Z` / `latest`
-(default: customization + testcontainer), `X.Y.Z-customization` /
-`customization` (customization only) and `X.Y.Z-minimal` / `minimal` (no
-features) — and creates a GitHub Release whose notes explain the exact
-feature set of each tag. Images are amd64; point the container at your
-Kanidm instance by mounting a TOML overlay into `/workspace/app` — there
-is no env-var override for `kanidm.url` (see the release notes for the
-exact command).
+Running the app itself as a container — with or without the dev
+testcontainer chain — plus image build variants and releases are
+covered in [Running in containers](docs/containers.md).
 
 ## Configuration
 
@@ -236,83 +163,11 @@ Settings are layered TOML files: `app/appsettings.toml` (base), then
 | `frontend.serve_from`   | `disk` (dev) / `embedded` (prod) | Serve the SPA from disk or the embedded assets |
 | `frontend.watch`        | `false`                        | `bun watch` live rebuild (development)          |
 | `kanidm.url`            | `https://localhost:8443`       | Kanidm server URL                               |
-| `testcontainer.enabled` | `false` (`true` in dev)  | Master switch for the dev container chain       |
-| `testcontainer.kanidm.enabled` | `false` (`true` in dev) | Start an ephemeral Kanidm container at startup  |
-| `testcontainer.kanidm.image`   | `kanidm/server:1.11.2` | Image used for the dev container                |
-| `testcontainer.kanidm.host_port` | `4001`               | Fixed loopback HTTPS port for the dev Kanidm    |
-| `customization.dir`     | `""` (`<manifest_dir>/customization/`) | Directory for uploaded customization files     |
-| `customization.max_size_bytes` | `524288`                        | Max upload size per file                       |
-| `customization.theme.light` | `""`                               | Deployment-default light theme variant file name |
-| `customization.theme.dark`  | `""`                               | Deployment-default dark theme variant file name  |
 
-### Theme variants
-
-Theme overrides are ordinary `.css` files in per-mode subfolders of
-the customization dir: `themes/light/` and `themes/dark/` (default
-`app/customization/themes/light|dark/`). Files mounted into a mode's
-folder appear automatically in that mode's dropdown on the
-customization page; the folders are separate namespaces, so the same
-file name may exist in both (its `:root` / `:root[theme='dark']`
-selectors decide what it affects). The active variant per mode
-resolves as: a selection made on the customization page → the
-deployment default set via `[customization.theme]` (env:
-`APP_CUSTOMIZATION__THEME__LIGHT` / `APP_CUSTOMIZATION__THEME__DARK`,
-file name only — the folder is implied) → the built-in default (no
-override stylesheet). Legacy `theme-light` / `theme-dark` files in the
-customization root are migrated into `themes/light/theme-light.css` /
-`themes/dark/theme-dark.css` at startup.
-
-## Dev testcontainers
-
-The dev containers are **opt-in via the configuration**: enable
-the `[testcontainer] enabled` master switch (default `false`,
-settable per-run as `APP_TESTCONTAINER__ENABLED`) and the backend
-starts a small chain of Docker containers at startup instead of
-using `[kanidm]`. The per-container `enabled` keys select *which*
-containers of the chain run:
-
-- **Kanidm** — ephemeral `kanidm/server` container, provisioned with
-  the built-in admin credentials (recovered and logged at startup).
-  Its HTTPS port is bound to `127.0.0.1` on the fixed
-  `testcontainer.kanidm.host_port` (default `4001`) in **both**
-  networking modes, so a host browser can open the dev Kanidm UI
-  directly. In host mode the URL `https://localhost:4001` matches
-  the certificate SAN; in-container mode the SAN is the container
-  DNS name (`kanidm`), so the browser shows a certificate warning
-  on the published port — expected for the throwaway dev chain.
-- **Kanidm mail sender** (`testcontainer.kanidm-mail-sender`) —
-  worker container polling Kanidm for outgoing mail and relaying it.
-  No ports are published for it.
-- **Mailpit** (`testcontainer.mailpit`) — catch-all SMTP server with
-  a web UI. The UI is published loopback-only on `mailpit.ui_port`
-  (default `8025`) and its URL is printed in the startup log when
-  mailpit runs; the SMTP port is bound to `127.0.0.1:1025` for
-  host-mode mail delivery.
-
-All containers share the `testcontainer.network` Docker network
-(default `kanidm-admin-dev`); `testcontainer.mode` selects `auto`,
-`host` or `in-container` networking. Both browser-facing ports —
-the Kanidm HTTPS port and the Mailpit UI — are published
-loopback-only in either mode; the mail sender publishes no ports.
-In host mode the app itself also reaches the chain over loopback;
-in-container mode it uses Docker DNS names instead. Container
-logs are captured under `logs/testcontainers/`.
-
-The same chain also runs when the admin app itself is a container:
-the [compose override](#docker) mounts the Docker socket and the app
-switches to `in-container` networking, reaching the containers via
-Docker DNS names instead of loopback ports.
-
-To develop against an existing Kanidm instance instead:
-
-```toml
-# app/appsettings.toml (or a local overlay)
-[kanidm]
-url = "https://idm.example.com"
-
-[testcontainer.kanidm]
-enabled = false
-```
+The `testcontainer.*` settings are documented in
+[Running in containers](docs/containers.md#settings), the
+`customization.*` settings in
+[Customization](docs/customization.md#configuration).
 
 ## Kanidm Compatibility
 
