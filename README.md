@@ -144,12 +144,18 @@ docker compose up -d     # builds the image and serves on port 4000
 To run the admin app itself as a container **with the dev
 testcontainer chain** (ephemeral Kanidm, mail sender, Mailpit), add
 the compose override. It mounts the host Docker socket into the app
-container and sets `APP_TESTCONTAINER__ENABLED`, so the backend
-drives the same dev chain through the mounted socket:
+container and enables `[testcontainer]`, so the backend drives the
+same dev chain through the mounted socket:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.testcontainers.yml up -d --build
 ```
+
+> **Note:** the shipped image is compiled **without** the testcontainer
+> feature (`--no-default-features --features customization`) — see
+> [Docker image build check](#docker-image-build-check-pipelight). The
+> override above only works with a locally rebuilt image that includes
+> the feature; otherwise the app starts without the dev chain.
 
 Inside the container the app talks to the dev chain over Docker DNS
 names (`https://kanidm:8443`, `smtps://mailpit:1025`) on the shared
@@ -174,6 +180,12 @@ root). It builds the same image `docker compose` runs:
 ```bash
 pipelight run docker-build   # builds kanidm-admin:local
 ```
+
+The image pins the production feature set in its Dockerfile:
+`cargo build --release --no-default-features --features customization` —
+the customization API (theme variants) stays in, while the dev-only
+testcontainer chain is compiled out, so the image never touches a
+Docker socket.
 
 Validate the pipeline definition without building:
 
@@ -202,9 +214,12 @@ git tag v0.1.0 && git push origin v0.1.0
 
 The workflow builds the image, pushes `ghcr.io/zyrakq/kanidm-admin:X.Y.Z`
 and `:latest`, and creates a GitHub Release with pull/run instructions.
-Images are amd64; point the container at your Kanidm instance by mounting a
-TOML overlay into `/workspace/app` — there is no env-var override for
-`kanidm.url` (see the release notes for the exact command).
+The image is compiled with `--no-default-features --features customization`
+(customization in, dev testcontainer chain out) — the release notes state
+the exact feature set. Images are amd64; point the container at your
+Kanidm instance by mounting a TOML overlay into `/workspace/app` — there
+is no env-var override for `kanidm.url` (see the release notes for the
+exact command).
 
 ## Configuration
 

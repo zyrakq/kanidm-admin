@@ -31,12 +31,18 @@ ENV APP_SKIP_FRONTEND_BUILD=1
 # build.rs is intentionally NOT copied here yet — the stub build does not
 # need it, and its absence keeps this layer independent of build script
 # edits.
+#
+# Feature set is pinned for the production image: the customization
+# feature stays (theme variant storage/upload API), the dev-only
+# testcontainer chain is compiled out. The stub layer must use the exact
+# same flags as the real build below or its cache is useless.
+# `|| true` keeps the stub layer valid even before app/ sources exist.
 WORKDIR /workspace
 
 COPY Cargo.toml Cargo.lock ./
 COPY app/Cargo.toml ./app/
 RUN mkdir -p app/src && printf 'fn main() {}' > app/src/main.rs
-RUN cargo build --release || true
+RUN cargo build --release --no-default-features --features customization || true
 
 # ── Real build ────────────────────────────────────────────────────────────────
 COPY app/build.rs                      ./app/
@@ -48,7 +54,7 @@ COPY app/appsettings.production.toml   ./app/
 # release binary at compile time.
 COPY --from=frontend-builder /build/dist ./app/ui/dist
 
-RUN touch app/src/main.rs && cargo build --release
+RUN touch app/src/main.rs && cargo build --release --no-default-features --features customization
 
 ###############################################################################
 # Stage 3 — Runtime (slim)

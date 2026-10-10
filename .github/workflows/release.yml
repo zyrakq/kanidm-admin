@@ -85,6 +85,20 @@ jobs:
             docker pull ghcr.io/zyrakq/kanidm-admin:latest
             ```
 
+            ## Image feature set
+
+            The binary is compiled with
+            `cargo build --release --no-default-features --features customization`:
+
+            - **Customization included** — theme variant storage/upload API
+              (`[customization]` settings, per-mode theme folders).
+            - **Dev testcontainer chain compiled out** — the ephemeral
+              Kanidm / mail sender / Mailpit dev containers are a development
+              convenience (host `cargo run` flow) and are not part of the
+              shipped binary; the image never needs a Docker socket.
+            - Smaller binary and dependency graph: the container-driver
+              crates (`testcontainers`, `rcgen`) are not linked in.
+
             ## Run
 
             ```bash
