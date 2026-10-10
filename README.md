@@ -220,6 +220,24 @@ Settings are layered TOML files: `app/appsettings.toml` (base), then
 | `testcontainer.kanidm.enabled` | `false` (`true` in dev) | Start an ephemeral Kanidm container at startup  |
 | `testcontainer.kanidm.image`   | `kanidm/server:1.11.2` | Image used for the dev container                |
 | `testcontainer.kanidm.host_port` | `4001`               | Fixed loopback HTTPS port for the dev Kanidm    |
+| `customization.dir`     | `""` (`<manifest_dir>/customization/`) | Directory for uploaded customization files     |
+| `customization.max_size_bytes` | `524288`                        | Max upload size per file                       |
+| `customization.theme.light` | `""`                               | Deployment-default light theme variant file name |
+| `customization.theme.dark`  | `""`                               | Deployment-default dark theme variant file name  |
+
+### Theme variants
+
+Theme overrides are ordinary `.css` files in the `themes/` subdirectory
+of the customization dir (default `app/customization/themes/`). Files
+mounted there appear automatically in the customization page dropdowns;
+the same file may be selected for both modes (its `:root` /
+`:root[theme='dark']` selectors decide). The active variant per mode
+resolves as: a selection made on the customization page → the
+deployment default set via `[customization.theme]` (env:
+`APP_CUSTOMIZATION__THEME__LIGHT` / `APP_CUSTOMIZATION__THEME__DARK`,
+file name only — the folder is implied) → the built-in default (no
+override stylesheet). Legacy `theme-light` / `theme-dark` files in the
+customization root are migrated into `themes/` at startup.
 
 ## Dev testcontainers
 

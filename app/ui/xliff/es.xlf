@@ -2729,42 +2729,6 @@
   <source>Upload replacement logos, favicons and theme CSS. Removing an upload restores the bundled default.</source>
   <target>Suba logotipos, favicons y CSS de tema de reemplazo. Al eliminar una subida se restaura el valor predeterminado incluido.</target>
 </trans-unit>
-<trans-unit id="s48c4dfde0b52f591">
-  <source>Theme override (light)</source>
-  <target>Tema personalizado (claro)</target>
-</trans-unit>
-<trans-unit id="s52edb11b975e5271">
-  <source>Theme override (dark)</source>
-  <target>Tema personalizado (oscuro)</target>
-</trans-unit>
-<trans-unit id="seb8cba4451aa1ed2">
-  <source>CSS uploaded.</source>
-  <target>CSS subido.</target>
-</trans-unit>
-<trans-unit id="s6b57e2efaa6d855c">
-  <source>Failed to upload the CSS.</source>
-  <target>Error al subir el CSS.</target>
-</trans-unit>
-<trans-unit id="s449b1328352cf23e">
-  <source>CSS removed.</source>
-  <target>CSS eliminado.</target>
-</trans-unit>
-<trans-unit id="sf3f26778222aba63">
-  <source>Failed to remove the CSS.</source>
-  <target>Error al eliminar el CSS.</target>
-</trans-unit>
-<trans-unit id="s529854138984ac13">
-  <source>Upload CSS</source>
-  <target>Subir CSS</target>
-</trans-unit>
-<trans-unit id="sc25a485620084628">
-  <source>Remove CSS...</source>
-  <target>Eliminar CSS...</target>
-</trans-unit>
-<trans-unit id="s98d266814c6e2747">
-  <source>Remove the uploaded CSS? The default returns.</source>
-  <target>¿Eliminar el CSS subido? Se restaurará el valor predeterminado.</target>
-</trans-unit>
 <trans-unit id="sd12f594a3184c056">
   <source>Customization</source>
   <target>Personalización</target>
@@ -2780,6 +2744,62 @@
 <trans-unit id="sf22cb99dedd49ad2">
   <source>Hide system groups</source>
   <target>Ocultar grupos del sistema</target>
+</trans-unit>
+<trans-unit id="saca0e39a485d107f">
+  <source>Theme selection saved.</source>
+  <target>Selección de tema guardada.</target>
+</trans-unit>
+<trans-unit id="s21bbbca2ea6a6ba0">
+  <source>Failed to save the theme selection.</source>
+  <target>No se pudo guardar la selección de tema.</target>
+</trans-unit>
+<trans-unit id="s892141ae80e39e18">
+  <source>Variant uploaded.</source>
+  <target>Variante subida.</target>
+</trans-unit>
+<trans-unit id="s34c9adee6f9fe0b2">
+  <source>Failed to upload the variant.</source>
+  <target>No se pudo subir la variante.</target>
+</trans-unit>
+<trans-unit id="se21d0ad41d0f1b7f">
+  <source>Variant deleted.</source>
+  <target>Variante eliminada.</target>
+</trans-unit>
+<trans-unit id="s98fc69584612d028">
+  <source>Failed to delete the variant.</source>
+  <target>No se pudo eliminar la variante.</target>
+</trans-unit>
+<trans-unit id="s64ceaba43f954248">
+  <source>Built-in default</source>
+  <target>Predeterminado integrado</target>
+</trans-unit>
+<trans-unit id="s6d8531aae08e6ba7">
+  <source>Deployment default:</source>
+  <target>Predeterminado del despliegue:</target>
+</trans-unit>
+<trans-unit id="s70b51e222c57a9ff">
+  <source>Light mode variant</source>
+  <target>Variante de modo claro</target>
+</trans-unit>
+<trans-unit id="saa0d710d5f0920a9">
+  <source>Dark mode variant</source>
+  <target>Variante de modo oscuro</target>
+</trans-unit>
+<trans-unit id="s9427c1fa71965df7">
+  <source>No theme variants uploaded yet.</source>
+  <target>Aún no hay variantes de tema subidas.</target>
+</trans-unit>
+<trans-unit id="s95189de7377c7838">
+  <source>Delete...</source>
+  <target>Eliminar...</target>
+</trans-unit>
+<trans-unit id="s6c5b662e2b7c0e05">
+  <source>Upload variant</source>
+  <target>Subir variante</target>
+</trans-unit>
+<trans-unit id="s44712d2eefcaecb8">
+  <source>Delete the theme variant? Pages using it fall back to the default.</source>
+  <target>¿Eliminar la variante de tema? Las páginas que la usan vuelven al tema predeterminado.</target>
 </trans-unit>
 </body>
 </file>

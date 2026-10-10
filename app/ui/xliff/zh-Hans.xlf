@@ -2729,42 +2729,6 @@
   <source>Upload replacement logos, favicons and theme CSS. Removing an upload restores the bundled default.</source>
   <target>上传替换的徽标、网站图标和主题 CSS。删除上传后将恢复内置默认值。</target>
 </trans-unit>
-<trans-unit id="s48c4dfde0b52f591">
-  <source>Theme override (light)</source>
-  <target>主题覆盖（浅色）</target>
-</trans-unit>
-<trans-unit id="s52edb11b975e5271">
-  <source>Theme override (dark)</source>
-  <target>主题覆盖（深色）</target>
-</trans-unit>
-<trans-unit id="seb8cba4451aa1ed2">
-  <source>CSS uploaded.</source>
-  <target>CSS 已上传。</target>
-</trans-unit>
-<trans-unit id="s6b57e2efaa6d855c">
-  <source>Failed to upload the CSS.</source>
-  <target>CSS 上传失败。</target>
-</trans-unit>
-<trans-unit id="s449b1328352cf23e">
-  <source>CSS removed.</source>
-  <target>CSS 已删除。</target>
-</trans-unit>
-<trans-unit id="sf3f26778222aba63">
-  <source>Failed to remove the CSS.</source>
-  <target>删除 CSS 失败。</target>
-</trans-unit>
-<trans-unit id="s529854138984ac13">
-  <source>Upload CSS</source>
-  <target>上传 CSS</target>
-</trans-unit>
-<trans-unit id="sc25a485620084628">
-  <source>Remove CSS...</source>
-  <target>删除 CSS...</target>
-</trans-unit>
-<trans-unit id="s98d266814c6e2747">
-  <source>Remove the uploaded CSS? The default returns.</source>
-  <target>删除已上传的 CSS？将恢复默认样式。</target>
-</trans-unit>
 <trans-unit id="sd12f594a3184c056">
   <source>Customization</source>
   <target>自定义</target>
@@ -2780,6 +2744,62 @@
 <trans-unit id="sf22cb99dedd49ad2">
   <source>Hide system groups</source>
   <target>隐藏系统组</target>
+</trans-unit>
+<trans-unit id="saca0e39a485d107f">
+  <source>Theme selection saved.</source>
+  <target>主题选择已保存。</target>
+</trans-unit>
+<trans-unit id="s21bbbca2ea6a6ba0">
+  <source>Failed to save the theme selection.</source>
+  <target>保存主题选择失败。</target>
+</trans-unit>
+<trans-unit id="s892141ae80e39e18">
+  <source>Variant uploaded.</source>
+  <target>变体已上传。</target>
+</trans-unit>
+<trans-unit id="s34c9adee6f9fe0b2">
+  <source>Failed to upload the variant.</source>
+  <target>上传变体失败。</target>
+</trans-unit>
+<trans-unit id="se21d0ad41d0f1b7f">
+  <source>Variant deleted.</source>
+  <target>变体已删除。</target>
+</trans-unit>
+<trans-unit id="s98fc69584612d028">
+  <source>Failed to delete the variant.</source>
+  <target>删除变体失败。</target>
+</trans-unit>
+<trans-unit id="s64ceaba43f954248">
+  <source>Built-in default</source>
+  <target>内置默认</target>
+</trans-unit>
+<trans-unit id="s6d8531aae08e6ba7">
+  <source>Deployment default:</source>
+  <target>部署默认值：</target>
+</trans-unit>
+<trans-unit id="s70b51e222c57a9ff">
+  <source>Light mode variant</source>
+  <target>浅色模式变体</target>
+</trans-unit>
+<trans-unit id="saa0d710d5f0920a9">
+  <source>Dark mode variant</source>
+  <target>深色模式变体</target>
+</trans-unit>
+<trans-unit id="s9427c1fa71965df7">
+  <source>No theme variants uploaded yet.</source>
+  <target>尚未上传主题变体。</target>
+</trans-unit>
+<trans-unit id="s95189de7377c7838">
+  <source>Delete...</source>
+  <target>删除…</target>
+</trans-unit>
+<trans-unit id="s6c5b662e2b7c0e05">
+  <source>Upload variant</source>
+  <target>上传变体</target>
+</trans-unit>
+<trans-unit id="s44712d2eefcaecb8">
+  <source>Delete the theme variant? Pages using it fall back to the default.</source>
+  <target>删除主题变体？使用它的页面将回退到默认主题。</target>
 </trans-unit>
 </body>
 </file>

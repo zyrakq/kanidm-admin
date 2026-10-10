@@ -35,6 +35,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let customization_store = customization::CustomizationStore::new(
         settings.customization.effective_dir(&manifest_dir),
         settings.customization.max_size_bytes,
+        settings.customization.theme.light.clone(),
+        settings.customization.theme.dark.clone(),
     );
 
     let listener = TcpListener::bind(&settings.server.address).await?;

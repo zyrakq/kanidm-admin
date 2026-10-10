@@ -1,14 +1,17 @@
 // CustomizationService — singleton; fetches the customization manifest
 // once during app init and exposes per-slot override URLs (with a
-// cache-busting ?v=) or null when the bundled default applies. Mutations
-// refresh the manifest and dispatch 'customization-changed' so consumers
-// re-render.
+// cache-busting ?v=) or null when the bundled default applies. Theme
+// variants are read from the manifest's theme section and mutated via
+// select/upload/remove. Mutations refresh the manifest and dispatch
+// 'customization-changed' so consumers re-render.
 
 import { apiFetch } from '@/shared/services/http-client';
 import {
   type CustomizationManifest,
   type CustomizationSlot,
   type CustomizationSlotEntry,
+  type ThemeManifest,
+  type ThemeMode,
 } from '../types/customization.types';
 
 export class CustomizationService {
@@ -39,7 +42,10 @@ export class CustomizationService {
   async refresh(): Promise<void> {
     this.manifest = await apiFetch<CustomizationManifest>('/api/customization');
     window.dispatchEvent(
-      new CustomEvent('customization-changed', { bubbles: true, composed: true })
+      new CustomEvent('customization-changed', {
+        bubbles: true,
+        composed: true,
+      })
     );
   }
 
@@ -51,6 +57,11 @@ export class CustomizationService {
 
   entry(slot: CustomizationSlot): CustomizationSlotEntry | null {
     return this.manifest?.slots[slot] ?? null;
+  }
+
+  /** Theme section of the manifest, or null before init succeeds. */
+  theme(): ThemeManifest | null {
+    return this.manifest?.theme ?? null;
   }
 
   version(): string {
@@ -66,6 +77,34 @@ export class CustomizationService {
 
   async remove(slot: CustomizationSlot): Promise<void> {
     await apiFetch(`/api/customization/${slot}`, { method: 'DELETE' });
+    await this.refresh();
+  }
+
+  /** Set (name) or clear (null) the stored selection for one mode. */
+  async selectTheme(mode: ThemeMode, name: string | null): Promise<void> {
+    await apiFetch(`/api/customization/theme/${mode}`, {
+      method: 'PUT',
+      body: JSON.stringify({ name }),
+    });
+    await this.refresh();
+  }
+
+  /** Upload a theme variant; returns the stored (sanitized) name. */
+  async uploadThemeVariant(file: File): Promise<string> {
+    const body = new FormData();
+    body.append('file', file);
+    const res = await apiFetch<{ name: string }>('/api/customization/themes', {
+      method: 'POST',
+      body,
+    });
+    await this.refresh();
+    return res.name;
+  }
+
+  async removeThemeVariant(name: string): Promise<void> {
+    await apiFetch(`/api/customization/themes/${encodeURIComponent(name)}`, {
+      method: 'DELETE',
+    });
     await this.refresh();
   }
 }

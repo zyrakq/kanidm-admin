@@ -32,3 +32,12 @@ ui_port = 8025
 dir = ""
 # Max upload size per slot; 512 KiB covers SVG/PNG images and CSS files.
 max_size_bytes = 524288
+
+[customization.theme]
+# Deployment-default theme variant file names (file name only, no
+# path — the `themes/` subdirectory of the customization dir is
+# implied). Empty means no default override; a selection made on the
+# customization page always wins over these values. Env overrides:
+# APP_CUSTOMIZATION__THEME__LIGHT / APP_CUSTOMIZATION__THEME__DARK.
+light = ""
+dark = ""

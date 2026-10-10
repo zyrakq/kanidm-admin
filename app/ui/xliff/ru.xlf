@@ -2729,42 +2729,6 @@
   <source>Upload replacement logos, favicons and theme CSS. Removing an upload restores the bundled default.</source>
   <target>Загрузите замену логотипов, фавиконов и CSS тем. После удаления загрузки возвращается встроенный вариант по умолчанию.</target>
 </trans-unit>
-<trans-unit id="s48c4dfde0b52f591">
-  <source>Theme override (light)</source>
-  <target>Переопределение темы (светлая)</target>
-</trans-unit>
-<trans-unit id="s52edb11b975e5271">
-  <source>Theme override (dark)</source>
-  <target>Переопределение темы (тёмная)</target>
-</trans-unit>
-<trans-unit id="seb8cba4451aa1ed2">
-  <source>CSS uploaded.</source>
-  <target>CSS загружен.</target>
-</trans-unit>
-<trans-unit id="s6b57e2efaa6d855c">
-  <source>Failed to upload the CSS.</source>
-  <target>Не удалось загрузить CSS.</target>
-</trans-unit>
-<trans-unit id="s449b1328352cf23e">
-  <source>CSS removed.</source>
-  <target>CSS удалён.</target>
-</trans-unit>
-<trans-unit id="sf3f26778222aba63">
-  <source>Failed to remove the CSS.</source>
-  <target>Не удалось удалить CSS.</target>
-</trans-unit>
-<trans-unit id="s529854138984ac13">
-  <source>Upload CSS</source>
-  <target>Загрузить CSS</target>
-</trans-unit>
-<trans-unit id="sc25a485620084628">
-  <source>Remove CSS...</source>
-  <target>Удалить CSS...</target>
-</trans-unit>
-<trans-unit id="s98d266814c6e2747">
-  <source>Remove the uploaded CSS? The default returns.</source>
-  <target>Удалить загруженный CSS? Вернётся значение по умолчанию.</target>
-</trans-unit>
 <trans-unit id="sd12f594a3184c056">
   <source>Customization</source>
   <target>Персонализация</target>
@@ -2780,6 +2744,62 @@
 <trans-unit id="sf22cb99dedd49ad2">
   <source>Hide system groups</source>
   <target>Скрыть системные группы</target>
+</trans-unit>
+<trans-unit id="saca0e39a485d107f">
+  <source>Theme selection saved.</source>
+  <target>Выбор темы сохранён.</target>
+</trans-unit>
+<trans-unit id="s21bbbca2ea6a6ba0">
+  <source>Failed to save the theme selection.</source>
+  <target>Не удалось сохранить выбор темы.</target>
+</trans-unit>
+<trans-unit id="s892141ae80e39e18">
+  <source>Variant uploaded.</source>
+  <target>Вариант загружен.</target>
+</trans-unit>
+<trans-unit id="s34c9adee6f9fe0b2">
+  <source>Failed to upload the variant.</source>
+  <target>Не удалось загрузить вариант.</target>
+</trans-unit>
+<trans-unit id="se21d0ad41d0f1b7f">
+  <source>Variant deleted.</source>
+  <target>Вариант удалён.</target>
+</trans-unit>
+<trans-unit id="s98fc69584612d028">
+  <source>Failed to delete the variant.</source>
+  <target>Не удалось удалить вариант.</target>
+</trans-unit>
+<trans-unit id="s64ceaba43f954248">
+  <source>Built-in default</source>
+  <target>Встроенный по умолчанию</target>
+</trans-unit>
+<trans-unit id="s6d8531aae08e6ba7">
+  <source>Deployment default:</source>
+  <target>Значение по умолчанию из конфигурации:</target>
+</trans-unit>
+<trans-unit id="s70b51e222c57a9ff">
+  <source>Light mode variant</source>
+  <target>Вариант светлой темы</target>
+</trans-unit>
+<trans-unit id="saa0d710d5f0920a9">
+  <source>Dark mode variant</source>
+  <target>Вариант тёмной темы</target>
+</trans-unit>
+<trans-unit id="s9427c1fa71965df7">
+  <source>No theme variants uploaded yet.</source>
+  <target>Загруженных вариантов тем пока нет.</target>
+</trans-unit>
+<trans-unit id="s95189de7377c7838">
+  <source>Delete...</source>
+  <target>Удалить...</target>
+</trans-unit>
+<trans-unit id="s6c5b662e2b7c0e05">
+  <source>Upload variant</source>
+  <target>Загрузить вариант</target>
+</trans-unit>
+<trans-unit id="s44712d2eefcaecb8">
+  <source>Delete the theme variant? Pages using it fall back to the default.</source>
+  <target>Удалить вариант темы? Страницы, использующие его, вернутся к стандартному оформлению.</target>
 </trans-unit>
 </body>
 </file>

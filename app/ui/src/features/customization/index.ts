@@ -9,5 +9,12 @@ export type {
   CustomizationSlot,
   CustomizationSlotEntry,
   CustomizationManifest,
+  ThemeMode,
+  ThemeModeInfo,
+  ThemeSource,
+  ThemeManifest,
 } from './types/customization.types.ts';
-export { CUSTOMIZATION_SLOTS } from './types/customization.types.ts';
+export {
+  CUSTOMIZATION_SLOTS,
+  THEME_MODES,
+} from './types/customization.types.ts';

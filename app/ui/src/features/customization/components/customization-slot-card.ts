@@ -1,9 +1,9 @@
-// One customization slot: upload and remove actions. Image slots render
-// an <img> preview (override or bundled default); CSS slots have no
-// preview — just upload/remove. The preview URL is cache-busted after
-// each mutation.
+// One customization slot: upload and remove actions for image slots
+// (logo/favicon). Renders an <img> preview (override or bundled
+// default); the preview URL is cache-busted after each mutation.
+// Theme variants are handled by the theme section on the page.
 
-import { LitElement, css, html, nothing } from 'lit';
+import { LitElement, css, html } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
@@ -18,11 +18,9 @@ import type { CustomizationSlot } from '../types/customization.types';
 @localized()
 export class CustomizationSlotCard extends LitElement {
   @property() slot: CustomizationSlot = 'logo-light';
-  /** 'image' renders an <img> preview; 'css' renders upload/remove only. */
-  @property() kind: 'image' | 'css' = 'image';
   /** Localized card title, set by the page. */
   @property() heading = '';
-  /** Bundled default asset URL for the preview fallback (image kind). */
+  /** Bundled default asset URL for the preview fallback. */
   @property() defaultSrc = '';
 
   @query('input[type="file"]') private fileInput!: HTMLInputElement;
@@ -33,10 +31,6 @@ export class CustomizationSlotCard extends LitElement {
   @state() private previewMissing = false;
   /** Bumped after upload/remove so the preview reloads. */
   @state() private version = 0;
-
-  private get isCss(): boolean {
-    return this.kind === 'css';
-  }
 
   private get previewUrl(): string {
     const override = customizationService.overrideUrl(this.slot);
@@ -51,15 +45,9 @@ export class CustomizationSlotCard extends LitElement {
       await customizationService.upload(this.slot, file);
       this.previewMissing = false;
       this.version += 1;
-      notificationService.success(
-        this.isCss ? msg('CSS uploaded.') : msg('Image uploaded.')
-      );
+      notificationService.success(msg('Image uploaded.'));
     } catch {
-      notificationService.error(
-        this.isCss
-          ? msg('Failed to upload the CSS.')
-          : msg('Failed to upload the image.')
-      );
+      notificationService.error(msg('Failed to upload the image.'));
     } finally {
       this.busy = false;
     }
@@ -73,15 +61,9 @@ export class CustomizationSlotCard extends LitElement {
       this.removeOpen = false;
       this.previewMissing = false;
       this.version += 1;
-      notificationService.success(
-        this.isCss ? msg('CSS removed.') : msg('Image removed.')
-      );
+      notificationService.success(msg('Image removed.'));
     } catch {
-      notificationService.error(
-        this.isCss
-          ? msg('Failed to remove the CSS.')
-          : msg('Failed to remove the image.')
-      );
+      notificationService.error(msg('Failed to remove the image.'));
     } finally {
       this.removing = false;
     }
@@ -96,27 +78,22 @@ export class CustomizationSlotCard extends LitElement {
 
   render() {
     const hasOverride = customizationService.overrideUrl(this.slot) !== null;
-    const accept = this.isCss ? '.css,text/css' : 'image/svg+xml,image/png';
     return html`
       <ui-card class="card">
         <h2>${this.heading}</h2>
-        ${
-          this.isCss
-            ? nothing
-            : this.previewMissing
-              ? html`<div class="placeholder">${msg('No image')}</div>`
-              : html`<img
-                  src=${this.previewUrl}
-                  alt=${this.heading}
-                  @error=${() => {
-                    this.previewMissing = true;
-                  }}
-                />`
-        }
+        ${this.previewMissing
+          ? html`<div class="placeholder">${msg('No image')}</div>`
+          : html`<img
+              src=${this.previewUrl}
+              alt=${this.heading}
+              @error=${() => {
+                this.previewMissing = true;
+              }}
+            />`}
         <div class="actions">
           <input
             type="file"
-            accept=${accept}
+            accept="image/svg+xml,image/png"
             @change=${this.handleFileChange}
           />
           <ui-button
@@ -124,7 +101,7 @@ export class CustomizationSlotCard extends LitElement {
             ?loading=${this.busy}
             @click=${() => this.fileInput.click()}
           >
-            ${this.isCss ? msg('Upload CSS') : msg('Upload image')}
+            ${msg('Upload image')}
           </ui-button>
           <ui-button
             variant="danger"
@@ -133,29 +110,23 @@ export class CustomizationSlotCard extends LitElement {
               this.removeOpen = true;
             }}
           >
-            ${this.isCss ? msg('Remove CSS...') : msg('Remove image...')}
+            ${msg('Remove image...')}
           </ui-button>
         </div>
       </ui-card>
-      ${
-        this.removeOpen
-          ? html`<confirm-dialog
-              open
-              danger
-              .busy=${this.removing}
-              confirmLabel=${msg('Remove')}
-              message=${
-                this.isCss
-                  ? msg('Remove the uploaded CSS? The default returns.')
-                  : msg('Remove the uploaded image? The default returns.')
-              }
-              @confirm=${() => void this.removeOverride()}
-              @cancel=${() => {
-                this.removeOpen = false;
-              }}
-            ></confirm-dialog>`
-          : nothing
-      }
+      ${this.removeOpen
+        ? html`<confirm-dialog
+            open
+            danger
+            .busy=${this.removing}
+            confirmLabel=${msg('Remove')}
+            message=${msg('Remove the uploaded image? The default returns.')}
+            @confirm=${() => void this.removeOverride()}
+            @cancel=${() => {
+              this.removeOpen = false;
+            }}
+          ></confirm-dialog>`
+        : ''}
     `;
   }
 
@@ -168,23 +139,6 @@ export class CustomizationSlotCard extends LitElement {
       font-size: 16px;
       font-weight: 600;
       color: var(--theme-color-text-primary);
-    }
-    .preview {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 160px;
-      height: 160px;
-      margin-bottom: 16px;
-      border: 1px dashed var(--theme-color-border);
-      border-radius: var(--theme-radius-md);
-      overflow: hidden;
-      background: var(--theme-color-surface-sunken);
-    }
-    .preview img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
     }
     .placeholder {
       font-size: 13px;

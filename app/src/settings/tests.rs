@@ -465,3 +465,49 @@ fn env_var_overrides_customization_dir() {
         "APP_CUSTOMIZATION__DIR should override the default dir"
     );
 }
+
+#[test]
+fn customization_theme_defaults_when_absent() {
+    let s = settings_from_toml(BASE_TOML, "").expect("should deserialize");
+    assert_eq!(s.customization.theme.light, "", "theme.light should default to empty");
+    assert_eq!(s.customization.theme.dark, "", "theme.dark should default to empty");
+}
+
+#[test]
+fn customization_theme_overlay_parses() {
+    let overlay = indoc! {r#"
+        [customization]
+        dir = "/srv/customization"
+
+        [customization.theme]
+        light = "corporate.css"
+        dark = "night.css"
+    "#};
+    let s = settings_from_toml(BASE_TOML, overlay).expect("should deserialize");
+    assert_eq!(s.customization.dir, "/srv/customization");
+    assert_eq!(s.customization.theme.light, "corporate.css");
+    assert_eq!(s.customization.theme.dark, "night.css");
+}
+
+#[test]
+fn env_var_overrides_customization_theme() {
+    let env = HashMap::from([
+        (
+            "APP_CUSTOMIZATION__THEME__LIGHT".to_string(),
+            "corporate.css".to_string(),
+        ),
+        (
+            "APP_CUSTOMIZATION__THEME__DARK".to_string(),
+            "night.css".to_string(),
+        ),
+    ]);
+    let s = settings_from_layers(BASE_TOML, "", Some(env)).expect("should deserialize");
+    assert_eq!(
+        s.customization.theme.light, "corporate.css",
+        "APP_CUSTOMIZATION__THEME__LIGHT should override the default"
+    );
+    assert_eq!(
+        s.customization.theme.dark, "night.css",
+        "APP_CUSTOMIZATION__THEME__DARK should override the default"
+    );
+}
