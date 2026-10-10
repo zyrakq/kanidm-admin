@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { msg, str } from '@lit/localize';
 import { localized } from '@/features/localization';
@@ -106,6 +106,12 @@ export class FooterInfo extends LitElement {
           <div class="left">${this.renderStatus()}</div>
           <div class="spacer"></div>
           <div class="right">
+            ${this.status?.customizationPage
+              ? html`
+                  <a class="design-link" href="/design">${msg('Design')}</a>
+                  <span class="separator">•</span>
+                `
+              : nothing}
             <a
               href="https://github.com/zyrakq/kanidm-admin"
               target="_blank"

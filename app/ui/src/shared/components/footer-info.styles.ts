@@ -96,6 +96,21 @@ export const footerInfoStyles = css`
     color: var(--theme-color-primary);
   }
 
+  /* The design page is public while enabled; the link stays visually
+     emphasized so the owner keeps noticing it and remembers to disable
+     the page in the config after customizing. */
+  a.design-link {
+    color: var(--theme-color-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 600;
+  }
+
+  a.design-link:hover {
+    color: var(--theme-color-primary-hover, var(--theme-color-primary));
+    text-decoration: none;
+  }
+
   @media (max-width: 768px) {
     .toolbar {
       flex-direction: column;

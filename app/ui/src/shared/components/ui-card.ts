@@ -11,6 +11,9 @@ export class UiCard extends LitElement {
   @property({ type: Boolean, reflect: true }) sunken = false;
   /** Remove body padding (tables, lists). */
   @property({ type: Boolean, reflect: true }) flush = false;
+  /** Stretch to the parent's height: card becomes a flex column and the
+   * body grows, so slotted content can pin actions to the bottom. */
+  @property({ type: Boolean, reflect: true }) stretch = false;
 
   render() {
     return html`
@@ -51,6 +54,17 @@ export class UiCard extends LitElement {
     }
     :host([flush]) .body {
       padding: 0;
+    }
+    :host([stretch]) .card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    :host([stretch]) .body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
     .header,
     .footer {

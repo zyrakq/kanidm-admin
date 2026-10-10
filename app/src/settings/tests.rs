@@ -433,6 +433,7 @@ fn customization_defaults_when_section_absent() {
         std::path::PathBuf::from("/tmp/manifest/customization"),
         "empty dir should resolve to <manifest>/customization"
     );
+    assert!(s.customization.page.enabled, "page should default to enabled");
 }
 
 #[test]
@@ -510,4 +511,61 @@ fn env_var_overrides_customization_theme() {
         s.customization.theme.dark, "night.css",
         "APP_CUSTOMIZATION__THEME__DARK should override the default"
     );
+}
+
+#[test]
+fn customization_page_defaults_to_enabled() {
+    let s = settings_from_toml(BASE_TOML, "").unwrap();
+    assert!(
+        s.customization.page.enabled,
+        "page.enabled should default to true (behavior-preserving)"
+    );
+}
+
+#[test]
+fn customization_page_overlay_can_disable() {
+    let s = settings_from_toml(
+        BASE_TOML,
+        indoc! {r#"
+            [customization.page]
+            enabled = false
+        "#},
+    )
+    .unwrap();
+    assert!(!s.customization.page.enabled);
+}
+
+#[test]
+fn env_var_overrides_customization_page_enabled() {
+    let s = settings_from_layers(
+        BASE_TOML,
+        "",
+        Some(HashMap::from([(
+            "APP_CUSTOMIZATION__PAGE__ENABLED".to_string(),
+            "false".to_string(),
+        )])),
+    )
+    .unwrap();
+    assert!(
+        !s.customization.page.enabled,
+        "APP_CUSTOMIZATION__PAGE__ENABLED should override the default"
+    );
+}
+
+#[test]
+fn env_var_can_re_enable_customization_page() {
+    // The overlay disables it; the env var wins (later layer).
+    let s = settings_from_layers(
+        BASE_TOML,
+        indoc! {r#"
+            [customization.page]
+            enabled = false
+        "#},
+        Some(HashMap::from([(
+            "APP_CUSTOMIZATION__PAGE__ENABLED".to_string(),
+            "true".to_string(),
+        )])),
+    )
+    .unwrap();
+    assert!(s.customization.page.enabled);
 }

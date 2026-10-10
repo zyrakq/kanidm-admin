@@ -16,6 +16,7 @@ import type { ThemeMode } from '../types/customization.types';
 import './customization-slot-card';
 import '@/shared/components/confirm-dialog';
 import '@/shared/components/form-field';
+import '@/shared/components/standalone-layout';
 import '@/shared/components/ui-button';
 import '@/shared/components/ui-card';
 
@@ -189,13 +190,18 @@ export class CustomizationPage extends LitElement {
 
   render() {
     return html`
-      <admin-layout>
+      <standalone-layout>
         <div class="page-head">
           <h1>${msg('Customization')}</h1>
         </div>
         <p class="intro">
           ${msg(
             'Upload replacement logos, favicons and theme CSS. Removing an upload restores the bundled default.'
+          )}
+        </p>
+        <p class="public-note">
+          ${msg(
+            'This page is publicly accessible while it is enabled. After you finish customizing, disable it in the configuration ([customization] page.enabled) so visitors cannot alter the design.'
           )}
         </p>
         ${this.renderThemeSection()}
@@ -222,7 +228,7 @@ export class CustomizationPage extends LitElement {
             .defaultSrc=${'/favicon-dark.svg'}
           ></customization-slot-card>
         </div>
-      </admin-layout>
+      </standalone-layout>
     `;
   }
 
@@ -248,6 +254,14 @@ export class CustomizationPage extends LitElement {
       margin: 0 0 24px;
       font-size: 14px;
       color: var(--theme-color-text-muted);
+    }
+    .public-note {
+      margin: -16px 0 24px;
+      padding: 10px 14px;
+      border: 1px solid var(--theme-color-warning);
+      border-radius: var(--theme-radius-md);
+      font-size: 13px;
+      color: var(--theme-color-warning);
     }
     h2 {
       margin: 0 0 12px;
@@ -301,7 +315,7 @@ export class CustomizationPage extends LitElement {
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
       gap: 16px;
     }
   `;

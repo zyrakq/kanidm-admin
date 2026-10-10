@@ -9,6 +9,7 @@ import {
   type SectionId,
 } from '@/shared/access/section-access';
 import { navigate, registerRouter } from '@/shared/services/router.service';
+import { kanidmStatusService } from '@/shared/services/kanidm-status.service';
 import '@/features/theme/services/favicon.service';
 import '@/features/customization';
 
@@ -157,9 +158,19 @@ export class AppComponent extends LitElement {
       enter: async () => this.guardSection('messages'),
     },
     {
-      path: '/admin/customization',
+      path: '/design',
       render: () => html`<customization-page></customization-page>`,
-      enter: async () => this.guardSection('customization'),
+      enter: async () => {
+        // Public standalone page (no auth guard). When the backend
+        // flag is off the management API is unmounted too, so the
+        // page would be a dead end — redirect home instead.
+        const status = await kanidmStatusService.fetchStatus();
+        if (!status.customizationPage) {
+          navigate('/', { replace: true });
+          return false;
+        }
+        return true;
+      },
     },
     {
       path: '/admin/no-access',

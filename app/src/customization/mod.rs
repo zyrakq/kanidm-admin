@@ -7,5 +7,5 @@ pub mod handlers;
 pub mod sanitize;
 pub mod store;
 
-pub use handlers::router;
+pub use handlers::{management_router, serving_router};
 pub use store::CustomizationStore;

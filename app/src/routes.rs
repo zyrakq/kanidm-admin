@@ -6,7 +6,6 @@
 // main.rs stays free of conditionals.
 
 use std::path::Path;
-use std::sync::Arc;
 
 use axum::{
     body::Body,
@@ -21,7 +20,7 @@ use crate::auth::handlers::routes as auth_routes;
 use crate::auth::AppState;
 use crate::frontend_assets::Assets;
 use crate::settings::frontend::FrontendSettings;
-use crate::status::{self, KanidmStatusProbe};
+use crate::status::{self, StatusAppState};
 
 /// Build the custom API router.
 ///
@@ -35,11 +34,12 @@ use crate::status::{self, KanidmStatusProbe};
 ///   POST /api/auth/reauth   — privilege step-up (refreshes cookie)
 ///   GET  /api/auth/profile  — signed-in user plus their Kanidm groups
 ///   ANY  /api/kanidm/{*path} — authenticated proxy to the Kanidm server
-///   GET/PUT/DELETE /api/customization[/{slot}] — customization manifest/upload/remove
+///   GET/PUT/DELETE /api/customization[/{slot}] — customization management
+///                 (merged by main.rs only when the page flag is on)
 ///   GET  /customization/{slot}   — serve an uploaded customization file
 pub fn build(
     state: AppState,
-    status_probe: Arc<dyn KanidmStatusProbe>,
+    status_state: StatusAppState,
     customization_routes: Router,
 ) -> Router {
     let router = Router::new()
@@ -47,7 +47,7 @@ pub fn build(
         .route("/api/hello", get(hello_handler))
         .route(
             "/api/status",
-            get(status::status_handler).with_state(status_probe),
+            get(status::status_handler).with_state(status_state),
         )
         .merge(auth_routes())
         .merge(crate::proxy::bulk::routes())

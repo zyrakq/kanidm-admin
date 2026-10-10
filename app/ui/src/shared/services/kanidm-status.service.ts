@@ -24,6 +24,8 @@ export interface KanidmStatus {
   supportedRange: string | null;
   /** Effective Kanidm base URL (resolved backend-side, container mode aware). */
   kanidmUrl: string | null;
+  /** Standalone customization page enabled ([customization] page.enabled). */
+  customizationPage: boolean;
 }
 
 interface StatusResponse {
@@ -32,6 +34,7 @@ interface StatusResponse {
   clientVersion: string;
   supportedRange?: string | null;
   kanidmUrl: string;
+  customizationPage?: boolean;
 }
 
 const UNREACHABLE: KanidmStatus = {
@@ -40,6 +43,7 @@ const UNREACHABLE: KanidmStatus = {
   clientVersion: null,
   supportedRange: null,
   kanidmUrl: null,
+  customizationPage: false,
 };
 
 export class KanidmStatusService {
@@ -83,6 +87,7 @@ export class KanidmStatusService {
         clientVersion: response.clientVersion ?? null,
         supportedRange: response.supportedRange ?? null,
         kanidmUrl: response.kanidmUrl ?? null,
+        customizationPage: response.customizationPage ?? false,
       };
     } catch {
       status = { ...UNREACHABLE };

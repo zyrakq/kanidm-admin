@@ -9,7 +9,10 @@
 //   POST   /api/customization/themes/{mode}       — theme variant upload (field `file`)
 //   PUT    /api/customization/theme/{mode}  — set/clear the stored selection
 //   DELETE /api/customization/themes/{mode}/{name} — remove a theme variant
+//          (the /api/customization* routes above are mounted only when
+//          [customization] page.enabled is on)
 //   GET    /customization/{slot}            — serve an image override
+//          (always mounted, regardless of the page flag)
 //   GET    /customization/theme-light|dark[.css] — serve the effective
 //            variant CSS; `/* custom styles */` placeholder when none
 //
@@ -40,9 +43,11 @@ pub type CustomizationState = Arc<CustomizationStore>;
 /// convention. Keeps the cascade order stable and the console clean.
 const CSS_PLACEHOLDER: &str = "/* custom styles */";
 
-/// Self-contained customization router (state applied inside) so
-/// `routes::build` can merge it regardless of its own state type.
-pub fn router(store: CustomizationState) -> Router {
+/// Management endpoints (`/api/customization*`): manifest, image slot
+/// upload/remove, theme variant upload/delete/selection. Mounted only
+/// when `[customization] page.enabled` is on — the standalone page is
+/// the only consumer, so a disabled page means a 404 by absence.
+pub fn management_router(store: CustomizationState) -> Router {
     Router::new()
         .route("/api/customization", get(manifest_handler))
         .route(
@@ -58,6 +63,14 @@ pub fn router(store: CustomizationState) -> Router {
             delete(delete_variant_handler),
         )
         .route("/api/customization/theme/{mode}", put(select_variant_handler))
+        .with_state(store)
+}
+
+/// Asset-serving endpoint (`GET /customization/{slot}`): always
+/// mounted, regardless of the page flag — the site header logo, login
+/// page and theme-override <link> elements request it on every page.
+pub fn serving_router(store: CustomizationState) -> Router {
+    Router::new()
         .route("/customization/{slot}", get(serve_handler))
         .with_state(store)
 }
@@ -380,7 +393,8 @@ mod tests {
             light.to_string(),
             dark.to_string(),
         ));
-        (router(store), dir)
+        // Same merge order as main.rs: serving always, management on top.
+        (serving_router(store.clone()).merge(management_router(store)), dir)
     }
 
     /// Build a minimal multipart body for one `file` field (image slots).
@@ -677,5 +691,37 @@ mod tests {
         assert_eq!(res.status(), StatusCode::NOT_FOUND);
         let res = app.oneshot(req("DELETE", "/api/customization/themes/mode/a.css")).await.unwrap();
         assert_eq!(res.status(), StatusCode::NOT_FOUND);
+    }
+
+    /// With the page disabled, main.rs mounts only the serving router:
+    /// management routes must 404 by absence while asset serving keeps
+    /// working (theme placeholder + unknown-slot 404).
+    #[tokio::test]
+    async fn flag_off_mount_keeps_serving_and_drops_management() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let store = Arc::new(CustomizationStore::new(
+            dir.path().to_path_buf(),
+            1024,
+            String::new(),
+            String::new(),
+        ));
+        let app = serving_router(store);
+
+        // Management surface is gone.
+        for (method, uri) in [
+            ("GET", "/api/customization"),
+            ("DELETE", "/api/customization/logo-light"),
+            ("PUT", "/api/customization/theme/light"),
+        ] {
+            let res = app.clone().oneshot(req(method, uri)).await.unwrap();
+            assert_eq!(res.status(), StatusCode::NOT_FOUND, "{method} {uri}");
+        }
+
+        // Asset serving is untouched: unset theme modes still serve the
+        // placeholder instead of failing.
+        let res = app.clone().oneshot(req("GET", "/customization/theme-light.css")).await.unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        assert_eq!(res.headers()["content-type"], "text/css");
+        assert_eq!(body_string(res).await, "/* custom styles */");
     }
 }

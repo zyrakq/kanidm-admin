@@ -152,6 +152,10 @@ pub struct StatusResponse {
     /// container mode has already substituted the URL by the time the
     /// probe is built.
     pub kanidm_url: String,
+    /// Whether the standalone customization page is enabled
+    /// ([customization.page.enabled]). The SPA reads it to show the
+    /// footer "Design" link and to guard the /design route.
+    pub customization_page: bool,
 }
 
 // ---------------------------------------------------------------------------
@@ -255,17 +259,23 @@ pub fn probe_from_settings(
 // Handler
 // ---------------------------------------------------------------------------
 
+/// State for the status handler: the Kanidm probe plus the static
+/// feature flags resolved from settings at startup.
+#[derive(Clone)]
+pub struct StatusAppState {
+    pub probe: Arc<dyn KanidmStatusProbe>,
+    /// [customization] page.enabled, resolved once in main.
+    pub customization_page: bool,
+}
+
 /// GET /api/status — always 200; the `state` field carries the outcome.
-pub async fn status_handler(
-    State(probe): State<Arc<dyn KanidmStatusProbe>>,
-) -> Json<StatusResponse> {
-    Json(
-        compute_response(
-            client_version(),
-            probe.probe().await,
-            probe.kanidm_url(),
-        )
-    )
+pub async fn status_handler(State(state): State<StatusAppState>) -> Json<StatusResponse> {
+    Json(compute_response(
+        client_version(),
+        state.probe.probe().await,
+        state.probe.kanidm_url(),
+        state.customization_page,
+    ))
 }
 
 /// Pure decision logic, kept out of the handler so the full design table
@@ -275,6 +285,7 @@ fn compute_response(
     client_version: &str,
     outcome: ProbeOutcome,
     kanidm_url: &str,
+    customization_page: bool,
 ) -> StatusResponse {
     let client_version = client_version.to_string();
     let kanidm_url = kanidm_url.to_string();
@@ -286,6 +297,7 @@ fn compute_response(
             client_version,
             supported_range: None,
             kanidm_url,
+            customization_page,
         };
     }
 
@@ -298,6 +310,7 @@ fn compute_response(
             client_version,
             supported_range: None,
             kanidm_url,
+            customization_page,
         };
     };
 
@@ -313,6 +326,7 @@ fn compute_response(
         client_version,
         supported_range: parsed_client.map(|client| supported_range(&client)),
         kanidm_url,
+        customization_page,
     }
 }
 
@@ -334,7 +348,7 @@ mod tests {
     use super::build_script::extract_kanidm_client_version;
     use super::{
         client_version, compute_response, parse_version, status_handler, supported_range,
-        version_state, KanidmStatusProbe, ProbeOutcome, StatusState, Version,
+        version_state, KanidmStatusProbe, ProbeOutcome, StatusAppState, StatusState, Version,
     };
     use async_trait::async_trait;
     use axum::body::{to_bytes, Body};
@@ -426,6 +440,7 @@ mod tests {
             "1.11.1",
             outcome(false, Some("1.11.1")),
             TEST_KANIDM_URL,
+            true,
         );
         assert_eq!(response.state, StatusState::Unreachable);
         assert_eq!(response.server_version, None);
@@ -436,7 +451,7 @@ mod tests {
     #[test]
     fn compute_response_alive_without_header_skips_version_check() {
         let response =
-            compute_response("1.11.1", outcome(true, None), TEST_KANIDM_URL);
+            compute_response("1.11.1", outcome(true, None), TEST_KANIDM_URL, true);
         assert_eq!(response.state, StatusState::Alive);
         assert_eq!(response.server_version, None);
         assert_eq!(response.supported_range, None);
@@ -449,6 +464,7 @@ mod tests {
             "1.11.1",
             outcome(true, Some("1.11.0")),
             TEST_KANIDM_URL,
+            true,
         );
         assert_eq!(response.state, StatusState::Alive);
         assert_eq!(response.server_version.as_deref(), Some("1.11.0"));
@@ -461,6 +477,7 @@ mod tests {
             "1.11.1",
             outcome(true, Some("1.12.0")),
             TEST_KANIDM_URL,
+            true,
         );
         assert_eq!(response.state, StatusState::Alive);
     }
@@ -471,6 +488,7 @@ mod tests {
             "1.11.1",
             outcome(true, Some("1.13.0")),
             TEST_KANIDM_URL,
+            true,
         );
         assert_eq!(response.state, StatusState::VersionWarning);
         assert_eq!(response.server_version.as_deref(), Some("1.13.0"));
@@ -484,6 +502,7 @@ mod tests {
             "2.0.0",
             outcome(true, Some("1.11.1")),
             TEST_KANIDM_URL,
+            true,
         );
         assert_eq!(response.state, StatusState::VersionConflict);
         // the band is reported even on conflict so the UI can show it
@@ -496,6 +515,7 @@ mod tests {
             "1.11.1",
             outcome(true, Some("2.0.0")),
             TEST_KANIDM_URL,
+            true,
         );
         assert_eq!(response.state, StatusState::VersionConflict);
     }
@@ -506,6 +526,7 @@ mod tests {
             "unknown",
             outcome(true, Some("1.11.2")),
             TEST_KANIDM_URL,
+            true,
         );
         assert_eq!(response.state, StatusState::Alive);
         assert_eq!(response.client_version, "unknown");
@@ -534,10 +555,13 @@ mod tests {
     fn router_with(outcome: ProbeOutcome) -> Router {
         Router::new().route(
             "/api/status",
-            get(status_handler).with_state(Arc::new(MockProbe {
-                outcome,
-                url: TEST_KANIDM_URL.to_string(),
-            })),
+            get(status_handler).with_state(StatusAppState {
+                probe: Arc::new(MockProbe {
+                    outcome,
+                    url: TEST_KANIDM_URL.to_string(),
+                }),
+                customization_page: true,
+            }),
         )
     }
 
@@ -578,10 +602,40 @@ mod tests {
         assert_eq!(body["serverVersion"], json!(server));
         assert_eq!(body["supportedRange"], json!(expected_range));
         assert_eq!(body["kanidmUrl"], json!(TEST_KANIDM_URL));
+        assert_eq!(body["customizationPage"], json!(true));
         assert!(
             body["clientVersion"].as_str().is_some_and(|v| !v.is_empty()),
             "clientVersion must be a non-empty string: {body}"
         );
+    }
+
+    #[tokio::test]
+    async fn handler_reports_customization_page_flag() {
+        // Same router as router_with but with the flag off: the response
+        // must carry the setting verbatim so the SPA can hide the link.
+        let response = Router::new()
+            .route(
+                "/api/status",
+                get(status_handler).with_state(StatusAppState {
+                    probe: Arc::new(MockProbe {
+                        outcome: outcome(true, Some("1.11.1")),
+                        url: TEST_KANIDM_URL.to_string(),
+                    }),
+                    customization_page: false,
+                }),
+            )
+            .oneshot(
+                Request::builder()
+                    .uri("/api/status")
+                    .body(Body::empty())
+                    .expect("build request"),
+            )
+            .await
+            .expect("router call");
+        assert_eq!(response.status(), StatusCode::OK);
+        let bytes = to_bytes(response.into_body(), usize::MAX).await.expect("read body");
+        let body: serde_json::Value = serde_json::from_slice(&bytes).expect("parse json body");
+        assert_eq!(body["customizationPage"], json!(false));
     }
 
     #[tokio::test]

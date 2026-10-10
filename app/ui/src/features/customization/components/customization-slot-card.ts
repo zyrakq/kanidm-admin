@@ -79,17 +79,19 @@ export class CustomizationSlotCard extends LitElement {
   render() {
     const hasOverride = customizationService.overrideUrl(this.slot) !== null;
     return html`
-      <ui-card class="card">
+      <ui-card class="card" stretch>
         <h2>${this.heading}</h2>
-        ${this.previewMissing
-          ? html`<div class="placeholder">${msg('No image')}</div>`
-          : html`<img
-              src=${this.previewUrl}
-              alt=${this.heading}
-              @error=${() => {
-                this.previewMissing = true;
-              }}
-            />`}
+        <div class="preview">
+          ${this.previewMissing
+            ? html`<div class="placeholder">${msg('No image')}</div>`
+            : html`<img
+                src=${this.previewUrl}
+                alt=${this.heading}
+                @error=${() => {
+                  this.previewMissing = true;
+                }}
+              />`}
+        </div>
         <div class="actions">
           <input
             type="file"
@@ -132,7 +134,11 @@ export class CustomizationSlotCard extends LitElement {
 
   static styles = css`
     :host {
-      display: block;
+      display: flex;
+      flex-direction: column;
+    }
+    ui-card {
+      flex: 1;
     }
     .card h2 {
       margin: 0 0 16px;
@@ -140,14 +146,31 @@ export class CustomizationSlotCard extends LitElement {
       font-weight: 600;
       color: var(--theme-color-text-primary);
     }
+    .preview {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 96px;
+    }
+    .preview img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
     .placeholder {
       font-size: 13px;
       color: var(--theme-color-text-muted);
     }
     .actions {
       display: flex;
-      justify-content: flex-end;
+      flex-wrap: wrap;
       gap: 8px;
+      margin-top: auto;
+      padding-top: 24px;
+    }
+    .actions ui-button {
+      flex: 1 1 auto;
     }
     input[type='file'] {
       display: none;

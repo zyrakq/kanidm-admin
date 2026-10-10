@@ -7,6 +7,9 @@
 // defaults (the `customization/` directory next to the manifest,
 // 512 KiB per upload, no theme file names), following the same
 // `#[serde(default)]` + `Default` pattern as kanidm_container.rs.
+//
+// [customization.page] toggles the standalone customization page
+// (management API + footer link); enabled by default.
 
 use serde::Deserialize;
 
@@ -29,6 +32,25 @@ pub struct ThemeSettings {
     pub dark: String,
 }
 
+/// Standalone customization page toggle (`[customization.page]`).
+/// Controls only the management surface: the `/api/customization*`
+/// routes and the footer link. Asset serving (`GET /customization/{slot}`)
+/// is never gated — the site header logo, login page and theme
+/// overrides depend on it on every page.
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+pub struct PageSettings {
+    /// Whether the standalone customization page is enabled.
+    pub enabled: bool,
+}
+
+impl Default for PageSettings {
+    fn default() -> Self {
+        // Enabled by default: preserves the pre-flag behavior for
+        // existing deployments whose TOML files never mention the key.
+        Self { enabled: true }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(default)]
 pub struct CustomizationSettings {
@@ -40,6 +62,8 @@ pub struct CustomizationSettings {
     pub max_size_bytes: i64,
     /// Deployment-default theme variant names (`[customization.theme]`).
     pub theme: ThemeSettings,
+    /// Standalone page toggle (`[customization.page]`).
+    pub page: PageSettings,
 }
 
 impl Default for CustomizationSettings {
@@ -48,6 +72,7 @@ impl Default for CustomizationSettings {
             dir: String::new(),
             max_size_bytes: DEFAULT_MAX_SIZE_BYTES,
             theme: ThemeSettings::default(),
+            page: PageSettings::default(),
         }
     }
 }

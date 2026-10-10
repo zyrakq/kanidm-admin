@@ -4,6 +4,7 @@ import { msg } from '@lit/localize';
 import { localized } from '@/features/localization';
 import { customizationService } from '@/features/customization';
 import { ThemeController } from '@/features/theme';
+import { navigate } from '@/shared/services/router.service';
 import '@/features/localization/components/locale-switcher';
 import '@/features/auth/components/session-indicator';
 import '@/shared/components/ui-icon';
@@ -29,6 +30,12 @@ export class AppHeader extends LitElement {
       this.requestUpdate()
     );
     await customizationService.init();
+  }
+
+  /** SPA navigation to "/" without a full page reload. */
+  private handleHomeClick(e: Event): void {
+    e.preventDefault();
+    navigate('/');
   }
 
   render() {
@@ -65,8 +72,15 @@ export class AppHeader extends LitElement {
               `
             : nothing}
           <div class="left-cluster">
-            <img src=${logo} alt="Kanidm Logo" class="logo" />
-            <span class="app-name">${msg('Kanidm Admin')}</span>
+            <a
+              class="home-link"
+              href="/"
+              aria-label=${msg('Go to home page')}
+              @click=${this.handleHomeClick}
+            >
+              <img src=${logo} alt="Kanidm Logo" class="logo" />
+              <span class="app-name">${msg('Kanidm Admin')}</span>
+            </a>
           </div>
           <div class="spacer"></div>
           <div class="right-cluster">

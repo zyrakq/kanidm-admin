@@ -43,6 +43,14 @@ export const appHeaderStyles = css`
     gap: 0.5rem;
   }
 
+  .home-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    text-decoration: none;
+  }
+
   .logo {
     width: 40px;
     height: 40px;

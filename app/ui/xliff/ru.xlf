@@ -2801,6 +2801,18 @@
   <source>Light mode</source>
   <target>Светлая тема</target>
 </trans-unit>
+<trans-unit id="sa2a4698b87a45f8f">
+  <source>Design</source>
+  <target>Дизайн</target>
+</trans-unit>
+<trans-unit id="s9e6a7afaed4e4df7">
+  <source>This page is publicly accessible while it is enabled. After you finish customizing, disable it in the configuration ([customization] page.enabled) so visitors cannot alter the design.</source>
+  <target>Эта страница общедоступна, пока она включена. После настройки дизайна отключите её в конфигурации ([customization] page.enabled), чтобы посетители не могли менять оформление.</target>
+</trans-unit>
+<trans-unit id="sa9b1e3b3add547b6">
+  <source>Go to home page</source>
+  <target>На главную страницу</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

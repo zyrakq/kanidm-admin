@@ -32,6 +32,11 @@ ui_port = 8025
 dir = ""
 # Max upload size per slot; 512 KiB covers SVG/PNG images and CSS files.
 max_size_bytes = 524288
+# Standalone customization page (/design): mounts the management API
+# (/api/customization*) and shows the footer "Design" link. Asset
+# serving is always on. Default: true.
+# Env override: APP_CUSTOMIZATION__PAGE__ENABLED
+# page.enabled = false
 
 [customization.theme]
 # Deployment-default theme variant file names (file name only, no
