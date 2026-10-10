@@ -40,9 +40,16 @@ export class DomainPage extends LitElement {
   // Behaviour form state.
   @state() private maxQueryableAttrs = '';
 
-  // Image state.
+  // Image state. The preview URL is cache-busted after each mutation so
+  // the new state is visible immediately (same pattern as the OAuth2
+  // image tab).
   @state() private imageFailed = false;
   @state() private imageBusy = false;
+  @state() private imageVersion = 0;
+
+  private get imageUrl(): string {
+    return `${DOMAIN_IMAGE_URL}?v=${this.imageVersion}`;
+  }
 
   // Confirm state.
   @state() private basednConfirmOpen = false;
@@ -161,7 +168,7 @@ export class DomainPage extends LitElement {
       await authService.withStepUp(() => domainService.setImage(file));
       notificationService.success(msg('Domain image updated.'));
       this.imageFailed = false;
-      await this.load();
+      this.imageVersion += 1;
     } catch (error) {
       this.toastError(error, msg('Failed to upload the domain image'));
     } finally {
@@ -176,8 +183,8 @@ export class DomainPage extends LitElement {
     try {
       await authService.withStepUp(() => domainService.removeImage());
       notificationService.success(msg('Domain image removed.'));
-      this.imageFailed = false;
-      await this.load();
+      this.imageFailed = true;
+      this.imageVersion += 1;
     } catch (error) {
       this.toastError(error, msg('Failed to remove the domain image'));
     } finally {
@@ -360,7 +367,7 @@ export class DomainPage extends LitElement {
             ? html`<div class="image-placeholder">${msg('No image')}</div>`
             : html`<img
                 class="image-preview"
-                src=${DOMAIN_IMAGE_URL}
+                src=${this.imageUrl}
                 alt=${msg('Domain image')}
                 @error=${() => (this.imageFailed = true)}
               />`}
