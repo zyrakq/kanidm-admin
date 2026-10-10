@@ -1,2 +1,5 @@
 [frontend]
 serve_from = "embedded"
+
+[customization]
+page.enabled = false
