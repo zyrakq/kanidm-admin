@@ -1,5 +1,7 @@
-# CI: validate pipelight.toml and run the docker-build pipeline against the
-# built-in Docker daemon on the runner.
+# Manual validation of pipelight.toml and docker-build pipelines against the
+# built-in Docker daemon on the runner. Never runs automatically: image
+# builds and publication happen only via the release workflow (tag push or
+# manual dispatch).
 #
 # pipelight v0.10.0 has no prebuilt binaries — it is installed from git with
 # cargo. `pipelight run` detaches by default, which would leave this job
@@ -11,10 +13,7 @@
 name: pipelight
 
 on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+  workflow_dispatch:
 
 jobs:
   docker-build:
