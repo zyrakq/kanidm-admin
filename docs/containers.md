@@ -154,11 +154,15 @@ on `.github/workflows/release.yml` with a version input):
 git tag v0.1.0 && git push origin v0.1.0
 ```
 
-The workflow builds **three image variants** — `X.Y.Z` / `latest`
-(default: customization + testcontainer), `X.Y.Z-customization` /
-`customization` (customization only) and `X.Y.Z-minimal` / `minimal` (no
-features) — and creates a GitHub Release whose notes explain the exact
-feature set of each tag. Images are amd64; point the container at your
+The workflow builds **three image variants** — `vX.Y.Z` / `latest`
+(default: customization + testcontainer), `vX.Y.Z-customization` /
+`latest-customization` (customization only) and `vX.Y.Z-minimal` /
+`latest-minimal` (no features) — and creates a GitHub Release whose notes
+explain the exact feature set of each tag. The version tags always carry
+the `v` prefix, matching the git tag. On a manual *Run workflow* dispatch
+a `latest` checkbox (checked by default) controls whether the rolling
+`latest*` tags are refreshed; pushing a version tag always refreshes
+them. Images are amd64; point the container at your
 Kanidm instance by mounting a TOML overlay into `/workspace/app` — there
 is no env-var override for `kanidm.url` (see the release notes for the
 exact command).

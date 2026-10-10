@@ -4,7 +4,10 @@
 # Triggers:
 #  - pushing a tag `vX.Y.Z` (semver is derived from the tag name)
 #  - manual dispatch with a `version` input (e.g. "0.2.0"); the release step
-#    creates the `v<version>` tag if it does not exist yet.
+#    creates the `v<version>` tag if it does not exist yet. A `latest`
+#    checkbox (checked by default) controls whether the rolling
+#    `latest` / `latest-customization` / `latest-minimal` tags are
+#    refreshed too; tag pushes always refresh them.
 #
 # amd64 only for the first release (multi-arch deferred).
 name: release
@@ -18,6 +21,11 @@ on:
         description: 'Release version without the v prefix (e.g. 0.2.0)'
         required: true
         type: string
+      latest:
+        description: 'Also refresh the rolling latest tags'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write   # create the GitHub Release (and tag on dispatch)
@@ -31,7 +39,9 @@ jobs:
         uses: actions/checkout@v4
 
       # Uniform version resolution for both triggers: dispatch input, or the
-      # pushed tag with its `v` prefix stripped (vX.Y.Z -> X.Y.Z).
+      # pushed tag with its `v` prefix stripped (vX.Y.Z -> X.Y.Z). The rolling
+      # `latest*` tags are refreshed on every tag push; on manual dispatch the
+      # `latest` checkbox decides (empty output = tag skipped).
       - name: Resolve version
         id: ver
         run: |
@@ -39,6 +49,15 @@ jobs:
             echo "version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
           else
             echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+          if [ "${{ inputs.latest }}" = "false" ]; then
+            echo "latest_default=" >> "$GITHUB_OUTPUT"
+            echo "latest_customization=" >> "$GITHUB_OUTPUT"
+            echo "latest_minimal=" >> "$GITHUB_OUTPUT"
+          else
+            echo "latest_default=ghcr.io/zyrakq/kanidm-admin:latest" >> "$GITHUB_OUTPUT"
+            echo "latest_customization=ghcr.io/zyrakq/kanidm-admin:latest-customization" >> "$GITHUB_OUTPUT"
+            echo "latest_minimal=ghcr.io/zyrakq/kanidm-admin:latest-minimal" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Set up Docker Buildx
@@ -60,8 +79,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/zyrakq/kanidm-admin:${{ steps.ver.outputs.version }}
-            ghcr.io/zyrakq/kanidm-admin:latest
+            ghcr.io/zyrakq/kanidm-admin:v${{ steps.ver.outputs.version }}
+            ${{ steps.ver.outputs.latest_default }}
 
       - name: Build and push image (customization only)
         uses: docker/build-push-action@v6
@@ -71,8 +90,8 @@ jobs:
           build-args: |
             CARGO_BUILD_FLAGS=--no-default-features --features customization
           tags: |
-            ghcr.io/zyrakq/kanidm-admin:${{ steps.ver.outputs.version }}-customization
-            ghcr.io/zyrakq/kanidm-admin:customization
+            ghcr.io/zyrakq/kanidm-admin:v${{ steps.ver.outputs.version }}-customization
+            ${{ steps.ver.outputs.latest_customization }}
 
       - name: Build and push image (minimal)
         uses: docker/build-push-action@v6
@@ -82,8 +101,8 @@ jobs:
           build-args: |
             CARGO_BUILD_FLAGS=--no-default-features
           tags: |
-            ghcr.io/zyrakq/kanidm-admin:${{ steps.ver.outputs.version }}-minimal
-            ghcr.io/zyrakq/kanidm-admin:minimal
+            ghcr.io/zyrakq/kanidm-admin:v${{ steps.ver.outputs.version }}-minimal
+            ${{ steps.ver.outputs.latest_minimal }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -112,7 +131,7 @@ jobs:
             production use behind an existing Kanidm this variant carries
             the dev-only container-driver crates for nothing.
 
-            ### `vX.Y.Z-customization` / `customization` — recommended for production
+            ### `vX.Y.Z-customization` / `latest-customization` — recommended for production
 
             Compiled with `--no-default-features --features customization`:
             the theme variant storage/upload API stays in, while the
@@ -120,7 +139,7 @@ jobs:
             compiled out — smaller binary, smaller dependency graph, and
             the image never needs a Docker socket.
 
-            ### `vX.Y.Z-minimal` / `minimal` — bare console
+            ### `vX.Y.Z-minimal` / `latest-minimal` — bare console
 
             Compiled with `--no-default-features`: every optional subsystem
             is compiled out. Core admin console only (persons, groups,
