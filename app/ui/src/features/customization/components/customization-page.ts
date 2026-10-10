@@ -99,7 +99,7 @@ export class CustomizationPage extends LitElement {
     ];
     return html`
       <form-field
-        type="select"
+        type="combobox"
         label=${msg('Active variant')}
         fieldId=${'theme-variant-' + mode}
         .options=${options}
@@ -260,7 +260,7 @@ export class CustomizationPage extends LitElement {
     }
     .theme-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
       gap: 16px;
       margin-bottom: 8px;
     }
