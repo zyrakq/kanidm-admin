@@ -12,9 +12,9 @@ services:
   kanidm-admin:
     environment:
       # Opt in to the dev container chain ([testcontainer] enabled)
-      APP_TESTCONTAINER__ENABLED: "true"
+      APP_TESTCONTAINER__ENABLED: ${APP_TESTCONTAINER__ENABLED:-true}
       # Select the baked-in appsettings.docker.toml overlay
-      APP_ENV: docker
+      APP_ENV: ${APP_ENV:-docker}
     volumes:
       # The app drives Docker through the host daemon socket
       - /var/run/docker.sock:/var/run/docker.sock

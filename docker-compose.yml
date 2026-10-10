@@ -1,9 +1,9 @@
 x-logging: &default-logging
-  driver: "json-file"
+  driver: json-file
   options:
-    max-size: "${LOG_MAX_SIZE:-10m}"
-    max-file: "${LOG_MAX_FILE:-3}"
-    compress: "${LOG_COMPRESS:-true}"
+    max-size: ${LOG_MAX_SIZE:-10m}
+    max-file: ${LOG_MAX_FILE:-3}
+    compress: ${LOG_COMPRESS:-true}
 
 services:
   kanidm-admin:
