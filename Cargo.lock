@@ -2966,6 +2966,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "kanidm-admin"
+version = "1.0.0"
+dependencies = [
+ "async-trait",
+ "axum",
+ "base64 0.22.1",
+ "config",
+ "dotenvy",
+ "env_logger 0.11.9",
+ "futures-util",
+ "http-body-util",
+ "indoc",
+ "kanidm_client",
+ "kanidm_proto",
+ "mime_guess",
+ "pretty_env_logger",
+ "rcgen",
+ "reqwest",
+ "rust-embed",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "testcontainers",
+ "time",
+ "tokio",
+ "tokio-tungstenite 0.29.0",
+ "tower",
+ "tower-http",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "kanidm-hsm-crypto"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4714,39 +4747,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.5",
-]
-
-[[package]]
-name = "server"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "axum",
- "base64 0.22.1",
- "config",
- "dotenvy",
- "env_logger 0.11.9",
- "futures-util",
- "http-body-util",
- "indoc",
- "kanidm_client",
- "kanidm_proto",
- "mime_guess",
- "pretty_env_logger",
- "rcgen",
- "reqwest",
- "rust-embed",
- "serde",
- "serde_json",
- "tempfile",
- "testcontainers",
- "time",
- "tokio",
- "tokio-tungstenite 0.29.0",
- "tower",
- "tower-http",
- "tracing",
- "uuid",
 ]
 
 [[package]]

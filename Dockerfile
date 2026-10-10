@@ -64,7 +64,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /workspace/app
 
 # ── Binary (frontend assets are embedded — no dist directory needed) ──────
-COPY --from=rust-builder /workspace/target/release/server /usr/local/bin/server
+COPY --from=rust-builder /workspace/target/release/kanidm-admin /usr/local/bin/kanidm-admin
 
 # ── Layered config ────────────────────────────────────────────────────────────
 # Settings::load() reads appsettings.toml then appsettings.<APP_ENV>.toml
@@ -78,4 +78,4 @@ EXPOSE 4000
 
 ENV APP_ENV=production
 
-CMD ["server"]
+CMD ["kanidm-admin"]

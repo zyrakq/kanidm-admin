@@ -1,7 +1,12 @@
 [package]
-name = "server"
-version = "0.1.0"
+name = "kanidm-admin"
+version = "1.0.0"
 edition = "2021"
+description = "A modern web-based administration console for Kanidm"
+license = "MIT"
+authors = ["Zyrakq <serg.shehov@tutanota.com>"]
+repository = "https://github.com/zyrakq/kanidm-admin"
+readme = "../README.md"
 
 [dependencies]
 axum = { workspace = true }
