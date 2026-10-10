@@ -163,22 +163,13 @@ impl Drop for TestcontainersHandle {
 /// Container mode: run the dev containers, recover the built-in
 /// accounts, and return effective settings pointing at the
 /// containers (the [kanidm] section is ignored with a warning).
-/// Disabled mode: pass [kanidm] through unchanged.
-/// Env var that turns the dev containers on at runtime (the
-/// `testcontainers` Cargo feature must also be compiled in).
-pub(crate) const ENV_REQUEST: &str = "KANIDM_ADMIN_TESTCONTAINERS";
-
+/// Disabled mode: pass [kanidm] through unchanged. The master
+/// switch is `[testcontainer] enabled`; the per-container
+/// `enabled` keys select which containers of the chain run.
 pub(crate) async fn start(
     settings: &Settings,
 ) -> Result<(KanidmSettings, TestcontainersHandle), Box<dyn std::error::Error + Send + Sync>> {
-    if !settings.testcontainer.kanidm.enabled {
-        return Ok((settings.kanidm.clone(), TestcontainersHandle::Disabled));
-    }
-    if std::env::var_os(ENV_REQUEST).is_none_or(|value| value.is_empty()) {
-        warn!(
-            "testcontainers compiled but '{ENV_REQUEST}' is not set; \
-             using the [kanidm] settings pass-through"
-        );
+    if !settings.testcontainer.enabled || !settings.testcontainer.kanidm.enabled {
         return Ok((settings.kanidm.clone(), TestcontainersHandle::Disabled));
     }
     warn!("[kanidm] url/verify_ca/ca_path are ignored while the testcontainer is enabled");

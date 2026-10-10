@@ -114,7 +114,7 @@ In development mode the app can run an **ephemeral Kanidm container**
 (`kanidm/server:1.11.2` via Docker), provision it and recover the
 built-in admin credentials — no pre-existing Kanidm server needed.
 The containers are **opt-in**: they start only when the
-`KANIDM_ADMIN_TESTCONTAINERS` env var is set (see
+`[testcontainer]` master switch is enabled (see
 [Dev testcontainers](#dev-testcontainers)).
 Frontend source edits trigger a rebuild (`bun watch`) and are served live.
 
@@ -144,7 +144,7 @@ docker compose up -d     # builds the image and serves on port 4000
 To run the admin app itself as a container **with the dev
 testcontainer chain** (ephemeral Kanidm, mail sender, Mailpit), add
 the compose override. It mounts the host Docker socket into the app
-container and sets `KANIDM_ADMIN_TESTCONTAINERS`, so the backend
+container and sets `APP_TESTCONTAINER__ENABLED`, so the backend
 drives the same dev chain through the mounted socket:
 
 ```bash
@@ -217,6 +217,7 @@ Settings are layered TOML files: `app/appsettings.toml` (base), then
 | `frontend.serve_from`   | `disk` (dev) / `embedded` (prod) | Serve the SPA from disk or the embedded assets |
 | `frontend.watch`        | `false`                        | `bun watch` live rebuild (development)          |
 | `kanidm.url`            | `https://localhost:8443`       | Kanidm server URL                               |
+| `testcontainer.enabled` | `false` (`true` in dev)  | Master switch for the dev container chain       |
 | `testcontainer.kanidm.enabled` | `false` (`true` in dev) | Start an ephemeral Kanidm container at startup  |
 | `testcontainer.kanidm.image`   | `kanidm/server:1.11.2` | Image used for the dev container                |
 | `testcontainer.kanidm.host_port` | `4001`               | Fixed loopback HTTPS port for the dev Kanidm    |
@@ -244,13 +245,12 @@ customization root are migrated into `themes/light/theme-light.css` /
 
 ## Dev testcontainers
 
-The dev containers are **opt-in via the environment**: set
-`KANIDM_ADMIN_TESTCONTAINERS` (any non-empty value) and the backend
+The dev containers are **opt-in via the configuration**: enable
+the `[testcontainer] enabled` master switch (default `false`,
+settable per-run as `APP_TESTCONTAINER__ENABLED`) and the backend
 starts a small chain of Docker containers at startup instead of
-using `[kanidm]`. Without the env var the `[kanidm]` settings pass
-through unchanged, no matter what `[testcontainer.*].enabled` says.
-The `enabled` keys only select *which* containers of the chain run
-once the env var is present:
+using `[kanidm]`. The per-container `enabled` keys select *which*
+containers of the chain run:
 
 - **Kanidm** — ephemeral `kanidm/server` container, provisioned with
   the built-in admin credentials (recovered and logged at startup).

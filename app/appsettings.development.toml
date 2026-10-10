@@ -2,9 +2,12 @@
 serve_from = "disk"
 watch = true
 
-# Which dev containers to run is configured here; whether they run
-# at all is decided by the KANIDM_ADMIN_TESTCONTAINERS env var
-# (set it to any non-empty value to enable).
+# Which dev containers to run is configured here; the whole chain
+# is gated by the [testcontainer] enabled master switch below
+# (settable per-run as APP_TESTCONTAINER__ENABLED).
+[testcontainer]
+enabled = true
+
 [testcontainer.kanidm]
 enabled = true
 

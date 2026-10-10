@@ -11,8 +11,8 @@
 services:
   kanidm-admin:
     environment:
-      # Opt in to the dev container chain
-      KANIDM_ADMIN_TESTCONTAINERS: "1"
+      # Opt in to the dev container chain ([testcontainer] enabled)
+      APP_TESTCONTAINER__ENABLED: "true"
       # Select the baked-in appsettings.docker.toml overlay
       APP_ENV: docker
     volumes:

@@ -38,6 +38,11 @@ const DEFAULT_KANIDM_HOST_PORT: u16 = 4001;
 /// partial tables never yield empty strings.
 #[derive(Debug, Clone, Deserialize)]
 pub struct TestcontainerSettings {
+    /// Master switch for the whole dev container chain (the
+    /// per-container `enabled` keys only select which containers
+    /// of the chain run).
+    #[serde(default = "default_enabled")]
+    pub enabled: bool,
     /// Startup mode: "auto" (detect), "host" or "in-container".
     #[serde(default = "default_mode")]
     pub mode: String,
@@ -64,6 +69,7 @@ pub struct TestcontainerSettings {
 impl Default for TestcontainerSettings {
     fn default() -> Self {
         Self {
+            enabled: default_enabled(),
             mode: default_mode(),
             network: default_network(),
             kanidm: KanidmContainerSettings::default(),
@@ -98,8 +104,8 @@ impl TestcontainerSettings {
 /// [testcontainer.kanidm]: the dev Kanidm server container.
 #[derive(Debug, Clone, Deserialize)]
 pub struct KanidmContainerSettings {
-    /// Start the dev containers at startup (gates the whole
-    /// chain).
+    /// Start the dev Kanidm server container (requires the
+    /// `[testcontainer]` master switch).
     #[serde(default = "default_enabled")]
     pub enabled: bool,
     /// Official kanidm/server image to run.
@@ -218,6 +224,7 @@ mod tests {
     #[test]
     fn absent_tables_yield_real_defaults() {
         let s = from_toml("").expect("empty config deserializes");
+        assert!(!s.enabled, "master switch defaults to off");
         assert_eq!(s.mode, "auto");
         assert_eq!(s.network, "kanidm-admin-dev");
         assert!(!s.kanidm.enabled);

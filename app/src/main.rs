@@ -25,30 +25,38 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
     let _frontend_handle = frontend::start(&settings.frontend, &manifest_dir)?;
-    // Container mode turns on only when the
-    // KANIDM_ADMIN_TESTCONTAINERS env var is set (see
-    // testcontainer::start); otherwise the configured [kanidm]
-    // settings pass through unchanged.
+    // Container mode turns on only when the [testcontainer]
+    // enabled master switch is set (see testcontainer::start);
+    // otherwise the configured [kanidm] settings pass through
+    // unchanged.
     let (kanidm_settings, _testcontainers_handle) = testcontainer::start(&settings).await?;
     let state = auth::app_state_from_settings(&kanidm_settings)?;
     let status_probe = status::probe_from_settings(&kanidm_settings)?;
-    let customization_store = customization::CustomizationStore::new(
+    let customization_state = std::sync::Arc::new(customization::CustomizationStore::new(
         settings.customization.effective_dir(&manifest_dir),
         settings.customization.max_size_bytes,
         settings.customization.theme.light.clone(),
         settings.customization.theme.dark.clone(),
-    );
+    ));
+    let status_state = status::StatusAppState {
+        probe: status_probe,
+        customization_page: settings.customization.page.enabled,
+    };
 
     let listener = TcpListener::bind(&settings.server.address).await?;
-    let router = routes::mount_fallback(
-        routes::build(
-            state,
-            status_probe,
-            customization::router(std::sync::Arc::new(customization_store)),
-        ),
-        &settings.frontend,
-        &manifest_dir,
+    // Asset serving is unconditional: the site header logo, login page
+    // and theme overrides request /customization/{slot} on every page.
+    let mut router = routes::build(
+        state,
+        status_state,
+        customization::serving_router(customization_state.clone()),
     );
+    // Management endpoints mount only when the standalone page is
+    // enabled; disabled means a 404 by absence for /api/customization*.
+    if settings.customization.page.enabled {
+        router = router.merge(customization::management_router(customization_state));
+    }
+    let router = routes::mount_fallback(router, &settings.frontend, &manifest_dir);
 
     info!("Server running at http://{}", settings.server.address);
     info!("Kanidm at {}", kanidm_settings.url);
