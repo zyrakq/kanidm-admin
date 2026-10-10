@@ -23,8 +23,8 @@ kanidm_client = { workspace = true }
 reqwest = { workspace = true }
 kanidm_proto = { workspace = true }
 time = { workspace = true }
-testcontainers = { workspace = true }
-rcgen = { workspace = true }
+testcontainers = { workspace = true, optional = true }
+rcgen = { workspace = true, optional = true }
 tokio-tungstenite = { workspace = true }
 futures-util = { workspace = true }
 
@@ -34,3 +34,12 @@ indoc = "2"
 tempfile = "3"
 tower = { workspace = true }
 uuid = { workspace = true }
+
+[features]
+default = ["customization", "testcontainer"]
+# Theme variant storage/upload API (customization/ module). Pulls in
+# axum's multipart feature, used only by customization/handlers.rs.
+customization = ["axum/multipart"]
+# Ephemeral dev container chain (testcontainer/ module): kanidm,
+# mail sender, mailpit. Pulls in the container driver crates.
+testcontainer = ["dep:testcontainers", "dep:rcgen"]

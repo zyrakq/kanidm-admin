@@ -6,6 +6,9 @@ export KANIDM_ADMIN_TESTCONTAINERS := "1"
 run:
     cargo run
 
+run-min:
+    cargo run --no-default-features
+
 [no-exit-message]
 kill:
     #!/usr/bin/env bash

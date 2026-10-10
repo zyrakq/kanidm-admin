@@ -37,12 +37,29 @@ use crate::status::{self, StatusAppState};
 ///   GET/PUT/DELETE /api/customization[/{slot}] — customization management
 ///                 (merged by main.rs only when the page flag is on)
 ///   GET  /customization/{slot}   — serve an uploaded customization file
+///
+/// The `customization_routes` parameter exists only under the
+/// `customization` feature; without it the customization routes are
+/// compiled out and `build` takes two arguments.
+#[cfg(feature = "customization")]
 pub fn build(
     state: AppState,
     status_state: StatusAppState,
     customization_routes: Router,
 ) -> Router {
-    let router = Router::new()
+    build_core(state, status_state).merge(customization_routes)
+}
+
+/// Feature-off variant of [`build`]: identical core routes, no
+/// customization merge.
+#[cfg(not(feature = "customization"))]
+pub fn build(state: AppState, status_state: StatusAppState) -> Router {
+    build_core(state, status_state)
+}
+
+/// Core routes shared by both `build` variants.
+fn build_core(state: AppState, status_state: StatusAppState) -> Router {
+    Router::new()
         .route("/api/health", get(health_check))
         .route("/api/hello", get(hello_handler))
         .route(
@@ -51,13 +68,8 @@ pub fn build(
         )
         .merge(auth_routes())
         .merge(crate::proxy::bulk::routes())
-        .merge(crate::proxy::handler::routes());
-
-    router.with_state(state)
-    // The customization router carries its own state (CustomizationState), so it
-    // is a stateless `Router<()>`; merge it only after `with_state`
-    // has turned the main router stateless too (axum 0.8 semantics).
-    .merge(customization_routes)
+        .merge(crate::proxy::handler::routes())
+        .with_state(state)
 }
 
 /// Attach the SPA fallback service chosen by `frontend.serve_from`.

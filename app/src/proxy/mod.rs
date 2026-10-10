@@ -9,5 +9,7 @@ pub mod error_map;
 pub mod forwarder;
 pub mod handler;
 
-#[cfg(test)]
+// The integration tests drive the real testcontainer chain, so they
+// only exist when that subsystem is compiled in.
+#[cfg(all(test, feature = "testcontainer"))]
 mod integration;

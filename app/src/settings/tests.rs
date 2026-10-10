@@ -304,6 +304,7 @@ fn missing_kanidm_section_is_rejected() {
     );
 }
 
+#[cfg(feature = "testcontainer")]
 #[test]
 fn testcontainer_base_defaults_are_correct() {
     let s = settings_from_toml(BASE_TOML, "").expect("should deserialize");
@@ -321,6 +322,7 @@ fn testcontainer_base_defaults_are_correct() {
     assert_eq!(s.testcontainer.mailpit.ui_port, 8025);
 }
 
+#[cfg(feature = "testcontainer")]
 #[test]
 fn dev_overlay_enables_the_mail_chain() {
     let s = settings_from_toml(BASE_TOML, DEV_TOML).expect("should deserialize");
@@ -341,6 +343,7 @@ fn dev_overlay_enables_the_mail_chain() {
     assert_eq!(s.testcontainer.kanidm.image, "kanidm/server:1.11.1");
 }
 
+#[cfg(feature = "testcontainer")]
 #[test]
 fn absent_testcontainer_section_yields_defaults() {
     // BASE_TOML minus every [testcontainer] table: the serde
@@ -364,6 +367,7 @@ fn absent_testcontainer_section_yields_defaults() {
     assert_eq!(s.testcontainer.mailpit.ui_port, 8025);
 }
 
+#[cfg(feature = "testcontainer")]
 #[test]
 fn env_var_disables_kanidm_testcontainer() {
     let env = HashMap::from([(
@@ -377,6 +381,7 @@ fn env_var_disables_kanidm_testcontainer() {
     );
 }
 
+#[cfg(feature = "testcontainer")]
 #[test]
 fn env_var_enables_sender_through_snake_alias() {
     // Config env keys are snake_case; the kebab-renamed TOML key
@@ -392,6 +397,7 @@ fn env_var_enables_sender_through_snake_alias() {
     );
 }
 
+#[cfg(feature = "testcontainer")]
 #[test]
 fn env_var_overrides_mailpit_ui_port() {
     let env = HashMap::from([(
@@ -405,6 +411,7 @@ fn env_var_overrides_mailpit_ui_port() {
     );
 }
 
+#[cfg(feature = "testcontainer")]
 #[test]
 fn env_var_overrides_mode() {
     let env = HashMap::from([(
@@ -420,6 +427,7 @@ fn env_var_overrides_mode() {
 
 // --- [customization] section ----------------------------------------------
 
+#[cfg(feature = "customization")]
 #[test]
 fn customization_defaults_when_section_absent() {
     let s = settings_from_toml(BASE_TOML, "").expect("should deserialize");
@@ -436,6 +444,7 @@ fn customization_defaults_when_section_absent() {
     assert!(s.customization.page.enabled, "page should default to enabled");
 }
 
+#[cfg(feature = "customization")]
 #[test]
 fn customization_overlay_parses() {
     let overlay = indoc! {r#"
@@ -453,6 +462,7 @@ fn customization_overlay_parses() {
     );
 }
 
+#[cfg(feature = "customization")]
 #[test]
 fn env_var_overrides_customization_dir() {
     let env = HashMap::from([(
@@ -467,6 +477,7 @@ fn env_var_overrides_customization_dir() {
     );
 }
 
+#[cfg(feature = "customization")]
 #[test]
 fn customization_theme_defaults_when_absent() {
     let s = settings_from_toml(BASE_TOML, "").expect("should deserialize");
@@ -474,6 +485,7 @@ fn customization_theme_defaults_when_absent() {
     assert_eq!(s.customization.theme.dark, "", "theme.dark should default to empty");
 }
 
+#[cfg(feature = "customization")]
 #[test]
 fn customization_theme_overlay_parses() {
     let overlay = indoc! {r#"
@@ -490,6 +502,7 @@ fn customization_theme_overlay_parses() {
     assert_eq!(s.customization.theme.dark, "night.css");
 }
 
+#[cfg(feature = "customization")]
 #[test]
 fn env_var_overrides_customization_theme() {
     let env = HashMap::from([
@@ -513,6 +526,7 @@ fn env_var_overrides_customization_theme() {
     );
 }
 
+#[cfg(feature = "customization")]
 #[test]
 fn customization_page_defaults_to_enabled() {
     let s = settings_from_toml(BASE_TOML, "").unwrap();
@@ -522,6 +536,7 @@ fn customization_page_defaults_to_enabled() {
     );
 }
 
+#[cfg(feature = "customization")]
 #[test]
 fn customization_page_overlay_can_disable() {
     let s = settings_from_toml(
@@ -535,6 +550,7 @@ fn customization_page_overlay_can_disable() {
     assert!(!s.customization.page.enabled);
 }
 
+#[cfg(feature = "customization")]
 #[test]
 fn env_var_overrides_customization_page_enabled() {
     let s = settings_from_layers(
@@ -552,6 +568,7 @@ fn env_var_overrides_customization_page_enabled() {
     );
 }
 
+#[cfg(feature = "customization")]
 #[test]
 fn env_var_can_re_enable_customization_page() {
     // The overlay disables it; the env var wins (later layer).

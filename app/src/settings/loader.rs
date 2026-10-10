@@ -1,10 +1,12 @@
 use config::{Config, ConfigError, Environment, File};
 use serde::Deserialize;
 
+#[cfg(feature = "customization")]
 use super::customization::CustomizationSettings;
 use super::frontend::FrontendSettings;
 use super::kanidm::KanidmSettings;
 use super::server::ServerSettings;
+#[cfg(feature = "testcontainer")]
 use super::testcontainer::TestcontainerSettings;
 
 #[derive(Debug, Deserialize)]
@@ -12,11 +14,14 @@ pub struct Settings {
     pub server: ServerSettings,
     pub frontend: FrontendSettings,
     pub kanidm: KanidmSettings,
+    /// Optional: uploaded customization files and theme variants.
+    #[cfg(feature = "customization")]
+    #[serde(default)]
+    pub customization: CustomizationSettings,
     /// Optional: ephemeral dev containers (kanidm + the mail
     /// chain). An absent section means defaults (disabled); see
     /// settings/testcontainer.rs.
-    #[serde(default)]
-    pub customization: CustomizationSettings,
+    #[cfg(feature = "testcontainer")]
     #[serde(default)]
     pub testcontainer: TestcontainerSettings,
 }
