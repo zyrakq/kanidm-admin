@@ -20,12 +20,14 @@ used:
 3. When you are done, set `[customization.page] enabled = false` (or leave
    it on, if the page should stay available).
 
-Disabling the page removes the footer link and the `/api/customization*`
-management routes entirely (404 by absence) — but **asset serving is never
-gated**: the uploaded logo, favicon and theme overrides keep working on
-every page, because the site header, login page and theme-override
-`<link>` elements request them all the time. So the typical cycle is:
-enable → edit → disable, with the results staying in place.
+Disabling the page removes the footer link and the mutating
+`/api/customization*` management routes entirely (404 by absence) — but
+**asset serving and the read-only manifest are never gated**: the uploaded
+logo, favicon and theme overrides keep working on every page, because the
+site header, login page, favicon and theme-override `<link>` elements
+resolve them all the time (the manifest is what tells the frontend which
+overrides exist). So the typical cycle is: enable → edit → disable, with
+the results staying in place.
 
 ## Image slots
 

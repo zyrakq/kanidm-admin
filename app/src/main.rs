@@ -74,8 +74,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             status_state,
             customization::serving_router(customization_state.clone()),
         );
-        // Management endpoints mount only when the standalone page is
-        // enabled; disabled means a 404 by absence for /api/customization*.
+        // Mutating management endpoints mount only when the standalone
+        // page is enabled; disabled means a 404 by absence for them.
+        // The read-only manifest stays mounted with asset serving so
+        // logo/favicon overrides keep resolving with the page off.
         if settings.customization.page.enabled {
             router = router.merge(customization::management_router(customization_state));
         }

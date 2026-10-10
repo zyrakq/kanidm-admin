@@ -33,10 +33,11 @@ pub struct ThemeSettings {
 }
 
 /// Standalone customization page toggle (`[customization.page]`).
-/// Controls only the management surface: the `/api/customization*`
-/// routes and the footer link. Asset serving (`GET /customization/{slot}`)
-/// is never gated — the site header logo, login page and theme
-/// overrides depend on it on every page.
+/// Controls only the mutating management surface: the upload/remove/
+/// selection `/api/customization*` routes and the footer link. The
+/// read-only manifest and asset serving (`GET /customization/{slot}`)
+/// are never gated — the site header logo, login page and favicon
+/// resolve their overrides through the manifest on every page.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct PageSettings {
     /// Whether the standalone customization page is enabled.
