@@ -1,7 +1,7 @@
 {
   "name": "kanidm-admin",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A modern web-based administration console for Kanidm",
   "license": "MIT",
   "author": "Zyrakq <serg.shehov@tutanota.com>",
