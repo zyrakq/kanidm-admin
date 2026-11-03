@@ -2,10 +2,11 @@
 //
 // The catch-all reverse proxy: /api/kanidm/{*path} -> {kanidm}/{path}.
 // Pipeline: cookie -> local token decode (401 envelope) -> allowlist
-// (403) -> write-privilege precheck for mutating methods (403
-// reauth_required, BEFORE any upstream call, so withStepUp works for
-// every proxied write) -> forward (bearer, content-type verbatim,
-// buffered body) -> map response (status preserved, error envelope).
+// (403) -> write-privilege precheck for mutating methods AND the
+// credential-intent GETs (403 reauth_required, BEFORE any upstream call,
+// so withStepUp works for every proxied write) -> forward (bearer,
+// content-type verbatim, buffered body) -> map response (status
+// preserved, error envelope).
 
 use axum::body::{to_bytes, Body, Bytes};
 use axum::extract::{DefaultBodyLimit, Request, State};
@@ -67,14 +68,36 @@ pub async fn proxy(State(state): State<AppState>, request: Request) -> Response 
             .into_response();
     }
 
-    // 3. Write-privilege precheck for mutating methods.
-    if matches!(
+/// True for the credential-intent GETs, which mint server-side state
+/// despite the method (Kanidm itself notes these shouldn't be GETs):
+/// GET /v1/person/{id}/_credential/_update_intent[/{ttl}].
+fn is_credential_intent_path(path: &str) -> bool {
+    let path = path.split('?').next().unwrap_or(path);
+    let segs: Vec<&str> = path.split('/').collect();
+    // ["", "v1", "person", id, "_credential", "_update_intent"] + [ttl]?
+    if segs.len() != 6 && segs.len() != 7 {
+        return false;
+    }
+    segs[1] == "v1"
+        && segs[2] == "person"
+        && !segs[3].is_empty()
+        && segs[4] == "_credential"
+        && segs[5] == "_update_intent"
+        && (segs.len() == 6 || segs[6].chars().all(|c| c.is_ascii_digit()))
+}
+
+    // 3. Write-privilege precheck for mutating methods, plus the
+    // credential-intent GETs (see above).
+    let needs_privilege = matches!(
         method,
         Method::POST | Method::PUT | Method::PATCH | Method::DELETE
-    ) && !matches!(
-        write_privilege(&uat, now),
-        kanidm_proto::internal::PrivilegesActive::True
-    ) {
+    ) || (method == Method::GET && is_credential_intent_path(&upstream_path));
+    if needs_privilege
+        && !matches!(
+            write_privilege(&uat, now),
+            kanidm_proto::internal::PrivilegesActive::True
+        )
+    {
         return ApiError::new(
             ApiErrorCode::ReauthRequired,
             "This operation requires elevated privileges. Re-authenticate to continue.",
@@ -391,6 +414,82 @@ mod tests {
                 "/api/kanidm/v1/person",
                 &live_token(),
                 r#"{"attrs":{"name":["test"]}}"#,
+            ))
+            .await
+            .expect("router call");
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(forwarder.calls(), 1);
+    }
+
+    #[tokio::test]
+    async fn intent_get_with_readonly_token_short_circuits_to_reauth_required() {
+        let forwarder = Arc::new(MockForwarder::default());
+        let response = router(Arc::clone(&forwarder))
+            .oneshot(request(
+                "GET",
+                "/api/kanidm/v1/person/demo_user/_credential/_update_intent/3600",
+                &readonly_token(),
+                "",
+            ))
+            .await
+            .expect("router call");
+
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
+        let bytes = to_bytes(response.into_body(), usize::MAX).await.expect("body");
+        let body: serde_json::Value = serde_json::from_slice(&bytes).expect("json");
+        assert_eq!(body["error"]["code"], "reauth_required");
+        assert_eq!(forwarder.calls(), 0, "precheck must fire before forwarding");
+    }
+
+    #[tokio::test]
+    async fn intent_get_without_ttl_with_readonly_token_short_circuits() {
+        let forwarder = Arc::new(MockForwarder::default());
+        let response = router(Arc::clone(&forwarder))
+            .oneshot(request(
+                "GET",
+                "/api/kanidm/v1/person/demo_user/_credential/_update_intent",
+                &readonly_token(),
+                "",
+            ))
+            .await
+            .expect("router call");
+
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
+        assert_eq!(forwarder.calls(), 0);
+    }
+
+    #[tokio::test]
+    async fn intent_get_with_live_window_forwarded() {
+        let forwarder = Arc::new(MockForwarder::with_response(ok_json_response(
+            br#"{"token":"abc","expiry_time":123}"#,
+        )));
+
+        let response = router(Arc::clone(&forwarder))
+            .oneshot(request(
+                "GET",
+                "/api/kanidm/v1/person/demo_user/_credential/_update_intent/3600",
+                &live_token(),
+                "",
+            ))
+            .await
+            .expect("router call");
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(forwarder.calls(), 1);
+    }
+
+    #[tokio::test]
+    async fn similar_paths_are_not_treated_as_intent() {
+        // Same prefix, different leaf: plain read, must forward, never reauth.
+        let forwarder = Arc::new(MockForwarder::with_response(ok_json_response(br#"[]"#)));
+
+        let response = router(Arc::clone(&forwarder))
+            .oneshot(request(
+                "GET",
+                "/api/kanidm/v1/person/demo_user/_credential/_status",
+                &readonly_token(),
+                "",
             ))
             .await
             .expect("router call");
